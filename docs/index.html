@@ -8,6 +8,44 @@
   <meta name="description" content="Short Textbooks on Various Topics Written by Generative AI">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
+  <style>
+    #mobile-sidebar-toggle {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      #mobile-sidebar-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        position: fixed;
+        left: 1rem;
+        top: 1rem;
+        z-index: 1000;
+        padding: 0.8rem 1rem;
+        border: 0;
+        border-radius: 999px;
+        background: #2563eb;
+        color: #fff;
+        box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25);
+        font-size: 0.95rem;
+        font-weight: 700;
+        line-height: 1;
+      }
+
+      #mobile-sidebar-toggle:hover {
+        background: #1d4ed8;
+      }
+
+      #mobile-sidebar-toggle .icon {
+        font-size: 1.1rem;
+      }
+
+      .sidebar-toggle {
+        display: none !important;
+      }
+    }
+  </style>
 </head>
 
 <body>
@@ -57,6 +95,39 @@
   <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-python.min.js"></script>
+  <script>
+    function addMobileSidebarButton() {
+      if (document.getElementById('mobile-sidebar-toggle')) {
+        return
+      }
+
+      const toggle = document.querySelector('.sidebar-toggle')
+      if (!toggle) {
+        setTimeout(addMobileSidebarButton, 200)
+        return
+      }
+
+      const button = document.createElement('button')
+      button.id = 'mobile-sidebar-toggle'
+      button.type = 'button'
+      button.setAttribute('aria-label', '目次を開く')
+      button.innerHTML = '<span>目次</span>'
+      button.addEventListener('click', function (event) {
+        event.preventDefault()
+        event.stopPropagation()
+        document.body.classList.toggle('close')
+      })
+
+      document.body.appendChild(button)
+    }
+
+    window.addEventListener('load', function () {
+      addMobileSidebarButton()
+    })
+    document.addEventListener('DOMContentLoaded', function () {
+      addMobileSidebarButton()
+    });
+  </script>
 </body>
 
 </html>
