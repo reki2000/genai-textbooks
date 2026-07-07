@@ -862,7 +862,7 @@ $$A_\mu \to A_\mu + \frac{1}{e}\partial_\mu\alpha$$
 「$A_\mu$ がこう変換してくれるなら、寄生虫は **ちょうど食われて** 消えるお。
 検算するお。$\phi' = e^{i\alpha}\phi$、$A'_\mu = A_\mu + \frac{1}{e}\partial_\mu\alpha$ で
 
-$$D'_\mu\phi' = e^{i\alpha}\Big(\partial_\mu\phi + \underbrace{i(\partial_\mu\alpha)\phi} - ieA_\mu\phi \underbrace{- i(\partial_\mu\alpha)\phi} \Big) = e^{i\alpha}D_\mu\phi$$
+$$D'_\mu\phi' = e^{i\alpha}\Big(\partial_\mu\phi + \underbrace{i(\partial_\mu\alpha)\phi}_{\text{寄生虫}} - ieA_\mu\phi \underbrace{- i(\partial_\mu\alpha)\phi}_{A_\mu\text{の補正}} \Big) = e^{i\alpha}D_\mu\phi$$
 
 **完璧に相殺だお！！**」
 
@@ -1041,7 +1041,7 @@ $$\partial_\lambda F_{\mu\nu} + \partial_\mu F_{\nu\lambda} + \partial_\nu F_{\l
 「$F_{\mu\nu}$ を部品にすれば (1) は自動。添字を縮約してスカラーにすると、
 2次で作れるのは実質 $F_{\mu\nu}F^{\mu\nu}$ だお。係数は慣例に合わせて」
 
-$$\mathcal{L} \small{A} = -\frac{1}{4}F_{\mu\nu}F^{\mu\nu}$$
+$$\mathcal{L}_A = -\frac{1}{4}F_{\mu\nu}F^{\mu\nu}$$
 
 「これをオイラー・ラグランジュにかけると……$A_\nu$ で変分して」
 
@@ -1071,7 +1071,7 @@ $$\mathcal{L}_{\rm QED} = \bar\psi\left(i\gamma^\mu D_\mu - m\right)\psi - \frac
 
 「展開すると $D_\mu = \partial_\mu - ieA_\mu$ から」
 
-$$\mathcal{L}_{\rm QED} = \underbrace{\bar\psi(i\gamma^\mu\partial_\mu - m)\psi} \underbrace{-\frac{1}{4}F_{\mu\nu}F^{\mu\nu}} + \underbrace{e\bar\psi\gamma^\mu\psi A_\mu}$$
+$$\mathcal{L}_{\rm QED} = \underbrace{\bar\psi(i\gamma^\mu\partial_\mu - m)\psi}_{\text{自由な電子}} \underbrace{-\frac{1}{4}F_{\mu\nu}F^{\mu\nu}}_{\text{自由な電磁場}} + \underbrace{e\bar\psi\gamma^\mu\psi A_\mu}_{\text{相互作用}}$$
 
 「相互作用項の $\bar\psi\gamma^\mu\psi$ は、ディラック場の位相対称性のネーター電流だお。
 スカラー場のときと同じで、**電流と $A_\mu$ の結合が自動で出る**」
@@ -1251,7 +1251,7 @@ U(1) は非可換版の特別な場合として吸収された。上位互換だ
 
 で、運動項は $F$ の2乗のトレース（トレースは $UFU^\dagger$ の $U$ を巡回で消すため）」
 
-$$\mathcal{L} \small{A} = -\frac{1}{2} \mathrm{tr}  \left(F_{\mu\nu} F^{\mu\nu} \right)$$
+$$\mathcal{L}_A = -\frac{1}{2} \mathrm{tr}  \left(F_{\mu\nu} F^{\mu\nu} \right)$$
 
 「……ちょっと待つお。この中身、ヤバいものが入ってるお。
 $F = \partial A - \partial A - ig[A, A]$ の2乗だから、展開すると
@@ -1815,7 +1815,7 @@ $$\mathcal{L}_{\rm Yukawa} = -y\bar\psi_L\phi\psi_R + (\text{複素共役})$$
 「（$y$ は無次元の結合定数）。これは3つの場の積の、ただの相互作用項。質量項じゃないお。
 でもヒッグス場を真空値のまわりで $\phi \to \frac{1}{\sqrt2}(v + h)$ と展開すると」
 
-$$\mathcal{L}_{\rm Yukawa} = -\underbrace{\frac{yv}{\sqrt2}}\bar\psi\psi - \frac{y}{\sqrt2}h\bar\psi\psi$$
+$$\mathcal{L}_{\rm Yukawa} = -\underbrace{\frac{yv}{\sqrt2}}_{=m_e}\bar\psi\psi - \frac{y}{\sqrt2}h\bar\psi\psi$$
 
 「第1項、**電子の質量項が真空から生えてきたお**。$m_e = \dfrac{yv}{\sqrt2}$。
 電子の質量も、電子そのものの属性じゃなくて、
@@ -1949,25 +1949,15 @@ $m_W \approx 80\mathrm{GeV}$、$m_Z \approx 91\mathrm{GeV}$。
 「振り返るお。
 
 **シュレーディンガー方程式と相対論の矛盾**（動機）
-
 → $E^2$ の量子化は負確率で死に（クライン・ゴルドン）、1階化しても負エネルギーが残り（ディラック）、それは反物質の予言に化けた
-
 → そもそも $E = mc^2$ が **1粒子という枠組み** を壊す → **場の量子論** へ
-
 → **ネーター**：対称性は保存則の製造機。捨てたはずの負の密度は電荷密度として復活
-
 → **「一斉に」への疑い**：位相の基準は場所ごとに自由であるべき（ゲージ原理）
-
 → $D_\mu$、$A_\mu$、$F_{\mu\nu}$：微分の修理から電磁気学が丸ごと再発明され、補償場の正体はベクトルポテンシャルだった
-
 → 質量項はゲージ不変性が禁止 → だが弱い力は重い媒介粒子を要求 → **三竦み**
-
 → 『法則の対称性』と『真空の対称性』は別物 → **メキシカンハット、ヒッグス機構**
-
 → ゴールドストーンは食われ、W・Z は重く、光子は残り、電子は水飴をまとう
-
 → **$SU(3)\times SU(2)\times U(1)$**
-
 → g−2 の12桁、中性カレント、W・Z の質量、そしてヒッグス粒子
 
 ……今回も、引っかかった場所が全部要所だったお。

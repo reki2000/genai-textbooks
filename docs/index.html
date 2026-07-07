@@ -9,6 +9,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
   <link rel="icon" href="./assets/favicon.png" type="image/png">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
   <style>
     #mobile-sidebar-toggle {
       display: none;
@@ -52,16 +53,6 @@
 <body>
   <div id="app"></div>
   <script>
-    window.MathJax = {
-      tex: {
-        inlineMath: [['$', '$'], ['\\(', '\\)']],
-        displayMath: [['$$', '$$'], ['\\[', '\\]']],
-        packages: { '[+]': ['ams', 'bbox'] }
-      },
-      svg: {
-        fontCache: 'global'
-      }
-    }
 
     window.$docsify = {
       name: '<span style="display:flex; align-items:center; margin-left:12px;"><img src="./assets/favicon.png" alt="genai-textbooks" width="36" height="36" style="opacity:0.85;"> genai-textbooks</span>',
@@ -77,25 +68,13 @@
         noData: '見つかりませんでした',
         depth: 3
       },
-      plugins: [
-        function (hook) {
-          function renderMath() {
-            if (window.MathJax && typeof MathJax.typesetPromise === 'function') {
-              MathJax.typesetPromise()
-            } else {
-              setTimeout(renderMath, 100)
-            }
-          }
 
-          hook.doneEach(function () {
-            renderMath()
-          })
-        }
-      ]
     };
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/docsify@4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify-katex@latest/dist/docsify-katex.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@alertbox/docsify-footer/dist/docsify-footer.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
