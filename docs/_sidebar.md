@@ -4,6 +4,7 @@
   - [やる夫が文部科学大臣になったようです](/books/education)
   - [やる夫が世界平和を目指すようです](/books/world-peace)
   - [やる夫が夢見るエネルギー政策](/books/energy-policy)
+  - [やる夫が悟りを開きそうです](/books/buddhism)
 
 - 技術
   - [やる夫が高層ビルを建てるそうです](/books/skyscraper)
