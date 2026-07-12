@@ -517,9 +517,10 @@ func FlatMapSlice[T, U any](xs []T, f func(T) []U) []U {
 grandReports := FlatMapSlice(FlatMapSlice([]Employee{e}, Reports), Reports)
 ```
 
-「……Option、Result、スライス。中身も用途も全然違うのに、
+「……いま書いた Option とスライス、それにさっきお前が言ってた Result も。
+　中身も用途も全然違うのに、
 　**Map があって、二重包装ができて、Flatten で潰して、FlatMap になる**。
-　3回連続で同じ映画を見た気分だお。これは偶然じゃないお」
+　同じ映画を何度も見せられてる気分だお。これは偶然じゃないお」
 
 **やらない夫**：
 「偶然ではない。だが名前を与えるのはまだ先だ。
@@ -810,7 +811,7 @@ $$\text{結合法則：}\quad (m \mathbin{>\!\!>\!\!=} f) \mathbin{>\!\!>\!\!=} 
 **やらない夫**：
 「あるが、正確な続柄を言うにはまだ道具が足りない。第6幕まで取っておけ。
 　それより先に、お前はもっと差し迫った問題を抱えているはずだ。
-　Option、Result、スライス、Writer──FlatMap を **何回書いた**？」
+　Option、スライス、Writer──FlatMap を **何回書いた**？」
 
 ---
 
@@ -819,8 +820,8 @@ $$\text{結合法則：}\quad (m \mathbin{>\!\!>\!\!=} f) \mathbin{>\!\!>\!\!=} 
 ---
 
 **やる夫**：
-「4回だお。しかも中身はほぼ同じ流れ作業だお。
-　プログラマとして、同じコードを4回書いたら共通化するのが本能だお。
+「3回だお。しかも中身はほぼ同じ流れ作業だお。
+　プログラマとして、同じコードを3回書いたら共通化するのが本能だお。
 　インターフェースを切るお。
 
 　えーと、『FlatMap を持つ型』を表せばいいから……」
@@ -872,8 +873,8 @@ instance Monad Maybe where
 
 「……あっ。`class Monad m` の **m が、作りかけの型のまま変数になってる** お。
 　`m a` って書けてる。Goで書けなかった ??? の行が、ここでは普通に書けてるお。
-　やる夫が4回書いた FlatMap は、Haskellなら
-　`instance Monad Option`、`instance Monad Writer` って **4回の実装＋1個の共通宣言** になる。
+　やる夫が3回書いた FlatMap は、Haskellなら
+　`instance Monad Option`、`instance Monad Writer` って **型ごとの実装＋1個の共通宣言** になる。
 　共通宣言が書けるから、`sequence` とか `mapM` みたいな
 　**どのモナドでも動く汎用関数** が書けるんだお。入門書に出てきた謎関数の正体だお」
 
