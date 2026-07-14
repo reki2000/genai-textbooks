@@ -43,6 +43,16 @@ def is_punct(ch):
     return ch != "" and unicodedata.category(ch)[0] in ("P", "S")
 
 
+def is_ascii_punct(ch):
+    # ASCII範囲の約物のみ（半角括弧、引用符など）
+    # 全角約物（。、！？）や全角括弧（（））は除外
+    if ch == "":
+        return False
+    code = ord(ch)
+    # ASCII punctuation: ! " # $ % & ' ( ) * + , - . / : ; < = > ? @ [ \ ] ^ _ ` { | } ~
+    return 0x0021 <= code <= 0x007E and ch not in "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+
+
 def left_flanking(before, after):
     if is_space(after):
         return False
@@ -71,27 +81,57 @@ def process_line(body):
 
     if any(len(m.group()) != 2 for m in runs):
         return body, False, ["長さ2以外の * の連続があるためスキップ"]
-    if len(runs) % 2 == 1:
-        return body, False, ["** が奇数個あり対応が取れないためスキップ"]
 
     inserts = []  # 半角スペースを挿入する位置
     warns = []
-    for k in range(0, len(runs), 2):
-        op, cl = runs[k], runs[k + 1]
-        ob = masked[op.start() - 1] if op.start() > 0 else ""
-        oa = masked[op.end()] if op.end() < len(masked) else ""
-        cb = masked[cl.start() - 1] if cl.start() > 0 else ""
-        ca = masked[cl.end()] if cl.end() < len(masked) else ""
 
-        if not left_flanking(ob, oa):
-            if is_space(oa):
-                warns.append(f"col {op.start() + 1}: ** の直後が空白（手動修正が必要）")
-            else:
-                inserts.append(op.start())
-        if not right_flanking(cb, ca):
-            if is_space(cb):
-                warns.append(f"col {cl.start() + 1}: ** の直前が空白（手動修正が必要）")
-            else:
+    # 奇数個の場合：複数行強調の可能性
+    if len(runs) % 2 == 1:
+        # 複数の ** がある場合は最初をopening、最後をclosingとして処理
+        # 単一の ** の場合は処理対象外（複数行強調の継続の可能性）
+        if len(runs) > 1:
+            op = runs[0]
+            cl = runs[-1]
+            ob = masked[op.start() - 1] if op.start() > 0 else ""
+            oa = masked[op.end()] if op.end() < len(masked) else ""
+            cb = masked[cl.start() - 1] if cl.start() > 0 else ""
+            ca = masked[cl.end()] if cl.end() < len(masked) else ""
+
+            if not left_flanking(ob, oa):
+                if is_space(oa):
+                    warns.append(f"col {op.start() + 1}: ** の直後が空白（手動修正が必要）")
+                else:
+                    inserts.append(op.start())
+
+            if not right_flanking(cb, ca):
+                if is_space(cb):
+                    warns.append(f"col {cl.start() + 1}: ** の直前が空白（手動修正が必要）")
+                else:
+                    inserts.append(cl.end())
+            # 直前が半角約物で直後が句点の場合は修正対象
+            elif is_ascii_punct(cb) and ca in ('。', '！', '？'):
+                inserts.append(cl.end())
+    else:
+        # 偶数個（通常の単一行強調）
+        for k in range(0, len(runs), 2):
+            op, cl = runs[k], runs[k + 1]
+            ob = masked[op.start() - 1] if op.start() > 0 else ""
+            oa = masked[op.end()] if op.end() < len(masked) else ""
+            cb = masked[cl.start() - 1] if cl.start() > 0 else ""
+            ca = masked[cl.end()] if cl.end() < len(masked) else ""
+
+            if not left_flanking(ob, oa):
+                if is_space(oa):
+                    warns.append(f"col {op.start() + 1}: ** の直後が空白（手動修正が必要）")
+                else:
+                    inserts.append(op.start())
+            if not right_flanking(cb, ca):
+                if is_space(cb):
+                    warns.append(f"col {cl.start() + 1}: ** の直前が空白（手動修正が必要）")
+                else:
+                    inserts.append(cl.end())
+            # 直前が半角約物で直後が句点の場合は修正対象
+            elif is_ascii_punct(cb) and ca in ('。', '！', '？'):
                 inserts.append(cl.end())
 
     for pos in sorted(inserts, reverse=True):
