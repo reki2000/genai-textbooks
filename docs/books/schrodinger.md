@@ -1067,7 +1067,7 @@ $$= \frac{m\omega}{2\hbar} \cdot \frac{-2i}{m\omega} \cdot i\hbar = \frac{m\omeg
 
 $$\boxed{[\hat{a}, \hat{a}^\dagger] = 1}$$」
 
-**やらない夫**：
+　**やらない夫**：
 　「ハミルトニアンを $\hat{a}, \hat{a}^\dagger$ で書くと：
 
 $$\hat{H} = \hbar\omega\left(\hat{a}^\dagger\hat{a} + \frac{1}{2}\right)$$
@@ -1075,7 +1075,7 @@ $$\hat{H} = \hbar\omega\left(\hat{a}^\dagger\hat{a} + \frac{1}{2}\right)$$
 　ここで $\hat{N} = \hat{a}^\dagger\hat{a}$ を**数演算子**と呼ぶ。
 　$[\hat{a}, \hat{a}^\dagger] = 1$ から $\hat{a}$ と $\hat{a}^\dagger$ の作用を導け」
 
-**やる夫**：
+　**やる夫**：
 　「$\hat{N}|n\rangle = n|n\rangle$ とすると、$\hat{a}|n\rangle$ は $\hat{N}$ の固有状態かお？
 　計算すると：
 
@@ -1096,16 +1096,16 @@ $$\boxed{E_n = \hbar\omega\left(n + \frac{1}{2}\right)}, \quad n = 0, 1, 2, \ldo
 　等間隔 $\Delta E = \hbar\omega$ だお。微分方程式を一切解かずに、
 　$[\hat{a}, \hat{a}^\dagger] = 1$ という代数関係だけで全固有値が出たお！」
 
-**やらない夫**：
+　**やらない夫**：
 　「$\hat{a}^\dagger$ は『エネルギー量子を1個追加する』演算子だ。
 　場の量子論ではこれが『光子を1個生成する』演算子になる。
 　調和振動子は光の量子化への直通ルートだ」
 
----
+　---
 
 ### 6-3　水素原子 ── s, p, d 軌道の起源
 
-**やらない夫**：
+　**やらない夫**：
 　「3次元に拡張しよう。
 　水素原子のポテンシャルは $V(r) = -e^2/(4\pi\epsilon_0 r)$。
 　球対称だから球座標 $(r, \theta, \phi)$ で変数分離する：
@@ -1120,14 +1120,14 @@ $$\psi_{nlm}(r, \theta, \phi) = R_{nl}(r) \cdot Y_l^m(\theta, \phi)$$
 | $l$（方位量子数）| $0, 1, \ldots, n{-}1$ | 角運動量の大きさ $L = \hbar\sqrt{l(l+1)}$ |
 | $m$（磁気量子数）| $-l, \ldots, +l$ | 角運動量の $z$ 成分 $L_z = m\hbar$ |
 
-**やる夫**：
+　**やる夫**：
 　「$E_n = -13.6/n^2$ eV……これ、第1幕でボーア模型から出した式と同じだお！」
 
-**やらない夫**：
+　**やらない夫**：
 　「そうだ。そしてここで第1幕の保留を回収する。
 　**ボーア模型はなぜ水素だけで正しかったのか？**」
 
-**やる夫**：
+　**やる夫**：
 　「……えーと、ボーア模型では角運動量 $L = n\hbar$ と仮定した。
 　でもSEからは $L = \hbar\sqrt{l(l+1)}$ で、$l$ は $0$ から $n-1$ まで取れる。
 　
@@ -1144,7 +1144,7 @@ $$\psi_{nlm}(r, \theta, \phi) = R_{nl}(r) \cdot Y_l^m(\theta, \phi)$$
 
 > **伏線③回収**：ボーア模型が水素で成功したのは縮退による偶然。SEは角運動量量子数 $l$ を自然に生成し、軌道の形まで決定する。
 
-**やらない夫**：
+　**やらない夫**：
 　「完璧な回収だ。軌道の形を確認しよう。
 
 　$Y_l^m(\theta, \phi)$ は**球面調和関数**で、角度方向の波動関数だ。
@@ -1154,15 +1154,15 @@ $$\psi_{nlm}(r, \theta, \phi) = R_{nl}(r) \cdot Y_l^m(\theta, \phi)$$
 　
 　節面の数は $l$ に等しい。$l$ が大きいほど複雑な角度依存性を持つ」
 
----
+　---
 
 ### 6-4　混成軌道 ── 固有解ではない
 
-**やる夫**：
+　**やる夫**：
 　「s, p, d はSEの固有解だってのは分かったお。
 　じゃあ $sp^2$ 混成軌道ってのは何なんだお？」
 
-**やらない夫**：
+　**やらない夫**：
 　「結論から言う。**$sp^2$ 混成軌道はSEの固有解ではない。**
 　人間が手で固有解を線形結合した近似だ。
 　
@@ -1178,7 +1178,7 @@ $$|sp^2_3\rangle = \frac{1}{\sqrt{3}}|s\rangle - \frac{1}{\sqrt{6}}|p_x\rangle -
 
 　検算しろ。$\langle sp^2_1 | sp^2_2 \rangle$ を計算してみろ」
 
-**やる夫**：
+　**やる夫**：
 　「$|s\rangle$, $|p_x\rangle$, $|p_y\rangle$ は正規直交だから：
 
 $$\langle sp^2_1 | sp^2_2 \rangle = \frac{1}{\sqrt{3}} \cdot \frac{1}{\sqrt{3}}\langle s|s\rangle + \sqrt{\frac{2}{3}} \cdot \left(-\frac{1}{\sqrt{6}}\right)\langle p_x|p_x\rangle + 0$$
@@ -1192,18 +1192,18 @@ $$= \frac{1}{3} - \frac{\sqrt{2}}{\sqrt{6} \cdot \sqrt{3}} = \frac{1}{3} - \frac
 　基底の取り直しであって、新しい物理じゃないんだお。
 　分子の対称性を反映した基底のほうが化学的に便利ってだけだお」
 
-**やらない夫**：
+　**やらない夫**：
 　「3つの混成軌道は120°間隔で3方向を向く。
 　これがベンゼン環の平面構造、グラフェンの六角格子の起源だ」
 
----
+　---
 
 ### 6-5　全行程の振り返り
 
-**やらない夫**：
+　**やらない夫**：
 　「6幕を振り返ろう。何を辿ってきた？」
 
-**やる夫**：
+　**やる夫**：
 　「第1幕：古典物理の破綻。ボーア模型の限界。
 　　→ 軌道の量子化じゃなく、力学そのものの再構築が要る。
 　
@@ -1232,7 +1232,7 @@ $$= \frac{1}{3} - \frac{\sqrt{2}}{\sqrt{6} \cdot \sqrt{3}} = \frac{1}{3} - \frac
 　**候補の棄却**がSEの形を一意に決めた。
 　全部の失敗が布石だったんだお」
 
-**やらない夫**：
+　**やらない夫**：
 　「最後に、この先の地図を示しておこう。
 　
 　我々が扱ったのは**1粒子・非相対論的**なシュレーディンガー方程式だ。
@@ -1244,21 +1244,21 @@ $$= \frac{1}{3} - \frac{\sqrt{2}}{\sqrt{6} \cdot \sqrt{3}} = \frac{1}{3} - \frac
 　どれも今日作った道具——ヒルベルト空間、演算子、固有値、交換子——の上に立つ。
 　土台は完成した。あとは建物を積んでいくだけだ」
 
----
+　---
 
 　*おわり*
 
----
+　---
 
 ## 参考文献
 
-[^1]: [Wikipedia『Planck constant』](https://en.wikipedia.org/wiki/Planck_constant), 2026年7月9日参照.
-[^2]: [Wikipedia『Balmer series』](https://en.wikipedia.org/wiki/Balmer_series), 2026年7月9日参照.
-[^3]: [Wikipedia『Bohr model』](https://en.wikipedia.org/wiki/Bohr_model), 2026年7月9日参照.
-[^4]: [Wikipedia『Helium atom』](https://en.wikipedia.org/wiki/Helium_atom), 2026年7月9日参照.
-[^5]: [Wikipedia『Photoelectric effect』](https://en.wikipedia.org/wiki/Photoelectric_effect), 2026年7月9日参照.
-[^6]: [Wikipedia『Matter wave』](https://en.wikipedia.org/wiki/Matter_wave), 2026年7月9日参照.
-[^7]: [Wikipedia『Davisson–Germer experiment』](https://en.wikipedia.org/wiki/Davisson%E2%80%93Germer_experiment), 2026年7月9日参照.
-[^8]: [Wikipedia『Born rule』](https://en.wikipedia.org/wiki/Born_rule), 2026年7月9日参照.
-[^9]: [Wikipedia『Hidden-variable theory』](https://en.wikipedia.org/wiki/Hidden-variable_theory), 2026年7月9日参照.
-[^10]: [Wikipedia『Bell's theorem』](https://en.wikipedia.org/wiki/Bell%27s_theorem), 2026年7月9日参照.
+　[^1]: [Wikipedia『Planck constant』](https://en.wikipedia.org/wiki/Planck_constant), 2026年7月9日参照.
+　[^2]: [Wikipedia『Balmer series』](https://en.wikipedia.org/wiki/Balmer_series), 2026年7月9日参照.
+　[^3]: [Wikipedia『Bohr model』](https://en.wikipedia.org/wiki/Bohr_model), 2026年7月9日参照.
+　[^4]: [Wikipedia『Helium atom』](https://en.wikipedia.org/wiki/Helium_atom), 2026年7月9日参照.
+　[^5]: [Wikipedia『Photoelectric effect』](https://en.wikipedia.org/wiki/Photoelectric_effect), 2026年7月9日参照.
+　[^6]: [Wikipedia『Matter wave』](https://en.wikipedia.org/wiki/Matter_wave), 2026年7月9日参照.
+　[^7]: [Wikipedia『Davisson–Germer experiment』](https://en.wikipedia.org/wiki/Davisson%E2%80%93Germer_experiment), 2026年7月9日参照.
+　[^8]: [Wikipedia『Born rule』](https://en.wikipedia.org/wiki/Born_rule), 2026年7月9日参照.
+　[^9]: [Wikipedia『Hidden-variable theory』](https://en.wikipedia.org/wiki/Hidden-variable_theory), 2026年7月9日参照.
+　[^10]: [Wikipedia『Bell's theorem』](https://en.wikipedia.org/wiki/Bell%27s_theorem), 2026年7月9日参照.
