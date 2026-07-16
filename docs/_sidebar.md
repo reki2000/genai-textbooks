@@ -6,6 +6,7 @@
   - [やる夫が夢見るエネルギー政策](/books/energy-policy)
   - [やる夫と深夜の牛丼](/books/japan-food-policy)
   - [やる夫が悟りを開きそうです](/books/buddhism)
+  - [やる夫が時をかけて哲学するようです](/books/philosophy)
 
 - 技術
   - [やる夫が高層ビルを建てるそうです](/books/skyscraper)
