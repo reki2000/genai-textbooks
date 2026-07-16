@@ -4,7 +4,7 @@
   - [やる夫が文部科学大臣になったようです](/books/education)
   - [やる夫が世界平和を目指すようです](/books/world-peace)
   - [やる夫が夢見るエネルギー政策](/books/energy-policy)
-  - [やる夫と深夜の牛丼](/books/japan-food-policy)
+  - [やる夫と牛丼と食料政策](/books/japan-food-policy)
   - [やる夫が悟りを開きそうです](/books/buddhism)
   - [やる夫が時をかけて哲学するようです](/books/philosophy)
 
