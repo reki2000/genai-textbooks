@@ -5,11 +5,11 @@ Short Textbooks on Various Topics Written by Generative AI
 [公開サイト](https://reki2000.github.io/genai-textbooks/#/)
 
 - GitHub Pages で公開されるテキスト本体（`docs/books/*.md`）
-- 「やる夫で学ぶ」形式の教材を作成・整形・校正するための Claude Code 用スキル 3 種（`.claude/skills/`）
+- 「やる夫で学ぶ」形式の教材を作成・整形・校正するための Claude Code / Codex 用スキル 3 種（`.claude/skills/`、`.codex/skills/`）
 
-## Claude Code 用スキル
+## Claude Code / Codex 用スキル
 
-やる夫（生徒）とやらない夫（教師）の対話で理論を「再発見」していく教材を、作成 → 整形 → 校正の 3 工程で扱う。各スキルはユーザーが該当キーワード（「対話形式の教材」「整形」「校正」など）に言及すると自動で起動する。
+やる夫（生徒）とやらない夫（教師）の対話で理論を「再発見」していく教材を、作成 → 整形 → 校正の 3 工程で扱う。各スキルはユーザーが該当キーワード（「対話形式の教材」「整形」「校正」など）に言及すると自動で起動する。Codex では `.codex/skills` から `.claude/skills` へのディレクトリシンボリックリンクを辿って、同じ `SKILL.md` と付属スクリプトを参照する。
 
 | スキル | 役割 | 主な起動キーワード |
 |---|---|---|
