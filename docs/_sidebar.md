@@ -10,6 +10,7 @@
 
 - 技術
   - [やる夫が高層ビルを建てるそうです](/books/skyscraper)
+  - [やる夫がマンションを建てて50年経ったそうです](/books/mansion-development)
   - [やる夫が携帯電話会社のCTOになるそうです](/books/mobile)
   - [やる夫が天気予報を作るそうです](/books/weather-forcast)
   - [やる夫で学ぶ電力系統](/books/power-grid)
@@ -20,6 +21,7 @@
 
 - 科学 
   - [やる夫で学ぶ一般相対性理論](/books/general-relativity)
+  - [やる夫で学ぶ統計学](/books/statistics)
   - [やる夫で学ぶ標準模型](/books/standard-model)
   - [やる夫で学ぶ軌道力学](/books/orbital-mechanics-moon)
   - [やる夫で学ぶシュレーディンガー方程式](/books/schrodinger)

@@ -8,6 +8,10 @@
 
 **やらない夫** ── 事務局のベテラン顧問。過去100年の失敗を全部知っている。答えを教えず、実際に起きた事例で潰す。
 
+> **時事例の扱い**：本書の2026年の記述は、**2026年7月10日時点のスナップショット**である。
+> 理論の骨格はA国・B国のトイ例と、国際連盟、英独建艦競争、キューバ危機など確定した歴史例に置く。
+> イラン、ウクライナ、台湾海峡・南シナ海は「執筆時点で同じ構造がどう現れているか」を見る補助例であり、情勢が変われば読み替えること。
+
 ---
 
 ## 第1幕　平和とは「何がない状態」か
@@ -211,7 +215,7 @@
 　みんな見栄を張る。その結果、避けられたはずの戦争で『相手の力を測り間違える』お」
 
 **やらない夫**：
-「まさに2026年のイランがそれだ。
+「ここでだけ、執筆時点の補助例を重ねる。2026年のイランだ。
 　イランの核開発が『どこまで進んでいるか』は、外からは正確に見えない。
 　IAEA（国際原子力機関）の査察を制限すればするほど、
 　イスラエルや米国から見て『わからない』が増える。
@@ -272,7 +276,7 @@
 **やらない夫**：
 「政治学の用語では **コミットメント問題（commitment problem）** という。
 　信頼できる約束（credible commitment）ができない、という意味だ。
-　2026年のウクライナ停戦交渉が、まさにこれで難航している」
+　この構造を、2026年7月時点のウクライナを補助例にして確認する」
 
 **やる夫**：
 「え、どういうことだお」
@@ -303,7 +307,7 @@
 　『じゃあ聖地を6対4で』なんて分け方は、どっちの信者も絶対に呑まないお」
 
 **やらない夫**：
-「そうだ。そしてもう一つ、2026年の現在進行形の例がある。
+「そうだ。そしてもう一つ、2026年7月時点の補助例がある。
 　**台湾**だ。
 　中国にとって台湾は『中国の一部』であり、独立を認めることは体制の正統性そのものに関わる。
 　『台湾を6割中国、4割独立』などという分割は概念的に存在しない。
@@ -428,12 +432,19 @@
 　両国とも『自衛のため』だと信じていた。それでも(+1,+1)の泥沼に落ちた」
 
 **やる夫**：
-「2026年の今も同じことが起きてるお。
-　南シナ海で中国が軍事拠点化を進めると、
-　フィリピンが米国・日本・豪州との軍事連携を強める。
-　それを見て中国が『黄岩島で戦闘準備パトロール』とさらに圧力をかける。
-　完全に軍拡スパイラルだお。**誰も『世界大戦をやりたい』とは思ってないのに**、
-　防御の連鎖が緊張を上げていくお」
+「英独の歴史例だけで構造は確定したお。
+　でも、この構造は今の地域情勢にも当てはめられるのかお」
+
+**やらない夫**：
+「2026年7月時点の南シナ海を補助線にする。
+　中国の拠点化・海警活動に対し、フィリピンは米国・日本・豪州との安全保障協力を強める。
+　中国側はそれを封じ込めと受け取り、さらに警戒と活動を強める。
+　各当事者の個別行動を、攻撃意思の証拠と決めつける必要はない。ここで見るのは、
+　**一方の防御が他方には脅威として映り、相互作用で緊張が増幅する**という構造だけだ」
+
+**やる夫**：
+「英独建艦競争で作った判定装置に通すと、現代の補助例にも同じ循環が見えるお。
+　やる夫が情勢を知っていたんじゃなく、**歴史から作った道具で情勢を読めた**んだお」
 
 **やらない夫**：
 「では事務総長、この泥沼から両国を救い出せ。どうする」
@@ -677,7 +688,7 @@
 　**大国か、大国の仲間が侵略者だと、安保理は絶対に止められない**お」
 
 **やらない夫**：
-「それがまさに2026年のウクライナだ。侵攻したロシアは、常任理事国そのものだ。
+「その不合格例を、2026年7月時点のウクライナで確認する。侵攻したロシアは、常任理事国そのものだ。
 　安保理で『ロシアを非難し制裁する』決議を出しても、
 　ロシアが自分で拒否権を使って潰す。**安保理は完全に麻痺する**」
 
@@ -1037,10 +1048,9 @@
 
 **やる夫**：
 「でも……喜べないお。
-　だって2026年の今、世界は戦争だらけだお。
-　ウクライナでは侵攻から4年、ロシア軍だけで死傷者100万人規模[^23]。
-　中東ではイランが攻撃され、最高指導者が死に[^4]、核物質の行方も不透明。
-　台湾海峡と南シナ海では、グレーゾーンの圧力が日々高まってる。
+　だって**2026年7月10日時点**でも、ウクライナへの全面侵攻は4年を超えて続き、
+　2月末に始まった米・イスラエルとイランの戦争も地域を揺らしている[^4]。
+　台湾海峡と南シナ海の緊張も消えていない。
 　**大国戦争は防げたのに、こんなに戦争が続いてるお**」
 
 **やらない夫**：
@@ -1109,12 +1119,12 @@
 
 ## 付録：三体の敵と国連の道具（早見表）
 
-| 戦争の原因（Fearon） | 具体例（2026年） | 国連・国際社会の道具 | 道具の限界 |
-|---|---|---|---|
-| 情報の非対称性 | イラン核開発の不透明さ → 予防攻撃 | IAEA査察、軍縮条約の検証 | 査察を拒否されると機能しない |
-| コミットメント問題 | ウクライナ停戦交渉の難航 | 拒否権、同盟、安全の保証、経済相互依存 | 上位の強制者は依然不在 |
-| 分割不可能性 | 台湾、エルサレム | 戦略的曖昧さ、棚上げ、施政と主権の分離 | 先送りであって解決ではない |
-| （殺し合いの発生後） | ルワンダ、スレブレニツァ、シリア | PKO（停戦後）、平和強制／R2P | R2Pの鍵が拒否権に握られ麻痺 |
+| 戦争の原因（Fearon） | 理論を固定する例 | 2026年7月時点の補助例 | 国連・国際社会の道具 | 道具の限界 |
+|---|---|---|---|---|
+| 情報の非対称性 | A国・B国の交渉トイ例 | イラン核開発の不透明さと予防攻撃 | IAEA査察、軍縮条約の検証 | 査察を拒否されると機能しない |
+| コミットメント問題 | A国・B国の力の移行トイ例、条約後の反復囚人のジレンマ | ウクライナの停戦・安全保証問題 | 拒否権、同盟、安全の保証、経済相互依存 | 上位の強制者は依然不在 |
+| 分割不可能性 | エルサレムと主権のトイ例 | 台湾 | 戦略的曖昧さ、棚上げ、施政と主権の分離 | 先送りであって解決ではない |
+| （殺し合いの発生後） | ルワンダ、スレブレニツァ | シリアなど | PKO（停戦後）、平和強制／R2P | R2Pの鍵が拒否権に握られ麻痺 |
 
 **設計の総括**：国連は「全ての戦争の根絶」ではなく「大国間全面戦争の防止」を最優先に設計された妥協の産物である。その一点（Long Peace）については歴史上例のない成功を収めた一方、小規模紛争・内戦・大国絡みの侵略を止める力は、その最優先目標を買うための代償として、構造的に制限されている。
 
@@ -1125,7 +1135,7 @@
 [^1]: [Journal of Peace Research『Violence, Peace, and Peace Research』](https://journals.sagepub.com/doi/10.1177/002234336900600301), 2026年7月10日参照.
 [^2]: [Wikipedia『League of Nations』](https://en.wikipedia.org/wiki/League_of_Nations), 2026年7月10日参照.
 [^3]: [International Organization『Rationalist Explanations for War』](https://www.cambridge.org/core/product/identifier/S0020818300033324/type/journal_article), 2026年7月10日参照.
-[^4]: [Wikipedia『2026 Iran war』](https://en.wikipedia.org/wiki/2026_Iran_war), 2026年7月10日参照.
+[^4]: [国連『Bombing of Iran and retaliatory strikes ‘a grave threat to international peace and security’: Guterres』](https://turkiye.un.org/en/310903-bombing-iran-and-retaliatory-strikes-%E2%80%98grave-threat-international-peace-and-security%E2%80%99), 2026年7月10日参照. 2026年2月28日の米・イスラエルによる攻撃とイランの反撃について。
 [^5]: [Wikipedia『Prisoner's dilemma』](https://en.wikipedia.org/wiki/Prisoner%27s_dilemma), 2026年7月10日参照.
 [^6]: [Wikipedia『HMS Dreadnought (1906)』](https://en.wikipedia.org/wiki/HMS_Dreadnought_%281906%29), 2026年7月10日参照.
 [^7]: [Wikipedia『Anglo-German naval arms race』](https://en.wikipedia.org/wiki/Anglo-German_naval_arms_race), 2026年7月10日参照.
@@ -1134,7 +1144,7 @@
 [^10]: [Wikipedia『Lytton Report』](https://en.wikipedia.org/wiki/Lytton_Report), 2026年7月10日参照.
 [^11]: [Wikipedia『Abyssinia Crisis』](https://en.wikipedia.org/wiki/Abyssinia_Crisis), 2026年7月10日参照.
 [^12]: [Wikipedia『United Nations Security Council veto power』](https://en.wikipedia.org/wiki/United_Nations_Security_Council_veto_power), 2026年7月10日参照.
-[^13]: [Ukrinform『UNGA adopts resolution 'Support for lasting peace in Ukraine'』](https://www.ukrinform.net/rubric-polytics/4095171-unga-adopts-resolution-support-for-lasting-peace-in-ukraine.html), 2026年7月10日参照.
+[^13]: [United Nations Digital Library『Support for lasting peace in Ukraine : resolution / adopted by the General Assembly』](https://digitallibrary.un.org/record/4103750?ln=en), 2026年7月10日参照. A/RES/ES-11/10、賛成107・反対12・棄権51。
 [^14]: [The National『UN General Assembly backs resolution for lasting peace in Ukraine but US abstains』](https://www.thenationalnews.com/news/us/2026/02/24/un-vote-ukraine-us-abstains/), 2026年7月10日参照.
 [^15]: [Wikipedia『Mutually assured destruction』](https://en.wikipedia.org/wiki/Mutually_assured_destruction), 2026年7月10日参照.
 [^16]: [Wikipedia『Cuban Missile Crisis』](https://en.wikipedia.org/wiki/Cuban_Missile_Crisis), 2026年7月10日参照.
