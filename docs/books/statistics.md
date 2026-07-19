@@ -1245,13 +1245,29 @@ $$\frac{C\,E|X-\mu|^3}{\sigma^3\sqrt n}$$
 「誤発売確率を100万分の1まで見たいとき、中心付近の正規近似だけで十分か？」
 
 **やる夫**：
-「裾そのものの指数速度が欲しいお。BernoulliならChernoffの方法で」
+「正規近似は中心の±数σでしか合わないお。100万分の1は平均から遠い裾で、そこは近似が桁で外れる。裾そのものの指数速度が欲しいお」
+
+**やらない夫**：
+「素朴なMarkovの不等式 $P(\bar X\ge q)\le E[\bar X]/q$ を使ってみろ」
+
+**やる夫**：
+「$E[\bar X]=p$ だから $p/q$。$q>p$ でも $1$ に近いだけで、指数的な小ささが全然出ないお。多項式の速さしか掴めてない」
+
+**やらない夫**：
+「裾を拡大する『レンズ』を先にかけろ。$\bar X\ge q \iff e^{tn\bar X}\ge e^{tnq}$（$t>0$）で、指数に載せてからMarkovだ」
+
+**やる夫**：
+「指数は単調だから同値。Markovを $e^{tn\bar X}$ に当てて、独立性でMGFが積になるお」
+
+$$P_p(\bar X\ge q)\le \frac{E[e^{tn\bar X}]}{e^{tnq}}=e^{-tnq}\prod_i E[e^{tX_i}]=\exp\Big\{-n\big(tq-\log E[e^{tX_1}]\big)\Big\}$$
+
+「これで $n$ の指数に載ったお。あとは一番きつく効く $t$ を選んで指数を最大化する。$t$ について最適化すると」
 
 $$P_p(\bar X\ge q)\le
-\exp\{-nD(q\|p)\},\qquad q>p$$
+\exp\{-nD(q\|p)\},\qquad D(q\|p)=q\log\frac qp+(1-q)\log\frac{1-q}{1-p},\quad q>p$$
 
-「ここで $D(q\|p)$ はBernoulli分布間のKL距離。
-　第5幕のモデル距離が、今度は稀な誤りの指数減衰率になったお！」
+「最適化で出た指数 $D(q\|p)$ は、まさにBernoulli分布間のKL距離だお。
+　第5幕のモデル距離が、今度は稀な誤りの **指数減衰率** になって戻ってきたお！　Markov素朴版の多項式が、指数レンズ＋最適化で指数速度に化けたんだお」
 
 ---
 
@@ -1301,25 +1317,35 @@ $$n^{-2s/(2s+d)}$$
 「『近い』を定義しろ」
 
 **やる夫**：
-「残差平方和」
+「残差平方和 $Q(\beta)$ を最小化するお」
 
-$$\|y-X\beta\|^2=(y-X\beta)^\top(y-X\beta)$$
+$$Q(\beta)=\|y-X\beta\|^2=(y-X\beta)^\top(y-X\beta)$$
 
-「を最小化する。微分して」
+「展開すると、$y^\top X\beta$ と $\beta^\top X^\top y$ は同じスカラーだから2倍にまとめて」
+
+$$Q(\beta)=y^\top y-2\,\beta^\top X^\top y+\beta^\top X^\top X\beta$$
+
+「$\beta$ で勾配を取るお。一次項は $-2X^\top y$、二次形式 $\beta^\top(X^\top X)\beta$ の勾配は $2X^\top X\beta$」
+
+$$\frac{\partial Q}{\partial\beta}=-2X^\top y+2X^\top X\beta$$
+
+「これを $0$ と置くと **正規方程式**」
 
 $$X^\top X\hat\beta=X^\top y$$
 
-「$X^\top X$ が逆行列を持てば $\hat\beta=(X^\top X)^{-1}X^\top y$」
+「$X^\top X$ が逆行列を持てば $\hat\beta=(X^\top X)^{-1}X^\top y$。二階微分 $2X^\top X$ は半正定値だから、これは最小だお」
 
 **やらない夫**：
-「幾何学的には？」
+「幾何学的には何が起きた？　正規方程式を残差の形に書き直せ」
 
 **やる夫**：
-「正規方程式は $X^\top(y-X\hat\beta)=0$。
-　残差が $X$ の列空間の全方向と直交する。
-　$X\hat\beta$ は $y$ を説明可能な部分空間へ射影した影だお」
+「移項すると $X^\top(y-X\hat\beta)=0$。
+　残差 $y-X\hat\beta$ が $X$ の **全列と直交** している。
+　つまり $X\hat\beta$ は $y$ を『説明できる部分空間（$X$ の列空間）』へ **垂直に落とした影**だお。近さを二乗で測ると、最小化＝射影になるんだお」
 
-$$\hat y=Hy,qquad H=X(X^\top X)^{-1}X^\top,qquad H^2=H=H^\top$$
+$$\hat y=Hy,\qquad H=X(X^\top X)^{-1}X^\top,\qquad H^2=H=H^\top$$
+
+「検算するお。$H$ は射影だから2回かけても変わらないはず。$H^2=X(X^\top X)^{-1}\underbrace{X^\top X(X^\top X)^{-1}}_{=I}X^\top=X(X^\top X)^{-1}X^\top=H$。確かに冪等。すでに影になったものをもう一度射影しても動かない、という当たり前が式で出たお」
 
 ---
 
@@ -1490,7 +1516,7 @@ X^\top\operatorname{diag}(\hat e_i^2)X
 **やる夫**：
 「オッズの対数なら」
 
-$$\log\frac{p(x)}{1-p(x)}=x^\top\beta,qquad
+$$\log\frac{p(x)}{1-p(x)}=x^\top\beta,\qquad
 p(x)=\frac{e^{x^\top\beta}}{1+e^{x^\top\beta}}$$
 
 「線形なのは確率ではなくロジット。Bernoulliの分布と、平均を線形予測子へ結ぶリンクを分けたお」
@@ -1531,16 +1557,32 @@ $$f(y;\theta,\phi)=
 ---
 
 **やる夫**：
-「ロジスティック回帰は最小二乗の世界を捨てたお」
+「ロジスティック回帰は尤度を直接最大化するお。でもロジットが非線形で閉じた解が出ないお。最小二乗の世界を捨てたお」
 
 **やらない夫**：
-「スコアをNewton法で解け。Hessianの期待値を使うFisher scoringでは、一回の更新が」
+「捨てる前にNewton法で一歩ずつ解け。まずスコア（対数尤度の勾配）を書け。指数型分布族では綺麗な形になる」
+
+**やる夫**：
+「GLMのスコアは $U(\beta)=X^\top(y-\mu)$。観測と平均のズレを説明変数で束ねた形だお。
+　Fisher scoringはHessianの期待値、つまりFisher情報量 $\mathcal I(\beta)=X^\top W X$ を使う。$W$ は分散とリンクの傾きで決まる対角重み。Newton更新は」
+
+$$\beta^{(t+1)}=\beta^{(t)}+\mathcal I^{-1}U=\beta^{(t)}+(X^\top W X)^{-1}X^\top(y-\mu)$$
+
+**やらない夫**：
+「その二項を一つの射影の形にまとめられるか。$X^\top W$ で無理やりくくり出せ」
+
+**やる夫**：
+「第一項の $\beta^{(t)}$ を $(X^\top WX)^{-1}(X^\top WX)\beta^{(t)}$ と書けば、両項が $(X^\top WX)^{-1}X^\top W$ を共通因子に持つお」
+
+$$\beta^{(t+1)}=(X^\top W X)^{-1}X^\top W\Big[\underbrace{X\beta^{(t)}+W^{-1}(y-\mu)}_{z^{(t)}\ \text{と置く}}\Big]$$
+
+「$z^{(t)}=X\beta^{(t)}+W^{-1}(y-\mu)$ を **擬似応答** と置くと」
 
 $$\beta^{(t+1)}=(X^\top W^{(t)}X)^{-1}X^\top W^{(t)}z^{(t)}$$
 
-**やる夫**：
-「形は重み付き最小二乗だお！　平均と分散が現在値に依存するから、擬似応答 $z$ と重み $W$ を更新しながら射影を繰り返す。
-　第7幕を捨てたんじゃなく、局所近似として使い回してるんだお」
+「**これ、重み付き最小二乗の正規方程式そのものだお！**（第7幕の $\hat\beta=(X^\top X)^{-1}X^\top y$ に重み $W$ が入っただけ）。
+　平均 $\mu$ と分散重み $W$ が現在値に依存するから、$z$ と $W$ を更新しながら射影を繰り返す。
+　第7幕を捨てたんじゃなく、非線形問題を各ステップで **局所的な最小二乗** に線形化して使い回してるんだお」
 
 **やらない夫**：
 「ただし購入者と非購入者を一本の直線で完全分離できると、係数が無限大へ逃げて通常の最尤推定値が存在しない。計算が収束しないとき、ソフトを叩く前にモデルの幾何を見ろ」
@@ -1619,14 +1661,22 @@ $$X^2=\sum_{i,j}\frac{(O_{ij}-E_{ij})^2}{E_{ij}}$$
 $$\pi(p\mid x)=\frac{L(p;x)\pi(p)}{\int L(u;x)\pi(u)\,du}$$
 
 **やらない夫**：
-「Beta$(a,b)$ 事前分布なら？」
+「Beta$(a,b)$ 事前分布 $\pi(p)\propto p^{a-1}(1-p)^{b-1}$ なら、事後分布を最後まで出せ。正規化定数の積分に怯むな」
 
 **やる夫**：
-「二項尤度と掛けて」
+「事後は尤度×事前に比例するお。$p$ を含む部分だけ書けば」
 
-$$p\mid S=s\sim\operatorname{Beta}(a+s,b+n-s)$$
+$$\pi(p\mid s)\propto \underbrace{p^{s}(1-p)^{n-s}}_{\text{尤度}}\cdot\underbrace{p^{a-1}(1-p)^{b-1}}_{\text{事前}}=p^{(a+s)-1}(1-p)^{(b+n-s)-1}$$
 
-「事後平均は $(a+s)/(a+b+n)$。事前の擬似的な成功 $a$、失敗 $b$ とデータを足した形だお」
+「指数を足すだけだお。……あっ、右辺は $\operatorname{Beta}(a+s,\,b+n-s)$ の **カーネルそのもの**だお。$p$ への依存が一致すれば分布は決まる（正規化定数は自動で埋まる）から」
+
+$$p\mid S=s\sim\operatorname{Beta}(a+s,\,b+n-s)$$
+
+「怖かった積分を一度も計算せず事後分布が出たお。事後平均はBetaの公式で」
+
+$$E[p\mid s]=\frac{a+s}{(a+s)+(b+n-s)}=\frac{a+s}{a+b+n}$$
+
+「事前の擬似的な成功 $a$、失敗 $b$ に、データの成功 $s$・失敗 $n-s$ を足しただけの形だお。事前は『架空の予備データ』だったんだお」
 
 ---
 
@@ -1662,16 +1712,17 @@ $$p\mid S=s\sim\operatorname{Beta}(a+s,b+n-s)$$
 **やる夫**：
 「A店は情報が少なすぎる。店舗率 $p_j$ 自体が共通分布から来ると置くお」
 
-$$S_j\mid p_j\sim\operatorname{Bin}(n_j,p_j),qquad
+$$S_j\mid p_j\sim\operatorname{Bin}(n_j,p_j),\qquad
 p_j\sim\operatorname{Beta}(a,b)$$
 
-「事後平均は」
+「事後平均は9-1の公式で $\dfrac{a+S_j}{a+b+n_j}$。これを『自店率』と『全店平均』の混合に分解したいお。分子を $S_j$ と $a$ に割って、それぞれ $n_j$ と $a+b$ で括り直すと」
 
 $$E[p_j\mid S_j]
-=\frac{a+S_j}{a+b+n_j}
+=\frac{n_j}{a+b+n_j}\cdot\frac{S_j}{n_j}+\frac{a+b}{a+b+n_j}\cdot\frac{a}{a+b}
 =w_j\frac{S_j}{n_j}+(1-w_j)\frac{a}{a+b}$$
 
-「標本の少ない店ほど全店平均へ強く縮み、十分ある店は自店データを信じる。
+「重みは $w_j=\dfrac{n_j}{a+b+n_j}$。標本 $n_j$ が大きいほど $w_j\to1$ で自店データを信じ、$n_j$ が小さいほど $w_j\to0$ で全店平均 $a/(a+b)$ へ縮むお。
+　検算するお。冒頭のA店は $n_j=1$ だから $w_A=1/(a+b+1)$ でほぼ0──『1人中1人で100%』はほとんど全店平均まで引き戻される。B店は $n_j=100$ で $w_B\approx100/(a+b+100)\approx1$ で自店の60%をほぼそのまま信じる。
 　一律に平均へ潰すのでも、店を完全に別扱いするのでもない **部分プーリング**だお」
 
 **やらない夫**：
@@ -1914,12 +1965,19 @@ O\!\left(\sqrt{\frac{\text{complexity}+\log(1/\delta)}n}\right)$$
 「各人 $i$ の抽出確率 $\pi_i$ が既知なら、観測された人に何人分を代表させる？」
 
 **やる夫**：
-「$1/\pi_i$ 人分だお。母集団合計 $T=\sum_{i=1}^NY_i$ の推定量を」
+「抽出確率 $\pi_i$ の人は、母集団で $1/\pi_i$ 人を代表させるお。$\pi_i=1/10$ なら1人が10人分。母集団合計 $T=\sum_{i=1}^NY_i$ の推定量を」
 
 $$\hat T_{HT}=\sum_{i\in s}\frac{Y_i}{\pi_i}$$
 
-「とすれば、抽出指示 $I_i$ に対して $E[I_i/\pi_i]=1$ だから $E[\hat T_{HT}]=T$。
-　これがHorvitz–Thompson推定量だお」
+「と置くお。本当に不偏か確かめるお。標本に入った人だけ和を取る代わりに、全 $N$ 人に抽出指示 $I_i\in\{0,1\}$ を掛けて書き直すと、和が母集団全体に伸びる」
+
+$$\hat T_{HT}=\sum_{i=1}^N\frac{Y_i}{\pi_i}I_i$$
+
+「期待値を取ると、$Y_i,\pi_i$ は定数で $E[I_i]=P(\text{$i$が入る})=\pi_i$ だから」
+
+$$E[\hat T_{HT}]=\sum_{i=1}^N\frac{Y_i}{\pi_i}E[I_i]=\sum_{i=1}^N\frac{Y_i}{\pi_i}\pi_i=\sum_{i=1}^NY_i=T$$
+
+「$\pi_i$ が綺麗に約分して母集団合計に戻ったお。**偏った抽出でも、抽出確率で割り戻せば不偏**。これがHorvitz–Thompson推定量だお。都市部を多めに引いた標本も、捨てずに重みで直せたんだお」
 
 **やらない夫**：
 「なら回答しない人も、回答確率の逆数で完全に直せるな」
@@ -2175,12 +2233,12 @@ $$\sum_{k=1}^K\sum_{i\in C_k}\|x_i-\mu_k\|^2$$
 **やらない夫**：
 「売上 $Y_t$ と前週 $Y_{t-1}$ が相関するなら、独立標本用の標準誤差も壊れる。まず弱定常性を」
 
-$$E[Y_t]=\mu,qquad
+$$E[Y_t]=\mu,\qquad
 \operatorname{Cov}(Y_t,Y_{t-h})=\gamma(h)$$
 
 「と定義し、AR(1)」
 
-$$Y_t-\mu=\phi(Y_{t-1}-\mu)+\varepsilon_t,qquad |\phi|<1$$
+$$Y_t-\mu=\phi(Y_{t-1}-\mu)+\varepsilon_t,\qquad |\phi|<1$$
 
 「なら $\gamma(h)=\phi^{|h|}\gamma(0)$ を得る」
 
@@ -2310,7 +2368,7 @@ $$\Lambda_n=\prod_{i=1}^n
 **やらない夫**：
 「誤り確率を概ね $\alpha,\beta$ に抑える境界は」
 
-$$A\approx\frac{1-\beta}{\alpha},qquad
+$$A\approx\frac{1-\beta}{\alpha},\qquad
 B\approx\frac{\beta}{1-\alpha}$$
 
 「Waldの逐次確率比検定だ」
