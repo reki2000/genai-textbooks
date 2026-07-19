@@ -2120,12 +2120,23 @@ $$\tau=E[Y(1)-Y(0)]$$
 「PCAが最大化したものは？」
 
 **やる夫**：
-「単位ベクトル $a$ に対する射影分散」
+「単位ベクトル $a$ 方向へ射影した $a^\top X$ の分散だお。$\operatorname{Var}(a^\top X)=a^\top\Sigma a$。ただし $a$ を伸ばせばいくらでも増えるから、$\|a\|=1$ の制約が要る」
 
-$$\max_{\|a\|=1}\operatorname{Var}(a^\top X)
-=\max_{\|a\|=1}a^\top\Sigma a$$
+$$\max_{a}\;a^\top\Sigma a\quad\text{s.t.}\ a^\top a=1$$
 
-「Lagrange乗数法で $\Sigma a=\lambda a$。第一主成分は最大固有値の固有ベクトルだお」
+**やらない夫**：
+「制約付き最大化だ。Lagrange未定乗数法で解け」
+
+**やる夫**：
+「$L(a,\lambda)=a^\top\Sigma a-\lambda(a^\top a-1)$。$a$ で勾配を取るお。二次形式 $a^\top\Sigma a$ の勾配は $2\Sigma a$（$\Sigma$ 対称）、$a^\top a$ の勾配は $2a$」
+
+$$\frac{\partial L}{\partial a}=2\Sigma a-2\lambda a=0\;\Longrightarrow\;\Sigma a=\lambda a$$
+
+「**固有値方程式が出たお！**　最適な $a$ は共分散行列の固有ベクトル。しかもこのとき目的関数は」
+
+$$a^\top\Sigma a=a^\top(\lambda a)=\lambda\, a^\top a=\lambda$$
+
+「射影分散はちょうど固有値 $\lambda$ に等しいお。だから分散を最大にするには **最大固有値** を選べばいい。第一主成分は最大固有値の固有ベクトルだったんだお。Lagrangeが自動で固有問題に翻訳してくれたお」
 
 **やらない夫**：
 「どこに心理的意味を最大化すると書いてある？」
@@ -2240,7 +2251,12 @@ $$E[Y_t]=\mu,\qquad
 
 $$Y_t-\mu=\phi(Y_{t-1}-\mu)+\varepsilon_t,\qquad |\phi|<1$$
 
-「なら $\gamma(h)=\phi^{|h|}\gamma(0)$ を得る」
+「を置くお。$\gamma(h)$ を出すお。両辺に $(Y_{t-h}-\mu)$ を掛けて期待値を取る。$\varepsilon_t$ は過去 $Y_{t-h}$（$h\ge1$）と無相関だから消えて」
+
+$$\gamma(h)=E[(Y_t-\mu)(Y_{t-h}-\mu)]=\phi\,E[(Y_{t-1}-\mu)(Y_{t-h}-\mu)]=\phi\,\gamma(h-1)$$
+
+「漸化式 $\gamma(h)=\phi\,\gamma(h-1)$ を $h$ 回下ろすと $\gamma(h)=\phi^{|h|}\gamma(0)$。
+　相関が $\phi^{|h|}$ で **指数的に減衰**する。$\phi=0.8$ なら1週差で0.8、5週差でも0.33残る。前週と相関する系列は独立標本のふりをできないお」
 
 **やる夫**：
 「予測区間には新しいノイズだけでなく、母数推定とモデル選択の不確実性もある。
@@ -2298,8 +2314,22 @@ $$\Delta Y_t=Y_t-Y_{t-1}=\varepsilon_t$$
 $$h(t)=\lim_{\Delta t\downarrow0}
 \frac{P(t\le T<t+\Delta t\mid T\ge t)}{\Delta t}$$
 
-「$S(t)=\exp\{-\int_0^th(u)du\}$。
-　故障確率とハザードを同じものとして読んではいけないお」
+「条件付き確率を分解するお。分子は $P(t\le T<t+\Delta t)/P(T\ge t)$ で、$\Delta t\to0$ の分子は密度 $f(t)\Delta t$、分母は $S(t)$。だから」
+
+$$h(t)=\frac{f(t)}{S(t)}$$
+
+「ここで $f(t)=-S'(t)$（$S=1-F$ だから）を使うと、ハザードは $S$ の対数微分になるお」
+
+$$h(t)=\frac{-S'(t)}{S(t)}=-\frac{d}{dt}\log S(t)$$
+
+「両辺を $0$ から $t$ まで積分して、$S(0)=1$ より $\log S(0)=0$ を使うと」
+
+$$-\int_0^t h(u)\,du=\log S(t)-\log S(0)=\log S(t)
+\;\Longrightarrow\;
+S(t)=\exp\Big\{-\int_0^t h(u)\,du\Big\}$$
+
+「ハザードを累積して指数の肩に載せると生存関数になる。瞬間故障率 $h$ と、そこまで生き延びる確率 $S$ は、この積分で結ばれてるお。
+　だから故障確率とハザードを同じものとして読んではいけないお」
 
 ---
 
@@ -2366,12 +2396,25 @@ $$\Lambda_n=\prod_{i=1}^n
 　対数を取れば一人の回答ごとに証拠を加算するランダムウォークだお」
 
 **やらない夫**：
-「誤り確率を概ね $\alpha,\beta$ に抑える境界は」
+「境界 $A,B$ を誤り確率と結べ。発売（$H_1$採用）で止まった標本の集合を考える。そこでは $\Lambda_n\ge A$、つまり尤度の定義から $P_1(\text{データ})\ge A\,P_0(\text{データ})$ だ。両辺を発売域で足し合わせろ」
+
+**やる夫**：
+「発売域全体で足すと、左辺は『真が $H_1$ のとき発売する確率』$=1-\beta$（検出力）、右辺は『真が $H_0$ のとき発売する確率』$=\alpha$（第一種過誤）の $A$ 倍。だから」
+
+$$1-\beta\ \ge\ A\,\alpha
+\;\Longrightarrow\;
+A\ \le\ \frac{1-\beta}{\alpha}$$
+
+「見送り域でも同じ手口で、$\Lambda_n\le B$ から」
+
+$$B\ \ge\ \frac{\beta}{1-\alpha}$$
+
+「境界に届いた瞬間の行き過ぎを無視して等号で近似すれば」
 
 $$A\approx\frac{1-\beta}{\alpha},\qquad
 B\approx\frac{\beta}{1-\alpha}$$
 
-「Waldの逐次確率比検定だ」
+「これがWaldの逐次確率比検定。境界を欲しい $\alpha,\beta$ から直接組めるお。検算するお。$\alpha=\beta=0.05$ なら $A\approx0.95/0.05=19$、$B\approx0.05/0.95\approx0.053$。対数証拠が $\log19\approx2.9$ を超えたら発売、$\log0.053\approx-2.9$ を割ったら見送りだお」
 
 **やる夫**：
 「第4幕の尤度比が、一回の判定から『いつ止めるか』まで成長したお」
