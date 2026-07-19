@@ -1872,14 +1872,25 @@ $$\hat R(f)=\frac1n\sum_{i=1}^nL(Y_i,f(X_i))$$
 「二つの強く相関した説明変数があると、OLS係数は少しのデータ変化で大きく振れる。予測MSEは偏りの二乗と分散の和だ」
 
 **やる夫**：
-「なら少し偏らせて分散を大きく下げれば、合計MSEは下がりうる」
+「なら係数の大きさに罰金を足して、少し偏らせて分散を大きく下げれば、合計MSEは下がりうる。二乗罰金を足したRidgeを解くお」
 
 $$\hat\beta_{\mathrm{ridge}}
 =\arg\min_\beta\{\|y-X\beta\|^2+\lambda\|\beta\|_2^2\}$$
 
-$$\hat\beta_{\mathrm{lasso}}
-=\arg\min_\beta\{\|y-X\beta\|^2+\lambda\|\beta\|_1\}$$
+「第7幕と同じく勾配を取るお。第一項の勾配は $-2X^\top y+2X^\top X\beta$（7-1で計算済み）、罰金項 $\lambda\beta^\top\beta$ の勾配は $2\lambda\beta$。足して $0$ と置くと」
 
+$$-2X^\top y+2X^\top X\beta+2\lambda\beta=0
+\;\Longrightarrow\;
+(X^\top X+\lambda I)\hat\beta_{\mathrm{ridge}}=X^\top y$$
+
+「OLSの正規方程式の $X^\top X$ に $\lambda I$ が足された形だお。だから」
+
+$$\hat\beta_{\mathrm{ridge}}=(X^\top X+\lambda I)^{-1}X^\top y$$
+
+「$\lambda I$ の御利益が二つ見えるお。第一に、相関が強くて $X^\top X$ がほぼ特異でも $+\lambda I$ で必ず逆行列を持ち、係数の暴れが収まる。第二に、$\lambda\to\infty$ で $\hat\beta\to0$、$\lambda=0$ でOLSに戻る。$\lambda$ が縮小の強さのつまみだお。
+　罰金を絶対値 $\lambda\|\beta\|_1$ に変えたLassoは、原点で角があるぶん係数をちょうど0にもできる（変数選択）」
+
+**やる夫**：
 「Ridgeは滑らかに縮め、Lassoは係数をちょうど0にもできる。
 　不偏性は神聖な目的じゃなく、リスクを考えると交換可能な性質だったお」
 
