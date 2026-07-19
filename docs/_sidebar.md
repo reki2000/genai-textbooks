@@ -20,6 +20,7 @@
 
 - 科学 
   - [やる夫で学ぶ一般相対性理論](/books/general-relativity)
+  - [やる夫で学ぶ統計学](/books/statistics)
   - [やる夫で学ぶ標準模型](/books/standard-model)
   - [やる夫で学ぶ軌道力学](/books/orbital-mechanics-moon)
   - [やる夫で学ぶシュレーディンガー方程式](/books/schrodinger)
