@@ -534,27 +534,33 @@ $$f_\theta(x)=g_\theta(T(x))h(x)$$
 　不偏なだけでは精度を保証しないお」
 
 **やらない夫**：
-「$X_1$ を、十分統計量 $S$ が分かった条件で平均しろ」
+「$X_1$ を、十分統計量 $S=\sum X_i$ が分かった条件で平均しろ」
 
 **やる夫**：
-「$S=s$ なら、対称性から各位置が1である条件付き確率は $s/n$。だから」
+「$S=s$ を知った上で $X_1$ の期待値だお。$E[X_1\mid S=s]=P(X_1=1\mid S=s)$。
+　合計が $s$ という条件下で、$s$ 個の1が $n$ 席のどこに座るかは対称だから、1席目が当たりの確率は $s/n$。
+　具体で確かめるお。$n=3,\ s=2$ なら1の配置は $(1,1,0),(1,0,1),(0,1,1)$ の3通り同確率。$X_1=1$ はうち2通りだから $2/3=s/n$。合うお。だから」
 
 $$E[X_1\mid S]=\frac Sn=\bar X$$
 
-「元の推定量を十分統計量で条件付けしたら標本平均になったお」
+「元の粗い推定量 $X_1$ を十分統計量で条件付けしたら、標本平均になったお」
 
 **やらない夫**：
-「全分散の公式を使え」
+「分散が本当に下がったか、全分散の公式で示せ」
 
 **やる夫**：
 「$U=X_1$ とすると」
 
 $$\operatorname{Var}(U)
-=E[\operatorname{Var}(U\mid S)]
+=\underbrace{E[\operatorname{Var}(U\mid S)]}_{\ge 0}
 +\operatorname{Var}(E[U\mid S])$$
 
-「だから $\operatorname{Var}(E[U\mid S])\le\operatorname{Var}(U)$。
-　条件付けは、$p$ に無関係な余計な揺れを平均して消すんだお。
+「右辺第一項は非負だから、落とすと不等号になって」
+
+$$\operatorname{Var}(E[U\mid S])\le\operatorname{Var}(U)$$
+
+「左辺は $\operatorname{Var}(\bar X)=p(1-p)/n$、右辺は $\operatorname{Var}(X_1)=p(1-p)$。確かに $1/n$ 倍に減ったお。
+　条件付けは、$S$ を決めた後に残る『$p$ に無関係な余計な揺れ』（第一項）を平均して消すんだお。
 　これが **Rao–Blackwell化**かお」
 
 **やらない夫**：
@@ -583,49 +589,80 @@ $$\sum_{s=0}^na(s)\binom ns p^s(1-p)^{n-s}=0\qquad(0<p<1)$$
 ---
 
 **やる夫**：
-「一意な最良不偏なら、推定論は終わりだお」
+「一意な最良不偏が見つかったお。じゃあ不偏推定量なら分散はいくらでも小さくできるのかお？
+　データを賢く使えば $0$ に近づける気がするお」
 
 **やらない夫**：
-「不偏という条件を外したら？」
+「試せ。二項標本 $S\sim\mathrm{Bin}(n,p)$ で、$p$ の不偏推定量を一つ、分散ができるだけ小さくなるように作ってみろ」
 
 **やる夫**：
-「……まだ競争相手がいるお。まず不偏推定量の限界を知りたいお」
+「$\bar X=S/n$ の分散は $p(1-p)/n$。これを半分にしたいお。
+　……でも $S$ の関数で不偏を保ったまま揺れだけ消す方法が思いつかないお。
+　**不偏という条件そのものが、分散に下限を課してる**気がしてきたお」
 
 **やらない夫**：
-「対数尤度を微分しろ」
+「その勘を式にしろ。まず、尤度が $\theta$ にどれだけ敏感かを測る量を作る。対数尤度を $\theta$ で微分しただけのものだ」
 
-$$\ell(\theta)=\log f_\theta(X),\qquad
-U(\theta)=\frac{\partial}{\partial\theta}\ell(\theta)$$
+$$U(\theta)=\frac{\partial}{\partial\theta}\log f_\theta(X)=\frac{f_\theta'(X)}{f_\theta(X)}$$
 
 **やる夫**：
-「正則条件の下で $E_\theta[U(\theta)]=0$。
-　不偏推定量 $T$ が $E_\theta[T]=\theta$ を満たすなら微分して」
+「これ、期待値はいくつだお？　なんとなく非ゼロの値を持ちそうだお」
 
-$$1=\frac\partial{\partial\theta}E_\theta[T]
-=E_\theta[TU(\theta)]
-=\operatorname{Cov}_\theta(T,U)$$
+**やらない夫**：
+「計算しろ。$\int f_\theta(x)\,dx=1$ を $\theta$ で微分するだけだ」
 
-「Cauchy–Schwarzから」
+**やる夫**：
+「……あっ。右辺は定数 $1$ だから微分は $0$。左辺は積分と微分を入れ替えて、$f_\theta'=(f_\theta'/f_\theta)f_\theta=U f_\theta$ を使うと」
 
-$$1\le \operatorname{Var}_\theta(T)\operatorname{Var}_\theta(U)$$
+$$0=\frac{d}{d\theta}\int f_\theta\,dx=\int f_\theta'\,dx=\int \frac{f_\theta'}{f_\theta}\,f_\theta\,dx=E_\theta[U]$$
 
-「$I(\theta)=E[U^2]$ と置けば」
+「**スコアの平均はいつでも $0$** だお！　非ゼロと思ったのが素朴な間違いだったお（第一段クリア）」
+
+**やらない夫**：
+「次に、不偏という条件を同じ手口で微分にかけろ。$E_\theta[T]=\theta$ の両辺を $\theta$ で微分する」
+
+**やる夫**：
+「左辺は $\int T f_\theta\,dx$ で、$T$ はデータの関数だから $\theta$ には触らない。$f_\theta$ だけ微分して」
+
+$$1=\frac{d}{d\theta}\int T f_\theta\,dx=\int T f_\theta'\,dx=\int T\,\frac{f_\theta'}{f_\theta}\,f_\theta\,dx=E_\theta[TU]$$
+
+**やらない夫**：
+「$E[U]=0$ を思い出せ。$E[TU]$ を共分散に化けさせられるか」
+
+**やる夫**：
+「$\operatorname{Cov}(T,U)=E[TU]-E[T]E[U]=E[TU]-0=1$。
+　**不偏推定量とスコアの共分散は、必ずちょうど $1$**。$T$ が何であってもだお！（第二段クリア）」
+
+**やらない夫**：
+「共分散が $1$ に固定されたなら、分散に下限が落ちる。Cauchy–Schwarzだ」
+
+**やる夫**：
+「相関係数の絶対値は $1$ 以下、つまり $\operatorname{Cov}(T,U)^2\le\operatorname{Var}(T)\operatorname{Var}(U)$。左辺は $1^2=1$ だから」
+
+$$1\le \operatorname{Var}(T)\operatorname{Var}(U)
+\quad\Longrightarrow\quad
+\operatorname{Var}(T)\ge\frac1{\operatorname{Var}(U)}$$
+
+「スコアの分散 $I(\theta)=\operatorname{Var}(U)=E[U^2]$ を **Fisher情報量** と呼ぶなら（第三段）」
 
 $$\boxed{\operatorname{Var}_\theta(T)\ge\frac1{I(\theta)}}$$
 
+「三段でたどり着いたお。素朴な『分散は $0$ にできる』は、**スコアとの共分散が $1$ に固定される**という壁で死ぬんだお」
+
 **やらない夫**：
-「Cramér–Raoの下界だ。二項標本では？」
+「Cramér–Raoの下界だ。数値で検算しろ。ベルヌーイ1個で $I_1(p)$ を出せ」
 
 **やる夫**：
-「1観測の情報量は $1/[p(1-p)]$、$n$ 個なら加法性で」
+「$\log f=x\log p+(1-x)\log(1-p)$ を微分して $U=\dfrac{x}{p}-\dfrac{1-x}{1-p}$。
+　$x=1$ なら $1/p$、$x=0$ なら $-1/(1-p)$。平均は $p\cdot\frac1p-(1-p)\cdot\frac1{1-p}=0$（確かにスコア平均0）。分散を取ると」
 
-$$I_n(p)=\frac n{p(1-p)}$$
+$$I_1(p)=p\Big(\frac1p\Big)^2+(1-p)\Big(\frac1{1-p}\Big)^2=\frac1p+\frac1{1-p}=\frac1{p(1-p)}$$
 
-「下界は $p(1-p)/n$。標本平均の分散と一致する。
-　**標本平均は下界に到達する効率的推定量**だお！」
+「独立 $n$ 個は情報が足し算で $I_n=\dfrac n{p(1-p)}$。下界は $\dfrac{p(1-p)}{n}$ ──
+　**さっき出した $\bar X$ の分散とピッタリ一致**。だから $\bar X$ は下界に到達する効率的推定量。分散を半分にしたかった最初の願いは、原理的に不可能だったんだお」
 
 **やらない夫**：
-「ただし、下界は正則性と不偏性の壁の内側の話だ。壁を外すと、偏りを少し入れてMSEを下げる道がある。第9幕と第10幕で戻る」
+「ただし、この壁は正則性と不偏性の内側でだけ立っている。壁を外すと、偏りを少し入れてMSEを下げる道がある。第9幕と第10幕で戻る」
 
 ---
 
