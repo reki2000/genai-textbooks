@@ -15,6 +15,7 @@
   - [やる夫で学ぶ電力系統](/books/power-grid)
   - [やる夫で学ぶデータベース設計](/books/database-design)
   - [やる夫が作る総合感冒薬](/books/cold-medicine)
+  - [やる夫が新型電池を量産するそうです](/books/chemical-plant)
   - [やる夫が圏論チョットワカルかもしれません](/books/fp-category-theory)
 
 - 科学 
