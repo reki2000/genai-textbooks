@@ -10,6 +10,7 @@
 
 - 技術
   - [やる夫が高層ビルを建てるそうです](/books/skyscraper)
+  - [やる夫がマンションを建てて50年経ったそうです](/books/mansion-development)
   - [やる夫が携帯電話会社のCTOになるそうです](/books/mobile)
   - [やる夫が天気予報を作るそうです](/books/weather-forcast)
   - [やる夫で学ぶ電力系統](/books/power-grid)
