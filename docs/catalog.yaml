@@ -110,6 +110,14 @@ documents:
     question: 生の4K映像は毎秒12ギガビットあるのに、なぜ25Mbpsの細い回線で高画質のまま止まらず届くのか。
     plot: ネトフリ廃人で高画質マニアのやる夫が、細い回線に阻まれ、話しかけてくる動画の中のやらない夫から、エントロピーの限界・DCT・動き補償・マスキング・適応ストリーミング・規格戦争を再発見していく。
 
+  - id: water-infrastructure
+    title: やる夫が水の都をデバッグするようです
+    path: /books/water-infrastructure
+    category: engineering
+    order: 80
+    question: 都市は洪水・渇水・疫病・汚染の失敗を通じて、治水と上下水道をどのように作り上げてきたのか。
+    plot: 都市開発ゲームの開発者やる夫が、古代灌漑から流域治水までの歴史キャンペーンをプレイし、失敗ログから都市の水循環を一つのシステムとして再実装する。
+
   - id: database-design
     title: やる夫で学ぶデータベース設計
     path: /books/database-design
