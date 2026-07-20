@@ -1,27 +1,34 @@
-- 社会
-  - [やる夫が日銀総裁になるようです](/books/economics-japan-bank)
-  - [やる夫が政令指定都市の市長になるようです](/books/local-government)
-  - [やる夫が文部科学大臣になったようです](/books/education)
-  - [やる夫が世界平和を目指すようです](/books/world-peace)
-  - [やる夫が夢見るエネルギー政策](/books/energy-policy)
-  - [やる夫と牛丼と食料政策](/books/japan-food-policy)
-  - [やる夫が悟りを開きそうです](/books/buddhism)
-  - [やる夫が時をかけて哲学するようです](/books/philosophy)
+<!-- Generated from docs/catalog.yaml. Do not edit directly. -->
 
-- 技術
-  - [やる夫が高層ビルを建てるそうです](/books/skyscraper)
-  - [やる夫がマンションを建てて50年経ったそうです](/books/mansion-development)
-  - [やる夫が携帯電話会社のCTOになるそうです](/books/mobile)
-  - [やる夫が天気予報を作るそうです](/books/weather-forcast)
-  - [やる夫で学ぶ電力系統](/books/power-grid)
-  - [やる夫で学ぶデータベース設計](/books/database-design)
+- 社会と制度
+  - [やる夫と牛丼と食料政策](/books/japan-food-policy)
+  - [やる夫が文部科学大臣になったようです](/books/education)
+  - [やる夫が政令指定都市の市長になるようです](/books/local-government)
+  - [やる夫が日銀総裁になるようです](/books/economics-japan-bank)
+  - [やる夫が夢見るエネルギー政策](/books/energy-policy)
+  - [やる夫が世界平和を目指すようです](/books/world-peace)
+
+- 工学と産業
   - [やる夫が作る総合感冒薬](/books/cold-medicine)
+  - [やる夫が携帯電話会社のCTOになるそうです](/books/mobile)
+  - [やる夫がマンションを建てて50年経ったそうです](/books/mansion-development)
+  - [やる夫が高層ビルを建てるそうです](/books/skyscraper)
+  - [やる夫で学ぶ電力系統](/books/power-grid)
   - [やる夫が新型電池を量産するそうです](/books/chemical-plant)
+
+- 数学と情報
+  - [やる夫で学ぶデータベース設計](/books/database-design)
+  - [やる夫で学ぶ統計学](/books/statistics)
+  - [やる夫で学ぶ数学基礎論](/books/mathematical-foundations)
   - [やる夫が圏論チョットワカルかもしれません](/books/fp-category-theory)
 
-- 科学 
-  - [やる夫で学ぶ一般相対性理論](/books/general-relativity)
-  - [やる夫で学ぶ統計学](/books/statistics)
-  - [やる夫で学ぶ標準模型](/books/standard-model)
+- 自然科学
+  - [やる夫が天気予報を作るそうです](/books/weather-forcast)
   - [やる夫で学ぶ軌道力学](/books/orbital-mechanics-moon)
   - [やる夫で学ぶシュレーディンガー方程式](/books/schrodinger)
+  - [やる夫で学ぶ標準模型](/books/standard-model)
+  - [やる夫で学ぶ一般相対性理論](/books/general-relativity)
+
+- 思想と人間
+  - [やる夫が悟りを開きそうです](/books/buddhism)
+  - [やる夫が時をかけて哲学するようです](/books/philosophy)

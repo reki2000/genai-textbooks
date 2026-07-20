@@ -1,0 +1,4 @@
+interface:
+  display_name: "やる夫教材目次管理"
+  short_description: "教材カタログYAMLから公開目次を安全に再生成・検証"
+  default_prompt: "$yaruo-index を使って教材カタログを更新し、公開目次を再生成・検証してください。"

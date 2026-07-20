@@ -1,0 +1,183 @@
+categories:
+  - id: society
+    title: 社会と制度
+    order: 10
+  - id: engineering
+    title: 工学と産業
+    order: 20
+  - id: math-information
+    title: 数学と情報
+    order: 30
+  - id: natural-science
+    title: 自然科学
+    order: 40
+  - id: thought
+    title: 思想と人間
+    order: 50
+
+documents:
+  - id: japan-food-policy
+    title: やる夫と牛丼と食料政策
+    path: /books/japan-food-policy
+    category: society
+    order: 10
+    question: 食料自給率を上げれば本当に安全なのか、日本の食料安全保障は何で成り立っているのか。
+    plot: 深夜の牛丼屋で一杯の牛丼を分解しながら、やる夫が輸入、備蓄、価格、農業政策のつながりをたどる。
+  - id: education
+    title: やる夫が文部科学大臣になったようです
+    path: /books/education
+    category: society
+    order: 20
+    question: 教育は予算や制度を増やせば良くなるのか、学力や格差を左右する要因は何か。
+    plot: 文部科学大臣になったやる夫が、思いつきの改革案を歴史的な実験や統計の反例で崩されながら、教育政策の難しさを学ぶ。
+  - id: local-government
+    title: やる夫が政令指定都市の市長になるようです
+    path: /books/local-government
+    category: society
+    order: 30
+    question: 市長はどこまで都市を動かせるのか、自治体の予算・議会・行政組織はどのように噛み合うのか。
+    plot: 新人市長のやる夫が、給食費無償化などの公約を実行しようとして、二元代表制、財政制約、行政実務の壁にぶつかる。
+  - id: economics-japan-bank
+    title: やる夫が日銀総裁になるようです
+    path: /books/economics-japan-bank
+    category: society
+    order: 40
+    question: お金を刷れば物価は上がるのか、中央銀行は何を操作して景気とインフレに働きかけるのか。
+    plot: 日銀総裁に任命されたやる夫が、貨幣数量説の素朴な理解から出発し、金利・期待・国債市場・金融政策の限界を再発見していく。
+  - id: energy-policy
+    title: やる夫が夢見るエネルギー政策
+    path: /books/energy-policy
+    category: society
+    order: 50
+    question: 安さ、安定供給、脱炭素、安全保障を同時に満たすエネルギーミックスはどう設計できるのか。
+    plot: エネルギー政策の責任者になったやる夫が、単一目標への全振り案を次々に失敗させ、電源構成のトレードオフを掘り下げる。
+  - id: world-peace
+    title: やる夫が世界平和を目指すようです
+    path: /books/world-peace
+    category: society
+    order: 60
+    question: 平和とは単に戦争がないことなのか、国際社会は紛争をどのように予防・管理できるのか。
+    plot: 国連事務総長になったやる夫が、理想的な平和案を冷戦・抑止・安全保障制度の現実に照らして作り直していく。
+
+  - id: cold-medicine
+    title: やる夫が作る総合感冒薬
+    path: /books/cold-medicine
+    category: engineering
+    order: 10
+    question: 風邪薬は風邪を治しているのか、一錠の中身はどの症状をどう抑えているのか。
+    plot: 風邪を一発で治す薬を求めるやる夫が、対症療法、成分の役割、副作用と配合設計を薬局で学ぶ。
+  - id: mobile
+    title: やる夫が携帯電話会社のCTOになるそうです
+    path: /books/mobile
+    category: engineering
+    order: 20
+    question: 声やデータはどのように電波へ載り、限られた周波数で多数の利用者をつなぐのか。
+    plot: 携帯電話会社のCTOになったやる夫が、アンテナ、変調、セル設計、シャノン限界の壁に順番にぶつかる。
+  - id: mansion-development
+    title: やる夫がマンションを建てて50年経ったそうです
+    path: /books/mansion-development
+    category: engineering
+    order: 30
+    question: 都心200戸のマンションは、企画・資金・法規・交渉・販売をどう経て決まり、50年後・80年後に何を住民へ残すのか。
+    plot: 竣工50年目の理事会から回想が始まり、デベロッパー新人のやる夫が、伝説の親方（実は会長）に導かれて事業収支表を逆算し、土壌汚染や金利上昇などのトラブルを浴びながら、修繕積立金と長期のモラルまでを見通す。
+  - id: skyscraper
+    title: やる夫が高層ビルを建てるそうです
+    path: /books/skyscraper
+    category: engineering
+    order: 40
+    question: 高層ビルは、重力・風・地震にどう耐えて空へ伸びるのか。
+    plot: 240mのビルを建てようとするやる夫が、組積造から鉄骨、耐震・制振設計へと、人類の失敗の階段を踏み直す。
+  - id: power-grid
+    title: やる夫で学ぶ電力系統
+    path: /books/power-grid
+    category: engineering
+    order: 50
+    question: 電気を在庫できない社会で、需要と供給、周波数、安定度をどう保つのか。
+    plot: 電力会社CTOになったやる夫が、離島グリッドの小さな例をいじりながら、発電機・送電網・需給調整を再設計する。
+  - id: chemical-plant
+    title: やる夫が新型電池を量産するそうです
+    path: /books/chemical-plant
+    category: engineering
+    order: 60
+    question: フラスコで一度成功した反応を、そのまま巨大工場で再現できないのはなぜか──その反応、工場になるのか。
+    plot: 新型電池の固体電解質を発見して舞い上がる院生やる夫が、スケールアップ・分離・材料・立地・時間・安全の壁に一つずつ転びながら、化学工場が「化学」ではなく巨大システム工学であることを再発見する。
+
+  - id: database-design
+    title: やる夫で学ぶデータベース設計
+    path: /books/database-design
+    category: math-information
+    order: 10
+    question: 正規化だけで業務システムは作れるのか、データの意味・履歴・制約はどう設計するのか。
+    plot: 給与計算システムを題材に、やる夫がExcel風の表を崩しながら、実務に耐えるテーブル設計を組み立てる。
+  - id: statistics
+    title: やる夫で学ぶ統計学
+    path: /books/statistics
+    category: math-information
+    order: 20
+    question: 100人中62人が「買いたい」と答えたとき、新商品は売れると判断してよいのか。
+    plot: おもちゃ会社の企画担当やる夫が、素朴なアンケート判定の失敗から出発し、確率・推定・検定、回帰、ベイズ統計、機械学習、因果推論、意思決定理論までを再発見していく。
+  - id: mathematical-foundations
+    title: やる夫で学ぶ数学基礎論
+    path: /books/mathematical-foundations
+    category: math-information
+    order: 30
+    question: 「1+1=2」はなぜ正しく、数学は集合・論理・証明の上にどう立っているのか。
+    plot: 数学動画の断片知識に惹かれたやる夫が、自然数、集合、形式体系、不完全性へと根本の問いを追っていく。
+  - id: fp-category-theory
+    title: やる夫が圏論チョットワカルかもしれません
+    path: /books/fp-category-theory
+    category: math-information
+    order: 40
+    question: 圏論やモナドは、プログラミングの何を抽象化しているのか。
+    plot: 関数型プログラミングで挫折したやる夫が、日々書くコードを足場に、射・関手・自然変換・モナドへ近づく。
+
+  - id: weather-forcast
+    title: やる夫が天気予報を作るそうです
+    path: /books/weather-forcast
+    category: natural-science
+    order: 10
+    question: 天気予報はなぜ難しく、観測・物理モデル・データ同化・AIは何を補っているのか。
+    plot: 明日の天気を当てたいだけのやる夫が、持続予報やアナログ予報の限界から数値予報の仕組みへ進んでいく。
+  - id: orbital-mechanics-moon
+    title: やる夫で学ぶ軌道力学
+    path: /books/orbital-mechanics-moon
+    category: natural-science
+    order: 20
+    question: 月へ行って帰るには、なぜ一直線ではなく軌道を設計しなければならないのか。
+    plot: 月旅行を思い立ったやる夫が、大砲案や単純加速案を退けられ、Δv、遷移軌道、帰還の計算を積み上げる。
+  - id: schrodinger
+    title: やる夫で学ぶシュレーディンガー方程式
+    path: /books/schrodinger
+    category: natural-science
+    order: 30
+    question: 古典物理が破綻したあと、波動関数とシュレーディンガー方程式は何を説明するために必要になるのか。
+    plot: 黒体放射や水素スペクトルの謎から出発し、やる夫がボーア模型の限界を越えて量子力学の形を再発見する。
+  - id: standard-model
+    title: やる夫で学ぶ標準模型
+    path: /books/standard-model
+    category: natural-science
+    order: 40
+    question: 量子力学と特殊相対論を両立させると、粒子と力はどのように見えてくるのか。
+    plot: シュレーディンガー方程式の限界を出発点に、やる夫が場、対称性、ゲージ理論、ヒッグス機構へ進む。
+  - id: general-relativity
+    title: やる夫で学ぶ一般相対性理論
+    path: /books/general-relativity
+    category: natural-science
+    order: 50
+    question: ニュートン重力の瞬時作用を捨てると、重力は何として記述されるべきなのか。
+    plot: 特殊相対論を学んだやる夫が、遅延する力の失敗から時空の曲率とアインシュタイン方程式へ導かれる。
+
+  - id: buddhism
+    title: やる夫が悟りを開きそうです
+    path: /books/buddhism
+    category: thought
+    order: 10
+    question: 「空」や「悟り」は、単にすべてが無意味だということなのか。
+    plot: 般若心経を分かった気になったやる夫が、敗北への執着を手がかりに、空・縁起・苦の見方を問い直していく。
+  - id: philosophy
+    title: やる夫が時をかけて哲学するようです
+    path: /books/philosophy
+    category: thought
+    order: 20
+    question: 「当たり前」を疑うことには何の意味があり、哲学はどのように常識を作り替えてきたのか。
+    plot: やる夫が古代から現代までの時代を渡り歩き、各時代の常識に閉じ込められながら哲学上の問いを追体験する。
