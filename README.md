@@ -1,6 +1,6 @@
 # genai-textbooks
 
-Short Textbooks on Various Topics Written by Generative AI
+AI-Generated Japanese Short Textbooks: "Yaruo"-Style Dialogue Collection and AI Text Generation Skill Definitions
 
 [公開サイト](https://reki2000.github.io/genai-textbooks/#/)
 
