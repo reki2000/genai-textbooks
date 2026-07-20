@@ -28,6 +28,7 @@
   - [やる夫で学ぶシュレーディンガー方程式](/books/schrodinger) (28分)
   - [やる夫で学ぶ標準模型](/books/standard-model) (41分)
   - [やる夫で学ぶ一般相対性理論](/books/general-relativity) (18分)
+  - [やる夫と犬と分類学](/books/taxonomy) (9分)
 
 - 思想と人間
   - [やる夫が悟りを開きそうです](/books/buddhism) (22分)
