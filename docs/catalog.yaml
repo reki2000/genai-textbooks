@@ -102,6 +102,14 @@ documents:
     question: フラスコで一度成功した反応を、そのまま巨大工場で再現できないのはなぜか──その反応、工場になるのか。
     plot: 新型電池の固体電解質を発見して舞い上がる院生やる夫が、スケールアップ・分離・材料・立地・時間・安全の壁に一つずつ転びながら、化学工場が「化学」ではなく巨大システム工学であることを再発見する。
 
+  - id: media-compression
+    title: やる夫の回線は細いのに4Kが止まらない
+    path: /books/media-compression
+    category: engineering
+    order: 70
+    question: 生の4K映像は毎秒12ギガビットあるのに、なぜ25Mbpsの細い回線で高画質のまま止まらず届くのか。
+    plot: ネトフリ廃人で高画質マニアのやる夫が、細い回線に阻まれ、話しかけてくる動画の中のやらない夫から、エントロピーの限界・DCT・動き補償・マスキング・適応ストリーミング・規格戦争を再発見していく。
+
   - id: database-design
     title: やる夫で学ぶデータベース設計
     path: /books/database-design
