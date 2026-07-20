@@ -3,7 +3,7 @@
 - 社会と制度
   - [やる夫と牛丼と食料政策](/books/japan-food-policy) (14分)
   - [やる夫が文部科学大臣になったようです](/books/education) (15分)
-  - [やる夫が政令指定都市の市長になるようです](/books/local-government) (11分)
+  - [やる夫が政令指定都市の市長になるようです](/books/local-government) (10分)
   - [やる夫が日銀総裁になるようです](/books/economics-japan-bank) (14分)
   - [やる夫が夢見るエネルギー政策](/books/energy-policy) (11分)
   - [やる夫が世界平和を目指すようです](/books/world-peace) (10分)
@@ -11,7 +11,7 @@
 - 工学と産業
   - [やる夫が作る総合感冒薬](/books/cold-medicine) (9分)
   - [やる夫が携帯電話会社のCTOになるそうです](/books/mobile) (13分)
-  - [やる夫がマンションを建てて50年経ったそうです](/books/mansion-development) (13分)
+  - [やる夫がマンションを建てて50年経ったそうです](/books/mansion-development) (12分)
   - [やる夫が高層ビルを建てるそうです](/books/skyscraper) (11分)
   - [やる夫で学ぶ電力系統](/books/power-grid) (14分)
   - [やる夫が新型電池を量産するそうです](/books/chemical-plant) (40分)
@@ -19,7 +19,7 @@
 
 - 数学と情報
   - [やる夫で学ぶデータベース設計](/books/database-design) (18分)
-  - [やる夫で学ぶ統計学](/books/statistics) (55分)
+  - [やる夫で学ぶ統計学](/books/statistics) (54分)
   - [やる夫で学ぶ数学基礎論](/books/mathematical-foundations) (50分)
   - [やる夫が圏論チョットワカルかもしれません](/books/fp-category-theory) (30分)
 
