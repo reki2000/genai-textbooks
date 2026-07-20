@@ -10,44 +10,43 @@ from pathlib import Path
 from typing import Any, Iterable
 
 
-SPEAKER_LINE = re.compile(r"\*\*(?:やる夫|やらない夫)\*\*：\s*")
-SPEECH_BOUNDARY = re.compile(r"(?:#{1,6}\s|---+\s*$)")
+FULLWIDTH_SPACE = "　"
+SPEAKER_LINE = re.compile(r"^\*\*([^*\n]+)\*\*[^*:：\n]*[:：]\s*$")
+ROSTER_LINE = re.compile(r"^\*\*([^*\n]+)\*\*")
+SECTION_LINE = re.compile(r"^(?:---\s*$|#{1,6}\s)")
+DEFAULT_SPEAKERS = {"やる夫", "やらない夫"}
 
 
-def normalized_content_lines(source_path: Path) -> list[str]:
-    """Return countable lines after removing dialogue presentation characters."""
+def countable_content_lines(source_path: Path) -> list[str]:
+    """Return countable lines after excluding recognized speaker labels."""
     lines = source_path.read_text(encoding="utf-8").splitlines()
-    kept: list[str] = []
-    speech: list[str] | None = None
+    bodies = [line.lstrip(FULLWIDTH_SPACE) for line in lines]
+    marker_counts: dict[str, int] = {}
+    for body in bodies:
+        if match := SPEAKER_LINE.match(body):
+            name = match.group(1)
+            marker_counts[name] = marker_counts.get(name, 0) + 1
 
-    def flush_speech() -> None:
-        nonlocal speech
-        if speech is None:
-            return
-        speech = [line.lstrip("　") for line in speech]
-        nonempty = [index for index, line in enumerate(speech) if line]
-        if nonempty:
-            first, last = nonempty[0], nonempty[-1]
-            if speech[first].startswith("「"):
-                speech[first] = speech[first][1:]
-            if speech[last].endswith("」"):
-                speech[last] = speech[last][:-1]
-        kept.extend(speech)
-        speech = None
+    speaker_names = set(DEFAULT_SPEAKERS)
+    speaker_names.update(name for name, count in marker_counts.items() if count >= 2)
+    in_roster = False
+    for body in bodies:
+        if re.match(r"^##\s+登場人物\s*$", body):
+            in_roster = True
+            continue
+        if in_roster and SECTION_LINE.match(body):
+            in_roster = False
+        if in_roster and (match := ROSTER_LINE.match(body)):
+            speaker_names.add(match.group(1))
 
-    for line in lines:
-        if SPEAKER_LINE.fullmatch(line):
-            flush_speech()
-            speech = []
-        elif speech is not None and SPEECH_BOUNDARY.match(line):
-            flush_speech()
-            kept.append(line)
-        elif speech is not None:
-            speech.append(line)
-        else:
-            kept.append(line)
-    flush_speech()
-    return kept
+    return [
+        line
+        for line, body in zip(lines, bodies)
+        if not (
+            (match := SPEAKER_LINE.match(body))
+            and match.group(1) in speaker_names
+        )
+    ]
 
 
 def count_math_characters(lines: Iterable[str]) -> int:
@@ -126,7 +125,7 @@ def count_document(source_path: Path | str) -> dict[str, Any]:
     """Return all count and reading-time metrics for one textbook."""
     path = Path(source_path)
     raw_bytes = path.read_bytes()
-    lines = normalized_content_lines(path)
+    lines = countable_content_lines(path)
     characters = sum(len(line) for line in lines)
     math_characters = count_math_characters(lines)
     other_characters = characters - math_characters
