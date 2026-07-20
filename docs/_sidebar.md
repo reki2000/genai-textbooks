@@ -15,7 +15,8 @@
   - [やる夫が高層ビルを建てるそうです](/books/skyscraper) (11分)
   - [やる夫で学ぶ電力系統](/books/power-grid) (14分)
   - [やる夫が新型電池を量産するそうです](/books/chemical-plant) (40分)
-  - [やる夫の回線は細いのに4Kが止まらない](/books/media-compression) (20分)
+  - [やる夫の回線は細いのに4Kが止まらない](/books/media-compression) (10分)
+  - [やる夫が水の都をデバッグするようです](/books/water-infrastructure) (13分)
 
 - 数学と情報
   - [やる夫で学ぶデータベース設計](/books/database-design) (18分)
