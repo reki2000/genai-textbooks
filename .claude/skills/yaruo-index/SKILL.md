@@ -14,6 +14,8 @@ description: やる夫式教材集のカタログと公開目次を `docs/catalo
 - 生成マーカー内だけを生成：`docs/README.md`
 - 生成スクリプト：`.claude/skills/yaruo-index/scripts/generate_catalog.py`
 
+生成時に `yaruo-count` スキルの集計スクリプトを使って各教材の読了時間を自動計算し、サイドバーとトップページの各教材リンクの後ろへ `(0分)` 形式で付与する。計算規則や実装をこのスキルやカタログへ重複して持たせない。
+
 `docs/README.md` の生成マーカー外にあるサイト説明は手動管理とし、このスキルでは変更しない。
 
 ## YAML構造
@@ -77,6 +79,7 @@ python3 -m pip install -r requirements-dev.txt
 - `docs/books/*.md` にある未登録教材
 - 文書が一つもないカテゴリ
 - トップページの生成マーカー欠落
+- 各教材から算出した読了時間がサイドバーとトップページに反映されていること
 - YAMLと生成済みMarkdownの不一致（`--check`）
 
 ## 完了報告

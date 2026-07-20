@@ -1,0 +1,4 @@
+interface:
+  display_name: "やる夫教材カウント"
+  short_description: "教材の文字数・行数・読了時間を統一ルールで正確に集計"
+  default_prompt: "Use $yaruo-count to count textbook characters, lines, and estimated reading time."

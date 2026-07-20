@@ -26,6 +26,11 @@ def find_repo_root() -> Path:
 
 
 ROOT = find_repo_root()
+COUNT_SCRIPT_DIR = ROOT / ".claude" / "skills" / "yaruo-count" / "scripts"
+sys.path.insert(0, str(COUNT_SCRIPT_DIR))
+sys.dont_write_bytecode = True
+from count_textbooks import count_document  # noqa: E402
+
 CATALOG_PATH = ROOT / "docs" / "catalog.yaml"
 SIDEBAR_PATH = ROOT / "docs" / "_sidebar.md"
 TOP_PAGE_PATH = ROOT / "docs" / "README.md"
@@ -153,6 +158,11 @@ def documents_by_category(
     return [(category, grouped[category["id"]]) for category in categories]
 
 
+def reading_minutes(document: dict[str, Any]) -> int:
+    source_path = (ROOT / "docs" / document["path"].removeprefix("/")).with_suffix(".md")
+    return count_document(source_path)["reading_minutes"]
+
+
 def render_sidebar(
     categories: list[dict[str, Any]], documents: list[dict[str, Any]]
 ) -> str:
@@ -160,7 +170,10 @@ def render_sidebar(
     for category, category_documents in documents_by_category(categories, documents):
         lines.append(f"- {category['title']}")
         for document in category_documents:
-            lines.append(f"  - [{document['title']}]({document['path']})")
+            minutes = reading_minutes(document)
+            lines.append(
+                f"  - [{document['title']}]({document['path']}) ({minutes}分)"
+            )
         lines.append("")
     return "\n".join(lines).rstrip() + "\n"
 
@@ -173,9 +186,10 @@ def render_top_page_catalog(
         lines.append(f"### {category['title']}")
         lines.append("")
         for document in category_documents:
+            minutes = reading_minutes(document)
             lines.extend(
                 [
-                    f"#### [{document['title']}]({document['path']})",
+                    f"#### [{document['title']}]({document['path']}) ({minutes}分)",
                     f"問い：{document['question']}",
                     f"プロット：{document['plot']}",
                     "",
