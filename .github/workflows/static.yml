@@ -6,6 +6,10 @@ on:
   push:
     branches: ["main"]
 
+  # Validates generated catalog files before changes reach the default branch
+  pull_request:
+    branches: ["main"]
+
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -22,11 +26,8 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # Single deploy job since we're just deploying
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  validate-catalog:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -35,6 +36,17 @@ jobs:
         run: |
           python3 -m pip install -r requirements-dev.txt
           python3 .claude/skills/yaruo-index/scripts/generate_catalog.py --check
+
+  # Single deploy job since we're just deploying
+  deploy:
+    if: github.event_name != 'pull_request'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact

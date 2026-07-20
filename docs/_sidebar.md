@@ -20,7 +20,7 @@
 
 - 数学と情報
   - [やる夫で学ぶデータベース設計](/books/database-design) (18分)
-  - [やる夫で学ぶ統計学](/books/statistics) (54分)
+  - [やる夫で学ぶ統計学](/books/statistics) (55分)
   - [やる夫で学ぶ数学基礎論](/books/mathematical-foundations) (50分)
   - [やる夫が圏論チョットワカルかもしれません](/books/fp-category-theory) (30分)
 
@@ -34,4 +34,4 @@
 
 - 思想と人間
   - [やる夫が悟りを開きそうです](/books/buddhism) (22分)
-  - [やる夫が時をかけて哲学するようです](/books/philosophy) (56分)
+  - [やる夫が時をかけて哲学するようです](/books/philosophy) (57分)
