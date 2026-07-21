@@ -21,7 +21,7 @@
 
 - 数学と情報
   - [やる夫で学ぶデータベース設計](/books/database-design) (18分)
-  - [やる夫で学ぶ統計学](/books/statistics) (55分)
+  - [やる夫で学ぶ統計学](/books/statistics) (61分)
   - [やる夫で学ぶ数学基礎論](/books/mathematical-foundations) (50分)
   - [やる夫が圏論チョットワカルかもしれません](/books/fp-category-theory) (30分)
 
