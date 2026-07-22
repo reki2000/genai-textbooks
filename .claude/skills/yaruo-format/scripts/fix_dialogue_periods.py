@@ -13,6 +13,9 @@ import re
 import sys
 
 
+# 話者行・登場人物欄の判定規則は format_dialogue.py / count_textbooks.py と同一。
+# check_dialogue_constraints.py は主役2名に限定した同等版。ここを変えるときは各
+# スクリプトの SPEAKER_RE とロースター走査も同期すること。
 SPEAKER_RE = re.compile(r"^\*\*([^*\n]+)\*\*[^*:：\n]*[:：]\s*$")
 ROSTER_RE = re.compile(r"^\*\*([^*\n]+)\*\*")
 SECTION_RE = re.compile(r"^(?:---\s*$|#{1,6}\s)")
