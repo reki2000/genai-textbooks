@@ -44,18 +44,25 @@ documents:
     order: 40
     question: お金を刷れば物価は上がるのか、中央銀行は何を操作して景気とインフレに働きかけるのか。
     plot: 日銀総裁に任命されたやる夫が、貨幣数量説の素朴な理解から出発し、金利・期待・国債市場・金融政策の限界を再発見していく。
+  - id: asset-management
+    title: やる夫は値札の向こう側を見て資産を運ぶようです
+    path: /books/asset-management
+    category: society
+    order: 50
+    question: 次に上がる商品を当てるのではなく、使う時期の違うお金を壊れにくい形で未来へ運ぶには、何をどう組み合わせればよいのか。
+    plot: 全財産をAI株・ビットコイン・金・原油・ドルへ等分しようとするやる夫が、家計と権利の違いから出発し、株価の日々の形成、分散、投資信託、金、原油先物、FX、暗号資産、デリバティブを読み解いて運用設計書を作る。
   - id: energy-policy
     title: やる夫が夢見るエネルギー政策
     path: /books/energy-policy
     category: society
-    order: 50
+    order: 60
     question: 安さ、安定供給、脱炭素、安全保障を同時に満たすエネルギーミックスはどう設計できるのか。
     plot: エネルギー政策の責任者になったやる夫が、単一目標への全振り案を次々に失敗させ、電源構成のトレードオフを掘り下げる。
   - id: world-peace
     title: やる夫が世界平和を目指すようです
     path: /books/world-peace
     category: society
-    order: 60
+    order: 70
     question: 平和とは単に戦争がないことなのか、国際社会は紛争をどのように予防・管理できるのか。
     plot: 国連事務総長になったやる夫が、理想的な平和案を冷戦・抑止・安全保障制度の現実に照らして作り直していく。
 

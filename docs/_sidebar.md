@@ -5,6 +5,7 @@
   - [やる夫が文部科学大臣になったようです](/books/education) (15分)
   - [やる夫が政令指定都市の市長になるようです](/books/local-government) (10分)
   - [やる夫が日銀総裁になるようです](/books/economics-japan-bank) (14分)
+  - [やる夫は値札の向こう側を見て資産を運ぶようです](/books/asset-management) (28分)
   - [やる夫が夢見るエネルギー政策](/books/energy-policy) (11分)
   - [やる夫が世界平和を目指すようです](/books/world-peace) (10分)
 
