@@ -1,6 +1,6 @@
 ---
 name: yaruo-index
-description: やる夫式教材集のカタログと公開目次を `docs/catalog.yaml` で一元管理し、`docs/_sidebar.md` とトップページ `docs/README.md` の教材一覧を再生成・検証するスキル。教材（`docs/books/*.md`）の追加・削除・改名、目次・教材一覧・索引の更新、カテゴリ・分類・表示順・タイトル・URL・問い・プロットの変更、sidebarやトップページへの反映、カタログ生成エラーの修正を依頼された場合は必ず使うこと。yaruo-rediscovery（教材作成）、yaruo-format（書式整形）、yaruo-proofread（校正）とは独立しており、該当する作業では併用する。
+description: やる夫式教材集のカタログと公開目次を `docs/catalog.yaml` で一元管理し、`docs/_sidebar.md` とトップページ `docs/README.md` の教材一覧を再生成・検証するスキル。教材（`docs/books/*.md`）の追加・削除・改名、目次・教材一覧・索引の更新、カテゴリ・分類・表示順・タイトル・URL・問い・プロットの変更、sidebarやトップページへの反映、カタログ生成エラーの修正を依頼された場合は必ず使うこと。yaruo-rediscovery（教材作成）、yaruo-format（書式整形）、yaruo-proofread（校正）とは独立しており、該当する作業では併用する。読了時間の算出には yaruo-count の集計スクリプトを内部利用する。
 ---
 
 # やる夫教材目次管理

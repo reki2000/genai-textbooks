@@ -11,6 +11,9 @@ from typing import Any, Iterable
 
 
 FULLWIDTH_SPACE = "　"
+# 話者行・登場人物欄の判定規則は format_dialogue.py / fix_dialogue_periods.py と
+# 同一。check_dialogue_constraints.py は主役2名に限定した同等版。ここを変えるとき
+# は各スクリプトの SPEAKER_RE とロースター走査も同期すること。
 SPEAKER_LINE = re.compile(r"^\*\*([^*\n]+)\*\*[^*:：\n]*[:：]\s*$")
 ROSTER_LINE = re.compile(r"^\*\*([^*\n]+)\*\*")
 SECTION_LINE = re.compile(r"^(?:---\s*$|#{1,6}\s)")

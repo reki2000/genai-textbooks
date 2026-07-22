@@ -9,7 +9,11 @@ from dataclasses import dataclass
 from pathlib import Path
 
 
-SPEAKER_RE = re.compile(r"^\*\*(やる夫|やらない夫)\*\*.*：\s*$")
+# 話者行の判定は yaruo-format / yaruo-count と同一の規則に合わせる（全角・半角
+# コロン両対応、**名前**（注記）：の形も許容）。5往復の判定対象は主役2名のみ
+# なので名前は限定する。ここを変えるときは format_dialogue.py / count_textbooks.py /
+# fix_dialogue_periods.py の SPEAKER_RE も同期すること。
+SPEAKER_RE = re.compile(r"^\*\*(やる夫|やらない夫)\*\*[^*:：\n]*[:：]\s*$")
 HEADING_RE = re.compile(r"^(##|###)\s+(.+?)\s*$")
 KANJI_MONEY_RE = re.compile(
     r"(?<![0-9０-９])[〇一二三四五六七八九十百千]"

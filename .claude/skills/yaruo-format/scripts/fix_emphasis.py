@@ -33,6 +33,15 @@ RUN_RE = re.compile(r"(?<!\*)\*+(?!\*)")
 INLINE_SKIP_RE = re.compile(r"`[^`]*`|\$\$[^$]+\$\$|\$[^$\n]+\$")
 
 
+def split_eol(line):
+    """行を本文と改行コード（\\r\\n / \\n / 空）に分ける。newline="" で読むため。"""
+    if line.endswith("\r\n"):
+        return line[:-2], "\r\n"
+    if line.endswith("\n"):
+        return line[:-1], "\n"
+    return line, ""
+
+
 def is_space(ch):
     # 行頭・行末（空文字）は CommonMark では空白扱い
     return ch == "" or ch.isspace()
@@ -147,7 +156,7 @@ def process(lines):
     in_math = False
 
     for i, line in enumerate(lines, 1):
-        body = line.rstrip("\n")
+        body, eol = split_eol(line)
         stripped = body.lstrip("　 \t")
 
         if in_fence:
@@ -169,7 +178,6 @@ def process(lines):
             out.append(line)
             continue
 
-        eol = line[len(body):]
         fixed, did, warns = process_line(body)
         if did:
             changed.append(i)
@@ -187,7 +195,7 @@ def main():
         print(__doc__, file=sys.stderr)
         return 2
     path = args[0]
-    with open(path, encoding="utf-8") as f:
+    with open(path, encoding="utf-8", newline="") as f:
         lines = f.readlines()
     out, changed, warnings = process(lines)
     for n, w in warnings:
@@ -198,7 +206,7 @@ def main():
         print(f"{len(changed)} line(s) need emphasis fix")
         return 1 if changed else 0
     if changed:
-        with open(path, "w", encoding="utf-8") as f:
+        with open(path, "w", encoding="utf-8", newline="") as f:
             f.writelines(out)
     print(f"{path}: {len(changed)} line(s) fixed")
     return 0

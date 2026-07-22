@@ -36,6 +36,15 @@ import sys
 DELIM_CELL_RE = re.compile(r"^\s*:?-+:?\s*$")
 
 
+def split_eol(line):
+    """行を本文と改行コード（\\r\\n / \\n / 空）に分ける。newline="" で読むため。"""
+    if line.endswith("\r\n"):
+        return line[:-2], "\r\n"
+    if line.endswith("\n"):
+        return line[:-1], "\n"
+    return line, ""
+
+
 def is_table_line(body):
     return body.lstrip().startswith("|")
 
@@ -72,7 +81,7 @@ def process(lines):
 
     while i < n:
         line = lines[i]
-        body = line.rstrip("\n")
+        body, _ = split_eol(line)
         stripped = body.lstrip("　 \t")
 
         if in_fence:
@@ -112,7 +121,7 @@ def process(lines):
         start = i
         block = []
         while i < n:
-            b = lines[i].rstrip("\n")
+            b, _ = split_eol(lines[i])
             if not is_table_line(b):
                 break
             block.append(b)
@@ -132,7 +141,8 @@ def process(lines):
         if prev_body.strip() and not prev_body.lstrip().startswith("#"):
             warnings.append((start + 1, "表の直前が空行でない（段落の続きと解釈され表にならない可能性）"))
 
-        eol = lines[start][len(block[0]):] or "\n"
+        _, eol = split_eol(lines[start])
+        eol = eol or "\n"
         fixed = []
         for k, b in enumerate(block):
             s = b.lstrip("　 \t")
@@ -162,7 +172,7 @@ def main():
         print(__doc__, file=sys.stderr)
         return 2
     path = args[0]
-    with open(path, encoding="utf-8") as f:
+    with open(path, encoding="utf-8", newline="") as f:
         lines = f.readlines()
     out, inserted, deindented, warnings = process(lines)
     for ln, w in warnings:
@@ -175,7 +185,7 @@ def main():
         print(f"{len(inserted)} delimiter row(s), {len(deindented)} de-indent(s) needed")
         return 1 if (inserted or deindented) else 0
     if inserted or deindented:
-        with open(path, "w", encoding="utf-8") as f:
+        with open(path, "w", encoding="utf-8", newline="") as f:
             f.writelines(out)
     print(f"{path}: {len(inserted)} delimiter row(s) inserted, {len(deindented)} line(s) de-indented")
     return 0
