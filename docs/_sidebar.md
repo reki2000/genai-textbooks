@@ -20,6 +20,7 @@
   - [やる夫が水の都をデバッグするようです](/books/water-infrastructure) (13分)
   - [やる夫が究極洗剤を作るようです](/books/ultimate-detergent) (11分)
   - [やる夫が中国拳法で戦うロボットを作るようです](/books/control-engineering) (20分)
+  - [やる夫がレンタカー業務を競争力に変えるようです](/books/rental-car-operations) (38分)
 
 - 数学と情報
   - [やる夫で学ぶデータベース設計](/books/database-design) (18分)
