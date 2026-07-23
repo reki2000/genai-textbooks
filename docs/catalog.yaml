@@ -149,6 +149,14 @@ documents:
     question: 首都圏の道路は、どうすれば丸暗記せずに覚えられるのか、道の形と名前は何を語っているのか。
     plot: 配車ドライバーで一儲けを夢見るやる夫が、ベテランタクシー運転手やらない夫の車内で、日本橋からの放射と環状の骨格、川の上を走る首都高、国道番号、通り名の着替え、地形と鉄道までを再発見していく。
 
+  - id: rental-car-operations
+    title: やる夫がレンタカー業務を競争力に変えるようです
+    path: /books/rental-car-operations
+    category: engineering
+    order: 120
+    question: 紙がなくても分断された事務業務を、変化と例外に強い競争力あるオペレーションへどう変えるのか。
+    plot: レンタカー会社のやる夫が、一件の延長・返却・請求事故から、業務の流れ、データ構造、レギュラーとイレギュラー、失敗学、BPR、自動化、AI、変更管理を学び、現場と専門家を結ぶ究極のCoEを組み立てる。
+
   - id: database-design
     title: やる夫で学ぶデータベース設計
     path: /books/database-design
