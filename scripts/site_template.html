@@ -2,6 +2,16 @@
 <html lang="ja">
 
 <head>
+  <script>
+    // Redirect legacy hash-mode URLs (e.g. #/books/foo, from before the
+    // history-mode migration) to their history-mode equivalent.
+    (function () {
+      var hash = window.location.hash;
+      if (hash.charAt(0) === '#' && hash.charAt(1) === '/') {
+        window.location.replace('@@BASE_PATH@@' + hash.slice(1) + window.location.search);
+      }
+    })();
+  </script>
   <meta charset="UTF-8">
   <title>@@TITLE@@</title>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
