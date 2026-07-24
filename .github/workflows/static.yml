@@ -32,10 +32,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Validate generated catalog
+      - name: Validate catalog
         run: |
           python3 -m pip install -r requirements-dev.txt
-          python3 .claude/skills/yaruo-index/scripts/generate_catalog.py --check
+          python3 scripts/generate_site.py --check
 
   # Single deploy job since we're just deploying
   deploy:
@@ -47,6 +47,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Generate site from catalog
+        run: |
+          python3 -m pip install -r requirements-dev.txt
+          python3 scripts/generate_site.py
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact

@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
-"""Generate the public textbook indexes from docs/catalog.yaml."""
+"""Generate the public docsify site (sidebar, top page, per-book pages,
+sitemap) from docs/catalog.yaml. Run automatically at build/deploy time;
+nothing here is meant to be hand-edited or committed as generated output.
+"""
 
 from __future__ import annotations
 
 import argparse
 import sys
+import tempfile
 from collections import defaultdict
 from pathlib import Path
 from typing import Any
@@ -32,10 +36,21 @@ sys.dont_write_bytecode = True
 from count_textbooks import count_document  # noqa: E402
 
 CATALOG_PATH = ROOT / "docs" / "catalog.yaml"
+TEMPLATE_PATH = ROOT / "scripts" / "site_template.html"
 SIDEBAR_PATH = ROOT / "docs" / "_sidebar.md"
 TOP_PAGE_PATH = ROOT / "docs" / "README.md"
+INDEX_PATH = ROOT / "docs" / "index.html"
+NOT_FOUND_PATH = ROOT / "docs" / "404.html"
+SITEMAP_PATH = ROOT / "docs" / "sitemap.xml"
+BOOKS_DIR = ROOT / "docs" / "books"
 START_MARKER = "<!-- BEGIN GENERATED CATALOG -->"
 END_MARKER = "<!-- END GENERATED CATALOG -->"
+
+SITE_ORIGIN = "https://reki2000.github.io"
+SITE_BASE_PATH = "/genai-textbooks"
+SITE_URL = SITE_ORIGIN + SITE_BASE_PATH
+SITE_TITLE = "genai-textbooks"
+SITE_DESCRIPTION = "Short Textbooks on Various Topics Written by Generative AI"
 
 
 def fail(message: str) -> None:
@@ -207,16 +222,60 @@ def replace_generated_catalog(current: str, generated: str) -> str:
     return before + generated + after.lstrip("\n")
 
 
-def update_or_check(path: Path, expected: str, check: bool) -> bool:
-    current = path.read_text(encoding="utf-8") if path.exists() else ""
-    if current == expected:
-        return True
-    if check:
-        print(f"out of date: {path.relative_to(ROOT)}", file=sys.stderr)
-        return False
-    path.write_text(expected, encoding="utf-8")
-    print(f"updated: {path.relative_to(ROOT)}")
-    return True
+def render_shell(title: str, description: str, extra_head: str = "") -> str:
+    template = TEMPLATE_PATH.read_text(encoding="utf-8")
+    return (
+        template.replace("@@TITLE@@", title)
+        .replace("@@DESCRIPTION@@", description)
+        .replace("@@BASE_PATH@@", SITE_BASE_PATH)
+        .replace("@@EXTRA_HEAD@@", extra_head)
+    )
+
+
+def render_book_extra_head(document: dict[str, Any]) -> str:
+    page_url = f"{SITE_URL}{document['path']}"
+    return (
+        f'  <link rel="canonical" href="{page_url}">\n'
+        f'  <meta property="og:type" content="article">\n'
+        f'  <meta property="og:site_name" content="{SITE_TITLE}">\n'
+        f'  <meta property="og:title" content="{document["title"]}">\n'
+        f'  <meta property="og:description" content="{document["question"]}">\n'
+        f'  <meta property="og:url" content="{page_url}">\n'
+        f'  <meta name="twitter:card" content="summary">\n'
+    )
+
+
+def render_sitemap(documents: list[dict[str, Any]]) -> str:
+    urls = [SITE_URL + "/"] + [SITE_URL + document["path"] for document in documents]
+    lines = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+    for url in urls:
+        lines.append(f"  <url><loc>{url}</loc></url>")
+    lines.append("</urlset>")
+    return "\n".join(lines) + "\n"
+
+
+def write_file(path: Path, content: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content, encoding="utf-8")
+
+
+def generate(categories: list[dict[str, Any]], documents: list[dict[str, Any]], out_docs: Path) -> None:
+    sidebar = render_sidebar(categories, documents)
+    current_top_page = (ROOT / "docs" / "README.md").read_text(encoding="utf-8")
+    top_page = replace_generated_catalog(current_top_page, render_top_page_catalog(categories, documents))
+
+    write_file(out_docs / "_sidebar.md", sidebar)
+    write_file(out_docs / "README.md", top_page)
+    write_file(out_docs / "index.html", render_shell(SITE_TITLE, SITE_DESCRIPTION))
+    write_file(out_docs / "404.html", render_shell(SITE_TITLE, SITE_DESCRIPTION))
+
+    for document in documents:
+        relative_path = Path(document["path"].removeprefix("/")).with_suffix(".html")
+        page_title = f"{document['title']} - {SITE_TITLE}"
+        page = render_shell(page_title, document["question"], render_book_extra_head(document))
+        write_file(out_docs / relative_path, page)
+
+    write_file(out_docs / "sitemap.xml", render_sitemap(documents))
 
 
 def main() -> int:
@@ -224,26 +283,27 @@ def main() -> int:
     parser.add_argument(
         "--check",
         action="store_true",
-        help="fail if generated files differ instead of updating them",
+        help="only validate docs/catalog.yaml and a trial build, without touching docs/",
     )
     args = parser.parse_args()
 
     try:
         categories, documents = load_catalog()
-        sidebar = render_sidebar(categories, documents)
-        current_top_page = TOP_PAGE_PATH.read_text(encoding="utf-8")
-        top_page = replace_generated_catalog(
-            current_top_page, render_top_page_catalog(categories, documents)
-        )
+        if args.check:
+            with tempfile.TemporaryDirectory() as tmp:
+                generate(categories, documents, Path(tmp))
+        else:
+            generate(categories, documents, ROOT / "docs")
     except (OSError, ValueError, yaml.YAMLError) as exc:
         print(f"catalog error: {exc}", file=sys.stderr)
         return 1
 
-    results = (
-        update_or_check(SIDEBAR_PATH, sidebar, args.check),
-        update_or_check(TOP_PAGE_PATH, top_page, args.check),
-    )
-    return 0 if all(results) else 1
+    if args.check:
+        print("catalog OK")
+    else:
+        print("generated: docs/_sidebar.md, docs/README.md, docs/index.html, docs/404.html, "
+              "docs/books/*.html, docs/sitemap.xml")
+    return 0
 
 
 if __name__ == "__main__":
