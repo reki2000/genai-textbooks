@@ -1,0 +1,91 @@
+schema_version: 1
+book_slug: payroll-calculation
+act_id: act-10
+purpose_detail: "日本・英国・米国などの簡略ケースを同じ比較軸へ載せ、手取り率だけで制度の優劣を決めない国際比較を行う。"
+sections:
+  - id: act-10-sec-01
+    title: "10-1　世界手取り選手権を開くな"
+    function: opening
+    core_concept_id: null
+    supporting_concept_ids: [historical-layering, payroll-equation]
+    entry_thread_ids: [thread-missing-money, thread-authority, thread-why-this-shape]
+    drama: {type: comedy, turn: "手取り率だけで移住先を決める夢が、保険と給付の違いで止まる。"}
+    setup_ids: []
+    payoff_ids: []
+    callback_ids: []
+    exit_thread_ids: [thread-missing-money, thread-authority, thread-why-this-shape]
+    closing_realization: "同じ総支給と手取りだけでは制度全体を比べられないと気づく。"
+    target_chars: 2400
+    target_dialogue_rounds: 8
+  - id: act-10-sec-02
+    title: "10-2　誰が毎月引き、誰が年に直すか ── 各国モデル"
+    function: rediscovery
+    core_concept_id: comparative-payroll-models
+    supporting_concept_ids: [assessment-bases, tax-return-boundary, employer-as-collector]
+    entry_thread_ids: [thread-authority, thread-why-this-shape]
+    rediscovery:
+      problem: "各国は税率だけ違い、給与計算の仕組みは日本と同じだとみなす。"
+      naive_attempt: "日本の明細欄へ外国の率を差し替えれば比較できると考える。"
+      failure_direction: "源泉方式、社会保険の負担、年次精算、本人申告、給付連携の役割分担を無視する。"
+      counterexample: "英国PAYE、米国の連邦源泉・給与税、日本の年末調整を同じ欄へ押し込んで矛盾させる。"
+      cause_to_verbalize: "比較すべきは率だけでなく誰がいつ何を精算するかだと説明させる。"
+      correction_direction: "徴収主体、算定基礎、精算主体、申告負担、保障対応の5軸へ載せる。"
+      verification: "3か国の簡略ケースを5軸表へ分類し、日本だけを基準にしない。"
+    drama: {type: wonder, turn: "率のランキングが役割分担の設計図へ変わる。"}
+    setup_ids: []
+    payoff_ids: []
+    callback_ids: []
+    exit_thread_ids: [thread-authority, thread-why-this-shape]
+    closing_realization: "外国制度は日本の率違いでなく、徴収と精算の仕事配分から比べるとまとめる。"
+    target_chars: 2400
+    target_dialogue_rounds: 8
+  - id: act-10-sec-03
+    title: "10-3　手取り率だけでは比べられない ── 比較の限界"
+    function: rediscovery
+    core_concept_id: comparability-limits
+    supporting_concept_ids: [rule-source-boundary, payroll-timeline]
+    entry_thread_ids: [thread-missing-money, thread-why-this-shape]
+    rediscovery:
+      problem: "総支給に対する手取り率が高い国を最良と断定する。"
+      naive_attempt: "振込額が多ければ労働者に必ず有利だと考える。"
+      failure_direction: "雇用主負担、給付、医療・年金、家族構成、通貨、物価、申告費用を落とす。"
+      counterexample: "同じ手取りでも医療保険を別払いするケースと拠出に含むケースを比べる。"
+      cause_to_verbalize: "比較対象の範囲と世帯条件をそろえない順位は意味が薄いと説明させる。"
+      correction_direction: "労働コスト、可処分所得、給付、世帯、物価、事務負担を明記する。"
+      verification: "見かけの手取り率が逆転する研修例を2通りの範囲で計算する。"
+    drama: {type: conflict, turn: "手取り王国への移住計画が比較範囲の変更で崩れる。"}
+    setup_ids: []
+    payoff_ids: []
+    callback_ids: []
+    exit_thread_ids: [thread-missing-money, thread-why-this-shape]
+    closing_realization: "何を手取りの外へ置いたかをそろえてから比べるとまとめる。"
+    target_chars: 2400
+    target_dialogue_rounds: 8
+  - id: act-10-sec-04
+    title: "10-4　同じ社員を3か国で計算する"
+    function: verification
+    core_concept_id: null
+    supporting_concept_ids: [comparative-payroll-models, comparability-limits, payroll-equation]
+    entry_thread_ids: [thread-missing-money, thread-authority, thread-why-this-shape]
+    drama: {type: tension, turn: "架空の同条件社員を3制度へ入れ、金額でなく処理経路の違いを検算する。"}
+    setup_ids: []
+    payoff_ids: []
+    callback_ids: []
+    exit_thread_ids: [thread-missing-money, thread-authority]
+    closing_realization: "同じ人でも制度が違えば会社・本人・行政の仕事量と精算時点が変わるとまとめる。"
+    target_chars: 2400
+    target_dialogue_rounds: 8
+  - id: act-10-sec-05
+    title: "10-5　赤鉛筆で世界を比べる ── 制度比較の検算"
+    function: recurring-corner
+    core_concept_id: null
+    supporting_concept_ids: [comparative-payroll-models, comparability-limits, historical-layering]
+    entry_thread_ids: [thread-missing-money, thread-authority, thread-why-this-shape]
+    drama: {type: reflection, turn: "外国制度の模倣から、目的と副作用を選ぶ比較へ成熟する。"}
+    setup_ids: []
+    payoff_ids: []
+    callback_ids: []
+    exit_thread_ids: [thread-missing-money, thread-authority]
+    closing_realization: "日本の形を当然とも最悪とも決めず、歴史・役割・保障を同じ軸で問うとまとめる。"
+    target_chars: 2400
+    target_dialogue_rounds: 8

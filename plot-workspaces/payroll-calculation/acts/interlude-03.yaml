@@ -1,0 +1,75 @@
+schema_version: 1
+book_slug: payroll-calculation
+act_id: interlude-03
+purpose_detail: "架空の制度改革案を比較し、外国制度の部分模倣でなく徴収・保障・事務負担のトレードオフを判定する。"
+sections:
+  - id: interlude-03-sec-01
+    title: "幕間3-1　天引きを全部なくす案"
+    function: exercise
+    core_concept_id: null
+    supporting_concept_ids: [employer-as-collector, comparability-limits]
+    entry_thread_ids: [thread-missing-money, thread-authority]
+    drama: {type: comedy, turn: "明細を1行にする人気改革が本人納付件数と未納リスクで揺れる。"}
+    setup_ids: []
+    payoff_ids: []
+    callback_ids: []
+    exit_thread_ids: [thread-missing-money, thread-authority]
+    closing_realization: "欄を消すと仕事が消えるのでなく別の人へ移るとまとめる。"
+    target_chars: 1000
+    target_dialogue_rounds: 6
+  - id: interlude-03-sec-02
+    title: "幕間3-2　会社に全部任せる案"
+    function: exercise
+    core_concept_id: null
+    supporting_concept_ids: [tax-return-boundary, employer-as-collector]
+    entry_thread_ids: [thread-authority]
+    drama: {type: conflict, turn: "完全自動精算の夢がプライバシーと会社の情報限界で止まる。"}
+    setup_ids: []
+    payoff_ids: []
+    callback_ids: []
+    exit_thread_ids: [thread-authority]
+    closing_realization: "会社へ集めるほど便利になる一方、情報と責任も集中するとまとめる。"
+    target_chars: 1000
+    target_dialogue_rounds: 6
+  - id: interlude-03-sec-03
+    title: "幕間3-3　外国の一部だけ輸入する案"
+    function: exercise
+    core_concept_id: null
+    supporting_concept_ids: [comparative-payroll-models, historical-layering]
+    entry_thread_ids: [thread-authority]
+    drama: {type: tension, turn: "有名な仕組みだけ移植する案が周辺制度との不整合で崩れる。"}
+    setup_ids: []
+    payoff_ids: []
+    callback_ids: []
+    exit_thread_ids: [thread-authority]
+    closing_realization: "制度は部品単体でなく、精算・給付・申告との接続まで見るとまとめる。"
+    target_chars: 1000
+    target_dialogue_rounds: 6
+  - id: interlude-03-sec-04
+    title: "幕間3-4　新しい給与制度を審査する"
+    function: interlude
+    core_concept_id: null
+    supporting_concept_ids: [comparability-limits, rule-source-boundary, reconciliation]
+    entry_thread_ids: [thread-missing-money, thread-authority]
+    drama: {type: wonder, turn: "批判だけでなく、目的・主体・時点・検算可能性から制度案を評価できる。"}
+    setup_ids: []
+    payoff_ids: []
+    callback_ids: []
+    exit_thread_ids: [thread-missing-money, thread-authority]
+    closing_realization: "単純さだけでなく、誰が何を守りどう訂正できるかで制度を選ぶとまとめる。"
+    target_chars: 1000
+    target_dialogue_rounds: 6
+  - id: interlude-03-sec-05
+    title: "幕間3-5　年間台帳の監査通知"
+    function: bridge
+    core_concept_id: null
+    supporting_concept_ids: [reconciliation, exception-stop-rule, comparative-payroll-models]
+    entry_thread_ids: [thread-missing-money, thread-authority]
+    drama: {type: tension, turn: "制度を論じる余裕が、実在する年間台帳の締切へ切り替わる。"}
+    setup_ids: []
+    payoff_ids: []
+    callback_ids: []
+    exit_thread_ids: [thread-missing-money, thread-authority]
+    closing_realization: "最後は知識を語るのでなく、重なったケースを確定・保留・引渡しへ分ける必要があるとまとめる。"
+    target_chars: 1000
+    target_dialogue_rounds: 6

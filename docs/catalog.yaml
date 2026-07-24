@@ -65,6 +65,13 @@ documents:
     order: 70
     question: 平和とは単に戦争がないことなのか、国際社会は紛争をどのように予防・管理できるのか。
     plot: 国連事務総長になったやる夫が、理想的な平和案を冷戦・抑止・安全保障制度の現実に照らして作り直していく。
+  - id: payroll-calculation
+    title: やる夫で学ぶ給与計算
+    path: /books/payroll-calculation
+    category: society
+    order: 80
+    question: 給与明細の数字は何を足し、何を引き、どの月とどの規則を見れば1円まで再現できるのか。
+    plot: 初任給の差額を盗難だと疑うやる夫が、給与担当代理として月例給与から賞与・年末調整・退職・海外勤務までを検算し、会社の年間給与台帳を締める。
 
   - id: cold-medicine
     title: やる夫が作る総合感冒薬

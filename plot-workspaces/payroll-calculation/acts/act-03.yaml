@@ -1,0 +1,99 @@
+schema_version: 1
+book_slug: payroll-calculation
+act_id: act-03
+purpose_detail: "支払日前夜の5枚を用い、検算、遡及差額、資料不足の停止判定を組み合わせて月例給与を実務として締める。"
+sections:
+  - id: act-03-sec-01
+    title: "3-1　5枚をどの順で見るか ── 一斉計算の入口"
+    function: verification
+    core_concept_id: null
+    supporting_concept_ids: [payroll-equation, payroll-timeline, rounding-order]
+    entry_thread_ids: [thread-missing-money, thread-one-yen, thread-authority]
+    drama: {type: tension, turn: "5枚を同時に暗算する英雄願望が、入力一覧の欠落で止まる。"}
+    setup_ids: []
+    payoff_ids: []
+    callback_ids: [clue-folded-payslip]
+    exit_thread_ids: [thread-missing-money, thread-one-yen, thread-authority]
+    closing_realization: "人ごとに入力、規則、計算、出力を同じ順で並べる必要があるとまとめる。"
+    target_chars: 2400
+    target_dialogue_rounds: 8
+  - id: act-03-sec-02
+    title: "3-2　合計一致だけでは足りない ── 検算と監査証跡"
+    function: rediscovery
+    core_concept_id: reconciliation
+    supporting_concept_ids: [payroll-equation, assessment-bases, payroll-timeline, rounding-order]
+    entry_thread_ids: [thread-missing-money, thread-one-yen]
+    rediscovery:
+      problem: "支給合計と控除合計だけが一致した明細を正しいと判定する。"
+      naive_attempt: "最終の差引支給額が合えば途中項目は問わない。"
+      failure_direction: "誤った項目同士が相殺する可能性と入力根拠を見落とす。"
+      counterexample: "残業を1,000円多く、住民税を1,000円多くした同じ手取りの明細を示す。"
+      cause_to_verbalize: "出力一致だけでは入力と計算の正しさを証明しないと説明させる。"
+      correction_direction: "入力件数、項目式、合計、前月差、振込額を独立に照合する。"
+      verification: "正しい明細と相殺誤りの明細を検算票で見分ける。"
+    drama: {type: wonder, turn: "手取り一致の安心が、経路を追う監査の発見へ変わる。"}
+    setup_ids: []
+    payoff_ids: [clue-one-yen-coin]
+    callback_ids: []
+    exit_thread_ids: [thread-missing-money, thread-authority]
+    closing_realization: "答えだけでなく、どの入力と式で答えへ来たかを残すとまとめる。"
+    target_chars: 2400
+    target_dialogue_rounds: 8
+  - id: act-03-sec-03
+    title: "3-3　過去を書き換えない ── 遡及差額"
+    function: rediscovery
+    core_concept_id: retroactive-correction
+    supporting_concept_ids: [payroll-timeline, rounding-order, reconciliation]
+    entry_thread_ids: [thread-missing-money, thread-authority]
+    rediscovery:
+      problem: "4月へ遡る昇給を過去明細の基本給上書きで処理する。"
+      naive_attempt: "今の正しい基本給へ全履歴を更新すればよいと考える。"
+      failure_direction: "当時支払った事実と今月精算する差額を混同する。"
+      counterexample: "4月・5月各15,000円不足を過去改変すると銀行振込記録と不一致になる。"
+      cause_to_verbalize: "過去の支払事実は残し、差額30,000円を今月項目で精算すると説明させる。"
+      correction_direction: "旧額、新額、対象月、差額、精算月を分離する。"
+      verification: "2か月分の差額と当月新基本給を二重計上せず検算する。"
+    drama: {type: conflict, turn: "履歴を美しく直す夢が銀行記録との矛盾で崩れる。"}
+    setup_ids: []
+    payoff_ids: []
+    callback_ids: []
+    exit_thread_ids: [thread-missing-money, thread-authority]
+    closing_realization: "過去を直すのでなく、過去との差を当月に説明可能な形で置くとまとめる。"
+    target_chars: 2400
+    target_dialogue_rounds: 8
+  - id: act-03-sec-04
+    title: "3-4　埋めない勇気 ── 例外の停止条件"
+    function: rediscovery
+    core_concept_id: exception-stop-rule
+    supporting_concept_ids: [rule-source-boundary, payroll-timeline, reconciliation]
+    entry_thread_ids: [thread-authority]
+    rediscovery:
+      problem: "扶養申告書のない社員の欄を前年情報で推測し締切へ間に合わせる。"
+      naive_attempt: "空欄より推測値の方が実務的だと考える。"
+      failure_direction: "不足資料を計算誤差のように扱い、権限外の事実を作る。"
+      counterexample: "扶養0人と1人で税額が変わるのに確認不能な明細を比較する。"
+      cause_to_verbalize: "計算可能性と確定可能性は別で、資料不足は停止理由だと説明させる。"
+      correction_direction: "確定、保留、差戻しの3状態と不足資料・期限・担当者を記す。"
+      verification: "5枚を確定4枚・保留1枚へ根拠付きで仕分ける。"
+    drama: {type: reflection, turn: "全件完了の名声より、1枚を止める責任を選ぶ。"}
+    setup_ids: []
+    payoff_ids: []
+    callback_ids: []
+    exit_thread_ids: [thread-missing-money, thread-authority]
+    closing_realization: "分からない欄を埋めず、何が足りないかを示して止めるのも給与計算だとまとめる。"
+    target_chars: 2400
+    target_dialogue_rounds: 8
+  - id: act-03-sec-05
+    title: "3-5　赤鉛筆で5枚を締める ── 月例給与の最終検証"
+    function: recurring-corner
+    core_concept_id: null
+    supporting_concept_ids: [reconciliation, retroactive-correction, exception-stop-rule]
+    entry_thread_ids: [thread-missing-money, thread-authority]
+    drama: {type: relief, turn: "4枚の振込確定と1枚の安全な保留を同じ成果として受け止める。"}
+    setup_ids: []
+    payoff_ids: []
+    callback_ids: [clue-folded-payslip]
+    exit_thread_ids: [thread-missing-money, thread-authority]
+    closing_realization: "速く全部埋めるのでなく、根拠を残して確定と保留を分けることが締める仕事だとまとめる。"
+    target_chars: 2400
+    target_dialogue_rounds: 8
