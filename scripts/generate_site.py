@@ -186,6 +186,15 @@ def page_url(document: dict[str, Any]) -> str:
     return f"{SITE_URL}{document['path']}/"
 
 
+def nav_href(document: dict[str, Any]) -> str:
+    """Site-root-relative link for sidebar/top-page navigation, including the
+    project subpath. docsify history mode runs with no basePath, so links must
+    carry the full subpath (/genai-textbooks/...); a bare /books/... link would
+    drop the subpath on client-side navigation and 404. The trailing slash
+    loads docs/books/<id>/README.md via docsify's directory convention."""
+    return f"{SITE_BASE_PATH}{document['path']}/"
+
+
 def render_sidebar(
     categories: list[dict[str, Any]], documents: list[dict[str, Any]]
 ) -> str:
@@ -195,7 +204,7 @@ def render_sidebar(
         for document in category_documents:
             minutes = reading_minutes(document)
             lines.append(
-                f"  - [{document['title']}]({document['path']}/) ({minutes}分)"
+                f"  - [{document['title']}]({nav_href(document)}) ({minutes}分)"
             )
         lines.append("")
     return "\n".join(lines).rstrip() + "\n"
@@ -212,7 +221,7 @@ def render_top_page_catalog(
             minutes = reading_minutes(document)
             lines.extend(
                 [
-                    f"#### [{document['title']}]({document['path']}/) ({minutes}分)",
+                    f"#### [{document['title']}]({nav_href(document)}) ({minutes}分)",
                     f"問い：{document['question']}",
                     f"プロット：{document['plot']}",
                     "",
