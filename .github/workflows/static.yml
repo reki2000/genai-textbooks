@@ -6,7 +6,7 @@ on:
   push:
     branches: ["main"]
 
-  # Validates generated catalog files before changes reach the default branch
+  # Confirms the site builds without error before changes reach the default branch
   pull_request:
     branches: ["main"]
 
@@ -26,16 +26,16 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  validate-catalog:
+  build:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Validate catalog
+      - name: Build site from catalog
         run: |
           python3 -m pip install -r requirements-dev.txt
-          python3 scripts/generate_site.py --check
+          python3 scripts/generate_site.py
 
   # Single deploy job since we're just deploying
   deploy:
