@@ -3,16 +3,22 @@
 
 <head>
   <script>
-    // Redirect legacy hash-mode URLs (e.g. #/books/foo, from before the
-    // history-mode migration) to their history-mode equivalent.
     (function () {
-      var hash = window.location.hash;
+      var loc = window.location;
+      // Normalize an explicit .../index.html to its clean directory URL.
+      if (/\/index\.html$/.test(loc.pathname)) {
+        loc.replace(loc.pathname.replace(/index\.html$/, '') + loc.search + loc.hash);
+        return;
+      }
+      // Redirect legacy hash-mode URLs (e.g. #/books/foo, from before the
+      // history-mode migration) to their history-mode equivalent.
+      var hash = loc.hash;
       if (hash.charAt(0) === '#' && hash.charAt(1) === '/') {
         var newPath = '@@BASE_PATH@@' + hash.slice(1);
         if (newPath.charAt(newPath.length - 1) !== '/') {
           newPath += '/';
         }
-        window.location.replace(newPath + window.location.search);
+        loc.replace(newPath + loc.search);
       }
     })();
   </script>
@@ -75,7 +81,6 @@
     window.$docsify = {
       name: '<span style="display:flex; align-items:center; margin-left:12px;"><img src="@@BASE_PATH@@/assets/favicon.png" alt="@@SITE_TITLE@@" width="36" height="36" style="opacity:0.85;"> @@SITE_TITLE@@</span>',
       routerMode: 'history',
-      basePath: '@@BASE_PATH@@/',
       loadSidebar: true,
       loadFooter: "_footer.md",
       subMaxLevel: 2,
