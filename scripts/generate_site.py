@@ -49,7 +49,7 @@ END_MARKER = "<!-- END GENERATED CATALOG -->"
 SITE_ORIGIN = "https://reki2000.github.io"
 SITE_BASE_PATH = "/genai-textbooks"
 SITE_URL = SITE_ORIGIN + SITE_BASE_PATH
-SITE_TITLE = "genai-textbooks"
+SITE_TITLE = "やる夫で学ぶ"
 SITE_DESCRIPTION = "Short Textbooks on Various Topics Written by Generative AI"
 
 
@@ -228,6 +228,7 @@ def render_shell(title: str, description: str, extra_head: str = "") -> str:
         template.replace("@@TITLE@@", title)
         .replace("@@DESCRIPTION@@", description)
         .replace("@@BASE_PATH@@", SITE_BASE_PATH)
+        .replace("@@SITE_TITLE@@", SITE_TITLE)
         .replace("@@EXTRA_HEAD@@", extra_head)
     )
 
