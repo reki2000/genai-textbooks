@@ -198,7 +198,12 @@ def nav_href(document: dict[str, Any]) -> str:
 def render_sidebar(
     categories: list[dict[str, Any]], documents: list[dict[str, Any]]
 ) -> str:
-    lines = ["<!-- Generated from docs/catalog.yaml. Do not edit directly. -->", ""]
+    lines = [
+        "<!-- Generated from docs/catalog.yaml. Do not edit directly. -->",
+        "",
+        f"- [🏠 トップ]({SITE_BASE_PATH}/)",
+        "",
+    ]
     for category, category_documents in documents_by_category(categories, documents):
         lines.append(f"- {category['title']}")
         for document in category_documents:
