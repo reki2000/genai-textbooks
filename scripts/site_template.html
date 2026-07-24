@@ -2,15 +2,25 @@
 <html lang="ja">
 
 <head>
+  <script>
+    // Redirect legacy hash-mode URLs (e.g. #/books/foo, from before the
+    // history-mode migration) to their history-mode equivalent.
+    (function () {
+      var hash = window.location.hash;
+      if (hash.charAt(0) === '#' && hash.charAt(1) === '/') {
+        window.location.replace('@@BASE_PATH@@' + hash.slice(1) + window.location.search);
+      }
+    })();
+  </script>
   <meta charset="UTF-8">
-  <title>genai-textbooks</title>
+  <title>@@TITLE@@</title>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="description" content="Short Textbooks on Various Topics Written by Generative AI">
+  <meta name="description" content="@@DESCRIPTION@@">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
-  <link rel="icon" href="./assets/favicon.png" type="image/png">
+  <link rel="icon" href="@@BASE_PATH@@/assets/favicon.png" type="image/png">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
-  <style>
+@@EXTRA_HEAD@@  <style>
     #mobile-sidebar-toggle {
       display: none;
     }
@@ -59,7 +69,9 @@
   <script>
 
     window.$docsify = {
-      name: '<span style="display:flex; align-items:center; margin-left:12px;"><img src="./assets/favicon.png" alt="genai-textbooks" width="36" height="36" style="opacity:0.85;"> genai-textbooks</span>',
+      name: '<span style="display:flex; align-items:center; margin-left:12px;"><img src="@@BASE_PATH@@/assets/favicon.png" alt="@@SITE_TITLE@@" width="36" height="36" style="opacity:0.85;"> @@SITE_TITLE@@</span>',
+      routerMode: 'history',
+      basePath: '@@BASE_PATH@@/',
       loadSidebar: true,
       loadFooter: "_footer.md",
       subMaxLevel: 2,
@@ -67,19 +79,12 @@
       markdown: {
         breaks: true,
       },
-      search: {
-        placeholder: '検索',
-        noData: '見つかりませんでした',
-        depth: 3
-      },
-
     };
   </script>
   <script src="https://cdn.jsdelivr.net/npm/docsify@4"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked@4"></script>
   <script src="https://cdn.jsdelivr.net/npm/docsify-katex@latest/dist/docsify-katex.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/docsify-footnote@1.0.8/dist/docsify-footnote.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@alertbox/docsify-footer/dist/docsify-footer.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>

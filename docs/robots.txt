@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://reki2000.github.io/genai-textbooks/sitemap.xml
