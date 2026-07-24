@@ -1,6 +1,6 @@
 ---
 name: yaruo-count
-description: やる夫式教材（docs/books/*.md）の文字数・行数・UTF-8バイト数と推定読了時間を、話者表示・本文中の引用・TeX数式を考慮した統一ルールで集計する、集計規則の正本スキル。scripts/generate_site.py が読了時間の算出に内部利用するほか、概算でなく規則に基づく正確な文字数・行数・数式量・読了時間の算出をユーザーが明示的に求めた場合に使う。概算でよい文字数はファイルサイズ÷3で見積もり、本スキルは起動しない。
+description: やる夫式教材（docs/books/*/README.md）の文字数・行数・UTF-8バイト数と推定読了時間を、話者表示・本文中の引用・TeX数式を考慮した統一ルールで集計する、集計規則の正本スキル。scripts/generate_site.py が読了時間の算出に内部利用するほか、概算でなく規則に基づく正確な文字数・行数・数式量・読了時間の算出をユーザーが明示的に求めた場合に使う。概算でよい文字数はファイルサイズ÷3で見積もり、本スキルは起動しない。
 ---
 
 # やる夫教材カウント
@@ -18,7 +18,7 @@ python3 .claude/skills/yaruo-count/scripts/count_textbooks.py
 特定ファイルだけを集計する場合はパスを渡す。
 
 ```bash
-python3 .claude/skills/yaruo-count/scripts/count_textbooks.py docs/books/example.md
+python3 .claude/skills/yaruo-count/scripts/count_textbooks.py docs/books/example/README.md
 ```
 
 機械処理には `--format json` を使う。別のPythonスクリプトから利用するときは、同スクリプトの `count_document(path)` を呼び出す。
