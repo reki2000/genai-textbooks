@@ -8,7 +8,11 @@
     (function () {
       var hash = window.location.hash;
       if (hash.charAt(0) === '#' && hash.charAt(1) === '/') {
-        window.location.replace('@@BASE_PATH@@' + hash.slice(1) + window.location.search);
+        var newPath = '@@BASE_PATH@@' + hash.slice(1);
+        if (newPath.charAt(newPath.length - 1) !== '/') {
+          newPath += '/';
+        }
+        window.location.replace(newPath + window.location.search);
       }
     })();
   </script>

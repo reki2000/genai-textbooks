@@ -4,7 +4,7 @@ AI-Generated Japanese Short Textbooks: "Yaruo"-Style Dialogue Collection and AI 
 
 [公開サイト](https://reki2000.github.io/genai-textbooks/)
 
-- GitHub Pages で公開されるテキスト本体（`docs/books/*.md`）。公開用の目次・サイドバー・各教材ページ（SEO用meta含む）は `docs/catalog.yaml` を正本として `scripts/generate_site.py` がビルド時に自動生成する（`scripts/site_template.html` 参照）
+- GitHub Pages で公開されるテキスト本体（`docs/books/*/README.md`）。公開用の目次・サイドバー・各教材ページ（SEO用meta含む）は `docs/catalog.yaml` を正本として `scripts/generate_site.py` がビルド時に自動生成する（`scripts/site_template.html` 参照）
 - 「やる夫で学ぶ」形式の教材を作成・整形・校正するための Claude Code / Codex 用スキル 3 種（`.claude/skills/`、`.codex/skills/`）
 
 ## Claude Code / Codex 用スキル

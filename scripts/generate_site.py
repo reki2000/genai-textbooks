@@ -141,7 +141,7 @@ def load_catalog() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
         relative_path = Path(path.removeprefix("/"))
         if ".." in relative_path.parts or relative_path.suffix:
             fail(f"document {document_id} has an unsafe path: {path!r}")
-        source_path = (ROOT / "docs" / relative_path).with_suffix(".md")
+        source_path = ROOT / "docs" / relative_path / "README.md"
         if not source_path.is_file():
             fail(f"document {document_id} points to missing file: {source_path}")
         document_ids.add(document_id)
@@ -149,11 +149,11 @@ def load_catalog() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
         document_orders[category_id].add(order)
         registered_files.add(source_path.resolve())
 
-    actual_files = {path.resolve() for path in (ROOT / "docs" / "books").glob("*.md")}
+    actual_files = {path.resolve() for path in (ROOT / "docs" / "books").glob("*/README.md")}
     unregistered = sorted(actual_files - registered_files)
     if unregistered:
-        names = ", ".join(path.name for path in unregistered)
-        fail(f"unregistered files in docs/books: {names}")
+        names = ", ".join(path.parent.name for path in unregistered)
+        fail(f"unregistered folders in docs/books: {names}")
 
     empty_categories = [category_id for category_id in category_ids if not document_orders[category_id]]
     if empty_categories:
@@ -174,8 +174,16 @@ def documents_by_category(
 
 
 def reading_minutes(document: dict[str, Any]) -> int:
-    source_path = (ROOT / "docs" / document["path"].removeprefix("/")).with_suffix(".md")
+    source_path = ROOT / "docs" / document["path"].removeprefix("/") / "README.md"
     return count_document(source_path)["reading_minutes"]
+
+
+def page_url(document: dict[str, Any]) -> str:
+    """Absolute URL for a book page. Trailing slash matches the docs/books/<id>/
+    directory + index.html layout, since GitHub Pages (no Jekyll pretty URLs)
+    only resolves extensionless paths via directory + index.html, not via
+    filename-without-extension lookup."""
+    return f"{SITE_URL}{document['path']}/"
 
 
 def render_sidebar(
@@ -187,7 +195,7 @@ def render_sidebar(
         for document in category_documents:
             minutes = reading_minutes(document)
             lines.append(
-                f"  - [{document['title']}]({document['path']}) ({minutes}分)"
+                f"  - [{document['title']}]({document['path']}/) ({minutes}分)"
             )
         lines.append("")
     return "\n".join(lines).rstrip() + "\n"
@@ -204,7 +212,7 @@ def render_top_page_catalog(
             minutes = reading_minutes(document)
             lines.extend(
                 [
-                    f"#### [{document['title']}]({document['path']}) ({minutes}分)",
+                    f"#### [{document['title']}]({document['path']}/) ({minutes}分)",
                     f"問い：{document['question']}",
                     f"プロット：{document['plot']}",
                     "",
@@ -234,20 +242,20 @@ def render_shell(title: str, description: str, extra_head: str = "") -> str:
 
 
 def render_book_extra_head(document: dict[str, Any]) -> str:
-    page_url = f"{SITE_URL}{document['path']}"
+    url = page_url(document)
     return (
-        f'  <link rel="canonical" href="{page_url}">\n'
+        f'  <link rel="canonical" href="{url}">\n'
         f'  <meta property="og:type" content="article">\n'
         f'  <meta property="og:site_name" content="{SITE_TITLE}">\n'
         f'  <meta property="og:title" content="{document["title"]}">\n'
         f'  <meta property="og:description" content="{document["question"]}">\n'
-        f'  <meta property="og:url" content="{page_url}">\n'
+        f'  <meta property="og:url" content="{url}">\n'
         f'  <meta name="twitter:card" content="summary">\n'
     )
 
 
 def render_sitemap(documents: list[dict[str, Any]]) -> str:
-    urls = [SITE_URL + "/"] + [SITE_URL + document["path"] for document in documents]
+    urls = [SITE_URL + "/"] + [page_url(document) for document in documents]
     lines = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
     for url in urls:
         lines.append(f"  <url><loc>{url}</loc></url>")
@@ -271,7 +279,7 @@ def generate(categories: list[dict[str, Any]], documents: list[dict[str, Any]], 
     write_file(out_docs / "404.html", render_shell(SITE_TITLE, SITE_DESCRIPTION))
 
     for document in documents:
-        relative_path = Path(document["path"].removeprefix("/")).with_suffix(".html")
+        relative_path = Path(document["path"].removeprefix("/")) / "index.html"
         page_title = f"{document['title']} - {SITE_TITLE}"
         page = render_shell(page_title, document["question"], render_book_extra_head(document))
         write_file(out_docs / relative_path, page)
@@ -303,7 +311,7 @@ def main() -> int:
         print("catalog OK")
     else:
         print("generated: docs/_sidebar.md, docs/README.md, docs/index.html, docs/404.html, "
-              "docs/books/*.html, docs/sitemap.xml")
+              "docs/books/*/index.html, docs/sitemap.xml")
     return 0
 
 

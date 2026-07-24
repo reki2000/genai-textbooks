@@ -5,5 +5,5 @@
 /docs/_sidebar.md
 /docs/index.html
 /docs/404.html
-/docs/books/*.html
+/docs/books/*/index.html
 /docs/sitemap.xml
