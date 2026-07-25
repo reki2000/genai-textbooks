@@ -1,0 +1,564 @@
+schema_version: 1
+
+book:
+  slug: payroll-calculation
+  title: "やる夫で学ぶ給与計算 ── 給与明細の1円を自分で説明する"
+  size_band: survey
+  target_chars: 159000
+  audience: "日本の会社員の給与明細を読み、自分または小規模事業所の月例給与を手計算で検算したい初学者"
+  prerequisites:
+    - "四則演算、小数、割合の基礎"
+    - "表から条件に合う行を探す操作"
+  outcomes:
+    - "給与を勤怠、支給、控除、差引支給額の流れに分解し、各数字の出所を説明できる"
+    - "基本給、手当、時間外手当、欠勤控除から総支給額を計算できる"
+    - "研修用の保険料率、等級表、源泉徴収表、住民税通知額を使って控除額を計算できる"
+    - "締日、支払日、端数処理、遡及訂正を含む給与明細を1円単位で照合できる"
+    - "賞与、退職金、年末調整、確定申告との境界、現物給与、海外勤務、複数事業所勤務の計算経路を判定できる"
+    - "日本の給与が現在の支給・天引き・年末精算の形になった制度史を説明し、諸外国の給与計算と同じ観点で比較できる"
+    - "実務で会社規程と当年の公的資料を確認すべき箇所を判別できる"
+  scope:
+    includes:
+      - "月例給与の全体式、勤怠集計、固定給と変動給、割増賃金、欠勤控除"
+      - "社会保険・雇用保険・源泉所得税・住民税の計算構造と資料の使い分け"
+      - "課税対象と保険対象の違い、等級表、税額表、端数処理、締日と支払日の時間差"
+      - "架空のカモメ製作所と研修用ルール表による一貫した手計算と検算"
+      - "賞与、退職金、年末調整、確定申告、現物給与、海外勤務、複数事業所勤務などの特殊計算"
+      - "日本の賃金支払・源泉徴収・社会保険・住民税特別徴収・年末調整の成立過程と諸外国の給与制度比較"
+    excludes:
+      - "実在年度の料率・税額表を使った法的または税務上の個別助言"
+      - "給与ソフトの具体的な操作方法と会計仕訳"
+
+story:
+  premise: "初任給30万円のはずが口座には246,830円しかなく会社に盗まれたと騒ぐやる夫が、カモメ製作所の給与担当代理として月例給与から年末・退職・海外勤務までの1年を締める。"
+  setting: "給与担当者が長期療養へ入り、やらない夫の監督下で、架空の研修用就業規則・料率表・税額表を使って小さな製作所の年間給与実務を引き継ぐ。"
+  central_gimmick: "給与の出来事ごとに赤鉛筆で事実、支給、控除、時点、端数、精算先の六層を追い、現代日本から過去の日本・諸外国へ同じ検算票を拡張する。"
+  dramatic_question: "口座から消えたように見える73,170円を起点に、やる夫は働き方が変わっても1円と判断経路を説明し、会社の1年を安全に締められるのか。"
+  opening:
+    situation: "入金通知246,830円を見たやる夫が、求人票の月給300,000円との差額53,170円を盗難だと思い込み、経理へ怒鳴り込もうとする。"
+    image: "差引支給額だけを赤丸で囲み、他の欄を折り畳んだ給与明細と、机の端に置かれた1円玉。"
+    planted_question: "明細の数字は何を足し、何を引き、どの月とどの規則を見れば再現できるのか。"
+  midpoint_turns:
+    - after_act: act-03
+      event: "月例給与5枚を締めて成功した直後、賞与・現物給与・年末調整の書類が届き、毎月の式だけでは年間の精算が終わらない。"
+      function: "月次の正解を、年間所得と別の支払種別を扱う複線的な実務へ拡張する。"
+    - after_act: act-06
+      event: "退職者の計算を終えた直後、海外赴任者と副業者が現れ、同じ人でも居住地や勤務先で判定主体が分かれる。"
+      function: "一社一人の閉じた計算から、国・自治体・複数事業所をまたぐ境界判定へ反転させる。"
+    - after_act: act-10
+      event: "日本の制度史と各国比較を終え、明細の複雑さが偶然の寄せ集めではなく、徴収・保障・精算の役割分担の結果だと判明する。"
+      function: "日本の手順を唯一の常識とみなす理解から、目的と制度選択を比較して監査する理解へ進める。"
+  climax:
+    act_id: act-11
+    problem: "月給、賞与、現物給与、年末精算、退職、海外赴任、副業が同じ年に重なった社員台帳から、会社で確定する額と外部へつなぐ申告・届出を仕分ける。"
+    required_concept_ids:
+      - payroll-equation
+      - attendance-to-pay
+      - overtime-decomposition
+      - assessment-bases
+      - table-driven-deduction
+      - payroll-timeline
+      - rounding-order
+      - reconciliation
+      - bonus-calculation
+      - year-end-reconciliation
+      - retirement-income-separation
+      - tax-return-boundary
+      - overseas-residency
+      - multiple-workplaces
+      - historical-layering
+      - comparative-payroll-models
+    decision: "会社で計算できる支払だけを確定し、本人申告・税務判断・複数事業所調整が必要な項目は資料と期限を付けて適切な精算先へ渡す。"
+  ending:
+    resolution: "やる夫は会社の年間給与台帳を締め、月例から特殊計算までを検算票で接続したうえで、自分の246,830円も総支給320,000円と研修用控除73,170円から再現する。"
+    callback_to_opening: "折り畳んでいた明細を全部開き、差引支給額の赤丸から年間台帳と各精算先へ線を引き、最後に1円玉を検算済みの印として置く。"
+    remaining_question: "制度改正と個別事情が続く中で、正解を暗記せず根拠と更新履歴を守り続ける仕事を次の実務課題として残す。"
+
+arcs:
+  concept: "手取りは月給から謎の率を引く数字だという理解から、日本の制度史と国際的な別解を踏まえ、月次・年次・退職・国境・複数勤務先を接続した結果だという理解へ進む。"
+  character: "自分の手取りだけを増やしたいやる夫が、1円の差と資料不足を軽視できない責任を知り、自社で決められない計算を適切な相手へ渡せるようになる。"
+  story: "盗難騒ぎから月例・賞与・年末・退職・海外・副業を進み、古い賃金台帳と各国明細で制度の理由を発見してから、年間台帳の総合監査で決着する。"
+
+structure:
+  recurring_corner:
+    name: "赤鉛筆で明細を追え"
+    function: "その幕までに得た道具だけを使い、別の支払・時代・国へ六層の検算票を累積適用して精算先まで線を引く。"
+  interludes:
+    - act_id: interlude-01
+      after_act: act-02
+      functions: [summary, transfer]
+    - act_id: interlude-02
+      after_act: act-06
+      functions: [quiz]
+    - act_id: interlude-03
+      after_act: act-10
+      functions: [transfer, quiz]
+
+concepts:
+  - id: arithmetic-and-percent
+    name: "円単位の四則演算と割合"
+    kind: prerequisite
+    depends_on: []
+    first_discovery: null
+  - id: rule-source-boundary
+    name: "事実・会社規程・公的表の役割分担"
+    kind: core
+    depends_on: [arithmetic-and-percent]
+    first_discovery: act-01
+  - id: payroll-equation
+    name: "総支給額－控除合計＝差引支給額"
+    kind: core
+    depends_on: [arithmetic-and-percent]
+    first_discovery: act-01
+  - id: pay-period-cutoff
+    name: "給与の締日・支払日・対象期間"
+    kind: core
+    depends_on: [arithmetic-and-percent]
+    first_discovery: act-01
+  - id: fixed-and-variable-pay
+    name: "固定的賃金と勤怠連動の変動項目"
+    kind: auxiliary
+    depends_on: [payroll-equation]
+    first_discovery: null
+  - id: attendance-to-pay
+    name: "勤怠数量を支給・控除へ変換する単価"
+    kind: core
+    depends_on: [arithmetic-and-percent, fixed-and-variable-pay]
+    first_discovery: act-01
+  - id: overtime-decomposition
+    name: "時間外手当を基礎単価・時間・割増率へ分解する"
+    kind: core
+    depends_on: [arithmetic-and-percent, fixed-and-variable-pay]
+    first_discovery: act-01
+  - id: proration-and-eligibility
+    name: "日割り計算と手当の支給条件"
+    kind: core
+    depends_on: [arithmetic-and-percent, fixed-and-variable-pay]
+    first_discovery: act-01
+  - id: deduction-classification
+    name: "法定控除と任意控除の区別"
+    kind: core
+    depends_on: [rule-source-boundary, payroll-equation]
+    first_discovery: act-02
+  - id: assessment-bases
+    name: "控除ごとに異なる算定基礎"
+    kind: core
+    depends_on: [payroll-equation]
+    first_discovery: act-02
+  - id: table-driven-deduction
+    name: "等級表・税額表・通知額による控除"
+    kind: core
+    depends_on: [rule-source-boundary, payroll-equation]
+    first_discovery: act-02
+  - id: withholding-not-final
+    name: "源泉徴収はその場の仮払いである"
+    kind: core
+    depends_on: [rule-source-boundary, payroll-equation]
+    first_discovery: act-02
+  - id: payroll-timeline
+    name: "勤怠月・支給月・算定月・通知月の時間差"
+    kind: core
+    depends_on: [pay-period-cutoff]
+    first_discovery: act-02
+  - id: rounding-order
+    name: "項目別の端数処理と計算順序"
+    kind: core
+    depends_on: [attendance-to-pay]
+    first_discovery: act-02
+  - id: reconciliation
+    name: "入力・計算・出力を結ぶ検算と監査証跡"
+    kind: core
+    depends_on: [payroll-equation, assessment-bases, payroll-timeline, rounding-order]
+    first_discovery: act-03
+  - id: retroactive-correction
+    name: "遡及差額と当月訂正の分離"
+    kind: core
+    depends_on: [payroll-timeline, rounding-order]
+    first_discovery: act-03
+  - id: exception-stop-rule
+    name: "資料不足・例外を推測せず止める判定"
+    kind: core
+    depends_on: [rule-source-boundary, payroll-timeline]
+    first_discovery: act-03
+  - id: bonus-calculation
+    name: "賞与の支給・保険・源泉税を月例給与と分ける"
+    kind: core
+    depends_on: [assessment-bases, table-driven-deduction]
+    first_discovery: act-04
+  - id: in-kind-pay
+    name: "現物給与の評価額と支給・課税への算入"
+    kind: core
+    depends_on: [rule-source-boundary, assessment-bases]
+    first_discovery: act-04
+  - id: year-end-reconciliation
+    name: "年末調整で年間の源泉徴収を精算する"
+    kind: core
+    depends_on: [withholding-not-final, payroll-timeline]
+    first_discovery: act-05
+  - id: declaration-deductions
+    name: "申告書と証明書から年末控除を組み立てる"
+    kind: core
+    depends_on: [rule-source-boundary, withholding-not-final]
+    first_discovery: act-05
+  - id: retirement-income-separation
+    name: "退職所得を通常給与と分離して計算する"
+    kind: core
+    depends_on: [payroll-equation, table-driven-deduction]
+    first_discovery: act-06
+  - id: tax-return-boundary
+    name: "給与計算・年末調整・確定申告の担当境界"
+    kind: core
+    depends_on: [rule-source-boundary, withholding-not-final]
+    first_discovery: act-06
+  - id: overseas-residency
+    name: "海外勤務での居住者判定と国内源泉所得"
+    kind: core
+    depends_on: [tax-return-boundary, payroll-timeline]
+    first_discovery: act-07
+  - id: currency-conversion
+    name: "外貨給与の換算日と換算根拠"
+    kind: core
+    depends_on: [rule-source-boundary, payroll-timeline]
+    first_discovery: act-07
+  - id: multiple-workplaces
+    name: "複数勤務先の主従区分と源泉徴収"
+    kind: core
+    depends_on: [table-driven-deduction, tax-return-boundary]
+    first_discovery: act-08
+  - id: multi-office-insurance
+    name: "複数事業所勤務の社会保険調整"
+    kind: core
+    depends_on: [assessment-bases, rule-source-boundary]
+    first_discovery: act-08
+  - id: historical-layering
+    name: "賃金支払・税・社会保険が別々の時代と目的から積層した構造"
+    kind: core
+    depends_on: [rule-source-boundary, payroll-timeline]
+    first_discovery: act-09
+  - id: employer-as-collector
+    name: "雇用主が支払者と徴収・届出主体を兼ねる制度選択"
+    kind: core
+    depends_on: [rule-source-boundary, withholding-not-final]
+    first_discovery: act-09
+  - id: comparative-payroll-models
+    name: "各国の源泉徴収・社会保険・年次精算の役割分担"
+    kind: core
+    depends_on: [assessment-bases, tax-return-boundary]
+    first_discovery: act-10
+  - id: comparability-limits
+    name: "名目手取りだけで国際比較しない比較軸"
+    kind: core
+    depends_on: [rule-source-boundary, payroll-timeline]
+    first_discovery: act-10
+
+threads:
+  - id: thread-missing-money
+    question: "やる夫の口座から消えたように見える73,170円は、どの支給と控除から生まれたのか。"
+    opened_in: act-01
+    resolved_in: act-12
+  - id: thread-which-month
+    question: "明細の各数字は、勤怠月・支給月・算定月のどれに属するのか。"
+    opened_in: act-01
+    resolved_in: act-02
+  - id: thread-one-yen
+    question: "同じ式と数字を使ったはずなのに生じる1円差は、どこで生まれるのか。"
+    opened_in: act-01
+    resolved_in: act-03
+  - id: thread-authority
+    question: "給与担当者が計算で決めてよいことと、規程・公的資料へ戻すべきことの境界はどこか。"
+    opened_in: act-01
+    resolved_in: act-12
+  - id: thread-annual-settlement
+    question: "毎月正しく源泉徴収した金額は、年間でもそのまま最終答案になるのか。"
+    opened_in: act-04
+    resolved_in: act-06
+  - id: thread-many-jurisdictions
+    question: "国境や複数勤務先をまたぐとき、一社だけで確定できない金額を誰へつなぐのか。"
+    opened_in: act-06
+    resolved_in: act-11
+  - id: thread-why-this-shape
+    question: "なぜ日本の給与は会社が多くの税・保険を天引きし、年末に精算する形になったのか。"
+    opened_in: act-01
+    resolved_in: act-10
+
+foreshadows:
+  - id: clue-folded-payslip
+    content: "差引支給額だけを見せるよう折り畳まれたやる夫の初任給明細。"
+    setup_act: act-01
+    reminder_acts: [act-03, act-06, act-09, act-11]
+    payoff_act: act-12
+  - id: clue-one-yen-coin
+    content: "やらない夫が端数欄を隠すために帳票の上へ置いた1円玉。"
+    setup_act: act-01
+    reminder_acts: [act-02]
+    payoff_act: act-03
+  - id: clue-four-calendars
+    content: "壁に並ぶ勤怠、支給、保険、税の4枚の月めくりカレンダー。"
+    setup_act: act-01
+    reminder_acts: []
+    payoff_act: act-02
+  - id: clue-two-employers
+    content: "年末書類の束へ紛れ込んだ、同じ社員名の2社分の給与明細。"
+    setup_act: act-05
+    reminder_acts: [act-07]
+    payoff_act: act-08
+  - id: clue-passport
+    content: "退職手続の封筒へ誤って入っていた海外赴任者のパスポート写し。"
+    setup_act: act-06
+    reminder_acts: [interlude-02]
+    payoff_act: act-07
+  - id: clue-old-ledger
+    content: "経理室の金庫に残る、現金払いと控除欄の少ない古い賃金台帳。"
+    setup_act: act-01
+    reminder_acts: [act-02, act-05, act-08]
+    payoff_act: act-09
+
+acts:
+  - id: act-01
+    title: "第1幕　30万円が246,830円になった日"
+    role: opening
+    trigger: "入金通知だけを見たやる夫が会社の横領を疑い、折り畳まれた給与明細を持って経理室へ乗り込む。"
+    learning_goal_ids:
+      - rule-source-boundary
+      - payroll-equation
+      - pay-period-cutoff
+      - attendance-to-pay
+      - overtime-decomposition
+      - proration-and-eligibility
+    trigger_thread_ids:
+      - thread-missing-money
+      - thread-which-month
+      - thread-authority
+      - thread-why-this-shape
+    exit_thread_ids:
+      - thread-missing-money
+      - thread-which-month
+      - thread-one-yen
+      - thread-authority
+      - thread-why-this-shape
+    emotional_turn: "怒りと被害者意識から、勤怠と規程を追って総支給320,000円を自力で作る好奇心へ変わる。"
+    target_chars: 11000
+  - id: act-02
+    title: "第2幕　引かれる金を1円まで追う"
+    role: development
+    trigger: "総支給320,000円へ一つの控除率を掛ける案が、保険・税・住民税通知と時間差で破綻する。"
+    learning_goal_ids:
+      - deduction-classification
+      - assessment-bases
+      - table-driven-deduction
+      - withholding-not-final
+      - payroll-timeline
+      - rounding-order
+    trigger_thread_ids:
+      - thread-missing-money
+      - thread-which-month
+      - thread-one-yen
+      - thread-authority
+    exit_thread_ids:
+      - thread-missing-money
+      - thread-one-yen
+      - thread-authority
+    emotional_turn: "控除を敵視する単純さから、物差し・表・時点・端数をそろえて手取り246,830円を説明する落ち着きへ変わる。"
+    target_chars: 11000
+  - id: interlude-01
+    title: "幕間　明細を見ずに給与を語れるか"
+    role: interlude
+    trigger: "月例給与の道具を、時給制・日給制・途中入社の3人へ転移し、前半の理解を自分の言葉で再構成する。"
+    learning_goal_ids: []
+    trigger_thread_ids:
+      - thread-missing-money
+      - thread-one-yen
+      - thread-authority
+    exit_thread_ids:
+      - thread-missing-money
+      - thread-one-yen
+      - thread-authority
+    emotional_turn: "式を暗記した安心から、雇用形態が変わっても根拠順序を再構成できる自信へ進む。"
+    target_chars: 5000
+  - id: act-03
+    title: "第3幕　支払日前夜の5枚"
+    role: verification
+    trigger: "支払日前夜、条件の異なる5人分の明細が届き、計算、1円差、遡及、資料不足を短時間で仕分ける必要が生じる。"
+    learning_goal_ids:
+      - reconciliation
+      - retroactive-correction
+      - exception-stop-rule
+    trigger_thread_ids:
+      - thread-missing-money
+      - thread-one-yen
+      - thread-authority
+    exit_thread_ids:
+      - thread-missing-money
+      - thread-authority
+    emotional_turn: "全件を自力で確定して英雄になりたい焦りから、根拠のない1枚を止めることも正しい仕事だという責任感へ到達する。"
+    target_chars: 12000
+  - id: act-04
+    title: "第4幕　毎月ではない支給 ── 賞与と現物給与"
+    role: development
+    trigger: "月例給与を締めて祝杯を上げた直後、賞与支給案と社宅・食事の現物支給評価が届く。"
+    learning_goal_ids:
+      - bonus-calculation
+      - in-kind-pay
+    trigger_thread_ids:
+      - thread-missing-money
+      - thread-authority
+    exit_thread_ids:
+      - thread-missing-money
+      - thread-authority
+      - thread-annual-settlement
+    emotional_turn: "月例給与を極めた万能感から、支払種別と金銭以外の利益を見分ける慎重さへ移る。"
+    target_chars: 13000
+  - id: act-05
+    title: "第5幕　12枚の明細を1年へ束ねる ── 年末調整"
+    role: development
+    trigger: "年末に申告書と証明書が集まり、毎月正しく源泉した社員にも過不足があることが判明する。"
+    learning_goal_ids:
+      - year-end-reconciliation
+      - declaration-deductions
+    trigger_thread_ids:
+      - thread-missing-money
+      - thread-authority
+      - thread-annual-settlement
+    exit_thread_ids:
+      - thread-missing-money
+      - thread-authority
+      - thread-annual-settlement
+    emotional_turn: "還付額を競う祭り気分から、年間資料をそろえて仮払いを精算する責任へ変わる。"
+    target_chars: 14000
+  - id: act-06
+    title: "第6幕　会社の計算が終わる場所 ── 退職金と確定申告"
+    role: development
+    trigger: "退職者の最終給与・退職金と、年末調整だけでは処理できない所得資料が同時に届く。"
+    learning_goal_ids:
+      - retirement-income-separation
+      - tax-return-boundary
+    trigger_thread_ids:
+      - thread-missing-money
+      - thread-authority
+      - thread-annual-settlement
+    exit_thread_ids:
+      - thread-missing-money
+      - thread-authority
+      - thread-many-jurisdictions
+    emotional_turn: "何でも会社で精算して感謝されたい欲から、適切な申告先へ渡す判断力へ進む。"
+    target_chars: 12000
+  - id: interlude-02
+    title: "幕間　誰が最後の答案を書くのか"
+    role: interlude
+    trigger: "月例・賞与・年末・退職のカードを混ぜ、会社、本人、自治体、税務署の誰が次の処理を担うかを対話クイズで判定する。"
+    learning_goal_ids: []
+    trigger_thread_ids:
+      - thread-missing-money
+      - thread-authority
+      - thread-many-jurisdictions
+    exit_thread_ids:
+      - thread-missing-money
+      - thread-authority
+      - thread-many-jurisdictions
+    emotional_turn: "正解を一人で抱える不安から、境界を示して引き渡すことへの安堵へ変わる。"
+    target_chars: 5000
+  - id: act-07
+    title: "第7幕　国境を越える給与 ── 海外勤務"
+    role: development
+    trigger: "海外赴任者へ国内給与と現地給与が同時に支払われ、居住者区分と外貨換算日が未確定のまま明細が回る。"
+    learning_goal_ids:
+      - overseas-residency
+      - currency-conversion
+    trigger_thread_ids:
+      - thread-missing-money
+      - thread-authority
+      - thread-many-jurisdictions
+    exit_thread_ids:
+      - thread-missing-money
+      - thread-authority
+      - thread-many-jurisdictions
+    emotional_turn: "円へ換算すれば世界の給与を処理できるという高揚から、税務判定を専門家へつなぐ慎重さへ移る。"
+    target_chars: 12000
+  - id: act-08
+    title: "第8幕　給与明細が2枚ある ── 複数事業所勤務"
+    role: development
+    trigger: "同じ社員が2社から給与を受け、源泉税の主従区分と社会保険の事業所間調整が必要になる。"
+    learning_goal_ids:
+      - multiple-workplaces
+      - multi-office-insurance
+    trigger_thread_ids:
+      - thread-missing-money
+      - thread-authority
+      - thread-many-jurisdictions
+    exit_thread_ids:
+      - thread-missing-money
+      - thread-authority
+      - thread-many-jurisdictions
+    emotional_turn: "2社分を単純合算して手数料を取る夢から、自社の範囲と調整機関の役割を守る姿勢へ変わる。"
+    target_chars: 12000
+  - id: act-09
+    title: "第9幕　日本の給与はなぜこの形なのか"
+    role: development
+    trigger: "古い賃金台帳と現代の明細を比べ、控除欄と会社の事務が時代ごとに増えた理由を調べる。"
+    learning_goal_ids:
+      - historical-layering
+      - employer-as-collector
+    trigger_thread_ids:
+      - thread-missing-money
+      - thread-authority
+      - thread-why-this-shape
+    exit_thread_ids:
+      - thread-missing-money
+      - thread-authority
+      - thread-why-this-shape
+    emotional_turn: "日本の複雑さを無能の産物と笑う態度から、別々の目的と時代が積層した設計として批判的に読む姿勢へ変わる。"
+    target_chars: 12000
+  - id: act-10
+    title: "第10幕　世界の給与明細を並べる"
+    role: development
+    trigger: "日本、英国、米国などの簡略化した給与ケースを同じ検算票へ載せ、誰が徴収し誰が年次精算するかを比較する。"
+    learning_goal_ids:
+      - comparative-payroll-models
+      - comparability-limits
+    trigger_thread_ids:
+      - thread-missing-money
+      - thread-authority
+      - thread-why-this-shape
+    exit_thread_ids:
+      - thread-missing-money
+      - thread-authority
+    emotional_turn: "手取り率ランキングで日本代表を決める興奮から、税・保険・給付・申告負担まで同じ軸で比べる慎重さへ進む。"
+    target_chars: 12000
+  - id: interlude-03
+    title: "幕間　別の国の給与担当になってみる"
+    role: interlude
+    trigger: "架空の新制度案と各国ケースを混ぜ、徴収主体・精算主体・保障・事務負担のトレードオフを判定する。"
+    learning_goal_ids: []
+    trigger_thread_ids:
+      - thread-missing-money
+      - thread-authority
+    exit_thread_ids:
+      - thread-missing-money
+      - thread-authority
+    emotional_turn: "外国制度の模倣へ飛びつく姿勢から、目的と副作用を確認して制度を選ぶ態度へ変わる。"
+    target_chars: 5000
+  - id: act-11
+    title: "第11幕　年間給与台帳を締めろ"
+    role: climax
+    trigger: "月給、賞与、現物、年末、退職、海外、兼業が重なる年間台帳の監査期限が迫る。"
+    learning_goal_ids: []
+    trigger_thread_ids:
+      - thread-missing-money
+      - thread-authority
+      - thread-many-jurisdictions
+    exit_thread_ids:
+      - thread-missing-money
+      - thread-authority
+    emotional_turn: "全欄を埋める焦りから、条件を列挙し候補を棄却して確定・保留・引渡しを選ぶ落ち着きへ到達する。"
+    target_chars: 15000
+  - id: act-12
+    title: "第12幕　1円まで説明できる手取り"
+    role: ending
+    trigger: "年間台帳を締めた後、最後に残ったやる夫自身の折り畳まれた初任給明細を最初から検算する。"
+    learning_goal_ids: []
+    trigger_thread_ids:
+      - thread-missing-money
+      - thread-authority
+    exit_thread_ids: []
+    emotional_turn: "失われた金を取り戻す話だと思っていたやる夫が、数字の向こうの人と制度をつなぐ仕事だったと気づく。"
+    target_chars: 8000

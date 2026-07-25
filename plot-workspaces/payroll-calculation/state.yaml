@@ -1,0 +1,141 @@
+schema_version: 1
+book_slug: payroll-calculation
+current_act: act-12
+
+knowledge_acquired:
+  - rule-source-boundary
+  - payroll-equation
+  - pay-period-cutoff
+  - attendance-to-pay
+  - overtime-decomposition
+  - proration-and-eligibility
+  - deduction-classification
+  - assessment-bases
+  - table-driven-deduction
+  - withholding-not-final
+  - payroll-timeline
+  - rounding-order
+  - reconciliation
+  - retroactive-correction
+  - exception-stop-rule
+  - bonus-calculation
+  - in-kind-pay
+  - year-end-reconciliation
+  - declaration-deductions
+  - retirement-income-separation
+  - tax-return-boundary
+  - overseas-residency
+  - currency-conversion
+  - multiple-workplaces
+  - multi-office-insurance
+  - historical-layering
+  - employer-as-collector
+  - comparative-payroll-models
+  - comparability-limits
+terms_defined:
+  - "総支給額・控除合計・差引支給額"
+  - "締日・対象期間・支払日"
+  - "勤怠単価・時間外倍率"
+  - "算定基礎・標準報酬月額"
+  - "源泉徴収・特別徴収"
+  - "検算・監査証跡"
+  - "遡及差額"
+  - "確定・保留・差戻し"
+  - "標準賞与額"
+  - "現物給与・経済的利益"
+  - "年調年税額・既徴収税額・過不足額"
+  - "年末調整申告書・控除証明書"
+  - "退職所得控除・退職所得の受給に関する申告書"
+  - "年末調整と確定申告の処理境界"
+  - "居住者・非居住者と国内源泉所得"
+  - "外貨換算の目的・基準日・情報源"
+  - "主たる給与・従たる給与"
+  - "二以上事業所勤務・選択事業所・按分通知"
+  - "制度の積層・支払者による徴収"
+  - "労働コスト・手取り・tax wedge"
+toy_examples:
+  - id: yaruo-first-pay
+    use_history: ["act-01", "act-02", "interlude-01", "act-03", "act-04", "act-11", "act-12"]
+    values: "基本給300,000円、時間外手当20,000円、総支給320,000円、控除73,170円、差引支給246,830円"
+  - id: training-bonus
+    use_history: ["act-04", "interlude-02", "act-05", "act-11", "act-12"]
+    values: "賞与500,000円、研修用社会保険料等75,000円、社会保険料等控除後425,000円、研修用算出率4.084%、源泉税17,357円"
+  - id: training-company-housing
+    use_history: ["act-04", "act-05", "act-07", "act-11"]
+    values: "社会保険上の研修用評価額30,000円、本人負担10,000円、現物報酬20,000円"
+  - id: annual-audit
+    use_history: ["act-11", "act-12"]
+    values: "月例・賞与・現物・年末・退職・海外・複数勤務を、確定・差戻し・保留・引渡しへ根拠付きで分類"
+
+foreshadows:
+  planted:
+    - clue-folded-payslip
+    - clue-one-yen-coin
+    - clue-four-calendars
+    - clue-old-ledger
+  paid_off:
+    - clue-folded-payslip
+    - clue-one-yen-coin
+    - clue-passport
+    - clue-two-employers
+    - clue-old-ledger
+
+open_thread_ids: []
+
+sources:
+  - url: "https://www.mhlw.go.jp/bunya/roudoukijun/faq_kijyungyosei05.html"
+    use: "賃金支払の五原則、とくに全額払いと控除の入口"
+  - url: "https://www.mhlw.go.jp/bunya/roudoukijun/faq_kijyunhou_24.html"
+    use: "割増賃金の算定基礎と除外項目"
+  - url: "https://www.nenkin.go.jp/service/kounen/hokenryo/nofu/20121026.html"
+    use: "標準報酬月額を使う保険料計算と被保険者負担分の端数処理"
+  - url: "https://www.nta.go.jp/taxes/shiraberu/taxanswer/gensen/2511.htm"
+    use: "月額表・日額表・賞与表、社会保険料控除後額と甲欄・乙欄"
+  - url: "https://www.tax.metro.tokyo.lg.jp/kazei/life/kojin_ju/tokubetsu/about"
+    use: "個人住民税特別徴収の通知額と6月から翌年5月の時間軸"
+  - url: "https://www.nta.go.jp/about/organization/ntc/sozei/tokubetsu/h26shiryoukan/03.htm"
+    use: "1940年の給与所得への源泉徴収導入と制度目的"
+  - url: "https://www.nta.go.jp/about/organization/ntc/kenkyu/ronsou/110/01/01.pdf"
+    use: "1944年の年末調整創設を含む源泉徴収制度史"
+  - url: "https://www.nta.go.jp/about/introduction/torikumi/70th_html/02_1.htm"
+    use: "徴収の確実性・納税手続簡素化という源泉徴収の制度目的"
+  - url: "https://www.gov.uk/paye-for-employers"
+    use: "英国PAYEが雇用所得の所得税とNational Insuranceを徴収する仕組み"
+  - url: "https://www.irs.gov/individuals/your-first-job"
+    use: "米国の雇用主による連邦所得税・Social Security・Medicare等の源泉とW-2"
+  - url: "https://www.oecd.org/en/publications/taxing-wages-2025_b3a95829-en/full-report/methodology-and-limitations_49306c2c.html"
+    use: "国際比較で用いるtax wedge、労働コスト、net take-home payの定義"
+  - url: "https://normlex.ilo.org/dyn/nrmlx_en/f?p=NORMLEXPUB%3A12100%3A0%3A%3ANO%3A%3AP12100_ILO_CODE%3AC095%2C"
+    use: "ILO第95号条約の賃金保護、法定通貨払い、控除の法的根拠"
+  - url: "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1935.htm"
+    use: "海外勤務者の居住者・非居住者の一般的な判定と帰国年の扱い"
+  - url: "https://www.nta.go.jp/taxes/shiraberu/taxanswer/gensen/2878.htm"
+    use: "国内源泉所得と国内勤務に基因する給与・賞与の範囲"
+  - url: "https://www.nta.go.jp/taxes/shiraberu/taxanswer/gensen/2523.htm"
+    use: "賞与の源泉徴収で前月の社会保険料等控除後給与と扶養親族等から算出率を求める原則経路"
+  - url: "https://www.nenkin.go.jp/section/faq/kounen/hokenryo/shoyokeisan.html"
+    use: "賞与総額から1,000円未満を切り捨てた標準賞与額と保険料計算"
+  - url: "https://www.nenkin.go.jp/service/kounen/hokenryo/hoshu/20150511.html"
+    use: "食事・住宅等の現物給与を公的価額等で通貨換算し報酬へ合算する社会保険上の扱い"
+  - url: "https://www.nta.go.jp/law/tsutatsu/kihon/shotoku/05/04.htm"
+    use: "食事、商品、住宅など給与等とされる経済的利益の税務上の評価"
+  - url: "https://www.nta.go.jp/taxes/shiraberu/taxanswer/gensen/2675.htm"
+    use: "年調年税額と既徴収税額の過不足精算、還付と不足額徴収"
+  - url: "https://www.nta.go.jp/users/gensen/nenmatsu/nencho_01.htm"
+    use: "従業員の申告書、控除証明書、勤務先の検算という年末調整手続の役割分担"
+  - url: "https://www.nta.go.jp/publication/pamph/gensen/aramashi2026/pdf/05.pdf"
+    use: "退職所得控除額と退職所得の源泉徴収計算"
+  - url: "https://www.nta.go.jp/taxes/tetsuzuki/shinsei/annai/gensen/annai/1648_37.htm"
+    use: "退職所得の受給に関する申告書の提出時期と未提出時の取扱い"
+  - url: "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1400.htm"
+    use: "2か所給与、他所得、医療費控除など確定申告で精算する場面"
+  - url: "https://www.nta.go.jp/taxes/shiraberu/taxanswer/gensen/2520.htm"
+    use: "複数給与の主従区分、甲欄・乙欄、従たる給与の最終精算"
+  - url: "https://www.nenkin.go.jp/service/kounen/tekiyo/hihokensha1/20131022.html"
+    use: "二以上事業所勤務の報酬合算、保険料按分、選択事業所と通知"
+
+deviations:
+  - "初期案の第1〜4幕をユーザー合意により第1幕の総支給計算と第2幕の控除計算へ統合し、固定給・変動給は補助概念へ変更した。"
+  - "特殊計算、制度史、国際比較の追加により標準4.8万字案からサーベイ15.9万字案へ拡張した。"
+  - "全幕執筆後の本文対応検査で薄い節へ具体的反例・逆算・独立照合を追加し、各幕プロットの目標分量と往復数へ同期した。"
+  - "参考文献定義が終幕の概算分量へ混入しないよう、本文冒頭の節外へ移動した。"

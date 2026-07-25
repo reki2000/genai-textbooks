@@ -1,0 +1,91 @@
+schema_version: 1
+book_slug: payroll-calculation
+act_id: act-05
+purpose_detail: "12枚の明細と申告書・証明書を年間へ束ね、月々の仮徴収から年末調整の過不足精算を再発見する。"
+sections:
+  - id: act-05-sec-01
+    title: "5-1　12回正しければ年も正しいか"
+    function: opening
+    core_concept_id: null
+    supporting_concept_ids: [withholding-not-final, payroll-timeline]
+    entry_thread_ids: [thread-missing-money, thread-authority, thread-annual-settlement]
+    drama: {type: tension, turn: "12枚の税額を足すだけの案が年途中の事情変更で崩れる。"}
+    setup_ids: [clue-two-employers]
+    payoff_ids: []
+    callback_ids: [clue-old-ledger]
+    exit_thread_ids: [thread-missing-money, thread-authority, thread-annual-settlement]
+    closing_realization: "毎月の正しい仮額と年間の最終額は別に組み立てる必要があると見抜く。"
+    target_chars: 2800
+    target_dialogue_rounds: 8
+  - id: act-05-sec-02
+    title: "5-2　仮払いを年間で精算する ── 年末調整"
+    function: rediscovery
+    core_concept_id: year-end-reconciliation
+    supporting_concept_ids: [withholding-not-final, payroll-timeline, reconciliation]
+    entry_thread_ids: [thread-annual-settlement]
+    rediscovery:
+      problem: "各月の源泉税合計をそのまま年間税額とする。"
+      naive_attempt: "12回の正解を足せば最終答案になると考える。"
+      failure_direction: "年間給与・控除・扶養の確定情報と月次の仮情報の差を見落とす。"
+      counterexample: "途中で扶養が増えた社員の年調前源泉額と研修用年税額を比べる。"
+      cause_to_verbalize: "年間税額と既徴収額の差が還付または追加徴収になると説明させる。"
+      correction_direction: "年間給与→所得→控除→年税額→既徴収額との差の順へ並べる。"
+      verification: "年税額70,000円、既徴収78,000円から8,000円還付を出す。"
+    drama: {type: wonder, turn: "還付くじの興奮が、仮払い精算の式へ変わる。"}
+    setup_ids: []
+    payoff_ids: []
+    callback_ids: []
+    exit_thread_ids: [thread-annual-settlement]
+    closing_realization: "還付は賞金でなく、年間税額より多く預かった差を返すことだとまとめる。"
+    target_chars: 2800
+    target_dialogue_rounds: 8
+  - id: act-05-sec-03
+    title: "5-3　申告書だけでも証明書だけでも足りない ── 年末控除"
+    function: rediscovery
+    core_concept_id: declaration-deductions
+    supporting_concept_ids: [rule-source-boundary, withholding-not-final]
+    entry_thread_ids: [thread-authority, thread-annual-settlement]
+    rediscovery:
+      problem: "社員が口頭で言った保険料を証明なしで控除へ入れる。"
+      naive_attempt: "本人が得する申告なら善意で最大額を入れる。"
+      failure_direction: "本人申告、会社確認、証明資料という役割の違いを無視する。"
+      counterexample: "申告あり証明なし、証明あり申告なし、両方ありの3封筒を比べる。"
+      cause_to_verbalize: "会社は本人事情を発明せず、必要書類の組で処理すると説明させる。"
+      correction_direction: "控除ごとに申告欄、証明欄、適用条件、上限を確認する。"
+      verification: "研修用生命保険料控除を3封筒で判定する。"
+    drama: {type: conflict, turn: "還付最大化コンサルの夢が証明不足で止まる。"}
+    setup_ids: []
+    payoff_ids: []
+    callback_ids: []
+    exit_thread_ids: [thread-authority, thread-annual-settlement]
+    closing_realization: "親切で数字を盛らず、申告と証明がそろった範囲だけを処理するとまとめる。"
+    target_chars: 2800
+    target_dialogue_rounds: 8
+  - id: act-05-sec-04
+    title: "5-4　還付と追加徴収を明細へ戻す"
+    function: verification
+    core_concept_id: null
+    supporting_concept_ids: [year-end-reconciliation, declaration-deductions, payroll-equation]
+    entry_thread_ids: [thread-missing-money, thread-annual-settlement]
+    drama: {type: relief, turn: "年税額の差が年末の給与明細へ戻り、年間と月例がつながる。"}
+    setup_ids: []
+    payoff_ids: []
+    callback_ids: []
+    exit_thread_ids: [thread-missing-money, thread-authority]
+    closing_realization: "年間精算の差額も根拠付きの当月項目として明細へ戻すとまとめる。"
+    target_chars: 2800
+    target_dialogue_rounds: 8
+  - id: act-05-sec-05
+    title: "5-5　赤鉛筆で1年を束ねる ── 年末調整の検算"
+    function: recurring-corner
+    core_concept_id: null
+    supporting_concept_ids: [year-end-reconciliation, declaration-deductions, reconciliation]
+    entry_thread_ids: [thread-missing-money, thread-authority, thread-annual-settlement]
+    drama: {type: reflection, turn: "12枚を足す作業から、年間情報を照合する仕事へ理解が変わる。"}
+    setup_ids: []
+    payoff_ids: []
+    callback_ids: [clue-two-employers, clue-old-ledger]
+    exit_thread_ids: [thread-missing-money, thread-authority, thread-annual-settlement]
+    closing_realization: "年末調整は12月だけの計算でなく、1年の仮徴収と確定情報を結ぶ検算だとまとめる。"
+    target_chars: 2800
+    target_dialogue_rounds: 8
