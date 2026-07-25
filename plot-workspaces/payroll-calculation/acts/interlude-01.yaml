@@ -1,0 +1,75 @@
+schema_version: 1
+book_slug: payroll-calculation
+act_id: interlude-01
+purpose_detail: "月給制で得た手順を時給制・日給制・途中入社へ転移し、数字の暗記でなく検算順序を定着させる。"
+sections:
+  - id: interlude-01-sec-01
+    title: "幕間1-1　明細を伏せて背骨を描く"
+    function: interlude
+    core_concept_id: null
+    supporting_concept_ids: [payroll-equation, rule-source-boundary]
+    entry_thread_ids: [thread-missing-money, thread-one-yen, thread-authority]
+    drama: {type: reflection, turn: "金額を忘れる不安から、3箱と根拠線を描ける安心へ変わる。"}
+    setup_ids: []
+    payoff_ids: []
+    callback_ids: [clue-folded-payslip]
+    exit_thread_ids: [thread-missing-money, thread-one-yen, thread-authority]
+    closing_realization: "数字を隠しても計算の骨組みは再現できるとまとめる。"
+    target_chars: 1000
+    target_dialogue_rounds: 6
+  - id: interlude-01-sec-02
+    title: "幕間1-2　時給制へ移してみる"
+    function: interlude
+    core_concept_id: null
+    supporting_concept_ids: [attendance-to-pay, overtime-decomposition, payroll-equation]
+    entry_thread_ids: [thread-missing-money, thread-authority]
+    drama: {type: comedy, turn: "月給を無理に時給へ戻す案が、時給×実働時間という入口でほどける。"}
+    setup_ids: []
+    payoff_ids: []
+    callback_ids: []
+    exit_thread_ids: [thread-missing-money, thread-authority]
+    closing_realization: "雇用形態が変わっても事実から支給を作る向きは同じだとまとめる。"
+    target_chars: 1000
+    target_dialogue_rounds: 6
+  - id: interlude-01-sec-03
+    title: "幕間1-3　日給制の欠勤を数える"
+    function: interlude
+    core_concept_id: null
+    supporting_concept_ids: [attendance-to-pay, proration-and-eligibility]
+    entry_thread_ids: [thread-one-yen, thread-authority]
+    drama: {type: tension, turn: "月給制の欠勤式を流用する焦りから、日給制の支給条件を読み直す。"}
+    setup_ids: []
+    payoff_ids: []
+    callback_ids: []
+    exit_thread_ids: [thread-one-yen, thread-authority]
+    closing_realization: "同じ欠勤でも元の契約が違えば計算の入口が違うとまとめる。"
+    target_chars: 1000
+    target_dialogue_rounds: 6
+  - id: interlude-01-sec-04
+    title: "幕間1-4　途中入社者の明細クイズ"
+    function: exercise
+    core_concept_id: null
+    supporting_concept_ids: [proration-and-eligibility, assessment-bases, payroll-timeline]
+    entry_thread_ids: [thread-missing-money, thread-one-yen, thread-authority]
+    drama: {type: conflict, turn: "全部半額という再発した誤答を、項目別条件と適用月で自力修正する。"}
+    setup_ids: []
+    payoff_ids: []
+    callback_ids: [clue-one-yen-coin]
+    exit_thread_ids: [thread-missing-money, thread-one-yen, thread-authority]
+    closing_realization: "日割り・控除・適用月を別々に判定すれば途中入社も解けるとまとめる。"
+    target_chars: 1000
+    target_dialogue_rounds: 6
+  - id: interlude-01-sec-05
+    title: "幕間1-5　5枚の封筒"
+    function: bridge
+    core_concept_id: null
+    supporting_concept_ids: [payroll-equation, rounding-order, rule-source-boundary]
+    entry_thread_ids: [thread-missing-money, thread-one-yen, thread-authority]
+    drama: {type: tension, turn: "理解度クイズの安堵が、支払日前夜に届いた5枚の実務へ変わる。"}
+    setup_ids: []
+    payoff_ids: []
+    callback_ids: []
+    exit_thread_ids: [thread-missing-money, thread-one-yen, thread-authority]
+    closing_realization: "次は1枚ずつでなく、複数人を安全に締める順序が必要だと見抜く。"
+    target_chars: 1000
+    target_dialogue_rounds: 6

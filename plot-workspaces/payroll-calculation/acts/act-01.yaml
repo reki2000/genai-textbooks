@@ -1,0 +1,165 @@
+schema_version: 1
+book_slug: payroll-calculation
+act_id: act-01
+purpose_detail: "盗難騒ぎから給与明細の背骨と根拠資料を見つけ、勤怠を円へ変換して総支給320,000円までを一気に組み立てる。"
+sections:
+  - id: act-01-sec-01
+    title: "1-1　消えた53,170円 ── 入金額と月給"
+    function: opening
+    core_concept_id: null
+    supporting_concept_ids: [arithmetic-and-percent]
+    entry_thread_ids: [thread-missing-money, thread-which-month, thread-authority, thread-why-this-shape]
+    drama: {type: comedy, turn: "横領を確信した勢いが、総支給320,000円の存在で空回りする。"}
+    setup_ids: [clue-folded-payslip, clue-four-calendars, clue-old-ledger]
+    payoff_ids: []
+    callback_ids: []
+    exit_thread_ids: [thread-missing-money, thread-which-month, thread-authority, thread-why-this-shape]
+    closing_realization: "求人票の月給、総支給、振込額を同じ数字だと思ったことが最初の失敗だと認める。"
+    target_chars: 1400
+    target_dialogue_rounds: 7
+  - id: act-01-sec-02
+    title: "1-2　誰が数字を決めるのか ── 根拠資料"
+    function: rediscovery
+    core_concept_id: rule-source-boundary
+    supporting_concept_ids: [arithmetic-and-percent]
+    entry_thread_ids: [thread-authority]
+    rediscovery:
+      problem: "残業時間、手当、税額を検索結果の平均値で埋めようとする。"
+      naive_attempt: "給与担当者が常識的な数字を一つ選べば全社員へ使えると考える。"
+      failure_direction: "勤怠事実、会社規程、公的表を同じ権限で作り替える。"
+      counterexample: "同じ10時間残業でも勤怠・規程・年度のどれかが違う3枚のカードを比べる。"
+      cause_to_verbalize: "計算者は規則から答えを出せても事実や規則を発明できないと説明させる。"
+      correction_direction: "全入力へ勤怠、規程、公的資料の出所ラベルを付ける。"
+      verification: "残業時間、住宅手当、住民税額を戻すべき資料へ分類する。"
+    drama: {type: tension, turn: "万能給与係の夢が、根拠のない数字を入れる怖さへ変わる。"}
+    setup_ids: []
+    payoff_ids: []
+    callback_ids: []
+    exit_thread_ids: [thread-authority]
+    closing_realization: "自分が決めるのは計算手順であり、入力は事実・規程・公的表へ戻すとまとめる。"
+    target_chars: 1400
+    target_dialogue_rounds: 7
+  - id: act-01-sec-03
+    title: "1-3　明細の3つの箱 ── 給与計算の全体式"
+    function: rediscovery
+    core_concept_id: payroll-equation
+    supporting_concept_ids: [fixed-and-variable-pay, rule-source-boundary]
+    entry_thread_ids: [thread-missing-money]
+    rediscovery:
+      problem: "月給300,000円と振込246,830円の差だけでは残業20,000円と控除73,170円を説明できない。"
+      naive_attempt: "月給から振込額を直接引き53,170円を控除合計とする。"
+      failure_direction: "控除前に加わる変動支給を飛ばし、異なる段階を比較する。"
+      counterexample: "総支給320,000円から73,170円を引くと246,830円になる例を置く。"
+      cause_to_verbalize: "固定・変動の支給を集める段階と控除を引く段階は分ける必要があると説明させる。"
+      correction_direction: "支給合計、控除合計、差引支給額の3箱を作る。"
+      verification: "控除0円の特殊例と最初の明細で全体式を検算する。"
+    drama: {type: wonder, turn: "謎の差額が3箱の式で追跡可能になる。"}
+    setup_ids: []
+    payoff_ids: []
+    callback_ids: [clue-folded-payslip]
+    exit_thread_ids: [thread-missing-money]
+    closing_realization: "月給と手取りを直結せず、固定・変動支給を集めてから控除を引くとまとめる。"
+    target_chars: 1400
+    target_dialogue_rounds: 7
+  - id: act-01-sec-04
+    title: "1-4　何月分を払うのか ── 締日と支払日"
+    function: rediscovery
+    core_concept_id: pay-period-cutoff
+    supporting_concept_ids: [rule-source-boundary, payroll-equation]
+    entry_thread_ids: [thread-which-month]
+    rediscovery:
+      problem: "月末の残業を同じ月25日払いへ入れ、まだ起きていない勤怠を計算する。"
+      naive_attempt: "明細の支給月と働いた対象期間は必ず同じ月だとみなす。"
+      failure_direction: "締日より後の事実は支払日前でも未確定だと見落とす。"
+      counterexample: "前月21日から当月20日締めへ当月28日の残業を入れて破綻させる。"
+      cause_to_verbalize: "支給日と勤怠対象期間は別の時間情報だと説明させる。"
+      correction_direction: "締日、対象期間、計算日、支払日を時間軸へ置く。"
+      verification: "当月5日と28日の残業がどの支給月へ入るか判定する。"
+    drama: {type: conflict, turn: "未来予知で即日払いする夢が、確定事実だけを扱う規律に負ける。"}
+    setup_ids: []
+    payoff_ids: []
+    callback_ids: [clue-four-calendars]
+    exit_thread_ids: [thread-which-month]
+    closing_realization: "明細の年月だけでなく、最初に勤怠の対象期間を確かめると決める。"
+    target_chars: 1400
+    target_dialogue_rounds: 7
+  - id: act-01-sec-05
+    title: "1-5　時間を円へ翻訳する ── 勤怠単価"
+    function: rediscovery
+    core_concept_id: attendance-to-pay
+    supporting_concept_ids: [fixed-and-variable-pay, arithmetic-and-percent]
+    entry_thread_ids: [thread-missing-money]
+    rediscovery:
+      problem: "欠勤1日を全社員一律10,000円として月給差を説明できない。"
+      naive_attempt: "日数や時間へ会社共通の罰金単価を掛ける。"
+      failure_direction: "対象賃金、所定日数・時間、端数規則を無視する。"
+      counterexample: "月給240,000円と300,000円の社員へ同額を引く。"
+      cause_to_verbalize: "勤怠数量だけでは円にならず、誰の賃金を何で割るかが必要だと説明させる。"
+      correction_direction: "対象賃金÷所定数量で単価を作ってから勤怠数量を掛ける。"
+      verification: "240,000円÷20日×2日＝24,000円を単位付きで確かめる。"
+    drama: {type: tension, turn: "欠勤罰金で儲ける妄想が単価の根拠を示せず崩れる。"}
+    setup_ids: [clue-one-yen-coin]
+    payoff_ids: []
+    callback_ids: []
+    exit_thread_ids: [thread-missing-money, thread-one-yen]
+    closing_realization: "勤怠は規程で作った単価を通して初めて円になると説明する。"
+    target_chars: 1400
+    target_dialogue_rounds: 7
+  - id: act-01-sec-06
+    title: "1-6　1.25倍を分解する ── 時間外手当"
+    function: rediscovery
+    core_concept_id: overtime-decomposition
+    supporting_concept_ids: [attendance-to-pay, fixed-and-variable-pay]
+    entry_thread_ids: [thread-missing-money, thread-authority]
+    rediscovery:
+      problem: "残業10時間へ基本給の25%を払う式から時間数が消える。"
+      naive_attempt: "割増率25%を残業代そのものと読む。"
+      failure_direction: "基礎単価、時間数、通常部分1.00、割増部分0.25を混同する。"
+      counterexample: "基礎単価1,600円で残業1時間と10時間が同額になる式を試す。"
+      cause_to_verbalize: "1.25は金額でなく単価と時間へ掛ける係数だと説明させる。"
+      correction_direction: "1時間単価×時間×1.25へ因子を分ける。"
+      verification: "1,600円×10時間×1.25＝20,000円を0時間でも検算する。"
+    drama: {type: wonder, turn: "残業王の夢が式の因子を自力で組む興奮へ変わる。"}
+    setup_ids: []
+    payoff_ids: []
+    callback_ids: []
+    exit_thread_ids: [thread-missing-money, thread-authority]
+    closing_realization: "率だけでなく基礎賃金、時間、倍率を順に確認するとまとめる。"
+    target_chars: 1400
+    target_dialogue_rounds: 7
+  - id: act-01-sec-07
+    title: "1-7　途中入社を半額にするな ── 日割りと支給条件"
+    function: rediscovery
+    core_concept_id: proration-and-eligibility
+    supporting_concept_ids: [attendance-to-pay, rule-source-boundary]
+    entry_thread_ids: [thread-which-month, thread-authority]
+    rediscovery:
+      problem: "15日入社者の基本給と通勤手当を全部50%にする。"
+      naive_attempt: "月の半ばなら全支給項目を一律半額にする。"
+      failure_direction: "暦日、所定労働日、実費、在籍要件の違いを無視する。"
+      counterexample: "31日月の16日入社、所定20日中11日勤務、定期券12,000円を比べる。"
+      cause_to_verbalize: "日割りの分母と支給条件は項目別に規程が決めると説明させる。"
+      correction_direction: "項目ごとに日割りの有無、分母、端数規則を確認する。"
+      verification: "基本給は所定日数按分、通勤手当は実費という研修規程へ当てはめる。"
+    drama: {type: conflict, turn: "半額ボタンの特許が項目別条件表に阻まれる。"}
+    setup_ids: []
+    payoff_ids: []
+    callback_ids: []
+    exit_thread_ids: [thread-which-month, thread-authority, thread-one-yen]
+    closing_realization: "同じ月でも項目ごとに日割りの入口が違うとまとめる。"
+    target_chars: 1400
+    target_dialogue_rounds: 7
+  - id: act-01-sec-08
+    title: "1-8　赤鉛筆で総支給を作る ── 支給欄の検算"
+    function: recurring-corner
+    core_concept_id: null
+    supporting_concept_ids: [payroll-equation, pay-period-cutoff, fixed-and-variable-pay, attendance-to-pay, overtime-decomposition, proration-and-eligibility]
+    entry_thread_ids: [thread-missing-money, thread-which-month, thread-one-yen, thread-authority, thread-why-this-shape]
+    drama: {type: relief, turn: "勤怠と規程が基本給300,000円と残業20,000円を経て総支給320,000円へ収束する。"}
+    setup_ids: []
+    payoff_ids: []
+    callback_ids: [clue-folded-payslip, clue-old-ledger]
+    exit_thread_ids: [thread-missing-money, thread-which-month, thread-one-yen, thread-authority, thread-why-this-shape]
+    closing_realization: "総支給は求人票の写しでなく、根拠別の固定・変動項目を足した結果だとまとめる。"
+    target_chars: 1200
+    target_dialogue_rounds: 7

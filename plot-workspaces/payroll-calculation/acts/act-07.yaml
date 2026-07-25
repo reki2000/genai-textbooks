@@ -1,0 +1,91 @@
+schema_version: 1
+book_slug: payroll-calculation
+act_id: act-07
+purpose_detail: "海外勤務を円換算だけの問題とみなす案を壊し、居住者区分・所得の源泉地・換算時点・専門判断への接続を扱う。"
+sections:
+  - id: act-07-sec-01
+    title: "7-1　振込先を変えるだけではない"
+    function: bridge
+    core_concept_id: null
+    supporting_concept_ids: [tax-return-boundary, payroll-timeline]
+    entry_thread_ids: [thread-missing-money, thread-authority, thread-many-jurisdictions]
+    drama: {type: tension, turn: "海外赴任を口座変更だけで終える案が国内・現地の二重支給で止まる。"}
+    setup_ids: []
+    payoff_ids: []
+    callback_ids: [clue-passport]
+    exit_thread_ids: [thread-missing-money, thread-authority, thread-many-jurisdictions]
+    closing_realization: "金額計算の前に人・仕事・支払がどの国につながるかを整理すると見抜く。"
+    target_chars: 2400
+    target_dialogue_rounds: 8
+  - id: act-07-sec-02
+    title: "7-2　183日だけで決めない ── 居住者判定と所得の源泉地"
+    function: rediscovery
+    core_concept_id: overseas-residency
+    supporting_concept_ids: [tax-return-boundary, payroll-timeline, rule-source-boundary]
+    entry_thread_ids: [thread-authority, thread-many-jurisdictions]
+    rediscovery:
+      problem: "出国から183日を超えた瞬間だけで日本の課税関係を自動決定する。"
+      naive_attempt: "日数だけなら給与担当が電卓で確定できると考える。"
+      failure_direction: "住所・居所、赴任予定、家族、契約、勤務場所など事実関係と条約確認を無視する。"
+      counterexample: "短期出張、1年以上予定の赴任、予定変更の3ケースを日数だけで判定して矛盾させる。"
+      cause_to_verbalize: "日数は手掛かりでも単独の万能判定ではなく、身分と所得源泉を分けると説明させる。"
+      correction_direction: "出国日、予定期間、生活の本拠、勤務場所、支払者、条約・専門確認を一覧にする。"
+      verification: "研修用3ケースを確定・要確認へ仕分け、根拠不足は止める。"
+    drama: {type: conflict, turn: "183日電卓アプリで世界制覇する夢が事実関係の束で崩れる。"}
+    setup_ids: []
+    payoff_ids: [clue-passport]
+    callback_ids: []
+    exit_thread_ids: [thread-authority, thread-many-jurisdictions]
+    closing_realization: "日数へ飛びつかず、先に人の立場と働いた場所を事実から判定するとまとめる。"
+    target_chars: 2400
+    target_dialogue_rounds: 8
+  - id: act-07-sec-03
+    title: "7-3　どの日のレートを使うのか ── 外貨換算"
+    function: rediscovery
+    core_concept_id: currency-conversion
+    supporting_concept_ids: [rule-source-boundary, payroll-timeline, rounding-order]
+    entry_thread_ids: [thread-missing-money, thread-authority]
+    rediscovery:
+      problem: "現地給与3,000ドルを検索時のレートで好きな日に円換算する。"
+      naive_attempt: "一番得になるレートか月平均なら公平だと考える。"
+      failure_direction: "換算目的、換算日、参照レート、端数規則を混同する。"
+      counterexample: "発生日150円、支払日148円、月末145円で450,000円・444,000円・435,000円へ分かれる。"
+      cause_to_verbalize: "レート選択は利益調整でなく規程・税務目的に結び付くと説明させる。"
+      correction_direction: "通貨、金額、換算目的、基準日、情報源、端数を記録する。"
+      verification: "研修規程の支払日レート148円で444,000円を再現する。"
+    drama: {type: wonder, turn: "為替差で給与を増やす夢が、換算根拠を固定する設計へ変わる。"}
+    setup_ids: []
+    payoff_ids: []
+    callback_ids: []
+    exit_thread_ids: [thread-missing-money, thread-authority]
+    closing_realization: "外貨は掛け算の前に、何のために何日のどのレートを使うかを固定するとまとめる。"
+    target_chars: 2400
+    target_dialogue_rounds: 8
+  - id: act-07-sec-04
+    title: "7-4　国内給与と現地給与を二重計上しない"
+    function: verification
+    core_concept_id: null
+    supporting_concept_ids: [overseas-residency, currency-conversion, reconciliation]
+    entry_thread_ids: [thread-missing-money, thread-authority, thread-many-jurisdictions]
+    drama: {type: tension, turn: "会社負担分と本人受取額を混ぜた二重計上を六層の検算票で発見する。"}
+    setup_ids: []
+    payoff_ids: []
+    callback_ids: []
+    exit_thread_ids: [thread-missing-money, thread-authority, thread-many-jurisdictions]
+    closing_realization: "国ごとの支給を合算する前に同じ利益を別名で数えていないか確認するとまとめる。"
+    target_chars: 2400
+    target_dialogue_rounds: 8
+  - id: act-07-sec-05
+    title: "7-5　赤鉛筆で国境を越える ── 海外給与の検算"
+    function: recurring-corner
+    core_concept_id: null
+    supporting_concept_ids: [overseas-residency, currency-conversion, tax-return-boundary, exception-stop-rule]
+    entry_thread_ids: [thread-missing-money, thread-authority, thread-many-jurisdictions]
+    drama: {type: reflection, turn: "世界の給与を一人で確定する野心から、専門判断へ安全につなぐ自信へ変わる。"}
+    setup_ids: []
+    payoff_ids: []
+    callback_ids: [clue-two-employers]
+    exit_thread_ids: [thread-missing-money, thread-authority, thread-many-jurisdictions]
+    closing_realization: "海外給与は換算だけでなく、立場・源泉地・時点・引渡し先まで追うとまとめる。"
+    target_chars: 2400
+    target_dialogue_rounds: 8

@@ -1,0 +1,165 @@
+schema_version: 1
+book_slug: payroll-calculation
+act_id: act-02
+purpose_detail: "控除を一律率で扱う案を壊し、権限・算定基礎・表・時点・端数をつないで差引支給246,830円を完成させる。"
+sections:
+  - id: act-02-sec-01
+    title: "2-1　引いてよい金、いけない金 ── 控除の権限"
+    function: rediscovery
+    core_concept_id: deduction-classification
+    supporting_concept_ids: [rule-source-boundary, payroll-equation]
+    entry_thread_ids: [thread-missing-money, thread-which-month, thread-one-yen, thread-authority]
+    rediscovery:
+      problem: "親睦会費や制服代を便利だから自動控除へ加えようとする。"
+      naive_attempt: "社員のためになる費用なら会社が自由に差し引けると考える。"
+      failure_direction: "法定控除と根拠を要する任意控除を区別しない。"
+      counterexample: "所得税、保険料、本人が知らない会費を同じ控除欄へ置く。"
+      cause_to_verbalize: "引き算できることと引いてよいことは別だと説明させる。"
+      correction_direction: "控除項目へ法定・協定等の区分と根拠資料を付ける。"
+      verification: "研修用5項目を分類し根拠不明の制服代を止める。"
+    drama: {type: tension, turn: "天引き事業の妄想が他人の生活費を扱う怖さへ変わる。"}
+    setup_ids: []
+    payoff_ids: []
+    callback_ids: []
+    exit_thread_ids: [thread-missing-money, thread-one-yen, thread-authority]
+    closing_realization: "控除欄の各行には引いてよい根拠が要るとまとめる。"
+    target_chars: 1400
+    target_dialogue_rounds: 7
+  - id: act-02-sec-02
+    title: "2-2　一律15%ではない ── 控除ごとの算定基礎"
+    function: rediscovery
+    core_concept_id: assessment-bases
+    supporting_concept_ids: [payroll-equation, deduction-classification]
+    entry_thread_ids: [thread-missing-money, thread-one-yen]
+    rediscovery:
+      problem: "総支給320,000円へ一律15%を掛け全保険料48,000円とする。"
+      naive_attempt: "控除はすべて総支給額を共通の入口にする割合計算だとみなす。"
+      failure_direction: "対象賃金、標準額、社会保険料控除後額、通知額の違いを見落とす。"
+      counterexample: "総支給320,000円、標準報酬320,000円、税額表対象270,080円を並べる。"
+      cause_to_verbalize: "何の負担を測るかで対象額が変わると説明させる。"
+      correction_direction: "控除ごとに対象額を先に作り、率や表を最後に適用する。"
+      verification: "通勤手当を含む例と含まない例を研修規則で判定する。"
+    drama: {type: wonder, turn: "万能控除率の夢が複数の物差しへの驚きに変わる。"}
+    setup_ids: []
+    payoff_ids: []
+    callback_ids: []
+    exit_thread_ids: [thread-missing-money, thread-one-yen]
+    closing_realization: "率を探す前に制度ごとの対象額を作るとまとめる。"
+    target_chars: 1400
+    target_dialogue_rounds: 7
+  - id: act-02-sec-03
+    title: "2-3　率を掛けずに表を引く ── 等級表・税額表・通知額"
+    function: rediscovery
+    core_concept_id: table-driven-deduction
+    supporting_concept_ids: [rule-source-boundary, assessment-bases]
+    entry_thread_ids: [thread-missing-money, thread-authority]
+    rediscovery:
+      problem: "所得税も住民税も検索した10%を掛けて明細と一致しない。"
+      naive_attempt: "税や保険はすべて対象額×率の一本式で出せると考える。"
+      failure_direction: "等級表、扶養条件の税額表、自治体通知という決定方法を無視する。"
+      counterexample: "同じ標準報酬の2人、扶養人数違いの2人、通知額固定の1人を比べる。"
+      cause_to_verbalize: "掛け算でなく表の行選択や通知転記で決まる控除があると説明させる。"
+      correction_direction: "対象額、表の版、列、行、通知番号を記録する。"
+      verification: "研修用3表から社会保険・源泉税・住民税を引く。"
+    drama: {type: conflict, turn: "暗算税理士の夢が表の版違いで崩れる。"}
+    setup_ids: []
+    payoff_ids: []
+    callback_ids: []
+    exit_thread_ids: [thread-missing-money, thread-authority]
+    closing_realization: "まず率方式・表方式・通知方式のどれかを判定するとまとめる。"
+    target_chars: 1400
+    target_dialogue_rounds: 7
+  - id: act-02-sec-04
+    title: "2-4　所得税は最終答案か ── 源泉徴収"
+    function: rediscovery
+    core_concept_id: withholding-not-final
+    supporting_concept_ids: [table-driven-deduction, payroll-equation]
+    entry_thread_ids: [thread-missing-money, thread-authority]
+    rediscovery:
+      problem: "毎月の源泉税を年間所得税の正確な12分の1だと断定する。"
+      naive_attempt: "月額表は年間税額を完全に確定した表だと考える。"
+      failure_direction: "支払時の仮徴収と年間事情をそろえた精算を同一視する。"
+      counterexample: "同じ月給でも扶養申告の有無と途中変更で月額が変わる例を比べる。"
+      cause_to_verbalize: "その時点の情報による前払いなので後で精算があり得ると説明させる。"
+      correction_direction: "当月は指定版・区分で源泉し最終税額と別に記録する。"
+      verification: "研修用月額表の甲欄0人と1人を引く。"
+    drama: {type: wonder, turn: "税を完全予言する夢が仮払いの時間構造へ変わる。"}
+    setup_ids: []
+    payoff_ids: []
+    callback_ids: []
+    exit_thread_ids: [thread-missing-money, thread-authority]
+    closing_realization: "源泉税は当月の正しい仮額で人生全体の最終額ではないとまとめる。"
+    target_chars: 1400
+    target_dialogue_rounds: 7
+  - id: act-02-sec-05
+    title: "2-5　4枚のカレンダー ── 給与の時間軸"
+    function: rediscovery
+    core_concept_id: payroll-timeline
+    supporting_concept_ids: [pay-period-cutoff, assessment-bases, table-driven-deduction]
+    entry_thread_ids: [thread-which-month]
+    rediscovery:
+      problem: "届いた変更を全部当月給与へ反映し、締め済み勤怠や通知月と衝突する。"
+      naive_attempt: "書類を受け取った日だけで反映月を決める。"
+      failure_direction: "勤怠、支給、保険、税の時間を一つへ潰す。"
+      counterexample: "20日締め、翌月適用の等級、6月開始の住民税を同じ月へ置く。"
+      cause_to_verbalize: "正しい金額でも適用月違いなら誤払いだと説明させる。"
+      correction_direction: "発生日、適用日、支給反映日を4本の時間軸へ置く。"
+      verification: "残業、扶養変更、住民税通知の反映月を判定する。"
+    drama: {type: tension, turn: "届いた順の高速処理が月またぎ事故の寸前で止まる。"}
+    setup_ids: []
+    payoff_ids: [clue-four-calendars]
+    callback_ids: []
+    exit_thread_ids: []
+    closing_realization: "何円かだけでなく何月へ置くかを確かめるとまとめる。"
+    target_chars: 1400
+    target_dialogue_rounds: 7
+  - id: act-02-sec-06
+    title: "2-6　最後に丸めれば同じか ── 端数処理"
+    function: rediscovery
+    core_concept_id: rounding-order
+    supporting_concept_ids: [attendance-to-pay, table-driven-deduction]
+    entry_thread_ids: [thread-one-yen, thread-authority]
+    rediscovery:
+      problem: "最後に一度だけ四捨五入して項目別処理の明細と1円ずれる。"
+      naive_attempt: "端数は誤差だから最後に丸めれば最も正確だと考える。"
+      failure_direction: "項目ごとの丸め段階と方法を無視する。"
+      counterexample: "1,000.5円を2本切り捨てる場合と合計後に丸める場合を比べる。"
+      cause_to_verbalize: "丸めは規則の一部で位置が変われば答えも変わると説明させる。"
+      correction_direction: "項目へ処理時点と切捨て・切上げ・四捨五入を記す。"
+      verification: "欠勤単価と雇用保険の研修規則で1円差を再現する。"
+    drama: {type: conflict, turn: "1円を誤差として捨てる夢が累積差で砕ける。"}
+    setup_ids: []
+    payoff_ids: []
+    callback_ids: [clue-one-yen-coin]
+    exit_thread_ids: [thread-one-yen, thread-authority]
+    closing_realization: "端数処理は最後の化粧でなく途中の演算だとまとめる。"
+    target_chars: 1400
+    target_dialogue_rounds: 7
+  - id: act-02-sec-07
+    title: "2-7　73,170円を4本に分ける ── 控除欄"
+    function: bridge
+    core_concept_id: null
+    supporting_concept_ids: [deduction-classification, assessment-bases, table-driven-deduction, withholding-not-final, payroll-timeline, rounding-order]
+    entry_thread_ids: [thread-missing-money, thread-one-yen, thread-authority]
+    drama: {type: relief, turn: "控除の塊が社会保険48,000円、雇用保険1,920円、源泉税7,250円、住民税16,000円へ分かれる。"}
+    setup_ids: []
+    payoff_ids: []
+    callback_ids: [clue-folded-payslip]
+    exit_thread_ids: [thread-missing-money, thread-one-yen, thread-authority]
+    closing_realization: "合計だけでなく4本の入口と根拠を説明して初めて検算になるとまとめる。"
+    target_chars: 1400
+    target_dialogue_rounds: 7
+  - id: act-02-sec-08
+    title: "2-8　赤鉛筆で手取りへ ── 月例給与の完成"
+    function: recurring-corner
+    core_concept_id: null
+    supporting_concept_ids: [payroll-equation, deduction-classification, assessment-bases, table-driven-deduction, payroll-timeline, rounding-order]
+    entry_thread_ids: [thread-missing-money, thread-one-yen, thread-authority]
+    drama: {type: reflection, turn: "320,000円－73,170円＝246,830円を再現し、盗難騒ぎが検算課題へ変わる。"}
+    setup_ids: []
+    payoff_ids: []
+    callback_ids: [clue-one-yen-coin, clue-old-ledger]
+    exit_thread_ids: [thread-missing-money, thread-one-yen, thread-authority]
+    closing_realization: "金額や率でなく、根拠・対象・表・月・端数の順序を別の社員にも使えるとまとめる。"
+    target_chars: 1200
+    target_dialogue_rounds: 7

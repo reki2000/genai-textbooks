@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
-"""Generate the public textbook indexes from docs/catalog.yaml."""
+"""Generate the public docsify site (sidebar, top page, per-book pages,
+sitemap) from docs/catalog.yaml. Run automatically at build/deploy time;
+nothing here is meant to be hand-edited or committed as generated output.
+"""
 
 from __future__ import annotations
 
 import argparse
 import sys
+import tempfile
 from collections import defaultdict
 from pathlib import Path
 from typing import Any
@@ -32,10 +36,21 @@ sys.dont_write_bytecode = True
 from count_textbooks import count_document  # noqa: E402
 
 CATALOG_PATH = ROOT / "docs" / "catalog.yaml"
+TEMPLATE_PATH = ROOT / "scripts" / "site_template.html"
 SIDEBAR_PATH = ROOT / "docs" / "_sidebar.md"
 TOP_PAGE_PATH = ROOT / "docs" / "README.md"
+INDEX_PATH = ROOT / "docs" / "index.html"
+NOT_FOUND_PATH = ROOT / "docs" / "404.html"
+SITEMAP_PATH = ROOT / "docs" / "sitemap.xml"
+BOOKS_DIR = ROOT / "docs" / "books"
 START_MARKER = "<!-- BEGIN GENERATED CATALOG -->"
 END_MARKER = "<!-- END GENERATED CATALOG -->"
+
+SITE_ORIGIN = "https://reki2000.github.io"
+SITE_BASE_PATH = "/genai-textbooks"
+SITE_URL = SITE_ORIGIN + SITE_BASE_PATH
+SITE_TITLE = "やる夫で学ぶ"
+SITE_DESCRIPTION = "Short Textbooks on Various Topics Written by Generative AI"
 
 
 def fail(message: str) -> None:
@@ -126,7 +141,7 @@ def load_catalog() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
         relative_path = Path(path.removeprefix("/"))
         if ".." in relative_path.parts or relative_path.suffix:
             fail(f"document {document_id} has an unsafe path: {path!r}")
-        source_path = (ROOT / "docs" / relative_path).with_suffix(".md")
+        source_path = ROOT / "docs" / relative_path / "README.md"
         if not source_path.is_file():
             fail(f"document {document_id} points to missing file: {source_path}")
         document_ids.add(document_id)
@@ -134,11 +149,11 @@ def load_catalog() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
         document_orders[category_id].add(order)
         registered_files.add(source_path.resolve())
 
-    actual_files = {path.resolve() for path in (ROOT / "docs" / "books").glob("*.md")}
+    actual_files = {path.resolve() for path in (ROOT / "docs" / "books").glob("*/README.md")}
     unregistered = sorted(actual_files - registered_files)
     if unregistered:
-        names = ", ".join(path.name for path in unregistered)
-        fail(f"unregistered files in docs/books: {names}")
+        names = ", ".join(path.parent.name for path in unregistered)
+        fail(f"unregistered folders in docs/books: {names}")
 
     empty_categories = [category_id for category_id in category_ids if not document_orders[category_id]]
     if empty_categories:
@@ -159,20 +174,42 @@ def documents_by_category(
 
 
 def reading_minutes(document: dict[str, Any]) -> int:
-    source_path = (ROOT / "docs" / document["path"].removeprefix("/")).with_suffix(".md")
+    source_path = ROOT / "docs" / document["path"].removeprefix("/") / "README.md"
     return count_document(source_path)["reading_minutes"]
+
+
+def page_url(document: dict[str, Any]) -> str:
+    """Absolute URL for a book page. Trailing slash matches the docs/books/<id>/
+    directory + index.html layout, since GitHub Pages (no Jekyll pretty URLs)
+    only resolves extensionless paths via directory + index.html, not via
+    filename-without-extension lookup."""
+    return f"{SITE_URL}{document['path']}/"
+
+
+def nav_href(document: dict[str, Any]) -> str:
+    """Site-root-relative link for sidebar/top-page navigation, including the
+    project subpath. docsify history mode runs with no basePath, so links must
+    carry the full subpath (/genai-textbooks/...); a bare /books/... link would
+    drop the subpath on client-side navigation and 404. The trailing slash
+    loads docs/books/<id>/README.md via docsify's directory convention."""
+    return f"{SITE_BASE_PATH}{document['path']}/"
 
 
 def render_sidebar(
     categories: list[dict[str, Any]], documents: list[dict[str, Any]]
 ) -> str:
-    lines = ["<!-- Generated from docs/catalog.yaml. Do not edit directly. -->", ""]
+    lines = [
+        "<!-- Generated from docs/catalog.yaml. Do not edit directly. -->",
+        "",
+        f"- [🏠 トップ]({SITE_BASE_PATH}/)",
+        "",
+    ]
     for category, category_documents in documents_by_category(categories, documents):
         lines.append(f"- {category['title']}")
         for document in category_documents:
             minutes = reading_minutes(document)
             lines.append(
-                f"  - [{document['title']}]({document['path']}) ({minutes}分)"
+                f"  - [{document['title']}]({nav_href(document)}) ({minutes}分)"
             )
         lines.append("")
     return "\n".join(lines).rstrip() + "\n"
@@ -189,7 +226,7 @@ def render_top_page_catalog(
             minutes = reading_minutes(document)
             lines.extend(
                 [
-                    f"#### [{document['title']}]({document['path']}) ({minutes}分)",
+                    f"#### [{document['title']}]({nav_href(document)}) ({minutes}分)",
                     f"問い：{document['question']}",
                     f"プロット：{document['plot']}",
                     "",
@@ -207,16 +244,61 @@ def replace_generated_catalog(current: str, generated: str) -> str:
     return before + generated + after.lstrip("\n")
 
 
-def update_or_check(path: Path, expected: str, check: bool) -> bool:
-    current = path.read_text(encoding="utf-8") if path.exists() else ""
-    if current == expected:
-        return True
-    if check:
-        print(f"out of date: {path.relative_to(ROOT)}", file=sys.stderr)
-        return False
-    path.write_text(expected, encoding="utf-8")
-    print(f"updated: {path.relative_to(ROOT)}")
-    return True
+def render_shell(title: str, description: str, extra_head: str = "") -> str:
+    template = TEMPLATE_PATH.read_text(encoding="utf-8")
+    return (
+        template.replace("@@TITLE@@", title)
+        .replace("@@DESCRIPTION@@", description)
+        .replace("@@BASE_PATH@@", SITE_BASE_PATH)
+        .replace("@@SITE_TITLE@@", SITE_TITLE)
+        .replace("@@EXTRA_HEAD@@", extra_head)
+    )
+
+
+def render_book_extra_head(document: dict[str, Any]) -> str:
+    url = page_url(document)
+    return (
+        f'  <link rel="canonical" href="{url}">\n'
+        f'  <meta property="og:type" content="article">\n'
+        f'  <meta property="og:site_name" content="{SITE_TITLE}">\n'
+        f'  <meta property="og:title" content="{document["title"]}">\n'
+        f'  <meta property="og:description" content="{document["question"]}">\n'
+        f'  <meta property="og:url" content="{url}">\n'
+        f'  <meta name="twitter:card" content="summary">\n'
+    )
+
+
+def render_sitemap(documents: list[dict[str, Any]]) -> str:
+    urls = [SITE_URL + "/"] + [page_url(document) for document in documents]
+    lines = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+    for url in urls:
+        lines.append(f"  <url><loc>{url}</loc></url>")
+    lines.append("</urlset>")
+    return "\n".join(lines) + "\n"
+
+
+def write_file(path: Path, content: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content, encoding="utf-8")
+
+
+def generate(categories: list[dict[str, Any]], documents: list[dict[str, Any]], out_docs: Path) -> None:
+    sidebar = render_sidebar(categories, documents)
+    current_top_page = (ROOT / "docs" / "README.md").read_text(encoding="utf-8")
+    top_page = replace_generated_catalog(current_top_page, render_top_page_catalog(categories, documents))
+
+    write_file(out_docs / "_sidebar.md", sidebar)
+    write_file(out_docs / "README.md", top_page)
+    write_file(out_docs / "index.html", render_shell(SITE_TITLE, SITE_DESCRIPTION))
+    write_file(out_docs / "404.html", render_shell(SITE_TITLE, SITE_DESCRIPTION))
+
+    for document in documents:
+        relative_path = Path(document["path"].removeprefix("/")) / "index.html"
+        page_title = f"{document['title']} - {SITE_TITLE}"
+        page = render_shell(page_title, document["question"], render_book_extra_head(document))
+        write_file(out_docs / relative_path, page)
+
+    write_file(out_docs / "sitemap.xml", render_sitemap(documents))
 
 
 def main() -> int:
@@ -224,26 +306,27 @@ def main() -> int:
     parser.add_argument(
         "--check",
         action="store_true",
-        help="fail if generated files differ instead of updating them",
+        help="only validate docs/catalog.yaml and a trial build, without touching docs/",
     )
     args = parser.parse_args()
 
     try:
         categories, documents = load_catalog()
-        sidebar = render_sidebar(categories, documents)
-        current_top_page = TOP_PAGE_PATH.read_text(encoding="utf-8")
-        top_page = replace_generated_catalog(
-            current_top_page, render_top_page_catalog(categories, documents)
-        )
+        if args.check:
+            with tempfile.TemporaryDirectory() as tmp:
+                generate(categories, documents, Path(tmp))
+        else:
+            generate(categories, documents, ROOT / "docs")
     except (OSError, ValueError, yaml.YAMLError) as exc:
         print(f"catalog error: {exc}", file=sys.stderr)
         return 1
 
-    results = (
-        update_or_check(SIDEBAR_PATH, sidebar, args.check),
-        update_or_check(TOP_PAGE_PATH, top_page, args.check),
-    )
-    return 0 if all(results) else 1
+    if args.check:
+        print("catalog OK")
+    else:
+        print("generated: docs/_sidebar.md, docs/README.md, docs/index.html, docs/404.html, "
+              "docs/books/*/index.html, docs/sitemap.xml")
+    return 0
 
 
 if __name__ == "__main__":

@@ -154,7 +154,7 @@ def count_document(source_path: Path | str) -> dict[str, Any]:
 
 def default_paths() -> list[Path]:
     repo_root = Path(__file__).resolve().parents[4]
-    return sorted((repo_root / "docs" / "books").glob("*.md"))
+    return sorted((repo_root / "docs" / "books").glob("*/README.md"))
 
 
 def render_tsv(results: list[dict[str, Any]]) -> str:
