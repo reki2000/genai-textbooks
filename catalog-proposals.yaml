@@ -1,0 +1,367 @@
+# 新規教材の提案（50件）
+#
+# docs/catalog.yaml と同じスキーマ（id / title / path / category / order /
+# question / plot）で記述した案のリスト。採用するものを docs/catalog.yaml の
+# documents に移し、対応する docs/books/<id>/README.md を用意する。
+# order は各カテゴリの既存最大値の続きから10刻みで採番している。
+
+documents:
+  # ---- society（社会と制度）: 既存の最大 order は 90 ----
+  - id: pension-system
+    title: やる夫が年金を100年もたせるようです
+    path: /books/pension-system
+    category: society
+    order: 100
+    question: 払った保険料は自分の口座に積み上がっているのか、少子高齢化のもとで年金は誰が誰に払う仕組みなのか。
+    plot: ねんきん定期便を見て「元が取れない」と怒るやる夫が、賦課方式と積立方式の違いから出発し、マクロ経済スライド、支給開始年齢、積立金運用、世代間の分配をたどって、自分の改革案が誰の取り分を削るのかを再発見する。
+  - id: health-insurance
+    title: やる夫が皆保険の窓口に立つようです
+    path: /books/health-insurance
+    category: society
+    order: 110
+    question: 窓口で払う3割の裏側で誰が値段を決めているのか、いつでも医者にかかれる制度はなぜ維持が難しいのか。
+    plot: 医療費を下げると宣言して保険者の理事になったやる夫が、診療報酬点数表、高額療養費、フリーアクセス、後期高齢者医療、薬価改定を一つずつ触り、削った先で必ず誰かの受診が止まる構造に突き当たる。
+  - id: tax-system
+    title: やる夫が税制改正を任されたようです
+    path: /books/tax-system
+    category: society
+    order: 120
+    question: 「金持ちからもっと取ればいい」はなぜそのまま実現しないのか、税は結局誰が負担しているのか。
+    plot: 税制調査会に放り込まれたやる夫が、累進課税、消費税の逆進性、法人税の帰着、各種控除、資産課税を検討するたびに、想定と違う相手に負担が移っていく「転嫁と帰着」を再発見していく。
+  - id: courts-justice
+    title: やる夫が裁判員に選ばれたようです
+    path: /books/courts-justice
+    category: society
+    order: 130
+    question: 「本当にやったのか」はどうやって決まるのか、疑わしきは罰せずという原則は何を守っているのか。
+    plot: 殺人事件の裁判員に選ばれたやる夫が、自白、目撃証言、鑑定、状況証拠を前に有罪の心証を固めていき、証拠法則・立証責任・冤罪の歴史・量刑相場を通じて、事実認定という手続の設計思想に触れる。
+  - id: election-systems
+    title: やる夫が選挙制度を作り直すようです
+    path: /books/election-systems
+    category: society
+    order: 140
+    question: 「みんなの意見を正しく反映する選挙」は設計できるのか、多数決の何が壊れているのか。
+    plot: 学生自治会の選挙で自分が負けた理由を制度のせいにしたやる夫が、小選挙区・比例代表・決選投票・順位付け投票を試し、票の割れ、死票、一票の格差、選挙区割り、アローの不可能性定理へ導かれる。
+  - id: antitrust-competition
+    title: やる夫が独占を審査するようです
+    path: /books/antitrust-competition
+    category: society
+    order: 150
+    question: 安くて便利な巨大企業のどこが問題なのか、競争は保護すべき対象なのか結果なのか。
+    plot: 公正取引委員会の審査官になったやる夫が、価格カルテル、抱き合わせ、略奪的価格、プラットフォームの自社優遇を扱いながら、消費者利益と競争過程のどちらを守っているのかを問い直す。
+  - id: patent-ip
+    title: やる夫が発明を独り占めしたいようです
+    path: /books/patent-ip
+    category: society
+    order: 160
+    question: アイデアはなぜそのままでは守れないのか、独占権を与えることがなぜ社会の得になるのか。
+    plot: 画期的な留め具を思いついた町工場のやる夫が、特許・実用新案・意匠・商標・著作権を取り違えながら、新規性、先行技術調査、クレームの書き方、職務発明、パテントトロール、オープンソースライセンスまでを踏み抜いていく。
+  - id: insurance-actuarial
+    title: やる夫が保険料を決めるようです
+    path: /books/insurance-actuarial
+    category: society
+    order: 170
+    question: 起きるかどうか分からない事故に、どうやって値段をつけるのか、保険が成立しなくなるのはどんなときか。
+    plot: 少額短期保険を立ち上げたやる夫が、大数の法則で強気に価格を決めて赤字を出し、逆選択、モラルハザード、免責、大災害の相関リスク、再保険、支払余力を通じて、保険が「賭け」ではなくリスクの構造化であることを学ぶ。
+  - id: financial-statements
+    title: やる夫の会社は黒字なのに金がないようです
+    path: /books/financial-statements
+    category: society
+    order: 180
+    question: 利益が出ているのに現金が尽きるのはなぜか、決算書の三つの表は何を測り分けているのか。
+    plot: 好調なはずの自社の資金繰りに詰まったやる夫が、貸借対照表・損益計算書・キャッシュフロー計算書を突き合わせ、発生主義、運転資本、減価償却、のれん、引当金を通じて黒字倒産の正体を掴む。
+  - id: disaster-management
+    title: やる夫が想定外を計画に入れるようです
+    path: /books/disaster-management
+    category: society
+    order: 190
+    question: 防災はどこまで備えれば十分なのか、「想定」を決めることは何を諦めることなのか。
+    plot: 沿岸自治体の防災担当になったやる夫が、ハザードマップ、避難情報、堤防高、備蓄、受援計画を作りながら、確率と被害額のトレードオフ、避難しない人の合理性、リスクコミュニケーションの難しさに向き合う。
+  - id: international-trade
+    title: やる夫が関税で国内産業を守るようです
+    path: /books/international-trade
+    category: society
+    order: 200
+    question: 自国の工場を守る関税はなぜ自国を貧しくしうるのか、それでも各国が保護に走るのはなぜか。
+    plot: 通商担当の政務官になったやる夫が、比較優位の理屈で自由貿易を掲げて出発し、雇用調整、幼稚産業、ダンピング、WTOとFTA、輸出管理と経済安全保障を経て、効率と分配と安全のあいだで交渉表を書き直す。
+  - id: urban-vacant-houses
+    title: やる夫の町から人が消えていくようです
+    path: /books/urban-vacant-houses
+    category: society
+    order: 210
+    question: 家が余っているのに家賃が下がらないのはなぜか、縮む都市はどうたためばよいのか。
+    plot: 人口が半分になる予測を渡された都市計画課のやる夫が、空き家、区画整理、用途地域、インフラ維持費、立地適正化計画を扱い、拡げるより難しい「畳む計画」を設計していく。
+
+  # ---- engineering（工学と産業）: 既存の最大 order は 120 ----
+  - id: semiconductor-fab
+    title: やる夫が半導体工場の歩留まりと戦うようです
+    path: /books/semiconductor-fab
+    category: engineering
+    order: 130
+    question: 髪の毛の10万分の1の回路が、なぜ一枚のウェハに何百億個も作れるのか、そして何が作れなくするのか。
+    plot: 前工程の歩留まりが上がらない工場に送り込まれたやる夫が、リソグラフィの解像限界、多層プロセス、パーティクル、露光機の値段、微細化の壁とムーアの法則の終わり方を、一枚の不良マップから逆算していく。
+  - id: railway-timetable
+    title: やる夫が一分の遅れを取り戻すようです
+    path: /books/railway-timetable
+    category: engineering
+    order: 140
+    question: 数百本の列車がぶつからずに走れるのはなぜか、たった一分の遅れが夕方に一時間へ育つのはなぜか。
+    plot: 運転指令所に配属されたやる夫が、閉塞と信号の原理からダイヤグラムの引き方へ進み、余裕時分、折り返し、車両運用と乗務員運用、遅延の伝播、運転整理という現場判断を再発見する。
+  - id: jet-aircraft
+    title: やる夫が空を飛ぶ理由を確かめるようです
+    path: /books/jet-aircraft
+    category: engineering
+    order: 150
+    question: 何百トンもの金属はなぜ落ちないのか、翼とエンジンはどこまで大きくできるのか。
+    plot: 「翼の上は速いから浮く」という説明に納得できないやる夫が、循環と迎角、失速、後退翼と遷音速、ジェットエンジンの熱サイクル、与圧と疲労、冗長設計と事故調査までを一機の設計として組み直す。
+  - id: automobile-ev
+    title: やる夫が電気自動車を作り直すようです
+    path: /books/automobile-ev
+    category: engineering
+    order: 160
+    question: モーターは静かで効率もよいのに、なぜ自動車の電動化はここまで手間取っているのか。
+    plot: 内燃機関の技術者だったやる夫がEV開発に配置換えされ、トルク特性、電池のエネルギー密度と発熱、航続と重量のスパイラル、充電インフラ、資源とライフサイクル排出を突き合わせて、置き換えではなく再設計であることを知る。
+  - id: heat-pump-hvac
+    title: やる夫は熱を汲み上げたいようです
+    path: /books/heat-pump-hvac
+    category: engineering
+    order: 170
+    question: エアコンはなぜ電気1に対して熱を3以上運べるのか、それは永久機関ではないのか。
+    plot: 冷房の効かない部屋で熱力学第二法則を疑い始めたやる夫が、冷凍サイクル、冷媒、成績係数、除湿と潜熱、断熱と換気、寒冷地の霜取りを通じて、暖房と冷房が同じ機械であることを再発見する。
+  - id: food-preservation
+    title: やる夫は食べ物を腐らせたくないようです
+    path: /books/food-preservation
+    category: engineering
+    order: 180
+    question: 常温で何年も持つ食品と、明日には傷む食品を分けているものは何か。
+    plot: 特産品を全国へ売りたい町工場のやる夫が、自作の瓶詰めで食中毒寸前の失敗をし、水分活性、pH、加熱殺菌のD値とF値、包装とガス置換、冷凍時の氷結晶、コールドチェーンと賞味期限の決め方を学ぶ。
+  - id: rocket-propulsion
+    title: やる夫がロケットを上げるようです
+    path: /books/rocket-propulsion
+    category: engineering
+    order: 190
+    question: 燃料の大半を打ち上げ数分で使い切る乗り物は、どう設計すれば軌道に届くのか。
+    plot: 軌道の計算はできても機体が上がらないやる夫が、ツィオルコフスキーの式から出発し、比推力、推力重量比、多段化、燃焼不安定、ターボポンプ、再使用と回収のコスト勘定へ進む。
+  - id: shipping-logistics
+    title: やる夫が箱で世界を動かすようです
+    path: /books/shipping-logistics
+    category: engineering
+    order: 200
+    question: 地球の裏側から運ぶ方が国内輸送より安いことがあるのはなぜか。
+    plot: 輸入雑貨で失敗したやる夫が、コンテナ規格の誕生から、船型の規模の経済、積付けと復原性、港湾荷役、運河と喫水、傭船市況と燃料規制まで、箱一つが世界の産業配置を変えた理由をたどる。
+  - id: gnss-positioning
+    title: やる夫は自分がどこにいるか知りたいようです
+    path: /books/gnss-positioning
+    category: engineering
+    order: 210
+    question: 空の彼方の衛星が、なぜ手元の端末の位置を数メートルで言い当てられるのか。
+    plot: カーナビが橋の下でずれることに苛立つやる夫が、三辺測量と時計誤差、相対論による補正、電離層と多重反射、DGPSとRTK、慣性航法との統合、そして測位が止まる日の備えまでを再発見する。
+  - id: medical-imaging
+    title: やる夫が体を切らずに中を見るようです
+    path: /books/medical-imaging
+    category: engineering
+    order: 220
+    question: 影絵にすぎないX線写真から、どうやって体内の断面図が組み上がるのか。
+    plot: 検査を怖がるやる夫が放射線技師の同級生に連れ回され、X線の減弱、投影と再構成、CTの被曝と分解能のトレードオフ、MRIの核磁気共鳴、超音波とドプラ、そして画像診断が確率であることを学ぶ。
+  - id: machine-tools
+    title: やる夫が図面を金属にするようです
+    path: /books/machine-tools
+    category: engineering
+    order: 230
+    question: 図面に書いた寸法どおりの部品は、なぜそのままでは作れないのか。
+    plot: 3Dプリンタで試作までこぎつけたやる夫が量産で詰まり、切削・鋳造・鍛造・板金の使い分け、公差とはめあい、工程設計、治具、表面粗さ、加工費の見積もりを通じて、設計とは作り方を決めることだと気づく。
+  - id: bridge-engineering
+    title: やる夫が谷に橋を架けるようです
+    path: /books/bridge-engineering
+    category: engineering
+    order: 240
+    question: 桁・アーチ・吊橋はどう選ぶのか、風で落ちた橋は何を計算し損ねていたのか。
+    plot: 予算の足りない架橋計画を任されたやる夫が、力の流れから形式を選び、タコマ橋の自励振動、疲労とリベット、支承と伸縮装置、そして完成後50年の点検と補修費までを一つの設計問題として引き受ける。
+
+  # ---- math-information（数学と情報）: 既存の最大 order は 40 ----
+  - id: cryptography
+    title: やる夫の秘密が読まれているようです
+    path: /books/cryptography
+    category: math-information
+    order: 50
+    question: 鍵を渡していない相手と、なぜ盗聴されている回線で秘密を共有できるのか。
+    plot: 自作の換字式暗号を即座に破られたやる夫が、頻度分析、ワンタイムパッド、共通鍵と鍵配送問題、公開鍵とRSA、楕円曲線、署名と認証、そして「解読不能」が計算量の仮定にすぎないことを再発見する。
+  - id: compiler
+    title: やる夫が自分の言語を作るようです
+    path: /books/compiler
+    category: math-information
+    order: 60
+    question: 人間の書いた文字列は、どうやって機械が実行できる命令列に変わるのか。
+    plot: 「四則演算ができる言語」から始めたやる夫が、字句解析、構文解析と文法の曖昧さ、抽象構文木、型検査、中間表現、レジスタ割り当て、最適化を積み上げ、自分の言語で自分のコンパイラを書くところまで進む。
+  - id: operating-system
+    title: やる夫のパソコンは一度に一つしかできないようです
+    path: /books/operating-system
+    category: math-information
+    order: 70
+    question: CPUが一つしかないのに、なぜ何十個ものアプリが同時に動いているように見えるのか。
+    plot: 自作OSを起動させたいやる夫が、割り込みと特権モード、プロセスとコンテキストスイッチ、仮想記憶とページング、ファイルシステム、排他制御とデッドロックを順に踏み、抽象化の層が守っているものを知る。
+  - id: computational-complexity
+    title: やる夫が総当たりで殴れなくなるようです
+    path: /books/computational-complexity
+    category: math-information
+    order: 80
+    question: 「速い計算機を買えばいい」が通用しない問題があるのはなぜか、難しさはどう測るのか。
+    plot: 配送順の全探索が終わらないやる夫が、オーダー記法、多項式時間、P対NP、NP完全への帰着、近似アルゴリズムとヒューリスティクス、そして「解けない」と分かることの実務的価値を再発見する。
+  - id: deep-learning
+    title: やる夫が言語モデルを育てるようです
+    path: /books/deep-learning
+    category: math-information
+    order: 90
+    question: 次の単語を当てる訓練だけで、なぜ翻訳や要約や推論めいたことができるようになるのか。
+    plot: 手書き数字の分類器から始めたやる夫が、パーセプトロンの限界、誤差逆伝播、過学習と正則化、埋め込み、注意機構とTransformer、事前学習と微調整、スケーリング則と幻覚までを一本の線でたどる。
+  - id: linear-algebra
+    title: やる夫は行列の意味が分からないようです
+    path: /books/linear-algebra
+    category: math-information
+    order: 100
+    question: 数字を並べた表にすぎない行列が、なぜ回転や圧縮や連立方程式を同じ言葉で扱えるのか。
+    plot: 計算はできるのに意味が掴めないやる夫が、線形写像としての行列、基底の取り替え、階数と解の存在、固有値と固有ベクトル、対角化、特異値分解を通じて、データ圧縮と振動と検索が同じ道具で解けることを知る。
+  - id: internet-protocol
+    title: やる夫のパケットが届かないようです
+    path: /books/internet-protocol
+    category: math-information
+    order: 110
+    question: 誰も全体を管理していないネットワークで、なぜ地球の裏側まで通信が届くのか。
+    plot: 自宅サーバが外から見えないやる夫が、パケット交換と階層モデル、IPとルーティング、TCPの再送と輻輳制御、NATとDNS、TLS、BGPによる自律システム間の合意へ進み、故障を前提にした設計思想に出会う。
+  - id: distributed-consensus
+    title: やる夫のサーバが二台になったようです
+    path: /books/distributed-consensus
+    category: math-information
+    order: 120
+    question: 落ちる計算機と遅れるネットワークの上で、複数のサーバはどうやって同じ答えに合意するのか。
+    plot: 冗長化したはずが二重更新で壊れたやる夫が、複製とレプリカラグ、CAP定理、線形化可能性と結果整合性、二相コミット、PaxosとRaft、そして分散システムでは時刻すら信用できないことを再発見する。
+  - id: queueing-theory
+    title: やる夫のレジ行列が伸びるようです
+    path: /books/queueing-theory
+    category: math-information
+    order: 130
+    question: 平均すればさばけるはずの窓口で、なぜ行列が際限なく伸びるのか。
+    plot: 店の混雑を人員配置で解こうとするやる夫が、到着のばらつき、リトルの法則、M/M/1の待ち時間、稼働率90%の崖、行列を分けるか束ねるか、優先度と離脱を通じて、サーバ増設とサービス設計の勘所を掴む。
+  - id: optimization
+    title: やる夫が一番よい割り当てを探すようです
+    path: /books/optimization
+    category: math-information
+    order: 140
+    question: 「一番よい」を計算で決めるには、何を目的関数にし、何を制約に書けばよいのか。
+    plot: 配送とシフトの割り当てを勘で組んでいたやる夫が、線形計画と双対価格、感度分析、整数計画の難しさ、貪欲法と局所探索、多目的の重み付け、そして定式化そのものが最大の意思決定であることを学ぶ。
+  - id: quantum-computing
+    title: やる夫が量子コンピュータに夢を見るようです
+    path: /books/quantum-computing
+    category: math-information
+    order: 150
+    question: 重ね合わせで全部の答えを同時に試せるなら、なぜ何でも速くならないのか。
+    plot: 「量子なら総当たりが一瞬」と信じるやる夫が、量子ビット、測定でつぶれる確率振幅、干渉による増幅、グローバーとショア、量子誤り訂正の物量、そして古典計算に勝てる領域の狭さを確かめていく。
+
+  # ---- natural-science（自然科学）: 既存の最大 order は 60 ----
+  - id: thermodynamics
+    title: やる夫が永久機関を作るようです
+    path: /books/thermodynamics
+    category: natural-science
+    order: 70
+    question: エネルギーが保存されるなら、なぜ同じ熱を何度も使い回せないのか。
+    plot: 特許庁に持ち込んだ永久機関を却下されたやる夫が、熱と仕事、カルノーサイクル、エントロピー、自由エネルギー、統計力学のミクロな数え上げ、マクスウェルの悪魔と情報の代価までを積み上げる。
+  - id: evolution-genetics
+    title: やる夫は進化を疑っているようです
+    path: /books/evolution-genetics
+    category: natural-science
+    order: 80
+    question: 偶然の変異と選択だけで、目のような複雑な仕組みが本当にできあがるのか。
+    plot: 「進化は理論であって事実ではない」と言い出したやる夫が、人為選択、遺伝の粒子性、ハーディ・ワインベルグ、中立進化と分子時計、性選択と血縁選択、種分化の観測例を通じて、反証可能な理論としての進化に向き合う。
+  - id: molecular-biology
+    title: やる夫が生命の設計図を読むようです
+    path: /books/molecular-biology
+    category: natural-science
+    order: 90
+    question: 四種類の文字の並びが、どうやって働く分子と生き物の形になるのか。
+    plot: 遺伝子検査の結果に一喜一憂するやる夫が、DNAの構造と複製、転写と翻訳、遺伝暗号、遺伝子発現の制御、エピジェネティクス、PCRとシーケンサ、ゲノム編集の原理と限界をたどる。
+  - id: neuroscience
+    title: やる夫が自分の脳を覗くようです
+    path: /books/neuroscience
+    category: natural-science
+    order: 100
+    question: 電気と化学で動く細胞の集まりから、なぜ知覚や記憶や「私」が立ち上がるのか。
+    plot: 錯視の絵に何度も騙されるやる夫が、ニューロンと活動電位、シナプス可塑性、感覚地図と予測、海馬と記憶の再構成、報酬系、そして意識をめぐる説明の難しさへ進む。
+  - id: plate-tectonics
+    title: やる夫の足元が動いているようです
+    path: /books/plate-tectonics
+    category: natural-science
+    order: 110
+    question: 大陸が動くという突飛な説は、どんな証拠の積み重ねで常識になったのか。
+    plot: 地震の多さに疑問を持つやる夫が、化石と海岸線の一致、拒絶された大陸移動説、海洋底の地磁気縞、マントル対流、沈み込み帯と火山、地質年代と岩石記録を通じて、地球を一つの熱機関として読み直す。
+  - id: cosmology
+    title: やる夫が宇宙の始まりを見に行くようです
+    path: /books/cosmology
+    category: natural-science
+    order: 120
+    question: 宇宙が膨張しているとして、その「始まり」を人はどうやって観測しているのか。
+    plot: 夜空が暗い理由に引っかかったやる夫が、距離梯子とハッブルの法則、宇宙背景放射、元素合成、暗黒物質と暗黒エネルギー、インフレーション、そして観測できる範囲の限界へ導かれる。
+  - id: chemical-bonding
+    title: やる夫が周期表を作り直すようです
+    path: /books/chemical-bonding
+    category: natural-science
+    order: 130
+    question: 元素の性質はなぜ周期的に繰り返すのか、原子はどんな理屈でくっつくのか。
+    plot: 暗記させられた周期表に反発するやる夫が、当時の分類の試行錯誤から出発し、原子軌道と電子配置、イオン結合・共有結合・金属結合、電気陰性度、分子の形と極性、酸塩基と酸化還元を再構成する。
+  - id: immunology
+    title: やる夫の体が自分を攻撃しているようです
+    path: /books/immunology
+    category: natural-science
+    order: 140
+    question: 免疫はどうやって「自分」と「敵」を見分け、なぜその線引きを間違えるのか。
+    plot: 花粉症と自己免疫疾患の説明に納得できないやる夫が、自然免疫のパターン認識、抗体の多様性を生む遺伝子再編成、T細胞の教育と自己寛容、記憶とワクチン、アレルギーと自己免疫、がん免疫まで進む。
+  - id: electromagnetism
+    title: やる夫が磁石とコイルで遊んでいるようです
+    path: /books/electromagnetism
+    category: natural-science
+    order: 150
+    question: 触れていない物体の間に働く力を、人はどうやって「場」として書き直したのか。
+    plot: 磁石でモーターを回して満足していたやる夫が、クーロン力から場の考え方、ガウスの法則、電磁誘導、変位電流とマクスウェル方程式、電磁波の速度、そして相対論への入り口までを追いかける。
+  - id: ecology
+    title: やる夫が島の生態系を預かるようです
+    path: /books/ecology
+    category: natural-science
+    order: 160
+    question: 害獣を減らせば作物は守れるのか、生態系はどこまで人の手で調整できるのか。
+    plot: 離島の環境管理を任されたやる夫が、天敵導入で事態を悪化させ、個体群動態と捕食者被食者、食物網とキーストーン種、外来種、生息地の分断、レジームシフトと保全計画を学び直す。
+
+  # ---- thought（思想と人間）: 既存の最大 order は 20 ----
+  - id: ethics-applied
+    title: やる夫がトロッコの前で悩むようです
+    path: /books/ethics-applied
+    category: thought
+    order: 30
+    question: 「最大多数の最大幸福」で決めてよいのか、直観が反発するとき何が起きているのか。
+    plot: 自動運転車の事故時の挙動を決める仕事を押しつけられたやる夫が、功利主義、義務論、徳倫理、契約説を試すたびに反例に殴られ、原理を一つ選ぶのではなく反照的均衡で決める作業を経験する。
+  - id: linguistics
+    title: やる夫は規則を知らずに喋っているようです
+    path: /books/linguistics
+    category: thought
+    order: 40
+    question: 誰にも教わっていない文法を、なぜ子どもは数年で使いこなせるのか。
+    plot: 外国語学習に挫折したやる夫が、母語話者としての自分の直観を材料に、音素、形態素、統語構造の入れ子、意味と語用、言語習得と普遍性、方言と変化、機械翻訳との違いを掘り下げる。
+  - id: cognitive-bias
+    title: やる夫は自分の判断を信じているようです
+    path: /books/cognitive-bias
+    category: thought
+    order: 50
+    question: なぜ人は同じ内容でも言い方次第で逆の選択をするのか、直観は修理できるのか。
+    plot: 自信満々の予測を外し続けるやる夫が、ヒューリスティックとバイアス、プロスペクト理論、フレーミング、記憶の再構成、専門家の過信、そしてチェックリストやナッジという環境側の対処を学ぶ。
+  - id: historiography
+    title: やる夫が歴史を書き直すようです
+    path: /books/historiography
+    category: thought
+    order: 60
+    question: 「実際に何があったか」はどうすれば分かるのか、歴史は誰の視点で書かれてきたのか。
+    plot: ネットで見た歴史語りを鵜呑みにしたやる夫が、史料批判、一次史料と二次文献、実証史学とアナール派、オーラルヒストリー、記憶と歴史の違い、歴史修正への線引きを、一つの事件の再構成を通じて体得する。
+  - id: aesthetics-music
+    title: やる夫は名曲の理由を知りたいようです
+    path: /books/aesthetics-music
+    category: thought
+    order: 70
+    question: 心地よさは物理で決まるのか文化で決まるのか、「良い作品」の判断は共有できるのか。
+    plot: 好きな曲をうまく説明できないやる夫が、倍音と協和、音律の妥協、和声と調性の成立、様式の歴史的変化、逸脱が生む効果を追い、趣味判断と美的価値をめぐる議論へ踏み込む。
