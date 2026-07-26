@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Generate the public docsify site (sidebar, top page, per-book pages,
-sitemap) from docs/catalog.yaml. Run automatically at build/deploy time;
+sitemap) by merging catalog.yml files below docs/. Run automatically at build/deploy time;
 nothing here is meant to be hand-edited or committed as generated output.
 """
 
@@ -11,6 +11,7 @@ import shutil
 import sys
 import tempfile
 from collections import defaultdict
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -25,9 +26,12 @@ except ImportError:
 
 def find_repo_root() -> Path:
     for candidate in Path(__file__).resolve().parents:
-        if (candidate / "docs" / "catalog.yaml").is_file():
+        if (
+            (candidate / "docs" / "README.md").is_file()
+            and (candidate / "scripts" / "site_template.html").is_file()
+        ):
             return candidate
-    raise RuntimeError("could not find repository root containing docs/catalog.yaml")
+    raise RuntimeError("could not find repository root")
 
 
 ROOT = find_repo_root()
@@ -36,7 +40,8 @@ sys.path.insert(0, str(COUNT_SCRIPT_DIR))
 sys.dont_write_bytecode = True
 from count_textbooks import count_document  # noqa: E402
 
-CATALOG_PATH = ROOT / "docs" / "catalog.yaml"
+DOCS_DIR = ROOT / "docs"
+CATALOG_NAME = "catalog.yml"
 TEMPLATE_PATH = ROOT / "scripts" / "site_template.html"
 SIDEBAR_PATH = ROOT / "docs" / "_sidebar.md"
 TOP_PAGE_PATH = ROOT / "docs" / "README.md"
@@ -76,11 +81,48 @@ def require_fields(item: dict[str, Any], fields: tuple[str, ...], label: str) ->
         fail(f"{label} is missing: {', '.join(missing)}")
 
 
+def parse_created(value: Any, label: str) -> datetime:
+    if not isinstance(value, str):
+        fail(f"{label} must be an ISO 8601 string")
+    try:
+        created = datetime.fromisoformat(value)
+    except ValueError:
+        fail(f"{label} must be an ISO 8601 datetime")
+    if created.tzinfo is None:
+        fail(f"{label} must include a timezone")
+    return created
+
+
 def load_catalog() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    raw = yaml.safe_load(CATALOG_PATH.read_text(encoding="utf-8"))
-    catalog = require_mapping(raw, str(CATALOG_PATH.relative_to(ROOT)))
-    categories = require_list(catalog.get("categories"), "categories")
-    documents = require_list(catalog.get("documents"), "documents")
+    catalog_paths = sorted(DOCS_DIR.rglob(CATALOG_NAME))
+    if not catalog_paths:
+        fail(f"no {CATALOG_NAME} files found below docs/")
+
+    categories: list[Any] = []
+    documents: list[Any] = []
+    document_sources: list[Path] = []
+    for catalog_path in catalog_paths:
+        label = str(catalog_path.relative_to(ROOT))
+        raw = yaml.safe_load(catalog_path.read_text(encoding="utf-8"))
+        catalog = require_mapping(raw, label)
+        unknown_fields = sorted(set(catalog) - {"categories", "documents"})
+        if unknown_fields:
+            fail(f"{label} has unknown fields: {', '.join(unknown_fields)}")
+        if "categories" not in catalog and "documents" not in catalog:
+            fail(f"{label} must contain categories or documents")
+        if "categories" in catalog:
+            categories.extend(require_list(catalog["categories"], f"{label}: categories"))
+        if "documents" in catalog:
+            fragment_documents = require_list(
+                catalog["documents"], f"{label}: documents"
+            )
+            documents.extend(fragment_documents)
+            document_sources.extend([catalog_path] * len(fragment_documents))
+
+    if not categories:
+        fail("merged catalog has no categories")
+    if not documents:
+        fail("merged catalog has no documents")
 
     category_ids: set[str] = set()
     category_orders: set[int] = set()
@@ -104,24 +146,24 @@ def load_catalog() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
 
     document_ids: set[str] = set()
     document_paths: set[str] = set()
-    document_orders: dict[str, set[int]] = defaultdict(set)
     registered_files: set[Path] = set()
     required_document_fields = (
         "id",
         "title",
         "path",
         "category",
-        "order",
+        "created",
         "question",
         "plot",
     )
-    for index, raw_document in enumerate(documents):
+    for index, (raw_document, catalog_path) in enumerate(
+        zip(documents, document_sources, strict=True)
+    ):
         document = require_mapping(raw_document, f"documents[{index}]")
         require_fields(document, required_document_fields, f"documents[{index}]")
         document_id = document["id"]
         path = document["path"]
         category_id = document["category"]
-        order = document["order"]
         if not isinstance(document_id, str) or not document_id:
             fail(f"documents[{index}].id must be a non-empty string")
         for field in ("title", "question", "plot"):
@@ -135,19 +177,22 @@ def load_catalog() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
             fail(f"duplicate document path: {path}")
         if category_id not in category_ids:
             fail(f"document {document_id} references unknown category: {category_id}")
-        if not isinstance(order, int) or isinstance(order, bool):
-            fail(f"document {document_id} has a non-integer order")
-        if order in document_orders[category_id]:
-            fail(f"duplicate order {order} in category {category_id}")
+        parse_created(document["created"], f"document {document_id}.created")
         relative_path = Path(path.removeprefix("/"))
         if ".." in relative_path.parts or relative_path.suffix:
             fail(f"document {document_id} has an unsafe path: {path!r}")
         source_path = ROOT / "docs" / relative_path / "README.md"
         if not source_path.is_file():
             fail(f"document {document_id} points to missing file: {source_path}")
+        expected_catalog_path = source_path.parent / CATALOG_NAME
+        if catalog_path != expected_catalog_path:
+            fail(
+                f"document {document_id} must be defined in "
+                f"{expected_catalog_path.relative_to(ROOT)}, not "
+                f"{catalog_path.relative_to(ROOT)}"
+            )
         document_ids.add(document_id)
         document_paths.add(path)
-        document_orders[category_id].add(order)
         registered_files.add(source_path.resolve())
 
     actual_files = {path.resolve() for path in (ROOT / "docs" / "books").glob("*/README.md")}
@@ -156,12 +201,19 @@ def load_catalog() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
         names = ", ".join(path.parent.name for path in unregistered)
         fail(f"unregistered folders in docs/books: {names}")
 
-    empty_categories = [category_id for category_id in category_ids if not document_orders[category_id]]
+    populated_categories = {document["category"] for document in documents}
+    empty_categories = category_ids - populated_categories
     if empty_categories:
         fail(f"categories without documents: {', '.join(sorted(empty_categories))}")
 
     categories.sort(key=lambda item: item["order"])
-    documents.sort(key=lambda item: (item["category"], item["order"]))
+    documents.sort(
+        key=lambda item: (
+            item["category"],
+            parse_created(item["created"], f"document {item['id']}.created"),
+            item["id"],
+        )
+    )
     return categories, documents
 
 
@@ -200,7 +252,7 @@ def render_sidebar(
     categories: list[dict[str, Any]], documents: list[dict[str, Any]]
 ) -> str:
     lines = [
-        "<!-- Generated from docs/catalog.yaml. Do not edit directly. -->",
+        "<!-- Generated from docs/**/catalog.yml. Do not edit directly. -->",
         "",
         f"- [🏠 トップ]({SITE_BASE_PATH}/)",
         "",
@@ -312,7 +364,7 @@ def main() -> int:
     parser.add_argument(
         "--check",
         action="store_true",
-        help="only validate docs/catalog.yaml and a trial build, without touching build/",
+        help="only validate merged docs/**/catalog.yml and a trial build, without touching build/",
     )
     args = parser.parse_args()
 

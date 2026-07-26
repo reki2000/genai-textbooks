@@ -1,0 +1,8 @@
+documents:
+- id: database-design
+  title: やる夫で学ぶデータベース設計
+  path: /books/database-design
+  category: math-information
+  created: '2026-07-11T11:06:21+09:00'
+  question: 正規化だけで業務システムは作れるのか、データの意味・履歴・制約はどう設計するのか。
+  plot: 給与計算システムを題材に、やる夫がExcel風の表を崩しながら、実務に耐えるテーブル設計を組み立てる。

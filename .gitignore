@@ -1,7 +1,7 @@
 .claude/settings.local.json
 
 # Build artifacts: generated HTML, sidebars, etc.
-# Source files (docs/catalog.yaml, docs/README.md, docs/books/*/README.md, etc.)
+# Source files (docs/**/catalog.yml, docs/**/README.md, etc.)
 # are tracked; generated output goes to build/ and is excluded.
 /build/
 

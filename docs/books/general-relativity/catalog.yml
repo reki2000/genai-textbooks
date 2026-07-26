@@ -1,0 +1,8 @@
+documents:
+- id: general-relativity
+  title: やる夫で学ぶ一般相対性理論
+  path: /books/general-relativity
+  category: natural-science
+  created: '2026-07-05T10:35:11+09:00'
+  question: ニュートン重力の瞬時作用を捨てると、重力は何として記述されるべきなのか。
+  plot: 特殊相対論を学んだやる夫が、遅延する力の失敗から時空の曲率とアインシュタイン方程式へ導かれる。

@@ -1,0 +1,8 @@
+documents:
+- id: rental-car-operations
+  title: やる夫がレンタカー業務を競争力に変えるようです
+  path: /books/rental-car-operations
+  category: engineering
+  created: '2026-07-23T22:15:51+09:00'
+  question: 紙がなくても分断された事務業務を、変化と例外に強い競争力あるオペレーションへどう変えるのか。
+  plot: レンタカー会社のやる夫が、一件の延長・返却・請求事故から、業務の流れ、データ構造、レギュラーとイレギュラー、失敗学、BPR、自動化、AI、変更管理を学び、現場と専門家を結ぶ究極のCoEを組み立てる。

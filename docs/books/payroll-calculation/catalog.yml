@@ -1,0 +1,8 @@
+documents:
+- id: payroll-calculation
+  title: やる夫の給与明細
+  path: /books/payroll-calculation
+  category: society
+  created: '2026-07-25T07:46:51+09:00'
+  question: 昇給したのに手取りが減るのはなぜか、例外だらけの給与実務で何を払い、何を止め、誰へ渡せばよいのか。
+  plot: 入社2年目の6月、昇給後の給与が前月より減り、初賞与の税額にも驚いたやる夫が、遡及・住民税・退職・兼業・海外給与の例外を通じて、計算だけでなく保留と引渡しを学ぶ。
