@@ -1,0 +1,8 @@
+documents:
+- id: water-infrastructure
+  title: やる夫が水の都をデバッグするようです
+  path: /books/water-infrastructure
+  category: engineering
+  created: '2026-07-20T19:01:01+09:00'
+  question: 都市は洪水・渇水・疫病・汚染の失敗を通じて、治水と上下水道をどのように作り上げてきたのか。
+  plot: 都市開発ゲームの開発者やる夫が、古代灌漑から流域治水までの歴史キャンペーンをプレイし、失敗ログから都市の水循環を一つのシステムとして再実装する。

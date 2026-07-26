@@ -1,0 +1,8 @@
+documents:
+- id: orbital-mechanics-moon
+  title: やる夫で学ぶ軌道力学
+  path: /books/orbital-mechanics-moon
+  category: natural-science
+  created: '2026-07-05T12:38:41+09:00'
+  question: 月へ行って帰るには、なぜ一直線ではなく軌道を設計しなければならないのか。
+  plot: 月旅行を思い立ったやる夫が、大砲案や単純加速案を退けられ、Δv、遷移軌道、帰還の計算を積み上げる。

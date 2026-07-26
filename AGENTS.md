@@ -1,29 +1,35 @@
 # Repository instructions
 
-## catalog.yaml 構造
+## catalog.yml 構造
 
-教材の構成はすべて `docs/catalog.yaml` で定義：
+カテゴリはトップページの隣の `docs/catalog.yml` で定義：
 
 ```yaml
 categories:
   - id: social
     title: 社会と制度
     order: 1
+```
 
+教材情報は本文の隣の `docs/books/{ID}/catalog.yml` で定義：
+
+```yaml
 documents:
   - id: japan-food
     title: やる夫と牛丼と食料政策
-    path: /books/japan-food-policy/
+    path: /books/japan-food-policy
     category: social
-    order: 1
+    created: '2026-07-16T12:10:45+00:00'
     question: 食料自給率を上げれば本当に安全なのか？
     plot: 深夜の牛丼屋で一杯の牛丼を分解しながら...
 ```
 
+`created` には、旧 `docs/books/{ID}.md` と現行の本文パスを含む Git 履歴上の初出コミット日時を設定する。教材はカテゴリ内で `created` の昇順に表示し、同一日時の場合は `id` の昇順。
+
 ## 教材追加手順
 
 1. `/yaruo-rediscovery` で教材を執筆 → `docs/books/{ID}/README.md`
-2. `docs/catalog.yaml` に登録
+2. 同じディレクトリの `docs/books/{ID}/catalog.yml` に教材情報を登録
 3. `python3 scripts/generate_site.py` でビルド確認
 4. `git add docs/` でコミット
 

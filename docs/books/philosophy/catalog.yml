@@ -1,0 +1,8 @@
+documents:
+- id: philosophy
+  title: やる夫が時をかけて哲学するようです
+  path: /books/philosophy
+  category: thought
+  created: '2026-07-16T21:57:43+00:00'
+  question: 「当たり前」を疑うことには何の意味があり、哲学はどのように常識を作り替えてきたのか。
+  plot: やる夫が古代から現代までの時代を渡り歩き、各時代の常識に閉じ込められながら哲学上の問いを追体験する。

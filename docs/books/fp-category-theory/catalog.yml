@@ -1,0 +1,8 @@
+documents:
+- id: fp-category-theory
+  title: やる夫が圏論チョットワカルかもしれません
+  path: /books/fp-category-theory
+  category: math-information
+  created: '2026-07-12T03:36:06+00:00'
+  question: 圏論やモナドは、プログラミングの何を抽象化しているのか。
+  plot: 関数型プログラミングで挫折したやる夫が、日々書くコードを足場に、射・関手・自然変換・モナドへ近づく。

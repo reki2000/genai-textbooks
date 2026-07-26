@@ -6,23 +6,31 @@
 
 ```
 docs/                  ← ソースのみ（git 追跡対象）
-├── catalog.yaml       ← 教材カタログ（構成定義）
+├── catalog.yml        ← カテゴリ定義
 ├── README.md          ← トップページ（手書き部分のみ）
 ├── _footer.md         ← フッター
-└── books/*/README.md  ← 各教材本文
+└── books/*/
+    ├── README.md      ← 各教材本文
+    └── catalog.yml    ← 各教材のカタログ定義
 
 build/                 ← 生成ファイル（git 除外）
 ├── index.html         ← トップページHTML（自動生成）
 ├── 404.html           ← エラーページ（自動生成）
 ├── _sidebar.md        ← サイドバー（自動生成）
 ├── README.md          ← カタログ付きREADME（自動生成）
+├── _footer.md         ← docs/ からコピー
+├── assets/            ← docs/ からコピー
 ├── sitemap.xml        ← サイトマップ（自動生成）
+├── books/*/README.md  ← docs/ からコピー
 └── books/*/index.html ← 各教材SEOページ（自動生成）
 ```
 
 ### 生成ルール
 
-- `docs/catalog.yaml` を正本として `scripts/generate_site.py` がビルド時に `build/` 全体を生成
+- `docs/**/catalog.yml` を `scripts/generate_site.py` がビルド時に統合し、`docs/` のソースを `build/` にコピーして生成ファイルを追加・上書き
+- カテゴリは `docs/catalog.yml`、教材情報は対応する `docs/books/{id}/catalog.yml` に置く
+- 教材の `created` には、旧 `docs/books/{id}.md` と現行パスを含む Git 履歴上の初出コミット日時をタイムゾーン付き ISO 8601 形式で記録し、カテゴリ内ではその昇順（同一日時は `id` の昇順）で表示する
+- 教材情報を別ディレクトリの `catalog.yml` に置いた場合や、ID・パスが重複した場合はビルドエラー
 - 生成対象：サイドバー・トップページ・教材SEOページ・サイトマップ
 - 生成ファイルは直接編集したりコミットしたりしない（`.gitignore` で `build/` を除外）
 
@@ -103,13 +111,14 @@ python3 -m pip install -r requirements-dev.txt
 
 確認事項：
 - ファイルパス：`docs/books/{id}/README.md` の形式
-- `docs/catalog.yaml` に登録済みか
+- 同じディレクトリの `docs/books/{id}/catalog.yml` に登録済みか
 - ファイルが実在するか：`ls docs/books/{id}/README.md`
 
 ## 設定ファイル
 
 - **生成スクリプト：** `scripts/generate_site.py`
 - **テンプレート：** `scripts/site_template.html`
-- **カタログ定義：** `docs/catalog.yaml`
+- **カテゴリ定義：** `docs/catalog.yml`
+- **教材カタログ定義：** `docs/books/*/catalog.yml`
 - **デプロイ設定：** `.github/workflows/static.yml`
 - **除外設定：** `.gitignore`（`/build/`）
