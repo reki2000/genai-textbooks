@@ -4,6 +4,3 @@
 # Source files (docs/catalog.yaml, docs/README.md, docs/books/*/README.md, etc.)
 # are tracked; generated output goes to build/ and is excluded.
 /build/
-
-# Development artifacts
-/scripts/check-generated-files.sh
