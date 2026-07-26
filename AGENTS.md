@@ -1,8 +1,41 @@
 # Repository instructions
 
-## サイドバー・トップページ・教材ページの生成
+## catalog.yaml 構造
 
-`docs/_sidebar.md`、`docs/README.md` の教材一覧ブロック、`docs/index.html`・`docs/404.html`、`docs/books/*/index.html`（各教材のSEO用ページ。教材本文は同じフォルダの `README.md`）、`docs/sitemap.xml` は `docs/catalog.yaml` を正本として `scripts/generate_site.py` がビルド時（GitHub Actions）に自動生成する。これらは生成物であり、直接編集したりコミットしたりしない（`.gitignore` 参照）。
+教材の構成はすべて `docs/catalog.yaml` で定義：
 
-- 教材カタログ、カテゴリ、分類、表示順、タイトル・URL・問い・プロット、または `docs/books/*/README.md` の追加・削除・改名を扱うときは、`docs/catalog.yaml` を編集する（対応する `docs/books/*/README.md` があれば同じ変更内で整合させる）。手元で確認する場合は `python3 scripts/generate_site.py` を実行する。
-- 教材の文字数は、簡便のためファイルサイズ / 3 で概算すること（換算規則の正本と正確な集計は yaruo-count スキル）。yaruo-count スキルは、`scripts/generate_site.py` の読了時間算出（内部で `count_document` を利用）か、規則に基づく正確な集計をユーザーが明示的に求めたときだけ使う。
+```yaml
+categories:
+  - id: social
+    title: 社会と制度
+    order: 1
+
+documents:
+  - id: japan-food
+    title: やる夫と牛丼と食料政策
+    path: /books/japan-food-policy/
+    category: social
+    order: 1
+    question: 食料自給率を上げれば本当に安全なのか？
+    plot: 深夜の牛丼屋で一杯の牛丼を分解しながら...
+```
+
+## 教材追加手順
+
+1. `/yaruo-rediscovery` で教材を執筆 → `docs/books/{ID}/README.md`
+2. `docs/catalog.yaml` に登録
+3. `python3 scripts/generate_site.py` でビルド確認
+4. `git add docs/` でコミット
+
+## ビルドシステム
+
+ソース・生成の分離詳細は [`docs/BUILD.md`](./docs/BUILD.md) を参照。
+
+- **`docs/`**: ソースのみ
+- **`build/`**: 生成ファイル（`.gitignore` で除外）
+
+## 文字数集計
+
+概算：ファイルサイズ ÷ 3
+
+正確な集計が必要なら `/yaruo-count` スキルを使用。

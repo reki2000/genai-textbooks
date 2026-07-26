@@ -306,7 +306,7 @@ def main() -> int:
     parser.add_argument(
         "--check",
         action="store_true",
-        help="only validate docs/catalog.yaml and a trial build, without touching docs/",
+        help="only validate docs/catalog.yaml and a trial build, without touching build/",
     )
     args = parser.parse_args()
 
@@ -316,7 +316,7 @@ def main() -> int:
             with tempfile.TemporaryDirectory() as tmp:
                 generate(categories, documents, Path(tmp))
         else:
-            generate(categories, documents, ROOT / "docs")
+            generate(categories, documents, ROOT / "build")
     except (OSError, ValueError, yaml.YAMLError) as exc:
         print(f"catalog error: {exc}", file=sys.stderr)
         return 1
@@ -324,8 +324,8 @@ def main() -> int:
     if args.check:
         print("catalog OK")
     else:
-        print("generated: docs/_sidebar.md, docs/README.md, docs/index.html, docs/404.html, "
-              "docs/books/*/index.html, docs/sitemap.xml")
+        print("generated: build/_sidebar.md, build/README.md, build/index.html, build/404.html, "
+              "build/books/*/index.html, build/sitemap.xml")
     return 0
 
 
