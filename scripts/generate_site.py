@@ -210,7 +210,7 @@ def render_sidebar(
         for document in category_documents:
             minutes = reading_minutes(document)
             lines.append(
-                f"  - [{document['title']}]({nav_href(document)}) ({minutes}分)"
+                f"  - [{document['title']} ({minutes}分)]({nav_href(document)})"
             )
         lines.append("")
     return "\n".join(lines).rstrip() + "\n"
