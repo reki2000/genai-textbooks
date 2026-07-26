@@ -45,7 +45,7 @@ documents:
     question: お金を刷れば物価は上がるのか、中央銀行は何を操作して景気とインフレに働きかけるのか。
     plot: 日銀総裁に任命されたやる夫が、貨幣数量説の素朴な理解から出発し、金利・期待・国債市場・金融政策の限界を再発見していく。
   - id: asset-management
-    title: やる夫は値札の向こう側を見て資産を運ぶようです
+    title: やる夫は億り人の夢を見る
     path: /books/asset-management
     category: society
     order: 50
