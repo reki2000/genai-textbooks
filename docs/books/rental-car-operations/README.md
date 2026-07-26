@@ -830,7 +830,7 @@ Excelでできることと、Excelへ任せてよい責任は別だお。
 
 **やらない夫**：
 実話を三つ渡す。
-一つ目、英国の公衆衛生当局では2020年、検査結果を報告系へ移す技術的問題で15,841件の陽性事例が日次集計から遅れた。[^ref-1]
+一つ目、英国の公衆衛生当局では2020年、検査結果を報告系へ移す技術的問題で15,841件の陽性事例が日次集計から遅れた。[^ref-1][^ref-4]
 当時の報道では、古いExcel形式へ取り込む際の行数上限が原因とされた。
 まず何を検査すべきだった。
 
@@ -2566,7 +2566,7 @@ LevesonとTurnerの調査は、ソフトウェアだけでなく、設計、試�
 ---
 
 **やらない夫**：
-2014年、米国退役軍人省の監察機関はPhoenixの医療施設を含む予約・待ち時間問題を調査した。[^ref-21]
+2014年、米国退役軍人省の監察機関はPhoenixの医療施設を含む予約・待ち時間問題を調査した。[^ref-21][^ref-22]
 公式の予約記録とは別の非公式リストが使われ、待ち時間データの信頼性が損なわれた。
 目標値があるのに、なぜ別リストが生まれる。
 
@@ -6154,21 +6154,21 @@ AIへ全部聞いて、自動化の見積りをできる夫へ投げていたお
 
 #### データ、表計算、モデル
 
-1. Public Health England, [PHE statement on delayed reporting of COVID-19 cases](https://www.gov.uk/government/news/phe-statement-on-delayed-reporting-of-covid-19-cases), 2020.
-   15,841件が日次報告に含まれなかったこと、データロード工程の技術的問題、入力ファイルが最大サイズを超えたことを説明する当局発表である。
-   本文は、画面が正常に見えても全件性を件数突合しなければ欠落を検知できないという教訓へ移した。
+[^ref-1]: Public Health England, [PHE statement on delayed reporting of COVID-19 cases](https://www.gov.uk/government/news/phe-statement-on-delayed-reporting-of-covid-19-cases), 2020.
+    15,841件が日次報告に含まれなかったこと、データロード工程の技術的問題、入力ファイルが最大サイズを超えたことを説明する当局発表である。
+    本文は、画面が正常に見えても全件性を件数突合しなければ欠落を検知できないという教訓へ移した。
 
-2. Thomas Herndon, Michael Ash, Robert Pollin, [Does High Public Debt Consistently Stifle Economic Growth? A Critique of Reinhart and Rogoff](https://econpapers.repec.org/paper/umaperiwp/wp322.htm), Political Economy Research Institute Working Paper No. 322, 2013.
-   表計算の範囲選択だけでなく、利用可能データの除外や集計方法を含めて結果を再検討した論文である。
-   本文は、数式の正しさ、対象集合、粒度、重み付けを別々に検証する例として用いた。
+[^ref-2]: Thomas Herndon, Michael Ash, Robert Pollin, [Does High Public Debt Consistently Stifle Economic Growth? A Critique of Reinhart and Rogoff](https://econpapers.repec.org/paper/umaperiwp/wp322.htm), Political Economy Research Institute Working Paper No. 322, 2013.
+    表計算の範囲選択だけでなく、利用可能データの除外や集計方法を含めて結果を再検討した論文である。
+    本文は、数式の正しさ、対象集合、粒度、重み付けを別々に検証する例として用いた。
 
-3. Mark Ziemann, Yotam Eren, Assam El-Osta, [Gene name errors are widespread in the scientific literature](https://link.springer.com/article/10.1186/s13059-016-1044-7), Genome Biology 17, 177, 2016.
-   Excelが遺伝子記号を日付等へ自動変換する問題を、公開された補足ファイルで調査した研究である。
-   本文は、識別子へ便利な自動型推論を適用する危険として扱った。
+[^ref-3]: Mark Ziemann, Yotam Eren, Assam El-Osta, [Gene name errors are widespread in the scientific literature](https://link.springer.com/article/10.1186/s13059-016-1044-7), Genome Biology 17, 177, 2016.
+    Excelが遺伝子記号を日付等へ自動変換する問題を、公開された補足ファイルで調査した研究である。
+    本文は、識別子へ便利な自動型推論を適用する危険として扱った。
 
-4. BBC News, [Excel: Why using Microsoft's tool caused Covid-19 results to be lost](https://www.bbc.com/news/technology-54423988), 2020.
-   PHEが公表した最大ファイルサイズ超過について、古いExcel形式の行数上限との関係を取材した二次資料である。
-   本文では当局が確認した事実と報道による技術的説明を分け、単一原因へ過度に単純化しないようにした。
+[^ref-4]: BBC News, [Excel: Why using Microsoft's tool caused Covid-19 results to be lost](https://www.bbc.com/news/technology-54423988), 2020.
+    PHEが公表した最大ファイルサイズ超過について、古いExcel形式の行数上限との関係を取材した二次資料である。
+    本文では当局が確認した事実と報道による技術的説明を分け、単一原因へ過度に単純化しないようにした。
 
 5. U.S. Senate Permanent Subcommittee on Investigations, [JPMorgan Chase Whale Trades: A Case History of Derivatives Risks and Abuses](https://www.hsgac.senate.gov/wp-content/uploads/imo/media/doc/REPORT%20-%20JPMorgan%20Chase%20Whale%20Trades%20%284-11-13%29.pdf), 2013.
    モデル、スプレッドシート、リスク指標、ガバナンスを含む複合的な事例である。
@@ -6180,19 +6180,19 @@ AIへ全部聞いて、自動化の見積りをできる夫へ投げていたお
    ジャスト・イン・タイム、自働化、異常時に止める考えの歴史を示す企業資料である。
    本文では製造手法をそのまま事務へ移植せず、異常を流さない、見えるようにする、原因を除くという機能へ翻訳した。
 
-7. Virginia Mason Franciscan Health, [Virginia Mason Production System](https://www.vmfh.org/about-vmfh/research-care-quality/virginia-mason-production-system) および [VMPS Success Stories](https://www.vmfh.org/about-vmfh/research-care-quality/virginia-mason-production-system/vmps-success-stories).
-   Toyota Production Systemを医療へ応用した組織自身の説明で、Patient Safety Alertは危害の恐れを報告し、必要な活動を止める仕組みとして紹介されている。
-   本文では、報告件数を失敗件数と決めつけず、弱い信号を早く出せる能力として読んだ。
+[^ref-7]: Virginia Mason Franciscan Health, [Virginia Mason Production System](https://www.vmfh.org/about-vmfh/research-care-quality/virginia-mason-production-system) および [VMPS Success Stories](https://www.vmfh.org/about-vmfh/research-care-quality/virginia-mason-production-system/vmps-success-stories).
+    Toyota Production Systemを医療へ応用した組織自身の説明で、Patient Safety Alertは危害の恐れを報告し、必要な活動を止める仕組みとして紹介されている。
+    本文では、報告件数を失敗件数と決めつけず、弱い信号を早く出せる能力として読んだ。
 
-8. NASA Aviation Safety Reporting System, [Program Overview: Confidentiality and Privilege](https://asrs.arc.nasa.gov/overview/confidentiality.html).
-   航空安全上の出来事を自発的に報告しやすくするための機密性等を説明する資料である。
-   本文では、処罰の免除を無条件に一般化せず、学習用報告と故意の違反・法的手続を分ける必要性を扱った。
+[^ref-8]: NASA Aviation Safety Reporting System, [Program Overview: Confidentiality and Privilege](https://asrs.arc.nasa.gov/overview/confidentiality.html).
+    航空安全上の出来事を自発的に報告しやすくするための機密性等を説明する資料である。
+    本文では、処罰の免除を無条件に一般化せず、学習用報告と故意の違反・法的手続を分ける必要性を扱った。
 
-9. Columbia Accident Investigation Board, [Columbia Accident Investigation Board Report, Volume I](https://ntrs.nasa.gov/archive/nasa/casi.ntrs.nasa.gov/20030066167.pdf), 2003.
-   物理的原因に加え、組織文化、意思決定、資源、過去の成功による逸脱の正常化などを扱う公的事故調査報告である。
-   本文の潜在条件、多層防護、悪い知らせの扱いの基礎資料とした。
+[^ref-9]: Columbia Accident Investigation Board, [Columbia Accident Investigation Board Report, Volume I](https://ntrs.nasa.gov/archive/nasa/casi.ntrs.nasa.gov/20030066167.pdf), 2003.
+    物理的原因に加え、組織文化、意思決定、資源、過去の成功による逸脱の正常化などを扱う公的事故調査報告である。
+    本文の潜在条件、多層防護、悪い知らせの扱いの基礎資料とした。
 
-10. Nancy G. Leveson, Clark S. Turner, [An Investigation of the Therac-25 Accidents](https://escholarship.org/uc/item/5dr206s3), Computer 26(7), 1993.
+[^ref-10]: Nancy G. Leveson, Clark S. Turner, [An Investigation of the Therac-25 Accidents](https://escholarship.org/uc/item/5dr206s3), Computer 26(7), 1993.
     1985年から1987年に起きた放射線治療装置の過剰照射事故を、ソフトウェア、インターフェース、調査、報告、組織の複数側面から検討した論文である。
     本文では、警告文を足すだけでなく、危険な状態を物理・論理的に成立させにくくする設計へつなげた。
 
@@ -6207,11 +6207,11 @@ AIへ全部聞いて、自動化の見積りをできる夫へ投げていたお
 13. Sidney Dekker, *The Field Guide to Understanding 'Human Error'*, 3rd ed., CRC Press, 2014.
     事故後の知識で当時の行動を断罪する後知恵バイアスを避け、行為者に見えていた世界を再構成する考えの参考文献である。
 
-14. Post Office Horizon IT Inquiry, [Completed List of Issues](https://www.postofficehorizoninquiry.org.uk/publications/completed-list-issues).
+[^ref-14]: Post Office Horizon IT Inquiry, [Completed List of Issues](https://www.postofficehorizoninquiry.org.uk/publications/completed-list-issues).
     Horizon IT systemの調達、設計、試行、展開、変更、バグ、遠隔アクセス、契約、調査、訴追等を広範に調べる公的調査の論点一覧である。
     本文では調査の最終結論を先取りせず、システム出力を絶対視し、反証経路を弱くする危険を考える素材とした。
 
-15. U.S. Securities and Exchange Commission, [SEC Charges Knight Capital With Violations of Market Access Rule](https://www.sec.gov/newsroom/press-releases/2013-222), 2013.
+[^ref-15]: U.S. Securities and Exchange Commission, [SEC Charges Knight Capital With Violations of Market Access Rule](https://www.sec.gov/newsroom/press-releases/2013-222), 2013.
     2012年の取引障害について、不完全な配備、休眠コード、統制、試験、警告への対応等をSECが認定した執行資料である。
     45分間に400万件を超える注文、4億6,000万ドル超の損失という数値も同資料に基づく。
 
@@ -6224,7 +6224,7 @@ AIへ全部聞いて、自動化の見積りをできる夫へ投げていたお
 17. Michael Hammer, [Reengineering Work: Don't Automate, Obliterate](https://hbr.org/1990/07/reengineering-work-dont-automate-obliterate), Harvard Business Review, 1990.
     既存工程をそのまま高速化するのではなく、仕事の前提を問い直すBPRの原論文である。
 
-18. John D. C. Little, [A Proof for the Queuing Formula: L = λW](https://pubsonline.informs.org/doi/10.1287/opre.9.3.383), Operations Research 9(3), 1961.
+[^ref-18]: John D. C. Little, [A Proof for the Queuing Formula: L = λW](https://pubsonline.informs.org/doi/10.1287/opre.9.3.383), Operations Research 9(3), 1961.
     安定した系で、平均仕掛り、平均到着・処理率、平均滞留時間を結ぶLittleの法則の原典である。
     本文では単位と観測境界をそろえ、変動中の短い期間へ機械的に当てはめない注意を置いた。
 
@@ -6232,41 +6232,41 @@ AIへ全部聞いて、自動化の見積りをできる夫へ投げていたお
     システム、変動、経営責任、数値目標の副作用を考える基本文献である。
     本文の共通原因・特殊原因、数値だけで管理する危険の背景とした。
 
-20. U.S. Consumer Financial Protection Bureau, [Consumer Financial Protection Bureau Fines Wells Fargo $100 Million for Widespread Illegal Practice of Secretly Opening Unauthorized Accounts](https://www.consumerfinance.gov/archive/newsroom/consumer-financial-protection-bureau-fines-wells-fargo-100-million-widespread-illegal-practice-secretly-opening-unauthorized-accounts/), 2016.
+[^ref-20]: U.S. Consumer Financial Protection Bureau, [Consumer Financial Protection Bureau Fines Wells Fargo $100 Million for Widespread Illegal Practice of Secretly Opening Unauthorized Accounts](https://www.consumerfinance.gov/archive/newsroom/consumer-financial-protection-bureau-fines-wells-fargo-100-million-for-widespread-illegal-practice-secretly-opening-unauthorized-accounts/), 2016.
     顧客の同意なしに口座等が作られた行為と販売目標・報酬を扱う規制当局発表である。
     本文では悪い個人を探すだけでなく、指標、報酬、圧力、異議申立て、監視の相互作用を読む材料にした。
 
-21. U.S. Department of Veterans Affairs Office of Inspector General, [Review of Alleged Patient Deaths, Patient Wait Times, and Scheduling Practices at the Phoenix VA Health Care System](https://vaoig.gov/reports/audit/review-alleged-patient-deaths-patient-wait-times-and-scheduling-practices-phoenix-va), 2014.
+[^ref-21]: U.S. Department of Veterans Affairs Office of Inspector General, [Review of Alleged Patient Deaths, Patient Wait Times, and Scheduling Practices at the Phoenix VA Health Care System](https://vaoig.gov/reports/audit/review-alleged-patient-deaths-patient-wait-times-and-scheduling-practices-phoenix-va), 2014.
     Phoenixを中心に、予約慣行、待ち時間、公式記録以外の一覧等を調べた監察資料である。
     本文では目標値が現実を改善せず、測定対象の付替えを誘発する場合を考えた。
 
-22. U.S. Government Accountability Office, [VA Health Care: Ongoing and Past Work Identified Access, Oversight, and Data Problems](https://www.gao.gov/products/gao-14-679t), 2014.
+[^ref-22]: U.S. Government Accountability Office, [VA Health Care: Ongoing and Past Work Identified Access, Oversight, and Data Problems](https://www.gao.gov/products/gao-14-679t), 2014.
     外来予約待ち時間の信頼性、方針実施、教育、資源配分、監督に関するGAOの知見をまとめる。
     単一施設・単一指標に問題を閉じないための補助資料とした。
 
 #### ソフトウェア、自動化、AI、変更
 
-23. GitLab, [Postmortem of database outage of January 31](https://about.gitlab.com/blog/postmortem-of-database-outage-of-january-31/), 2017.
+[^ref-23]: GitLab, [Postmortem of database outage of January 31](https://about.gitlab.com/blog/postmortem-of-database-outage-of-january-31/), 2017.
     データベース障害について、詳細な時系列、複数のバックアップ・復旧経路が機能しなかった経緯、改善項目を公開した組織自身の事後報告である。
     自己報告である点を踏まえつつ、バックアップの存在と復元能力は別だという教材に用いた。
 
-24. Atlassian, [Post-incident review: April 2022 outage](https://www.atlassian.com/blog/atlassian-engineering/post-incident-review-april-2022-outage), 2022.
+[^ref-24]: Atlassian, [Post-incident review: April 2022 outage](https://www.atlassian.com/blog/atlassian-engineering/post-incident-review-april-2022-outage), 2022.
     保守スクリプトによる一部顧客サイト削除、段階的な復旧、ソフトデリートや試験・展開の改善を説明する組織自身の報告である。
     標準ワークフローによる操作が監視上は正常に見える危険と、データ単位の復旧訓練を扱った。
 
-25. UK Parliament Treasury Committee, [IBM report on TSB's IT problems published](https://committees.parliament.uk/work/5051/service-disruption-at-tsb-inquiry/news/98948/ibm-report-on-tsbs-it-problems-published/), 2018.
+[^ref-25]: UK Parliament Treasury Committee, [IBM report on TSB's IT problems published](https://committees.parliament.uk/work/5051/service-disruption-at-tsb-inquiry/news/98948/ibm-report-on-tsbs-it-problems-published/), 2018.
     TSBのIT移行後のサービス障害に関して、議会委員会が公表したIBM報告への入口である。
     本文では本番移行を技術イベントだけにせず、顧客対応、能力、復旧、経営判断を含む業務変更として扱った。
 
-26. Moffatt v. Air Canada, [2024 BCCRT 149](https://www.canlii.org/en/bc/bccrt/doc/2024/2024bccrt149/2024bccrt149.html), Civil Resolution Tribunal of British Columbia, 2024.
+[^ref-26]: Moffatt v. Air Canada, [2024 BCCRT 149](https://www.canlii.org/en/bc/bccrt/doc/2024/2024bccrt149/2024bccrt149.html), Civil Resolution Tribunal of British Columbia, 2024.
     航空会社ウェブサイトのチャットボットによる弔事運賃案内を巡り、事業者の責任を認めた判断である。
     本文ではAIを独立した責任主体のように扱わず、公開前評価、知識更新、人への経路、組織の説明責任へつなげた。
 
-27. Royal Commission into the Robodebt Scheme, [Report](https://robodebt.royalcommission.gov.au/publications/report), 2023.
+[^ref-27]: Royal Commission into the Robodebt Scheme, [Report](https://robodebt.royalcommission.gov.au/publications/report), 2023.
     豪州の債務算定・回収制度について、適法性、政策、行政実務、データ、自動化、組織文化等を調べた王立委員会報告である。
     本文は、高影響の自動意思決定における説明、見直し、外部検証、異議申立ての必要性を学ぶ資料として用いた。
 
-28. CrowdStrike, [Falcon Content Update Preliminary Post Incident Report](https://www.crowdstrike.com/en-us/blog/falcon-content-update-preliminary-post-incident-report/), 2024.
+[^ref-28]: CrowdStrike, [Falcon Content Update Preliminary Post Incident Report](https://www.crowdstrike.com/en-us/blog/falcon-content-update-preliminary-post-incident-report/), 2024.
     2024年7月19日にWindowsホストへ影響したコンテンツ設定更新について、組織自身が技術的経緯と初期対策を説明した報告である。
     本文では、コード以外の設定・コンテンツ変更にも、段階配信、監視、停止、回復設計が必要だという例にした。
 
@@ -6280,41 +6280,18 @@ AIへ全部聞いて、自動化の見積りをできる夫へ投げていたお
 
 #### 顧客事故とCenter of Excellence
 
-31. Hertz, [Hertz Announces Settlement Agreements Related to Past Legal Claims](https://newsroom.hertz.com/press-releases/press-release-details/hertz-announces-settlement-agreements-related-to-past-legal-claims/), 2022.
+[^ref-31]: Hertz, [Hertz Announces Settlement Agreements Related to Past Legal Claims](https://newsroom.hertz.com/press-releases/press-release-details/hertz-announces-settlement-agreements-related-to-past-legal-claims/), 2022.
     車両盗難報告に関連する係争のうち364件を、総額約1億6,800万ドルで解決するとした会社発表である。
     個別請求の事実認定を一括して推測せず、契約状態、車両状態、支払、延長、返却、通報という複数記録の不整合が重大な顧客被害へつながり得る例として扱った。
 
-32. NASA, [Purpose, Principles, and Challenges of the NASA Engineering and Safety Center](https://ntrs.nasa.gov/citations/20160009258), 2016.
+[^ref-32]: NASA, [Purpose, Principles, and Challenges of the NASA Engineering and Safety Center](https://ntrs.nasa.gov/citations/20160009258), 2016.
     Columbia事故後に設置されたNESCについて、独立した技術評価、組織原則、課題を説明するNASA資料である。
     本文では、CoEが現場の全設計を代行するのでなく、高リスクへ独立した専門性と異論を届ける機能を学んだ。
 
-33. Microsoft, [Power Platform Center of Excellence Starter Kit overview](https://learn.microsoft.com/en-in/power-platform/guidance/coe/overview).
+[^ref-33]: Microsoft, [Power Platform Center of Excellence Starter Kit overview](https://learn.microsoft.com/en-in/power-platform/guidance/coe/overview).
     Power Platformの導入、ガバナンス、育成を支える部品と考え方を説明する製品公式資料である。
     Starter Kitの導入だけでCoEが完成しないという注意を含め、見える化、統治、育成を組み合わせる参考にした。
 
-34. Toyota Motor North America, [Celebrating 30 Years of the Toyota Production System Support Center](https://pressroom.toyota.com/celebrating-30-years-of-the-toyota-production-system-support-center/), 2023.
+[^ref-34]: Toyota Motor North America, [Celebrating 30 Years of the Toyota Production System Support Center](https://pressroom.toyota.com/celebrating-30-years-of-the-toyota-production-system-support-center/), 2023.
     TSSCが30年以上にわたり、製造業、食料支援、医療、行政等の500を超えるパートナーへTPSの知見を共有してきたとする企業発表である。
     本文では代行件数を増やすのでなく、相手の現場へ問題解決能力を移すCoE像の参考とした。
-
-[^ref-1]: 参考文献1・4を参照。英国の公衆衛生当局が公表した15,841件の報告遅延と、報道されたExcel形式の行数上限に対応する。
-[^ref-2]: 参考文献2を参照。表計算の範囲選択、対象データ、重み付けを再検討した研究に対応する。
-[^ref-3]: 参考文献3を参照。遺伝子記号が表計算ソフトにより日付へ自動変換された調査に対応する。
-[^ref-7]: 参考文献7を参照。Virginia Mason Production SystemとPatient Safety Alertの説明に対応する。
-[^ref-8]: 参考文献8を参照。NASA Aviation Safety Reporting Systemの機密性と自主報告の条件に対応する。
-[^ref-9]: 参考文献9を参照。Columbia事故を物理的原因だけでなく組織・意思決定まで含めて検討した報告に対応する。
-[^ref-10]: 参考文献10を参照。Therac-25の過剰照射事故を複数の技術・組織要因から調べた論文に対応する。
-[^ref-14]: 参考文献14を参照。Post Office Horizon IT Inquiryが扱う調査論点に対応する。
-[^ref-15]: 参考文献15を参照。Knight Capitalの配備・統制・警告対応と損失についてのSEC資料に対応する。
-[^ref-18]: 参考文献18を参照。安定した系の平均仕掛り、平均処理率、平均滞留時間を結ぶLittleの法則の原典である。
-[^ref-20]: 参考文献20を参照。Wells Fargoの無断口座等と販売目標・報酬を扱った規制当局発表に対応する。
-[^ref-21]: 参考文献21・22を参照。Phoenix VAの予約・待ち時間、記録、監督を調べた公的資料に対応する。
-[^ref-23]: 参考文献23を参照。GitLabのデータベース障害と、複数の復旧経路が機能しなかった事後報告に対応する。
-[^ref-24]: 参考文献24を参照。Atlassianの顧客サイト削除、復旧、再発防止策の事後報告に対応する。
-[^ref-25]: 参考文献25を参照。TSBのIT移行後のサービス障害を扱った英国議会資料に対応する。
-[^ref-26]: 参考文献26を参照。Air Canadaのチャットボット案内を巡るカナダの審判判断に対応する。
-[^ref-27]: 参考文献27を参照。Robodebtを巡る適法性、行政実務、データ、自動化の王立委員会報告に対応する。
-[^ref-28]: 参考文献28を参照。2024年7月のCrowdStrikeコンテンツ設定更新と初期対策の報告に対応する。
-[^ref-31]: 参考文献31を参照。Hertzが車両盗難報告関連の364件を約1億6,800万ドルで解決するとした会社発表に対応する。
-[^ref-32]: 参考文献32を参照。Columbia事故後に設けられたNESCの独立技術評価の役割に対応する。
-[^ref-33]: 参考文献33を参照。Power Platform CoE Starter Kitの管理、統治、育成に関する公式資料に対応する。
-[^ref-34]: 参考文献34を参照。TSSCが多様な組織へTPSの問題解決能力を移してきた企業資料に対応する。
