@@ -1,0 +1,8 @@
+documents:
+- id: statistics
+  title: やる夫で学ぶ統計学
+  path: /books/statistics
+  category: math-information
+  created: '2026-07-19T20:33:36+09:00'
+  question: 100人中62人が「買いたい」と答えたとき、新商品は売れると判断してよいのか。
+  plot: おもちゃ会社の企画担当やる夫が、素朴なアンケート判定の失敗から出発し、確率・推定・検定、回帰、ベイズ統計、機械学習、因果推論、意思決定理論までを再発見していく。

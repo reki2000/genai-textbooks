@@ -1,0 +1,16 @@
+categories:
+- id: society
+  title: 社会と制度
+  order: 10
+- id: engineering
+  title: 工学と産業
+  order: 20
+- id: math-information
+  title: 数学と情報
+  order: 30
+- id: natural-science
+  title: 自然科学
+  order: 40
+- id: thought
+  title: 思想と人間
+  order: 50

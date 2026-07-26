@@ -1,0 +1,8 @@
+documents:
+- id: mobile
+  title: やる夫が携帯電話会社のCTOになるそうです
+  path: /books/mobile
+  category: engineering
+  created: '2026-07-05T18:29:34+09:00'
+  question: 声やデータはどのように電波へ載り、限られた周波数で多数の利用者をつなぐのか。
+  plot: 携帯電話会社のCTOになったやる夫が、アンテナ、変調、セル設計、シャノン限界の壁に順番にぶつかる。

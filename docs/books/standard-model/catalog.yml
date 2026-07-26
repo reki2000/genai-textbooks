@@ -1,0 +1,8 @@
+documents:
+- id: standard-model
+  title: やる夫で学ぶ標準模型
+  path: /books/standard-model
+  category: natural-science
+  created: '2026-07-05T10:35:11+09:00'
+  question: 量子力学と特殊相対論を両立させると、粒子と力はどのように見えてくるのか。
+  plot: シュレーディンガー方程式の限界を出発点に、やる夫が場、対称性、ゲージ理論、ヒッグス機構へ進む。
