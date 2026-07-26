@@ -7,6 +7,7 @@ nothing here is meant to be hand-edited or committed as generated output.
 from __future__ import annotations
 
 import argparse
+import shutil
 import sys
 import tempfile
 from collections import defaultdict
@@ -283,6 +284,11 @@ def write_file(path: Path, content: str) -> None:
 
 
 def generate(categories: list[dict[str, Any]], documents: list[dict[str, Any]], out_docs: Path) -> None:
+    # The generated HTML is only the docsify shell. The Markdown sources and
+    # static assets must also be present in the deployed directory because
+    # docsify fetches them in the browser at runtime.
+    shutil.copytree(ROOT / "docs", out_docs, dirs_exist_ok=True)
+
     sidebar = render_sidebar(categories, documents)
     current_top_page = (ROOT / "docs" / "README.md").read_text(encoding="utf-8")
     top_page = replace_generated_catalog(current_top_page, render_top_page_catalog(categories, documents))

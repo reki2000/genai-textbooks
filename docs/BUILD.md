@@ -16,13 +16,16 @@ build/                 ← 生成ファイル（git 除外）
 ├── 404.html           ← エラーページ（自動生成）
 ├── _sidebar.md        ← サイドバー（自動生成）
 ├── README.md          ← カタログ付きREADME（自動生成）
+├── _footer.md         ← docs/ からコピー
+├── assets/            ← docs/ からコピー
 ├── sitemap.xml        ← サイトマップ（自動生成）
+├── books/*/README.md  ← docs/ からコピー
 └── books/*/index.html ← 各教材SEOページ（自動生成）
 ```
 
 ### 生成ルール
 
-- `docs/catalog.yaml` を正本として `scripts/generate_site.py` がビルド時に `build/` 全体を生成
+- `docs/catalog.yaml` を正本として `scripts/generate_site.py` が `docs/` のソースを `build/` にコピーし、生成ファイルを追加・上書き
 - 生成対象：サイドバー・トップページ・教材SEOページ・サイトマップ
 - 生成ファイルは直接編集したりコミットしたりしない（`.gitignore` で `build/` を除外）
 
