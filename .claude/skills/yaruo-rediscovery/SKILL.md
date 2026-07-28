@@ -148,7 +148,7 @@ description: やる夫（生徒）とやらない夫（教師）の対話を通�
 
 ### Step 5: 納品する
 
-本文を作る段階では [references/style-guide.md](references/style-guide.md) に従う。完成後は、作業冒頭に読んだ [references/final-checklist.md](references/final-checklist.md) の各項目で全体を再確認し、`python3 scripts/check_dialogue_constraints.py <教材.md>` を実行して5往復下限と数値表記を検査する。金額・割合の表記違反は、内容を確認してから `python3 scripts/normalize_financial_numbers.py <教材.md> --apply` で機械修正できる。教材カタログや公開目次は、教材完成をユーザーが確認した後に別工程で更新する。
+本文を作る段階では [references/style-guide.md](references/style-guide.md) に従う。完成後は、作業冒頭に読んだ [references/final-checklist.md](references/final-checklist.md) の各項目で全体を再確認し、リポジトリ直下から `python3 .claude/skills/yaruo-rediscovery/scripts/check_dialogue_constraints.py <教材.md>` を必ず実行して、**4往復の絶対下限**、発言量、数値表記を検査する。このスクリプトは同スキル配下にあるため、`scripts/check_dialogue_constraints.py` として探さない。金額・割合の表記違反は、内容を確認してから `python3 .claude/skills/yaruo-rediscovery/scripts/normalize_financial_numbers.py <教材.md> --apply` で機械修正できる。教材カタログや公開目次は、教材完成をユーザーが確認した後に別工程で更新する。
 
 ## 縮約改訂 ── 既存教材の分量を削減する
 
@@ -173,4 +173,4 @@ description: やる夫（生徒）とやらない夫（教師）の対話を通�
 - 削除・統合した節だけが参照していた脚注が孤立していないか。`[^n]` の使用と定義の差分を取る。
 - 節番号の連番、幕見出しとの対応、本文中に残った削除済み節への参照。
 - 節や幕間を落とした箇所の前後接続。直前の節末が残した問いを、直後の節冒頭が受けているか。
-- `python3 scripts/check_dialogue_constraints.py <教材.md>` と `python3 scripts/generate_site.py`。
+- `python3 .claude/skills/yaruo-rediscovery/scripts/check_dialogue_constraints.py <教材.md>` と `python3 scripts/generate_site.py`。

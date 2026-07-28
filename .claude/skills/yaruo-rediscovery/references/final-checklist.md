@@ -46,7 +46,7 @@
 - [ ] 分量のための空疎・定型的な相槌、同義反復、不要な概念を削っている。必要な反応表現は後続内容と結び付き、会話の感情や理解の進展を示している。
 - [ ] 話者表示、句読点、数式、見出しが `style-guide.md` の書式に従っている。
 - [ ] 金額を `100万円`、`1,000円` のような半角算用数字で、割合を `40%` のような半角算用数字と半角 `%` で表記している。
-- [ ] `python3 scripts/check_dialogue_constraints.py <教材.md>` が違反なしで終了する。
+- [ ] リポジトリ直下から `python3 .claude/skills/yaruo-rediscovery/scripts/check_dialogue_constraints.py <教材.md>` が違反なしで終了する。
 
 ## 数式と計算
 
