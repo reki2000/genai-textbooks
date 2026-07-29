@@ -1,0 +1,1425 @@
+# 新規教材の提案（200件）
+#
+# docs/catalog.yaml と同じスキーマ（id / title / path / category / order /
+# question / plot）で記述した案のリスト。採用するものを docs/catalog.yaml の
+# documents に移し、対応する docs/books/<id>/README.md を用意する。
+#
+# 設計方針:
+#   - 出発点は「分野の名前」ではなく、日常で観測できる異常・逆説・割に合わない現実。
+#   - question は、常識的な予想が外れる一点に絞る（「〜のはずなのに、なぜ〜」）。
+#   - 答えが一つの学問に収まらず、物理・制度・経済・認知のいずれかを跨ぐものを選ぶ。
+#   - order は各カテゴリの既存最大値の続きから10刻み。
+#
+# 内訳: society 50 / engineering 40 / math-information 35 /
+#       natural-science 40 / thought 35
+
+documents:
+  # ---- society（社会と制度）: 既存の最大 order は 90 ----
+  - id: queue-vs-price
+    title: やる夫の行列に値段をつけていいものか
+    path: /books/queue-vs-price
+    category: society
+    order: 100
+    question: 行列、抽選、先着、審査、値上げ──同じ足りないものを配るのに、なぜ方法によって不公平と感じたり感じなかったりするのか。
+    plot: 人気店の値上げを提案して炎上したやる夫が、災害時の水、保育園の入園、臓器移植、混雑した道路を同じ配分問題として並べ、価格・くじ・待ち時間・優先順位がそれぞれ何を測り、費用を誰に押しつけているのかを設計しなおす。
+  - id: unclaimed-benefits
+    title: やる夫の作った制度は誰にも使われないようです
+    path: /books/unclaimed-benefits
+    category: society
+    order: 110
+    question: 最も助けが必要な人ほど申請しないのはなぜか、制度の中身は条文ではなくどこで決まっているのか。
+    plot: 完璧なはずの支援制度の利用率が2割で止まり、やる夫が申請書、添付書類、窓口の待ち時間、スティグマ、情報の届き方をたどって、給付の実質を決めているのが要件ではなく手続コストと発見可能性であることに突き当たる。
+  - id: uninsurable-risks
+    title: やる夫の保険は地震で潰れるようです
+    path: /books/uninsurable-risks
+    category: society
+    order: 120
+    question: 自動車事故には保険が売れるのに、地震・失業・大流行には民間保険が成立しないのはなぜか。
+    plot: 大数の法則を信じて安く売ったやる夫の保険会社が一度の災害で吹き飛び、独立でないリスク、逆選択、裾の厚い分布、再保険と資本、そして最後の引受人としての国家という順に、保険が引ける線を引き直す。
+  - id: regulation-after-accident
+    title: やる夫のルールは誰かが死んでからできるようです
+    path: /books/regulation-after-accident
+    category: society
+    order: 130
+    question: 危険が事前に分かっていても、なぜ規制は事故のあとにしか作られないのか。先回りした規制はなぜ嫌われるのか。
+    plot: 新素材の安全基準を作る側に回ったやる夫が、費用は今・便益は将来という非対称、立証責任の置き場所、業界の情報優位、規制の虜、予防原則の暴走を経て、事故を待たずに書ける条文の形を探す。
+  - id: authoritarian-elections
+    title: やる夫は勝つと決まっている選挙をやるようです
+    path: /books/authoritarian-elections
+    category: society
+    order: 140
+    question: 結果が動かないのなら、独裁者はなぜわざわざ選挙や議会や統計を用意するのか。
+    plot: 架空の権威主義国家の顧問になったやる夫が、茶番だと切り捨てた選挙が、動員力の可視化、地方幹部の忠誠審査、不満のガス抜き、統治に必要な情報収集として機能していることを知り、制度が正統性ではなく技術として使われる論理をたどる。
+  - id: corruption-equilibrium
+    title: やる夫はどこからが賄賂か分からないようです
+    path: /books/corruption-equilibrium
+    category: society
+    order: 150
+    question: 同じ人間なのに、袖の下が当たり前の社会と異常な社会に分かれるのはなぜか。
+    plot: 海外拠点で手数料を求められて固まるやる夫が、贈与と対価の境界、多数が従うから従うという均衡、摘発確率の閾値効果、給与水準と内部通報を通じて、腐敗が個人の道徳ではなく均衡の選択であることを見る。
+  - id: same-job-different-pay
+    title: やる夫の給料は仕事ではなく会社で決まっているようです
+    path: /books/same-job-different-pay
+    category: society
+    order: 160
+    question: 同じ仕事、同じ能力なのに、勤め先が違うだけで賃金が倍違うのはなぜか。
+    plot: 転職した友人の年収が跳ね上がった理由を能力に求めたやる夫が、限界生産力の説明では合わない現実から、企業レントの分け前、探索と摩擦、内部労働市場、買い手独占、最低賃金の実験結果へ進む。
+  - id: drug-pricing
+    title: やる夫の薬は国境を越えると値段が変わるようです
+    path: /books/drug-pricing
+    category: society
+    order: 170
+    question: 同じ一錠が国によって10倍違う値段で売られ、それでも製薬会社も患者も引き下がらないのはなぜか。
+    plot: 難病薬の価格交渉に立ち会うやる夫が、巨額の開発費とほぼゼロの製造原価という構造、特許による期間限定の独占、国別価格差別、参照価格制、費用対効果評価という一年の命の値段の計算に向き合う。
+  - id: poverty-trap
+    title: やる夫は貧しいほど高い買い物をしているようです
+    path: /books/poverty-trap
+    category: society
+    order: 180
+    question: 余裕のない人ほど割高な支払いを重ねるのはなぜか。それは判断の誤りなのか、環境の帰結なのか。
+    plot: 家計が回らない理由を意志の弱さに求めたやる夫が、まとめ買いできない現金制約、少額多頻度の割高、欠乏が奪う認知資源、信用へのアクセス、マイクロファイナンスの成果と限界を確かめ、自分の説教が的を外していたことを知る。
+  - id: shrinking-city-costs
+    title: やる夫の町は人が減るほど高くつくようです
+    path: /books/shrinking-city-costs
+    category: society
+    order: 190
+    question: 人口が減れば一人当たりの取り分は増えるはずなのに、暮らしがむしろ苦しくなるのはなぜか。
+    plot: 人口半減の推計を渡された自治体のやる夫が、密度で決まるインフラ単価、家が余っても家賃が下がらない市場の分断、撤退に伴う補償、そして拡げるより難しい畳む計画の合意形成を組み立てる。
+  - id: standards-war
+    title: やる夫の規格は誰も選んでいないのに決まったようです
+    path: /books/standards-war
+    category: society
+    order: 200
+    question: より優れた方式が負け、誰が決めたわけでもない規格が世界を縛るのはなぜか。
+    plot: 自社方式を業界標準にしたいやる夫が、性能表を握りしめて敗北し、ネットワーク外部性、キーボード配列や電源形状の経路依存、標準化団体と特許プール、オープンとクローズドの綱引きを通じて、勝敗が期待の調整で決まる場を歩く。
+  - id: immigration-backlash
+    title: やる夫の町は人手が足りないのに人を入れたくないようです
+    path: /books/immigration-backlash
+    category: society
+    order: 210
+    question: 移民が経済全体を潤すという計算が正しいとして、なぜ受け入れ社会はそれを歓迎しないのか。
+    plot: 人手不足の解消策として受け入れ拡大を提案したやる夫が、集計の利益と局所の費用、賃金への影響をめぐる実証の食い違い、財政収支の世代差、言語と信頼、そして選挙で誰の票になるのかまでを突き合わせる。
+  - id: relative-inequality
+    title: やる夫は豊かになったのに不満が増えたようです
+    path: /books/relative-inequality
+    category: society
+    order: 220
+    question: 全員の暮らしが昔より良くなったのに、なぜ不公平感はかえって強まったのか。
+    plot: 統計は改善を示すのに世論が荒れる理由を探すやる夫が、絶対水準と相対順位、参照集団の入れ替わり、ジニ係数が捉え損ねるもの、上位層の可視化、そして格差の何が実際に人を傷つけるのかを切り分ける。
+  - id: inheritance-tax
+    title: やる夫の相続税は理屈で勝って世論で負けるようです
+    path: /books/inheritance-tax
+    category: society
+    order: 230
+    question: 機会の平等を重んじる人ほど支持しそうな相続課税が、なぜ最も嫌われる税なのか。
+    plot: 相続税強化の説明役になったやる夫が、二重課税という直観、家業と農地の流動性、生前贈与への逃避、資産形成の動機、そして家族という単位を国家がどう扱うのかという線引きに向き合う。
+  - id: credential-inflation
+    title: やる夫の学位は中身より入口で値段がつくようです
+    path: /books/credential-inflation
+    category: society
+    order: 240
+    question: 学んだ内容が同じでも学校名で待遇が変わるなら、教育は能力を高めているのか、それとも並べ替えているだけなのか。
+    plot: 学歴不問を掲げた採用で失敗したやる夫が、人的資本とシグナリングの見分け方、卒業直前で価値が跳ねる羊皮紙効果、全員が学歴を積むと起きる軍拡競争、資格の増殖を通じて、教育投資の何が私的で何が社会的かを分ける。
+  - id: hiring-interview
+    title: やる夫の面接は当たらないと分かっているようです
+    path: /books/hiring-interview
+    category: society
+    order: 250
+    question: 面接の予測力が低いことは繰り返し示されているのに、なぜどの会社も面接をやめないのか。
+    plot: 採用の当たり外れに悩むやる夫が、非構造化面接の妥当性研究、構造化と作業サンプル、面接官の自信と的中率の乖離、応募者側の納得感と儀式性、そして失敗の責任を誰が負うのかという組織の力学に行き着く。
+  - id: performance-review
+    title: やる夫の評価制度は誰も幸せにしないようです
+    path: /books/performance-review
+    category: society
+    order: 260
+    question: 公正に測ろうとするほど不満が増え、測った途端に測りたかったものが壊れるのはなぜか。
+    plot: 人事評価の刷新を任されたやる夫が、相対評価の分布縛り、目標のゲーム化、指標が目的に化けるグッドハートの法則、報酬が内発的動機を押しのける現象を経て、測らずに報いる方法の可能性まで検討する。
+  - id: red-tape
+    title: やる夫の無駄な手続きは誰にも消せないようです
+    path: /books/red-tape
+    category: society
+    order: 270
+    question: 全員が無駄だと言う手続きが、なぜ何十年も生き残るのか。
+    plot: 業務改革でハンコと三重チェックを廃止したやる夫が、一件の事故で全部復活させられ、説明責任、監査証跡、失敗の非対称な罰、前例と免責、そして手続が誰のリスクを吸収しているのかを解剖する。
+  - id: concentrated-benefits
+    title: やる夫は正しい政策を通せないようです
+    path: /books/concentrated-benefits
+    category: society
+    order: 280
+    question: 大多数が少し得をする改革が、ごく少数が大きく損をする改革に負け続けるのはなぜか。
+    plot: 万人向けの合理的な改革案を潰され続けるやる夫が、集中する利益と分散する費用、組織化コスト、選挙のタイミングと便益の遅れ、補償の設計を通じて、正しさではなく通し方の技術を身につける。
+  - id: polling-failure
+    title: やる夫の調査は当たらなくなったようです
+    path: /books/polling-failure
+    category: society
+    order: 290
+    question: 統計理論は変わっていないのに、なぜ世論調査は昔より外れるようになったのか。
+    plot: 選挙予測を外したやる夫が、固定電話からの離脱、回答してくれる人の偏り、答えを偽る動機、確率標本と非確率標本、加重と補正がかえって誤差を増やす場面を追い、当たらない予測を使う方法を考える。
+  - id: news-values
+    title: やる夫は大事なことほどニュースで見ないようです
+    path: /books/news-values
+    category: society
+    order: 300
+    question: 影響が大きい出来事ほど報じられず、珍しい事件が大量に流れるのはなぜか。
+    plot: 交通事故と感染症と統計的な貧困の扱いの差に苛立つやる夫が、ニュース価値の条件、注意という有限資源の市場、締切と取材コスト、視聴数の指標化、そして報道されない害をどう可視化するかを考える。
+  - id: conspiracy-belief
+    title: やる夫の周りで頭のいい人ほど陰謀論を信じるようです
+    path: /books/conspiracy-belief
+    category: society
+    order: 310
+    question: 知識も分析力もある人が、なぜ荒唐無稽な説を精緻に擁護するようになるのか。
+    plot: 論破すれば済むと考えたやる夫が失敗を重ね、反証を吸収する構造、所属と自己像の防衛、不確実性と無力感、知識が動員される方向、そして関係を切らずに問い直す会話のやり方を探す。
+  - id: crime-decline
+    title: やる夫の町は安全になったのに怖くなったようです
+    path: /books/crime-decline
+    category: society
+    order: 320
+    question: 犯罪は長期的に減り続けているのに、なぜ体感治安は悪化し、厳罰化の要求が強まるのか。
+    plot: 防犯対策の予算を組むやる夫が、認知件数と実数の差、検挙率と刑の重さのどちらが抑止に効くか、人口動態や環境要因の寄与、割れ窓理論の再検証、報道量と不安の関係を突き合わせる。
+  - id: fertility-policy
+    title: やる夫の少子化対策は効かないようです
+    path: /books/fertility-policy
+    category: society
+    order: 330
+    question: 現金給付も保育所も充実させた国で出生率が戻らないのはなぜか。
+    plot: 各国の政策と出生率のグラフを並べたやる夫が、単純な相関の崩れ方から、機会費用としての育児、住宅と雇用の安定、パートナー形成の段階、規範の変化、そして出生率を政策目標にすること自体の問題まで踏み込む。
+  - id: marriage-institution
+    title: やる夫は国家に結婚を管理される理由が分からないようです
+    path: /books/marriage-institution
+    category: society
+    order: 340
+    question: 二人の関係は当人の問題のはずなのに、なぜ国家が登録し、税や相続や在留資格を紐づけるのか。
+    plot: 婚姻届の様式に疑問を持ったやる夫が、家族が担ってきた扶養と相続と親子の推定、税と社会保険の単位、同性婚と別姓の論点、契約で代替できる部分とできない部分を切り分ける。
+  - id: eldercare-cost
+    title: やる夫が親を介護すると社会が高くつくようです
+    path: /books/eldercare-cost
+    category: society
+    order: 350
+    question: 家族が無償で介護する方が安いはずなのに、社会全体では損になることがあるのはなぜか。
+    plot: 介護離職を決めかけたやる夫が、失われる賃金と税、復職の困難、在宅と施設の費用比較、保険給付の設計、そして誰の時間を安く見積もってきたのかという計算の前提に向き合う。
+  - id: end-of-life-care
+    title: やる夫の医療費は最後の一ヶ月に集まるようです
+    path: /books/end-of-life-care
+    category: society
+    order: 360
+    question: 終末期に医療費が集中すると分かっていて、なぜそれを無駄と呼べないのか。
+    plot: 高齢医療の適正化を任されたやる夫が、亡くなった後からしか終末期と分からないこと、助かる可能性の見積もり、本人の意思と家族の希望のずれ、事前指示の限界、そして撤退の決断を誰が担うのかを扱う。
+  - id: organ-allocation
+    title: やる夫の善意だけでは臓器が足りないようです
+    path: /books/organ-allocation
+    category: society
+    order: 370
+    question: 善意に頼る制度が慢性的に足りないのなら、対価を認めればよいのか、それでも認められない理由は何か。
+    plot: 移植を待つ友人のためにやる夫が制度を調べ、意思表示の初期設定で提供率が変わる事実、売買を禁じる根拠、家族同意の運用、待機リストの優先順位、そして交換ドナーという市場でも贈与でもない仕組みに出会う。
+  - id: crowding-out-incentives
+    title: やる夫が謝礼を出したら献血が減ったようです
+    path: /books/crowding-out-incentives
+    category: society
+    order: 380
+    question: 報酬を増やせば行動は増えるはずなのに、金銭を持ち込むとかえって人が離れるのはなぜか。
+    plot: 献血や保育の延長やごみ出しに謝礼と罰金を導入して失敗したやる夫が、内発的動機の押し出し、規範を金銭に置き換えたときの意味の変化、罰金が免罪符になる仕組み、そして制度が発するメッセージを設計対象として扱い始める。
+  - id: rent-control
+    title: やる夫の家賃規制は借りたい人を追い出すようです
+    path: /books/rent-control
+    category: society
+    order: 390
+    question: 家賃の上限を決めると、なぜすでに住んでいる人だけが得をして、これから借りる人が住めなくなるのか。
+    plot: 高騰する家賃に上限を課したやる夫が、供給の縮小、質の低下、賃貸から分譲への転換、既存借家人の固定化、そして供給を増やす政策との効果比較を、実際に規制を導入した都市の記録で確かめる。
+  - id: regional-revitalization
+    title: やる夫の地方創生は東京を止められないようです
+    path: /books/regional-revitalization
+    category: society
+    order: 400
+    question: 補助金も移住支援も投じているのに、なぜ人と仕事は大都市へ集まり続けるのか。
+    plot: 交付金の使い道を考えるやる夫が、集積が生む生産性、企業と人材の相互待ち、補助金が地価と既得権者に吸われる帰着、若年女性の転出理由、そして集中を前提にした地域設計という選択肢に行き着く。
+  - id: farm-protection
+    title: やる夫が農業を守るほど農業が弱るようです
+    path: /books/farm-protection
+    category: society
+    order: 410
+    question: 手厚い保護を続けてきた分野ほど担い手が減っているのはなぜか。
+    plot: 農政の現場に立つやる夫が、価格支持と所得補償の違い、規模拡大を妨げる農地制度、兼業と補助金の関係、輸出で伸びた品目との比較を通じて、守る対象が産業なのか集落なのか景観なのかを明確にする。
+  - id: fishery-commons
+    title: やる夫の海は誰のものでもないから枯れるようです
+    path: /books/fishery-commons
+    category: society
+    order: 420
+    question: 全員が魚を残したいと願っているのに、なぜ獲り尽くしてしまうのか。
+    plot: 不漁を嘆く港でやる夫が、早い者勝ちの構造、資源評価の不確かさ、漁獲枠の割り当てと譲渡、監視と罰則の費用、そして共有地が悲劇にならずに済んだ地域の共通点を調べ上げる。
+  - id: public-debt
+    title: やる夫は国の借金が家計と違う理由を説明できないようです
+    path: /books/public-debt
+    category: society
+    order: 430
+    question: 家計なら破綻する規模の借金で国が回るのはなぜか。それでも限界があるとすれば、それはどこか。
+    plot: 借金時計に不安を覚えるやる夫が、通貨を発行できる主体の違い、金利と成長率の関係、国債を誰が持っているか、統合政府の見方、そして実際に破綻した国が何を失ったのかを並べ、危険の兆候を定義しなおす。
+  - id: currency-crisis
+    title: やる夫の国は健全なのに通貨が売られるようです
+    path: /books/currency-crisis
+    category: society
+    order: 440
+    question: 経済に問題がなくても通貨が暴落することがあるのはなぜか。
+    plot: 為替防衛の当事者になったやる夫が、固定相場と資本移動と金融政策のどれかを諦めるしかない三すくみ、自己実現的な取り付け、外貨準備の見せ方、IMF支援の条件、そして通貨危機が政治危機に化ける経路をたどる。
+  - id: bubbles
+    title: やる夫は高すぎると知りながら買っているようです
+    path: /books/bubbles
+    category: society
+    order: 450
+    question: 全員が割高だと気づいている資産を、それでも買い続ける行動はどこまで合理的なのか。
+    plot: 熱狂の渦中で冷静を装うやる夫が、将来の買い手を当てにする理屈、空売りの限界、信用と担保の増幅、崩壊が始まる引き金の見えなさ、そして事前にバブルと呼べるかという中央銀行の悩みに触れる。
+  - id: bank-run
+    title: やる夫の銀行は健全なのに潰れるようです
+    path: /books/bank-run
+    category: society
+    order: 460
+    question: 資産が負債を上回っている銀行が、なぜ一日で立ち行かなくなるのか。
+    plot: 預金流出の連絡を受けたやる夫が、短期で借りて長期で貸す満期変換の宿命、支払能力と流動性の違い、噂が自己実現する均衡、預金保険と最後の貸し手、そして通信速度が変えた取り付けの速さを検分する。
+  - id: audit-failure
+    title: やる夫の不正は監査を通り抜けるようです
+    path: /books/audit-failure
+    category: society
+    order: 470
+    question: 何重にも監査を受けている大企業で、なぜ大規模な不正が何年も見過ごされるのか。
+    plot: 粉飾の後始末を任されたやる夫が、監査人を誰が選び誰が報酬を払うのかという構造、試査という手法の限界、経営者による内部統制の無効化、内部通報の握りつぶし、そして不正の三要素を実例で確かめる。
+  - id: hours-not-falling
+    title: やる夫は生産性を上げたのに早く帰れないようです
+    path: /books/hours-not-falling
+    category: society
+    order: 480
+    question: 一世紀で生産性は何倍にもなったのに、週15時間労働という予言が外れたのはなぜか。
+    plot: 効率化した分だけ仕事が増える現実に苛立つやる夫が、所得効果と代替効果、他人との比較で価値が決まる財、長時間労働に高い時給がつく職種の構造、休みを取りにくくする調整コストを解きほぐす。
+  - id: employment-protection
+    title: やる夫が雇用を守ると若者が入れないようです
+    path: /books/employment-protection
+    category: society
+    order: 490
+    question: 解雇を難しくすると雇用は守られるはずなのに、なぜ新卒と非正規にしわ寄せが行くのか。
+    plot: 解雇規制の強化を支持していたやる夫が、採用をためらう企業の計算、二重化した労働市場、既に中にいる人と外にいる人の利害対立、金銭解決と職業訓練を組み合わせた各国の設計を比較する。
+  - id: seniority-wage
+    title: やる夫の年功賃金は非効率なのに合理的だったようです
+    path: /books/seniority-wage
+    category: society
+    order: 500
+    question: 若いうちは働きに比べて安く、年をとると高く払う仕組みが、なぜ長く機能し、なぜ壊れたのか。
+    plot: 制度改定の説明を求められたやる夫が、後払いによる勤続の動機づけ、企業特殊技能への投資、定年という清算装置、企業寿命が人の職業人生より短くなったこと、そして移行期の世代間不公平を扱う。
+  - id: refugee-protection
+    title: やる夫の国は難民条約を守っているようです
+    path: /books/refugee-protection
+    category: society
+    order: 510
+    question: 保護する義務を負う条約に加入していながら、実際にはほとんど保護しないことが可能なのはなぜか。
+    plot: 認定率の低さを問われた担当者のやる夫が、迫害の定義と立証、たどり着けなければ申請できない構造、第三国での足止め、審査期間と収容、そして責任を分担しようとした試みの失敗を追う。
+  - id: border-and-life-value
+    title: やる夫の命の値段は国境で変わるようです
+    path: /books/border-and-life-value
+    category: society
+    order: 520
+    question: 生まれた場所だけで生涯所得も寿命も桁違いになるのに、それを不正義と呼ばないのはなぜか。
+    plot: 海外拠点の安全基準を国内より緩く設定する稟議に署名を求められたやる夫が、統計的生命価値、賠償額の国際差、移動の自由の制限、援助と開放のどちらが効くのかという議論に踏み込む。
+  - id: foreign-aid
+    title: やる夫の援助が現地の店を潰したようです
+    path: /books/foreign-aid
+    category: society
+    order: 530
+    question: 善意で送った物資や資金が、なぜ受け取った側の産業や統治を弱めることがあるのか。
+    plot: 古着と食料を大量に送ったやる夫が、地元の生産者が消えた現場を見て、現物支給と現金給付の比較、汲み上げられる資源と腐敗、ランダム化比較試験が示した効果と限界、出口のある支援の設計を学び直す。
+  - id: climate-justice
+    title: やる夫の削減案は途上国を怒らせるようです
+    path: /books/climate-justice
+    category: society
+    order: 540
+    question: 今から排出を等しく減らそうという提案が、なぜ不公平だと拒まれるのか。
+    plot: 国際交渉の席に着いたやる夫が、累積排出の歴史的責任、一人当たりと国単位の違い、成長の権利、資金と技術移転の約束、国境炭素調整が保護主義と呼ばれる理由を突きつけられ、削減目標を配分問題として書き直す。
+  - id: deterrence-unprovable
+    title: やる夫の抑止は成功しても証明できないようです
+    path: /books/deterrence-unprovable
+    category: society
+    order: 550
+    question: 戦争が起きなかったことは、抑止が効いた証拠になるのか。効いていない場合とどう見分けるのか。
+    plot: 防衛力の増強を議論するやる夫が、反事実を観測できない難しさ、能力と意図と伝達の三条件、安心供与とのバランス、軍拡が招く不安の連鎖、そして抑止が破れた事例の共通点を検分する。
+  - id: free-platform-monopoly
+    title: やる夫は無料のサービスに独占の害を見つけられないようです
+    path: /books/free-platform-monopoly
+    category: society
+    order: 560
+    question: 価格がゼロで品質も高いサービスに、独占の弊害があると言えるのはなぜか。
+    plot: 値上げがないから問題なしと結論しかけたやる夫が、利用者と出品者の両面市場、切り替え費用とデータの蓄積、自社サービスの優遇、買収による芽の摘み取り、質と多様性の劣化という価格に出ない損害を測る方法を探す。
+  - id: patent-thicket
+    title: やる夫の特許が発明を止めているようです
+    path: /books/patent-thicket
+    category: society
+    order: 570
+    question: 発明を励ますための制度が、なぜ新しい製品を作れなくすることがあるのか。
+    plot: 一つの製品に数千件の特許が絡む分野に踏み込んだやる夫が、権利が細分化されすぎて誰も使えなくなる状態、標準必須特許と実施料の交渉、訴訟を業とする主体、パテントプールと防衛的公開を扱う。
+  - id: induced-childcare-demand
+    title: やる夫が保育所を作ったら待機児童が増えたようです
+    path: /books/induced-childcare-demand
+    category: society
+    order: 580
+    question: 定員を増やしたのに待機が減らないのはなぜか。需要とは、そもそも数えられるものなのか。
+    plot: 増設したのに行列が伸びた理由を追うやる夫が、諦めて申し込まなかった潜在需要、供給が就労を可能にする逆向きの因果、選考基準が申請行動を変える効果を通じて、道路の渋滞と同じ構造を福祉政策に見出す。
+  - id: prevention-paradox
+    title: やる夫の対策は成功するほど批判されるようです
+    path: /books/prevention-paradox
+    category: society
+    order: 590
+    question: 被害を防ぐことに成功した対策ほど、やりすぎだったと非難されるのはなぜか。
+    plot: 感染症対策の検証委員会に呼ばれたやる夫が、起きなかった被害の見えなさ、集団全体の小さなリスク低下と個人の実感の乖離、副作用だけが可視化される非対称、そして事後評価に耐える意思決定の記録の残し方を考える。
+
+  # ---- engineering（工学と産業）: 既存の最大 order は 120 ----
+  - id: elevator-dispatch
+    title: やる夫のビルはエレベーターが足りないようです
+    path: /books/elevator-dispatch
+    category: engineering
+    order: 130
+    question: かごを増やさずに待ち時間を短くできるのはなぜか。そもそも人が感じる待ち時間は何で決まっているのか。
+    plot: 苦情の絶えないビルの管理を任されたやる夫が、増設案を予算で潰され、群管理制御、行き先階予約、朝夕で反転する需要、待ちのばらつき、鏡と残り時間表示という知覚側の設計まで、物理と心理の両方から待ちを削る。
+  - id: induced-demand-roads
+    title: やる夫が道を広げたら渋滞がひどくなったようです
+    path: /books/induced-demand-roads
+    category: engineering
+    order: 140
+    question: 車線を倍にしたのに渋滞が悪化するのはなぜか。混雑は本当に容量の不足なのか。
+    plot: 幹線道路の拡幅を実現させたやる夫が、数年で元の混雑に戻る現実に直面し、誘発需要、経路選択の均衡、道を足すと全員が遅くなるブライスの逆説、移動するボトルネック、そして課金と時差通勤という需要側の操作へ回り込む。
+  - id: automation-irony
+    title: やる夫が自動化した現場から人が減らないようです
+    path: /books/automation-irony
+    category: engineering
+    order: 150
+    question: 自動化すれば人手は減るはずなのに、なぜ監視と例外対応の人員が増え、事故はかえって難しくなるのか。
+    plot: 完全自動化を掲げたやる夫のラインが稀な例外で長時間止まり、自動化の皮肉、監視という人間に向かない作業、腕の落ちた運転員、権限をどちらが握るか、そして人を残す工程をあえて設計する考え方に行き着く。
+  - id: safety-paradox
+    title: やる夫は安全装置を足すほど怖くなったようです
+    path: /books/safety-paradox
+    category: engineering
+    order: 160
+    question: 守りを重ねたはずのシステムが、なぜ守りそのもののせいで壊れるのか。
+    plot: 事故のたびにインターロックを追加してきたやる夫が、危険が減ると人が踏み込むリスク補償、鳴りやまない警報、共通原因故障、密結合が生む正常な事故を知り、故障を止めるのではなく壊れ方を選ぶ設計へ切り替える。
+  - id: quality-not-inspection
+    title: やる夫の検査では不良が減らないようです
+    path: /books/quality-not-inspection
+    category: engineering
+    order: 170
+    question: 全数検査をしているのに市場クレームが止まらないのはなぜか。品質は測れば上がるのか。
+    plot: 検査員を増やして赤字を出したやる夫が、見逃しと過検出、ばらつきと工程能力、条件を振って鈍感な設定を探すパラメータ設計、抜取り検査の統計を通じて、品質は工程に作り込むしかないという結論に追い込まれる。
+  - id: project-always-late
+    title: やる夫の工期は必ず延びるようです
+    path: /books/project-always-late
+    category: engineering
+    order: 180
+    question: 一つ一つは間に合う見積もりなのに、全体は必ず遅れるのはなぜか。
+    plot: 何度目かの納期遅延を出したやる夫が、作業時間の分布の裾、早く終わっても前倒しされない仕組み、合流点で遅れだけが残る性質、バッファの置き場所、計画錯誤と参照クラス予測を通じて、分布で約束する方法を組む。
+  - id: building-lifespan
+    title: やる夫のビルは壊れる前に壊されるようです
+    path: /books/building-lifespan
+    category: engineering
+    order: 190
+    question: 百年前の建物が現役なのに、三十年のビルが解体されるのはなぜか。寿命を決めているのは何か。
+    plot: まだ使える自社ビルの建替え提案に納得できないやる夫が、躯体・設備・法規・用途・帳簿という別々に進む五つの寿命を並べ、改修可能性を左右する設計、更新と解体の費用比較を通じて、寿命が制度と経済で決まる仕組みを見る。
+  - id: overpackaging
+    title: やる夫は包装を減らして怒られたようです
+    path: /books/overpackaging
+    category: engineering
+    order: 200
+    question: 過剰に見える包装を減らすと、なぜ環境負荷がかえって増えることがあるのか。
+    plot: 環境のためにパッケージを薄くしたやる夫が、輸送中の破損と返品の山を作り、衝撃と振動、酸素と水分の遮断、賞味期限、捨てられた中身の環境負荷との比較を通じて、包装の最適点が製品ごとに違う理由を計算で確かめる。
+  - id: electricity-bill
+    title: やる夫の電気代は使った分だけではないようです
+    path: /books/electricity-bill
+    category: engineering
+    order: 210
+    question: 同じ量を使っても、いつ使うかで費用が変わるのはなぜか。電気の値段は何を反映しているのか。
+    plot: 節電したのに請求が下がらないやる夫が、キロワットとキロワット時の違い、契約電力とデマンド、託送料金、時間帯で桁が変わる限界費用、再エネの出力抑制、蓄電と需要応答までを一枚の明細から逆算する。
+  - id: phone-slows-down
+    title: やる夫のスマホは三年で遅くなるようです
+    path: /books/phone-slows-down
+    category: engineering
+    order: 220
+    question: 部品が摩耗するわけでもない端末が、なぜ数年で遅くなるのか。誰かがわざと遅くしているのか。
+    plot: 買い替えを仕向けられていると疑うやる夫が、電池の内部抵抗による性能制限、熱設計とスロットリング、ストレージの空き容量、肥大するソフトウェア、更新が止まるセキュリティ寿命を切り分けていく。
+  - id: infrastructure-aging
+    title: やる夫は作る側から看取る側になったようです
+    path: /books/infrastructure-aging
+    category: engineering
+    order: 230
+    question: 一斉に古びる橋やトンネルを、必要額の三分の一の予算でどう選び、どれを諦めるのか。
+    plot: 点検台帳を渡されたやる夫が、劣化曲線と点検で見える範囲の限界、予防保全と事後保全の損得、集約と通行止めの判断、住民説明を通じて、落ちないように直すから落ちる前に閉じるへの設計転換を経験する。
+  - id: repairability
+    title: やる夫の製品は直せなくなったようです
+    path: /books/repairability
+    category: engineering
+    order: 240
+    question: 直して使う方が得なはずなのに、修理できない製品ばかりになったのはなぜか。
+    plot: 分解できない家電に怒るやる夫が、接着と一体成型が生む薄さと防水、部品点数と故障率、保守部品を十年抱える費用、修理工数と製造原価の逆転、修理する権利の議論を経て、直せる設計の代償を見積もる。
+  - id: jevons-rebound
+    title: やる夫は燃費を良くして燃料を増やしたようです
+    path: /books/jevons-rebound
+    category: engineering
+    order: 250
+    question: 機械の効率を上げると資源の消費は減るはずなのに、社会全体では増えることがあるのはなぜか。
+    plot: 省エネ機器への更新で総消費が増えた事実に戸惑うやる夫が、蒸気機関と石炭の歴史、価格低下が需要を呼ぶ経路、直接と間接のリバウンド、そして効率改善を削減に結びつけるには何を同時に動かす必要があるのかを詰める。
+  - id: jit-fragility
+    title: やる夫は在庫を減らして工場を止めたようです
+    path: /books/jit-fragility
+    category: engineering
+    order: 260
+    question: 無駄な在庫を削るほど強くなるはずの生産方式が、なぜ一つの部品で全社を止めるのか。
+    plot: 在庫削減で表彰された翌年に供給途絶で操業停止したやる夫が、バッファが吸収していた変動、リードタイムと安全在庫の数式、単一調達の代償、そして効率と頑健さの交換比率を意図的に選ぶ設計へ進む。
+  - id: bullwhip
+    title: やる夫の少しの注文増が工場を大混乱させたようです
+    path: /books/bullwhip
+    category: engineering
+    order: 270
+    question: 最終需要はほとんど変わっていないのに、なぜ川上ほど生産計画が乱高下するのか。
+    plot: 販売の数パーセントの変動が部品工場で数倍の揺れになる現象を追うやる夫が、発注のまとめ、欠品を恐れた水増し、値引きが生む先食い、情報の遅れを、需要予測ではなく情報共有と発注ルールの問題として解く。
+  - id: train-punctuality
+    title: やる夫の電車は秒単位で正確すぎるようです
+    path: /books/train-punctuality
+    category: engineering
+    order: 280
+    question: 同じ技術を使っている国で運行の正確さが桁違いなのはなぜか。正確さは何と引き換えに買われているのか。
+    plot: 数十秒の遅れが報道される国とされない国の差を調べるやる夫が、閉塞と信号の余裕、折り返し時間、車両と乗務員の運用の詰め方、乗客の行動、そして正確さが乱れたときに戻りにくくなる代償を測る。
+  - id: flight-fear
+    title: やる夫は一番安全な乗り物が一番怖いようです
+    path: /books/flight-fear
+    category: engineering
+    order: 290
+    question: 事故率が桁違いに低い乗り物が最も恐れられ、日常的に危険な移動手段が平気なのはなぜか。
+    plot: 搭乗前に手が震えるやる夫が、距離あたりと時間あたりで変わる事故率、制御できない状況への恐怖、稀で巨大な被害の心理的な扱い、そして事故を減らしてきた匿名報告制度と安全文化の設計を知る。
+  - id: metal-fatigue
+    title: やる夫の機体は飛んだ時間ではなく回数で古びるようです
+    path: /books/metal-fatigue
+    category: engineering
+    order: 300
+    question: 一度も限界荷重に達していない構造が、繰り返しの小さな力だけで壊れるのはなぜか。
+    plot: 与圧回数で寿命が決まる整備計画に疑問を持ったやる夫が、疲労という現象、コメット墜落から得られた教訓、応力集中と亀裂の進展、壊れないではなく壊れても落ちない損傷許容設計へ進む。
+  - id: dark-silicon
+    title: やる夫のチップは小さくすると熱で止まるようです
+    path: /books/dark-silicon
+    category: engineering
+    order: 310
+    question: 微細化すれば速くなるはずなのに、ある時期から動作周波数が上がらなくなったのはなぜか。
+    plot: 世代交代しても体感が変わらない理由を追うやる夫が、電力密度の壁、電圧を下げられなくなった事情、同時に光らせられない領域、マルチコアと専用回路への転換、そして冷却が設計を規定する構図を掴む。
+  - id: memory-wall
+    title: やる夫の計算は速いのにデータが間に合わないようです
+    path: /books/memory-wall
+    category: engineering
+    order: 320
+    question: 演算器が何千倍も速くなったのに、実際の処理がそれほど速くならないのはなぜか。
+    plot: 最適化してもスループットが伸びない原因を探るやる夫が、演算とメモリの速度差、キャッシュと局所性、帯域とレイテンシの違い、データの並べ方で性能が桁違いになる実験、そして計算よりデータ移動が高くつく時代の設計指針に至る。
+  - id: battery-limits
+    title: やる夫の電池は容量が増えないのに燃えるようです
+    path: /books/battery-limits
+    category: engineering
+    order: 330
+    question: 半導体は何十年も指数関数的に進んだのに、電池の容量が数割ずつしか増えないのはなぜか。
+    plot: 大容量化の要求に応えようとするやる夫が、原子の重さで決まる理論容量、電極と電解液の役割分担、発熱が発熱を呼ぶ熱暴走、安全機構が奪う体積、そして急速充電と寿命の綱引きを実験で確かめる。
+  - id: hydrogen-economy
+    title: やる夫の理想の燃料は誰も使わないようです
+    path: /books/hydrogen-economy
+    category: engineering
+    order: 340
+    question: 燃やしても水しか出ない燃料が、なぜ普及しないのか。どこで使うなら意味があるのか。
+    plot: 水素社会を掲げたやる夫が、軽いのにかさばる貯蔵の難しさ、作って運んで使うまでの効率の掛け算、既存インフラとの相性、電化で置き換えられる用途とできない用途を並べ、適材適所の一覧に書き換える。
+  - id: sound-insulation
+    title: やる夫の部屋は音を下げても静かにならないようです
+    path: /books/sound-insulation
+    category: engineering
+    order: 350
+    question: 騒音レベルの数値は下がったのに、うるさいと感じ続けるのはなぜか。
+    plot: 苦情の絶えない集合住宅の対策を任されたやる夫が、遮音と吸音と防振の役割分担、低い周波数ほど止められない物理、床衝撃音、暗騒音とマスキング、そして人の不快感が音量だけでは決まらないことに向き合う。
+  - id: condensation
+    title: やる夫の家は暖かくすると濡れるようです
+    path: /books/condensation
+    category: engineering
+    order: 360
+    question: 断熱を良くしたのに壁の中が腐るのはなぜか。暖かい家と長持ちする家は両立するのか。
+    plot: 寒い家を改善しようとしたやる夫が、露点と水蒸気の移動、熱橋、防湿層と通気層の順番、換気の必要量、そして基準を満たしても健康被害が残る理由を通じて、温熱と耐久と空気質を一つの設計として扱う。
+  - id: seismic-usable
+    title: やる夫のビルは倒れなかったのに使えないようです
+    path: /books/seismic-usable
+    category: engineering
+    order: 370
+    question: 耐震基準を満たして人命を守った建物が、地震のあと使えなくなるのはなぜか。
+    plot: 被災後の本社に入れず事業が止まったやる夫が、人命保護と機能維持という別の目標、天井や配管など非構造部材の被害、免震と制振の費用対効果、復旧目標の設定を通じて、何を守る建物なのかを先に決める設計へ移る。
+  - id: flood-paradox
+    title: やる夫の堤防が水害を大きくしたようです
+    path: /books/flood-paradox
+    category: engineering
+    order: 380
+    question: 治水施設を整えるほど被害額が増えることがあるのはなぜか。
+    plot: 完成した堤防の内側に住宅が広がるのを見たやる夫が、安全になった土地への集中、越えたときの被害の跳ね上がり、ダムの操作規則と事前放流、上下流の利害、そして氾濫させる場所を決める流域治水へ進む。
+  - id: tolerance-stackup
+    title: やる夫の部品は図面通りなのに組み立たないようです
+    path: /books/tolerance-stackup
+    category: engineering
+    order: 390
+    question: 一つ一つは合格しているのに、合わせると入らないのはなぜか。
+    plot: 現場のすり合わせで凌いできたやる夫が、公差の積み上がり、基準の取り方で変わる測定値、幾何公差、統計的な合成、そして組み立てやすさを設計側で作り込む考え方を、実際の不適合報告から逆算する。
+  - id: software-recall
+    title: やる夫の製品は後で直せるはずだったようです
+    path: /books/software-recall
+    category: engineering
+    order: 400
+    question: ソフトウェアなら後から直せるという前提は、機械や車に載ったときも成り立つのか。
+    plot: 出荷後の更新を前提に設計したやる夫が、更新できない現場、電波の届かない車両、更新が新たな不具合を生む事故、リコールと責任の所在、そして更新可能性そのものが攻撃面になる問題に直面する。
+  - id: lindy-technology
+    title: やる夫の新技術は古い技術に負けたようです
+    path: /books/lindy-technology
+    category: engineering
+    order: 410
+    question: 明らかに優れた新方式が採用されず、百年前の方式が現役であり続けるのはなぜか。
+    plot: 置き換えを提案して却下されたやる夫が、枯れた技術の故障率、周辺の道具と人の技能、切り替え費用と互換性、軌間や電圧のような決めた者勝ち、そして長く生き残ったものが持つ情報量を評価に組み込む。
+  - id: cleanroom-human
+    title: やる夫のクリーンルームの敵は自分だったようです
+    path: /books/cleanroom-human
+    category: engineering
+    order: 420
+    question: 空気を最高度に清浄にした部屋で、なぜ歩留まりを落とす最大の要因が作業者なのか。
+    plot: 不良の発生源を追うやる夫が、人が出す粒子の量、気流と圧力差の設計、装置間の搬送、そして人を減らすほど清浄度が上がる帰結から、無人化とレイアウトが品質を決める工程設計へ踏み込む。
+  - id: medical-device-regulation
+    title: やる夫の医療機器は性能より書類で決まるようです
+    path: /books/medical-device-regulation
+    category: engineering
+    order: 430
+    question: 明らかに優れた装置が、なぜ何年も患者のもとへ届かないのか。審査は何を守っているのか。
+    plot: 試作機の実用化に挑むやる夫が、リスク分類と要求される証拠、臨床試験の設計と費用、市販後の監視、承認が早い国と遅い国の帰結を比べ、審査の遅さがもたらす害と防いでいる害を同じ天秤に載せる。
+  - id: last-mile
+    title: やる夫の配送は最後の一キロが一番高いようです
+    path: /books/last-mile
+    category: engineering
+    order: 440
+    question: 地球の裏側から運ぶ費用より、駅から自宅までの配送の方が高くつくのはなぜか。
+    plot: 送料無料の内訳を調べたやる夫が、積載率と密度の効き方、停車ごとの時間、再配達の連鎖、時間指定の代償、宅配ボックスと置き配が変える経済性を通じて、輸送費が距離ではなく手間で決まる構造を掴む。
+  - id: autonomous-longtail
+    title: やる夫の自動運転は九割できてから十年かかるようです
+    path: /books/autonomous-longtail
+    category: engineering
+    order: 450
+    question: ほとんどの場面で問題なく走れる車が、なぜいつまでも実用化されないのか。
+    plot: 試験走行の成功に沸くやる夫が、稀な状況の尽きなさ、安全性を統計的に示すのに必要な走行距離、運行設計領域を絞る戦略、事故時の責任と社会の許容度を計算し、最後の一割の意味を知る。
+  - id: reliability-testing
+    title: やる夫の製品は試験に合格してから壊れるようです
+    path: /books/reliability-testing
+    category: engineering
+    order: 460
+    question: 規格試験を全て通過した製品が、なぜ現場では想定より早く壊れるのか。
+    plot: 市場故障の解析を任されたやる夫が、試験条件と実使用の環境差、初期故障と摩耗故障の分かれ方、加速試験の前提が崩れる場面、複合ストレス、そして壊れ方を予測するのではなく観測する仕組みづくりへ進む。
+  - id: glare-lighting
+    title: やる夫は明るくするほど見えなくなったようです
+    path: /books/glare-lighting
+    category: engineering
+    order: 470
+    question: 照明を強くしたのに視認性が落ちるのはなぜか。見えるとは何が起きていることなのか。
+    plot: 駐車場の照明を増設して事故が増えたやる夫が、照度と輝度の違い、グレアと明暗順応、対象と背景のコントラスト、色温度と配光、そして周囲を暗くする方が見える場面を、実測しながら設計に落とす。
+  - id: motion-sickness
+    title: やる夫は自分で運転すると酔わないようです
+    path: /books/motion-sickness
+    category: engineering
+    order: 480
+    question: 同じ揺れを受けているのに、運転者だけが酔わないのはなぜか。
+    plot: 車酔いに苦しむやる夫が、視覚と前庭感覚の食い違い、次の動きを予測できることの効果、遅延と映像酔い、船と車と宇宙での違いを確かめ、自動運転車や映像機器の設計に効く対策を組み立てる。
+  - id: tunnel-groundwater
+    title: やる夫は岩は掘れても水は止められないようです
+    path: /books/tunnel-groundwater
+    category: engineering
+    order: 490
+    question: 硬い岩盤を掘り抜ける技術があるのに、なぜ湧き出す水がトンネル工事を止めるのか。
+    plot: 出水事故で工程が半年飛んだやる夫が、地質調査で見える範囲の限界、水圧と地下水位の低下、周辺の井戸と沈下、薬液注入と凍結工法、そして地中のリスクを誰がどう分担して契約に書くのかへ進む。
+  - id: reshoring
+    title: やる夫の工場は出て行ってまた戻ってくるようです
+    path: /books/reshoring
+    category: engineering
+    order: 500
+    question: 人件費だけを見れば海外が有利なのに、生産が国内に戻ってくることがあるのはなぜか。
+    plot: 移転と回帰を二度経験したやる夫が、賃金以外の総コスト、輸送とリードタイムの在庫換算、為替と関税、設計と製造が離れることで失われる改良速度、そして供給途絶リスクの値付けを一枚の表にまとめる。
+  - id: escalator-standing
+    title: やる夫は片側を空けると遅くなると言われたようです
+    path: /books/escalator-standing
+    category: engineering
+    order: 510
+    question: 歩く人のために片側を空ける方が、なぜ全体では運べる人数が減るのか。
+    plot: 駅の混雑対策を任されたやる夫が、歩行者と立ち止まりの占有間隔、実験で測られた輸送量の差、行列の長さへの波及、安全と保守の費用、そして長年の慣行を変えるのに何が要るかを検証する。
+  - id: standby-failure
+    title: やる夫の非常用電源は非常時に動かないようです
+    path: /books/standby-failure
+    category: engineering
+    order: 520
+    question: 普段使わない予備の装置ほど、いざというときに動かないのはなぜか。
+    plot: 停電時に自家発電が起動せず全システムを落としたやる夫が、待機系に特有の隠れた故障、点検周期と発見確率、燃料と切替装置という見落とされる部分、同じ原因で全系統が倒れる共通原因故障を洗い出す。
+
+  # ---- math-information（数学と情報）: 既存の最大 order は 40 ----
+  - id: incompressible
+    title: やる夫の圧縮ファイルはもう縮まないようです
+    path: /books/incompressible
+    category: math-information
+    order: 50
+    question: どんなデータも縮める万能圧縮が作れないのはなぜか。もう縮まないとは何が起きている状態なのか。
+    plot: 二重に圧縮して容量が増えたやる夫が、鳩の巣論法による不可能性証明から出発し、情報量とエントロピー、乱数と圧縮不能性、コルモゴロフ複雑性を経て、意味のあるデータほど縮むという直観の正体に辿り着く。
+  - id: no-random
+    title: やる夫は本物の乱数が作れないようです
+    path: /books/no-random
+    category: math-information
+    order: 60
+    question: 決まった手順しか実行できない機械が、なぜ予測できない数を出せるのか。出せていないとしたら何が困るのか。
+    plot: 抽選が偏っていると苦情を受けたやる夫が、線形合同法の周期、統計検定を通ってしまう偽の乱数、暗号論的疑似乱数、物理エントロピー源、シード流出で全部当てられた事故を通じて、乱数の品質が何のためにあるのかを知る。
+  - id: floating-point
+    title: やる夫は同じ計算で違う答えを得たようです
+    path: /books/floating-point
+    category: math-information
+    order: 70
+    question: 同じプログラムに同じ入力を与えたのに、動かす場所を変えると答えが変わるのはなぜか。
+    plot: 集計値が数円ずれる原因を追うやる夫が、二進小数の表現誤差、桁落ちと丸め、足す順番で結果が変わる非結合性、並列化と再現性、金額計算に浮動小数点を使わない理由を経て、誤差を設計する数値計算へ進む。
+  - id: consensus-clock
+    title: やる夫のサーバは同じ時刻を持てないようです
+    path: /books/consensus-clock
+    category: math-information
+    order: 80
+    question: 正確な時計を全台に配ってもなお、どちらが先かを決められないのはなぜか。
+    plot: 二台構成にした途端に二重登録を出したやる夫が、通信遅延と時計のずれ、因果を数える論理時計、うるう秒で世界が止まった日、CAP定理、二相コミットとRaftを通じて、順序が観測ではなく合意で作られることを知る。
+  - id: search-vs-find
+    title: やる夫は検索できるのに見つけられないようです
+    path: /books/search-vs-find
+    category: math-information
+    order: 90
+    question: 数十億件を一瞬で検索できる時代に、社内の一枚の資料が見つからないのはなぜか。
+    plot: あるのに見つからない問題の解決を任されたやる夫が、転置索引の速さ、語の一致と意味の一致の隔たり、ランキングと評価指標、クエリに現れない前提、埋め込み検索の得手不得手を通じて、失敗の在処が問いの側にあることを掴む。
+  - id: big-data-wrong
+    title: やる夫はデータを増やして間違えたようです
+    path: /books/big-data-wrong
+    category: math-information
+    order: 100
+    question: データが増えるほど結論は確かになるはずなのに、なぜ大量データほど誤った発見が量産されるのか。
+    plot: 十万件のログから有意な法則を大量に見つけたやる夫が、多重比較、探索と検証の混同、集め方が生む選択バイアス、標本が大きいほど小さな偏りが有意になる仕組みを知り、事前登録と外部検証で自分の発見を潰しにかかる。
+  - id: nobody-understands-it
+    title: やる夫の会社のシステムは誰も全体を知らないようです
+    path: /books/nobody-understands-it
+    category: math-information
+    order: 110
+    question: 全体を理解している人間が一人もいないソフトウェアが、なぜ動き続けられるのか。
+    plot: 二十年物の基幹システムの改修を任されたやる夫が、全部読むという方針を三日で捨て、境界と契約、局所の理解で安全に変えるための不変条件、組織構造がそのまま現れるコンウェイの法則、資料より信用できるテストを武器にしていく。
+  - id: bugs-grow
+    title: やる夫はバグを直すほど増やしているようです
+    path: /books/bugs-grow
+    category: math-information
+    order: 120
+    question: 修正は品質を上げるはずなのに、直すほど壊れるのはなぜか。テストはどこまでを保証しているのか。
+    plot: 修正のたびに別の障害を出すやる夫が、結合度と回帰、テストが示せるのは欠陥の存在であって不在ではないこと、カバレッジの錯覚、契約と表明、形式手法が現実に引き合う範囲を切り分けていく。
+  - id: unrecoverable-backup
+    title: やる夫のバックアップは復旧できなかったようです
+    path: /books/unrecoverable-backup
+    category: math-information
+    order: 130
+    question: 毎日欠かさず取っていたバックアップが、肝心なときに使えないのはなぜか。
+    plot: 障害から戻せずに一晩を溶かしたやる夫が、書き込みが止まらない世界での静止点、気づかれない破損、暗号化被害まで伝播する複製、RPOとRTO、復旧訓練を通じて、設計すべきものが戻せることだと知る。
+  - id: assignment-hard
+    title: やる夫は最短経路は解けるのに割り当てが解けないようです
+    path: /books/assignment-hard
+    category: math-information
+    order: 140
+    question: 同じ最適を探す問題なのに、一瞬で解けるものと計算機を何日回しても終わらないものを分けているのは何か。
+    plot: 配送の最短経路が即座に出たのに、車両と時間枠の割り当てで計算が終わらないやる夫が、多項式時間と組合せ爆発、帰着とNP完全、緩和と分枝限定、近似保証を通じて、厳密解を諦める判断の根拠を手に入れる。
+  - id: quantum-not-fast
+    title: やる夫の量子コンピュータは何でも速くはならないようです
+    path: /books/quantum-not-fast
+    category: math-information
+    order: 150
+    question: 重ね合わせで全部の答えを同時に持てるなら、なぜ総当たり問題が一瞬で解けないのか。
+    plot: 量子計算に過大な期待を寄せるやる夫が、測定でつぶれる確率振幅、干渉で正解だけを強め合わせるという厳しい条件、グローバーが二乗どまりである理由、ショアが効く構造の特殊さ、誤り訂正に必要な物量を確かめていく。
+  - id: average-person
+    title: やる夫の平均的な客はどこにもいないようです
+    path: /books/average-person
+    category: math-information
+    order: 160
+    question: 全項目が平均の人に合わせて設計すると、なぜ誰にも合わない製品ができるのか。
+    plot: 平均寸法で座席を設計して総不評を浴びたやる夫が、各項目が平均に近い人がほぼ存在しない事実、分布の形と外れ値、代表値の選び方、調整範囲で設計するという発想の転換を、実際の身体寸法データで確かめる。
+  - id: screening-accuracy
+    title: やる夫の精度99パーセントの検査は当てにならないようです
+    path: /books/screening-accuracy
+    category: math-information
+    order: 170
+    question: 高精度をうたう検査で陽性と出ても、実際に病気である確率が低いことがあるのはなぜか。
+    plot: 健診の結果に青ざめたやる夫が、感度と特異度、有病率で変わる陽性的中率、検査を重ねる意味、集団検診の便益と過剰診断、そして誰に検査を勧めるべきかという設計問題に進む。
+  - id: algorithmic-fairness
+    title: やる夫の公平な判定は数学的に不可能だったようです
+    path: /books/algorithmic-fairness
+    category: math-information
+    order: 180
+    question: 差別しないアルゴリズムを作ろうとすると、なぜ公平の定義同士が両立しなくなるのか。
+    plot: 属性を使わなければ公平だと考えたやる夫が、代理変数による復元、群ごとの誤り率をそろえる定義と的中率をそろえる定義が同時に成り立たない証明、閾値の選択、そして技術で決められない部分の切り分けに至る。
+  - id: recommendation-narrowing
+    title: やる夫の推薦は当たるほど世界を狭めるようです
+    path: /books/recommendation-narrowing
+    category: math-information
+    order: 190
+    question: 好みに合うものを勧めるほど満足度は上がるのに、長期的には飽きて離れていくのはなぜか。
+    plot: 精度指標を改善したのに利用が落ちたやる夫が、探索と活用のバランス、人気の自己強化、評価指標が測っていない多様性と新規性、そして推薦が需要を作ってしまう因果の輪を扱う。
+  - id: llm-confident-wrong
+    title: やる夫の言語モデルは自信満々に嘘をつくようです
+    path: /books/llm-confident-wrong
+    category: math-information
+    order: 200
+    question: 知らないと答えるだけの選択肢があるのに、なぜもっともらしい作り話が出てくるのか。
+    plot: 社内向け質問応答の誤答に頭を抱えるやる夫が、次の語を当てる学習が何を最適化しているか、自信度と正答率のずれ、外部知識の接続で減る誤りと減らない誤り、そして検証を人間側に残す運用設計へ進む。
+  - id: benchmark-leak
+    title: やる夫のモデルは試験前に答えを見ていたようです
+    path: /books/benchmark-leak
+    category: math-information
+    order: 210
+    question: 評価指標が過去最高なのに、実運用で役に立たないのはなぜか。
+    plot: 社内ベンチマークで満点を取ったモデルが現場で失敗したやる夫が、訓練データへの評価問題の混入、検証データへの繰り返し適合、指標の飽和、そして本番に近い評価をどう作るかという退屈で重要な作業に取り組む。
+  - id: reidentification
+    title: やる夫の匿名データから個人が浮かび上がるようです
+    path: /books/reidentification
+    category: math-information
+    order: 220
+    question: 名前も住所も消したデータから、なぜ特定の個人を言い当てられるのか。
+    plot: 統計利用のために匿名化したデータを公開したやる夫が、生年月日と郵便番号だけで大半が特定できる事実、他のデータとの突き合わせ、集計値からの復元、k匿名性と差分プライバシー、そして有用性との取引を学ぶ。
+  - id: metadata-leak
+    title: やる夫の通信は中身を読まれなくても筒抜けのようです
+    path: /books/metadata-leak
+    category: math-information
+    order: 230
+    question: 完全に暗号化された通信から、なぜ誰と何をしていたかが分かってしまうのか。
+    plot: 暗号化すれば安心だと考えていたやる夫が、通信相手と時刻と量が残す形、パケットの大きさで判別される動画、位置情報の履歴が持つ一意性、そして隠すべきものが内容だけではないという設計要件に気づく。
+  - id: password-rules
+    title: やる夫の複雑なパスワード規則は安全を下げるようです
+    path: /books/password-rules
+    category: math-information
+    order: 240
+    question: 記号を混ぜて定期変更させるほど、なぜ全体としては破られやすくなるのか。
+    plot: 厳格な規則を課したのに侵入されたやる夫が、人が作る文字列の偏り、使い回しと総当たりの現実、推測されやすい変形、規則が推奨から外された経緯、そして多要素認証と漏洩リストの照合という別の守り方へ移る。
+  - id: side-channel
+    title: やる夫の暗号は解かずに破られたようです
+    path: /books/side-channel
+    category: math-information
+    order: 250
+    question: 数学的には解読不能とされる暗号が、実装されたとたんに破られるのはなぜか。
+    plot: 理論の安全性を信じていたやる夫が、処理時間の差、消費電力の波形、キャッシュの痕跡、鍵の生成と保管、更新されないライブラリを通じて、攻撃者が数式ではなく機械と運用を狙うことを知る。
+  - id: trustless-cost
+    title: やる夫は誰も信用しない仕組みに高い金を払ったようです
+    path: /books/trustless-cost
+    category: math-information
+    order: 260
+    question: 信頼できる第三者を不要にする技術が、なぜ既存の仕組みより遅くて高くつくのか。
+    plot: 全取引を分散台帳に載せようとしたやる夫が、合意を取ることの費用、確定までの待ち時間、鍵を失えば終わりという不可逆性、そもそも現実の紐付けには誰かの保証が要ること、それでも有効な用途の条件を洗い出す。
+  - id: single-queue
+    title: やる夫は列を一本にまとめて速くしたようです
+    path: /books/single-queue
+    category: math-information
+    order: 270
+    question: 窓口の数も処理速度も同じなのに、並び方を変えるだけで待ち時間が変わるのはなぜか。
+    plot: レジごとの行列を一本化して苦情が減ったやる夫が、ばらつきが待ちを生む仕組み、窓口を束ねる効果の数式、公平さと平均のどちらを取るか、優先レーンが全体に与える影響を、実測と計算の両方で確かめる。
+  - id: phantom-traffic-jam
+    title: やる夫の渋滞には原因がないようです
+    path: /books/phantom-traffic-jam
+    category: math-information
+    order: 280
+    question: 事故も工事もない直線道路で、なぜ渋滞が生まれ、上流へ後退していくのか。
+    plot: 先頭がないまま止まる車列に苛立つやる夫が、追従の遅れが増幅する仕組み、密度と流量の関係、自由流から渋滞流への急変、車間を空ける運転が渋滞を消す実験、そして自動運転車が混ざったときの効果を検討する。
+  - id: voting-paradox
+    title: やる夫の多数決は誰も望まない案を選ぶようです
+    path: /books/voting-paradox
+    category: math-information
+    order: 290
+    question: 全員が正直に投票しても、順番や方式を変えるだけで結論が変わるのはなぜか。
+    plot: 会議の決を採るたびに結論がひっくり返るやる夫が、三すくみになる集団の選好、議事順の操作、決選投票と順位付け投票の性質、望ましい条件を全部満たす方式が存在しないという定理に行き着く。
+  - id: fair-division
+    title: やる夫は誰も不満のない分け方を探しているようです
+    path: /books/fair-division
+    category: math-information
+    order: 300
+    question: 全員が納得する分割は必ず存在するのか。公平とは羨まないことなのか、比例することなのか。
+    plot: 遺産と当番と議席の割り振りで揉めるやる夫が、切る人と選ぶ人の手順、羨望のない配分の存在条件、分割できない財の扱い、議席配分で州の数を増やすと取り分が減る逆転現象を通じて、公平の定義を選ぶ作業に向き合う。
+  - id: matching-markets
+    title: やる夫の市場は値段では釣り合わないようです
+    path: /books/matching-markets
+    category: math-information
+    order: 310
+    question: 値段をつけられない相手選びで、放っておくと抜け駆けと早期化で市場が壊れるのはなぜか。
+    plot: 研修先の割り当てが年々前倒しになる混乱を収めるやる夫が、安定マッチングという条件、受入保留方式、正直に希望を出せる性質、学校選択や臓器交換への応用を通じて、制度が均衡を作る設計対象であることを知る。
+  - id: winners-curse
+    title: やる夫は競り落として損をしたようです
+    path: /books/winners-curse
+    category: math-information
+    order: 320
+    question: 一番高く評価した者が落札するのに、その落札者ほど損をしやすいのはなぜか。
+    plot: 入札で連戦連勝したのに赤字を出したやる夫が、価値の見積もりの分布と勝者の位置、方式による戦略の変化、収入がほぼ同じになるという定理、談合と共謀、周波数オークションの設計失敗例を追う。
+  - id: tragedy-equilibrium
+    title: やる夫は全員が最善を尽くして全員損したようです
+    path: /books/tragedy-equilibrium
+    category: math-information
+    order: 330
+    question: 各自が合理的に振る舞った結果が、全員にとって最悪になるのはなぜか。誰も裏切っていないのに。
+    plot: 値下げ競争と残業競争と資源の奪い合いを同じ図に描いたやる夫が、均衡と最適の乖離、繰り返しがもたらす協調、罰則と評判、コミットメントの技術、そして構造を変えるしかない場面の見分け方を学ぶ。
+  - id: map-projection
+    title: やる夫の地図はどう描いても嘘になるようです
+    path: /books/map-projection
+    category: math-information
+    order: 340
+    question: 測量が正確でも、丸い地表を平らな紙に正しく写せないのはなぜか。
+    plot: 面積を比べる資料で誤解を招いたやる夫が、曲がった面を伸ばせないという定理、角度と面積と距離のどれを諦めるかという選択、用途に応じた投影法、そして統計地図の色分けが生む錯覚まで、表現の責任を引き受ける。
+  - id: uncountable-computing
+    title: やる夫の計算機は無限を扱えないようです
+    path: /books/uncountable-computing
+    category: math-information
+    order: 350
+    question: 数学は実数も無限も扱えるのに、計算機がそれを持てないのはなぜか。何が失われているのか。
+    plot: 誤差ではない食い違いに突き当たったやる夫が、数えられる無限と数えられない無限、書き下せる数の少なさ、計算可能性、停止しない手続き、そして近似で十分な場面と致命的な場面の見分け方に進む。
+  - id: proof-and-error
+    title: やる夫の証明は正しいのに間違っているようです
+    path: /books/proof-and-error
+    category: math-information
+    order: 360
+    question: 論理の連鎖で確かめたはずの証明に誤りが残るのはなぜか。正しさは誰が保証しているのか。
+    plot: 自信のあった証明を覆されたやる夫が、証明が読み手に納得させる社会的な営みでもあること、査読を通った誤り、計算機による網羅的な証明への抵抗、形式証明支援系の登場と、それでも残る前提の問題を追う。
+  - id: curse-of-dimensionality
+    title: やる夫の直観は次元が増えると全部外れるようです
+    path: /books/curse-of-dimensionality
+    category: math-information
+    order: 370
+    question: 三次元では当たり前のことが、百次元ではことごとく成り立たなくなるのはなぜか。
+    plot: 特徴量を増やすほど精度が落ちる現象に困ったやる夫が、体積が表面に集まる高次元球、どの点も等距離に見える近傍、必要な標本数の爆発、そして次元を削るか構造を仮定するかという二つの逃げ道を試す。
+  - id: tail-latency
+    title: やる夫のシステムは平均は速いのに遅いようです
+    path: /books/tail-latency
+    category: math-information
+    order: 380
+    question: 平均応答時間が十分速いのに、利用者の体感が悪いのはなぜか。
+    plot: 平均値を改善しても苦情が減らないやる夫が、百回に一回の遅れが全体に効く合成の仕組み、依存関係が増えるほど悪化する末尾、再試行と重複要求、期限を切る設計を通じて、約束すべき指標を平均から分位点へ変える。
+  - id: spec-vs-intent
+    title: やる夫の指示通りに動く部下は最悪のようです
+    path: /books/spec-vs-intent
+    category: math-information
+    order: 390
+    question: 言った通りに正確に実行されると、なぜ望んだ結果から遠ざかるのか。
+    plot: 指標を最大化させたら想定外の抜け道を突かれたやる夫が、仕様と意図の隙間、報酬の設計が生む副作用、人間の指示に暗黙に含まれる制約、そして意図を明示する努力と監視で埋める部分の境界を、契約と自動化の両面から検討する。
+
+  # ---- natural-science（自然科学）: 既存の最大 order は 60 ----
+  - id: arrow-of-time
+    title: やる夫のコーヒーは勝手に温まらないようです
+    path: /books/arrow-of-time
+    category: natural-science
+    order: 70
+    question: 素過程はどれも時間を反転できるのに、なぜ現実の出来事には戻れない向きがあるのか。
+    plot: 冷めるのは分かるがなぜ温まらないのかに引っかかったやる夫が、可逆な運動方程式と不可逆な現象の落差から、場合の数としてのエントロピー、ゆらぎと再帰時間、マクスウェルの悪魔と情報を消す代価を追い、時間の矢の出どころを探す。
+  - id: why-we-die
+    title: やる夫は死ななくてよい理由を探しているようです
+    path: /books/why-we-die
+    category: natural-science
+    order: 80
+    question: 傷が治り、細胞が入れ替わる体を持ちながら、なぜ生き物は老いて死ぬように出来ているのか。
+    plot: 不老不死を本気で検討し始めたやる夫が、繁殖を終えた個体に選択が働かないこと、若い頃に有利な遺伝子が後で害になること、修復に資源を割かない使い捨ての体、がんと再生のトレードオフ、寿命が桁違いに異なる種の比較を突きつけられる。
+  - id: metabolic-scaling
+    title: やる夫はネズミとゾウの一生を数えているようです
+    path: /books/metabolic-scaling
+    category: natural-science
+    order: 90
+    question: 体重が千倍でも代謝は千倍にならず、一生の心拍数がどの動物でもほぼ同じになるのはなぜか。
+    plot: 小さい動物ほど早死にする理由を不思議がるやる夫が、表面積と体積の比、体中に物を配る網の分岐構造から出る四分の三乗則、体温と食事量、時間感覚の違い、そして同じ法則が都市や企業にも現れる不気味さに行き当たる。
+  - id: universal-genetic-code
+    title: やる夫は生き物が全部同じ暗号表を使う理由を疑うようです
+    path: /books/universal-genetic-code
+    category: natural-science
+    order: 100
+    question: 細菌もヒトも同じ遺伝暗号を使っているのは偶然か必然か。生命は一度しか生まれなかったのか。
+    plot: 遺伝暗号表を眺めてなぜこの割り当てなのかに取り憑かれたやる夫が、共通祖先の証拠、読み間違えても被害が小さい表の構造、途中で変えられなくなった凍結事故説、例外的なコドン、人工の非天然アミノ酸を通じて別の生化学の可能性を検討する。
+  - id: morphogenesis
+    title: やる夫の細胞はどこで自分の居場所を知るようです
+    path: /books/morphogenesis
+    category: natural-science
+    order: 110
+    question: 全部が同じ設計図を持つ細胞が、どうやってここは指の先と知り、毎回同じ形を作るのか。
+    plot: 一個の受精卵から必ず同じ形ができる不思議に取り憑かれたやる夫が、濃度勾配が伝える位置情報、遺伝子スイッチの組合せ、チューリングの反応拡散が生む縞模様、細胞にかかる力、そして途中で乱しても元に戻るロバストネスを再発見する。
+  - id: dark-night-sky
+    title: やる夫は夜空が暗い理由を説明できないようです
+    path: /books/dark-night-sky
+    category: natural-science
+    order: 120
+    question: 宇宙が無限に広く星が無数にあるなら、夜空はどの方向も星で埋まって明るいはずではないのか。
+    plot: 子どもじみた問いだと笑われたやる夫が、オルバースのパラドックスを真面目に詰め、宇宙の有限な年齢と光速、赤方偏移、膨張する時空、そして実は空全体を埋めている背景放射に行き着き、観測できる宇宙の縁に触れる。
+  - id: body-temperature
+    title: やる夫の体温はなぜ37度なのか気になるようです
+    path: /books/body-temperature
+    category: natural-science
+    order: 130
+    question: 高くても低くても不都合があるとして、多くの哺乳類がなぜ37度前後に揃ったのか。発熱はなぜ起きるのか。
+    plot: 微熱で休むか迷ったやる夫が、体温維持に必要な餌の量、酵素の効率、多くのカビが増えられなくなる温度、恒温という高価な戦略の見返り、そして発熱の防御機能と解熱薬の是非までを、体温という一点から広げていく。
+  - id: sandpile-criticality
+    title: やる夫の砂山はいつ崩れるか分からないようです
+    path: /books/sandpile-criticality
+    category: natural-science
+    order: 140
+    question: 一粒足しただけで大崩落が起きるのに、その大きさをどうしても予測できないのはなぜか。
+    plot: 砂を落とし続けて崩れ方を記録するやる夫が、いつも同じ角度に戻る安定と、雪崩の大きさに現れるべき則を見つけ、自己組織化臨界、地震や停電や渋滞との共通形、そして平均で備えることの危うさに行き着く。
+  - id: water-anomaly
+    title: やる夫は氷が浮くことに救われているようです
+    path: /books/water-anomaly
+    category: natural-science
+    order: 150
+    question: 固体が液体に浮くという例外的な性質がなかったら、地球の生命はどうなっていたのか。
+    plot: 冬の池を眺めるやる夫が、水素結合、密度が4度で最大になる異常、桁外れの比熱と気化熱、何でも溶かす性質を確かめ、湖が底から凍らないこと、気候の緩衝、細胞の中身が水である必然を一本に結び直す。
+  - id: quantum-interpretation
+    title: やる夫は計算できる理論の意味が分からないようです
+    path: /books/quantum-interpretation
+    category: natural-science
+    order: 160
+    question: 予言は桁違いの精度で当たるのに、何が起きているのかを誰も合意できない理論を、理解したと言ってよいのか。
+    plot: 量子力学の計算はできるようになったやる夫が、二重スリットと測定問題、EPRの主張とベルの不等式を破った実験、コペンハーゲン・多世界・隠れた変数の各解釈を並べ、解釈の争いに実験で決着がつく条件を問う。
+  - id: plate-tectonics-unique
+    title: やる夫は地球だけが動いている理由を知りたいようです
+    path: /books/plate-tectonics-unique
+    category: natural-science
+    order: 170
+    question: 岩石でできた惑星は他にもあるのに、プレートが動いているのがなぜ地球だけなのか。
+    plot: 大陸移動をようやく受け入れたやる夫が、金星と火星との比較へ進み、水が岩を柔らかくする役割、沈み込みが始まる条件、プレート運動が回す炭素循環と長期の気候安定、そして地面の運動と生命の存続がつながっている可能性を追う。
+  - id: oxygen-paradox
+    title: やる夫は吸っている酸素で錆びているようです
+    path: /books/oxygen-paradox
+    category: natural-science
+    order: 180
+    question: 生きるために不可欠な酸素が、同時に体を傷つけているというのはどういうことか。
+    plot: 抗酸化サプリを買い込んだやる夫が、呼吸で漏れる活性酸素、損傷と修復の釣り合い、大量投与の臨床試験がことごとく外れた経緯、適度なストレスが寿命を延ばす現象を通じて、酸化ストレス説の当たりと外れを仕分ける。
+  - id: peto-paradox
+    title: やる夫はゾウががんにならない理由を知らないようです
+    path: /books/peto-paradox
+    category: natural-science
+    order: 190
+    question: 細胞が多く長生きなほどがんになりやすいはずなのに、大型動物の発がん率が高くないのはなぜか。
+    plot: 体重差から予測した発がん率が現実と合わないことに気づいたやる夫が、多段階で起きる変異、体内で進む細胞の進化、免疫による監視、ゾウが持つ重複した抑制遺伝子を追い、がんを個体内の生態系として見る視点を得る。
+  - id: regeneration-limits
+    title: やる夫の傷は治るのに心臓は治らないようです
+    path: /books/regeneration-limits
+    category: natural-science
+    order: 200
+    question: 皮膚も肝臓も再生するのに、心臓や神経が元に戻らないのはなぜか。
+    plot: 手足を生やすイモリと自分を比べたやる夫が、幹細胞の在庫と分化の壁、傷を早く塞ぐことと元通りにすることの衝突、再生とがんの紙一重、そして再生医療がどこで詰まっているのかを確かめる。
+  - id: gut-microbiome
+    title: やる夫の体の半分は自分ではないようです
+    path: /books/gut-microbiome
+    category: natural-science
+    order: 210
+    question: 自分の細胞ではない微生物が、なぜ消化や免疫や気分にまで関わるのか。
+    plot: 抗生物質のあとの不調をきっかけに腸内細菌を調べ始めたやる夫が、共生と競合、免疫の教育、食物繊維の発酵産物、脳との連絡経路、そして相関だらけの研究から因果を取り出す難しさに向き合う。
+  - id: lactase-persistence
+    title: やる夫が牛乳を飲めるのは最近のことのようです
+    path: /books/lactase-persistence
+    category: natural-science
+    order: 220
+    question: 大人になれば乳を消化できなくなるのが哺乳類の標準なのに、一部の集団だけが飲めるのはなぜか。
+    plot: 乳製品で腹を壊す友人との違いを不思議がるやる夫が、酵素のスイッチが切れる仕組み、牧畜の開始と遺伝子頻度の急上昇、地域差、そして文化が遺伝子を選ぶという逆向きの進化に出会う。
+  - id: cooking-brain
+    title: やる夫は火を使うから頭が大きいようです
+    path: /books/cooking-brain
+    category: natural-science
+    order: 230
+    question: 脳は極端に燃費の悪い器官なのに、人類はその維持費をどこから捻出したのか。
+    plot: 生食にこだわる健康法に疑問を持ったやる夫が、消化に必要な時間とエネルギー、加熱による吸収効率の変化、消化管の縮小と脳の拡大、そして料理という体外での前処理が可能にしたものを比べていく。
+  - id: persistence-hunting
+    title: やる夫は足が遅いのに獲物に追いつくようです
+    path: /books/persistence-hunting
+    category: natural-science
+    order: 240
+    question: 短距離では他の動物に到底かなわない体で、なぜ狩りが成立したのか。
+    plot: 走るのが遅いことを悔しがるやる夫が、汗による冷却、二足歩行の効率、腱のばね、呼吸と歩調の独立、そして長距離で追い続けると相手が熱で止まる仕組みを通じて、人体を長距離仕様の装置として読み直す。
+  - id: obstetric-dilemma
+    title: やる夫の赤ん坊は未完成で生まれてくるようです
+    path: /books/obstetric-dilemma
+    category: natural-science
+    order: 250
+    question: 他の霊長類は生まれてすぐ動けるのに、ヒトの赤ん坊だけが何もできない状態で生まれるのはなぜか。
+    plot: 育児の大変さの起源を探るやる夫が、産道の幅と頭の大きさの綱引き、母体の代謝上限という別の説明、生後も続く脳の成長、そして未熟に生まれることが学習と共同育児を要求した帰結をたどる。
+  - id: immune-self-attack
+    title: やる夫の免疫は自分を敵と間違えるようです
+    path: /books/immune-self-attack
+    category: natural-science
+    order: 260
+    question: 無数の異物を見分けられる仕組みが、なぜ自分自身やスギ花粉を攻撃してしまうのか。
+    plot: 花粉症と自己免疫疾患の説明に納得できないやる夫が、遺伝子を組み替えて作る多様性、自己に反応する細胞を排除する教育、その漏れ、寄生虫のいない環境という仮説、そして抑える治療と守る機能の綱引きを追う。
+  - id: drug-response-variation
+    title: やる夫の薬は隣の人には効かないようです
+    path: /books/drug-response-variation
+    category: natural-science
+    order: 270
+    question: 有効性が証明された薬でも、効く人と効かない人に分かれるのはなぜか。平均の効果は誰の効果なのか。
+    plot: 同じ処方で結果が違う理由を追うやる夫が、代謝酵素の個人差、体重と年齢、飲み方の実態、集団平均と個人予測の断絶、そして効きそうな人を事前に選ぶ試みの成功と空振りを見比べる。
+  - id: open-label-placebo
+    title: やる夫は偽薬だと知っていても効いてしまうようです
+    path: /books/open-label-placebo
+    category: natural-science
+    order: 280
+    question: 中身がないと知らされたうえで飲む錠剤に効果が出るのは、いったい何が働いているのか。
+    plot: 気のせいで片付けようとしたやる夫が、痛みを抑える体内の仕組み、期待と条件づけ、自然経過や平均への回帰との切り分け、効く症状と効かない症状の差を通じて、治療の何が薬でありどこからが文脈なのかを問う。
+  - id: pain-mismatch
+    title: やる夫の痛みは傷と一致しないようです
+    path: /books/pain-mismatch
+    category: natural-science
+    order: 290
+    question: 失った手足が痛み、画像に異常のない腰が痛むのはなぜか。痛みはどこで作られているのか。
+    plot: 検査で異常なしと言われて途方に暮れるやる夫が、末梢からの信号と脳が作る予測、感作と慢性化、注意と不安の増幅、そして原因探しより機能回復を先に置く治療の考え方に触れる。
+  - id: seeing-what-isnt
+    title: やる夫は見ていないものを見ているようです
+    path: /books/seeing-what-isnt
+    category: natural-science
+    order: 300
+    question: 網膜には穴があり視野の大半はぼやけているのに、なぜ世界は隅々まで鮮明に見えるのか。
+    plot: 盲点の実験に衝撃を受けたやる夫が、視線の跳躍とその間の見えなさ、変化に気づかない実験、脳が先に予測して差分だけを処理する仕組みを通じて、見るという行為が受信ではなく構成であることを確かめる。
+  - id: why-sleep
+    title: やる夫は無防備になる時間をやめられないようです
+    path: /books/why-sleep
+    category: natural-science
+    order: 310
+    question: 捕食される危険を冒してまで眠る必要があるのはなぜか。眠らないと何が壊れるのか。
+    plot: 睡眠時間を削る計画を立てたやる夫が、断眠実験の結果、記憶の固定と整理、老廃物の排出、体内時計と光、動物ごとに異なる眠り方を比べ、眠りが休息ではなく能動的な処理であることを知る。
+  - id: left-right-asymmetry
+    title: やる夫の体は左右対称なのに心臓は左のようです
+    path: /books/left-right-asymmetry
+    category: natural-science
+    order: 320
+    question: 左右対称に作られる体で、内臓の配置だけが決まった向きに偏るのはなぜか。
+    plot: 内臓逆位の話をきっかけに調べ始めたやる夫が、発生初期に左右を決める繊毛の流れ、分子レベルの向きが器官の配置に拡大する経路、対称性が破れる一般的な仕組み、そして逆位でも健康でいられる理由を追う。
+  - id: size-limits
+    title: やる夫は虫が象より大きくなれない理由を探すようです
+    path: /books/size-limits
+    category: natural-science
+    order: 330
+    question: 生き物の大きさに上限があるのはなぜか。かつて巨大な昆虫がいたのはなぜか。
+    plot: 怪獣映画に文句をつけるやる夫が、長さと面積と体積の増え方の違い、骨と筋肉の強度、酸素をどう届けるかという方式の限界、大気組成の変化と巨大昆虫、そして水中と陸上で上限が違う理由を計算する。
+  - id: birds-survived
+    title: やる夫は恐竜が絶滅した理由より生き残った理由が気になるようです
+    path: /books/birds-survived
+    category: natural-science
+    order: 340
+    question: 同じ衝突を受けたのに、絶滅した系統と生き延びた系統を分けたのは何か。
+    plot: 隕石で全滅という説明に物足りなさを感じたやる夫が、衝突後に何が起きたのかの時系列、体の大きさと食べ物の関係、種子や死骸を食べられたこと、水中や地中の避難所、そして鳥が恐竜であるという結論を組み立てる。
+  - id: great-oxidation
+    title: やる夫は酸素が最初の大量絶滅を起こしたと知るようです
+    path: /books/great-oxidation
+    category: natural-science
+    order: 350
+    question: 今は生命を支える酸素が、かつて最大の毒だったというのはどういうことか。
+    plot: 縞状鉄鉱層の写真に惹かれたやる夫が、光合成の発明、海に溶けた鉄が受け皿になった時間、酸素が満ちたあとの生物相の入れ替わり、全球凍結との関係を通じて、生命が地球を作り変えてきた記録を読む。
+  - id: faint-young-sun
+    title: やる夫の地球は太陽が暗い頃も凍らなかったようです
+    path: /books/faint-young-sun
+    category: natural-science
+    order: 360
+    question: 昔の太陽は今より二割以上暗かったのに、地球が凍りつかなかったのはなぜか。
+    plot: 単純計算では全球凍結になるはずの過去に困惑したやる夫が、温室効果ガスの組成変化、岩石の風化が温度で変わる負のフィードバック、生物の関与をめぐる論争を追い、四十億年の気温安定を支えた調整装置を探す。
+  - id: ice-ages
+    title: やる夫の氷期は暦のように来るようです
+    path: /books/ice-ages
+    category: natural-science
+    order: 370
+    question: わずかな日射の変化で、なぜ大陸を覆う氷が発達したり消えたりするのか。
+    plot: 氷床コアの記録に周期を見つけたやる夫が、地球の軌道要素の変動、それだけでは足りない振幅、氷と反射率と二酸化炭素の増幅、周期が途中で入れ替わった謎を通じて、気候が引き金と増幅で動く仕組みを掴む。
+  - id: weather-vs-climate
+    title: やる夫は明日を外すのに百年後を語るようです
+    path: /books/weather-vs-climate
+    category: natural-science
+    order: 380
+    question: 一週間先の天気すら当たらないのに、数十年先の気候について語れるのはなぜか。
+    plot: 予報の外れを理由に長期予測を疑うやる夫が、初期値の問題と境界条件の問題、カオスと統計、アンサンブル、モデルが過去を再現できるかの検証、そして分かっていることと分かっていないことの線引きを扱う。
+  - id: tidal-locking
+    title: やる夫は月の裏側を一生見られないようです
+    path: /books/tidal-locking
+    category: natural-science
+    order: 390
+    question: 自転と公転の周期がぴったり一致しているのは偶然か。月はこれからどうなるのか。
+    plot: 月の同じ面しか見えないことに引っかかったやる夫が、潮汐が引き起こす摩擦、角運動量のやり取り、遠ざかる月と伸びる一日、皆既日食が今の時代にだけ見える偶然、そして地球の自転軸を安定させてきた役割を追う。
+  - id: stellar-equilibrium
+    title: やる夫の星は燃えているのに爆発しないようです
+    path: /books/stellar-equilibrium
+    category: natural-science
+    order: 400
+    question: 内部で核融合が起きている天体が、何十億年も同じ明るさを保てるのはなぜか。
+    plot: 制御されない核融合との違いを考えるやる夫が、重力と圧力の釣り合い、温度が上がると膨らんで冷える自己制御、質量で決まる一生、そして燃料が尽きたあとに何が起き、自分の体を作る元素がどこで作られたのかを辿る。
+  - id: vacuum-not-empty
+    title: やる夫の真空には何もないはずだったようです
+    path: /books/vacuum-not-empty
+    category: natural-science
+    order: 410
+    question: 何も入っていない空間にエネルギーがあるというのは、どういう意味か。それは測れるのか。
+    plot: 完全な無を想像しようとして失敗したやる夫が、不確定性から出る零点振動、板を引き寄せる測定可能な効果、粒子は場の励起という見方、そして理論値と観測が桁違いに合わない宇宙定数問題に突き当たる。
+  - id: matter-antimatter
+    title: やる夫がここに居るのは計算が合わないからのようです
+    path: /books/matter-antimatter
+    category: natural-science
+    order: 420
+    question: 物質と反物質が同量作られたのなら、なぜ全部消えずに星も人も残っているのか。
+    plot: 対消滅の話に納得しかけたやる夫が、宇宙に反物質の痕跡が見つからないこと、非対称が生まれるための条件、実験で見つかった小さな対称性の破れ、それでも足りない量、そして未解決のまま残る問いの立て方を知る。
+  - id: least-action
+    title: やる夫の光は最短の道を知っているようです
+    path: /books/least-action
+    category: natural-science
+    order: 430
+    question: 光や物体が、あらかじめ全経路を比べたかのように振る舞うのはなぜか。目的を持っているのか。
+    plot: 屈折の法則を最短時間で説明されて気味悪がるやる夫が、変分という考え方、力の記述と作用の記述の等価性、対称性から保存則が出る仕組み、そして量子の重ね合わせが古典の最短経路を作る筋道に至る。
+  - id: material-strength
+    title: やる夫の鉄は理論の百分の一で壊れるようです
+    path: /books/material-strength
+    category: natural-science
+    order: 440
+    question: 原子の結合から計算した強度に、実物の金属がまるで届かないのはなぜか。
+    plot: 強度計算と実測の桁違いに戸惑うやる夫が、結晶に潜む欠陥、そこが動くことで起きる変形、欠陥を止める加工と合金と熱処理、そして欠陥をなくす方向と増やして絡ませる方向の両方が正解になる材料設計を知る。
+  - id: why-plants-green
+    title: やる夫の植物は一番強い光を捨てているようです
+    path: /books/why-plants-green
+    category: natural-science
+    order: 450
+    question: 太陽光で最も強い緑の光を反射してしまう色素を使っているのは、なぜ淘汰されなかったのか。
+    plot: 効率を考えれば黒いはずだと言い出したやる夫が、光合成の量子効率、強すぎる光がもたらす損傷、光の変動に対する安定性という説明、そして地球の生産量の上限と作物改良の余地までを見積もる。
+  - id: tree-water-height
+    title: やる夫はポンプなしで水を百メートル上げるようです
+    path: /books/tree-water-height
+    category: natural-science
+    order: 460
+    question: 吸い上げでは十メートルが限界のはずなのに、木はなぜ百メートル上まで水を運べるのか。
+    plot: 気圧の計算と巨木の高さが合わないことに気づいたやる夫が、葉での蒸発が生む張力、途切れずに続く水の柱、気泡が入ったときの破綻、そして水を運ぶ限界が木の高さの上限を決めている可能性を検討する。
+
+  # ---- thought（思想と人間）: 既存の最大 order は 20 ----
+  - id: belief-persistence
+    title: やる夫は言い負かされても考えを変えないようです
+    path: /books/belief-persistence
+    category: thought
+    order: 30
+    question: 反証を突きつけられて信念がかえって強まることがあるのはなぜか。人はどんな条件でなら考えを変えるのか。
+    plot: 議論で完敗した翌日には元の主張に戻っている自分に気づいたやる夫が、動機づけられた推論、意見を変えることが集団内で払う代償、理想的なベイズ更新との落差、説得が実際に効いた事例を検分し、意見が変わる条件を設計する側に回る。
+  - id: public-lie
+    title: やる夫は誰も信じていない建前を守っているようです
+    path: /books/public-lie
+    category: thought
+    order: 40
+    question: 全員が内心では否定している規範が、なぜ壊れずに社会を動かし続けられるのか。
+    plot: 形骸化した社内ルールを守り続ける不合理に苛立つやる夫が、本音を隠す選好の偽装、みんなが知っていると全員が知る瞬間の急変、少数派だと思い込む錯覚、体制が一夜で崩れる事例を通じて、裸の王様の子どもが果たした役割を検討する。
+  - id: punishment-purpose
+    title: やる夫は割に合わない罰を求めているようです
+    path: /books/punishment-purpose
+    category: thought
+    order: 50
+    question: 刑罰が犯罪を防ぐためのものなら、抑止に効かないと分かっている厳罰がなぜこれほど強く求められるのか。
+    plot: 事件報道にもっと重くしろと即座に反応した自分を検分するやる夫が、応報・抑止・更生・隔離という食い違う目的、量刑相場、被害者の置き場所、見せしめの歴史、修復的司法を通じて、罰が担っている感情の機能を直視する。
+  - id: untranslatable
+    title: やる夫の言葉は訳すと何かが落ちるようです
+    path: /books/untranslatable
+    category: thought
+    order: 60
+    question: どの言語でも同じことが言えるはずなのに、訳せない言葉があるのはなぜか。
+    plot: 翻訳の仕事でもったいないの一語に詰まったやる夫が、語彙による世界の切り分けの違い、文法が言うことを強制する情報、翻訳の不確定性という主張、言語が思考を縛る度合いを測った実験、機械翻訳が落とす箇所を並べていく。
+  - id: work-ethic
+    title: やる夫は働くことが尊い理由を知らないようです
+    path: /books/work-ethic
+    category: thought
+    order: 70
+    question: 元は苦役だったはずの労働が、いつどうやって人の価値を測る物差しになったのか。
+    plot: 週休三日を提案して強い反発を浴びたやる夫が、労働を蔑んだ古代、修道院が刻んだ時間、勤勉を救いに結びつけた宗教改革、工場の時計と規律、余暇という発明、意味を感じられない仕事の増殖をたどり、反発の底にある価値観を掘り出す。
+  - id: goodhart-evaluation
+    title: やる夫は測った瞬間に壊してしまったようです
+    path: /books/goodhart-evaluation
+    category: thought
+    order: 80
+    question: 良し悪しを公正に測ろうとすると、なぜ測りたかったものそのものが変質してしまうのか。
+    plot: 評価指標を導入するたびに現場が指標に最適化されていく光景を見たやる夫が、代理指標と本来の目的、測れるものが重要になる逆転、教育や研究や医療での実例、そして測らずに質を保ってきた仕組みの脆さと強さを比べる。
+  - id: why-love-you
+    title: やる夫は愛している理由を答えられないようです
+    path: /books/why-love-you
+    category: thought
+    order: 90
+    question: 理由を挙げて愛を説明すると、なぜその理由を満たす別人でもよいことになってしまうのか。
+    plot: なぜ私なのかと問われて言葉に詰まったやる夫が、性質への愛と存在への愛、代替可能性の問題、恋愛結婚が標準になった歴史の浅さ、約束が感情をどう支えるのかを通じて、答えられないことの意味を考える。
+  - id: meaning-of-life
+    title: やる夫は幸せなときに意味を問わないようです
+    path: /books/meaning-of-life
+    category: thought
+    order: 100
+    question: 人生の意味は、なぜ順調なときには問題にならず、うまくいかないときにだけ立ち上がるのか。
+    plot: 目標を達成した直後に虚しくなったやる夫が、宇宙的な尺度での無意味さ、それでも生じる主観的な充実、シーシュポスの反復、意味は与えられるのか作るのかという対立、そして問いを解消することと答えることの違いを検討する。
+  - id: triage-ethics
+    title: やる夫は助かる人から助けないようです
+    path: /books/triage-ethics
+    category: thought
+    order: 110
+    question: 目の前の重症者を後回しにする判断が、なぜ人道的だと言えるのか。誰がその線を引いてよいのか。
+    plot: 災害訓練で黒いタグを付ける役を任されたやる夫が、救命数の最大化という原則、目の前の一人への義務との衝突、人工呼吸器が足りない状況の配分基準、くじという方法、そして判断した人を守る仕組みまで踏み込む。
+  - id: equality-of-what
+    title: やる夫は平等にしたのに不公平だと言われるようです
+    path: /books/equality-of-what
+    category: thought
+    order: 120
+    question: 全員に同じものを配ることが、なぜかえって不公平になるのか。平等にすべきなのは何なのか。
+    plot: 一律配分の施策が総批判を浴びたやる夫が、機会と結果、資源と厚生と潜在能力、自分の選択による差と運による差、必要に応じた分配と貢献に応じた分配を並べ、平等の前に何を等しくするのかを決める作業に取りかかる。
+  - id: meritocracy-trap
+    title: やる夫は能力で選んだのに社会を分断したようです
+    path: /books/meritocracy-trap
+    category: thought
+    order: 130
+    question: 身分ではなく能力で選ぶという最も公正に見える原則が、なぜ勝者の傲慢と敗者の屈辱を生むのか。
+    plot: 完全に実力本位の選抜制度を設計したやる夫が、能力そのものが環境と運の産物であること、成功が自己責任の物語に化ける仕組み、負けた側に残される言い訳のなさ、そして選抜と尊厳を切り離す方法を探る。
+  - id: apology-and-forgiveness
+    title: やる夫の謝罪は何も元に戻さないようです
+    path: /books/apology-and-forgiveness
+    category: thought
+    order: 140
+    question: 被害を回復しない言葉が、なぜこれほど強く求められ、時に賠償より重視されるのか。
+    plot: 形だけの謝罪で火に油を注いだやる夫が、謝罪が果たす承認と関係修復の機能、責任を認めることと法的な不利益、許しは被害者の義務ではないこと、時間が経った不正への謝罪の意味を検討する。
+  - id: self-binding-promise
+    title: やる夫は未来の自分を縛れないようです
+    path: /books/self-binding-promise
+    category: thought
+    order: 150
+    question: 気が変わることを知りながら将来の自分に約束するのは、どういう権利にもとづく行為なのか。
+    plot: ダイエットと貯金と禁煙に失敗し続けるやる夫が、時間とともに逆転する選好、自分を縛る仕掛け、将来の自分は別人かという問い、そして契約や遺言や事前指示が社会でどう扱われているのかを重ねていく。
+  - id: lying-ethics
+    title: やる夫は嘘をつかないと会話ができないようです
+    path: /books/lying-ethics
+    category: thought
+    order: 160
+    question: 社交辞令や気遣いの嘘は嘘ではないのか。嘘がいけないのは、誰の何を損なうからなのか。
+    plot: 正直であろうとして人間関係を壊したやる夫が、例外を認めない立場とその帰結、殺人者に問われても本当を言うのかという古典的な難題、黙秘と誤解の誘導の違い、信頼という公共財の消費として嘘を見る視点に至る。
+  - id: free-will-responsibility
+    title: やる夫の脳は本人より先に決めているようです
+    path: /books/free-will-responsibility
+    category: thought
+    order: 170
+    question: 決定が意識に上る前に脳内で始まっているなら、その行為の責任を本人に問えるのか。
+    plot: 実験の話を聞いて責任という概念が崩れかけたやる夫が、実験の解釈をめぐる批判、決定論と自由を両立させる立場、責任を能力と応答性で捉える見方、そして刑事責任と治療の線引きが実務でどう運用されているかを追う。
+  - id: personal-identity
+    title: やる夫は昨日のやる夫と同じ人物か怪しいようです
+    path: /books/personal-identity
+    category: thought
+    order: 180
+    question: 細胞も記憶も入れ替わっていくのに、同じ人物だと言い続けられる根拠は何か。
+    plot: 部品を全部交換した船の話から始まったやる夫の疑いが、記憶による同一性とその循環、分裂や転送を考えたときの破綻、物語としての自己、そして同一性が問われる場面が責任と約束と所有であることに向かう。
+  - id: fear-of-death
+    title: やる夫は生まれる前の無を怖がらないようです
+    path: /books/fear-of-death
+    category: thought
+    order: 190
+    question: 死後の無が怖くて、生前の無が怖くないのはなぜか。死は本当に本人にとって悪いことなのか。
+    plot: 深夜に急に怖くなったやる夫が、経験できない出来事は害になりうるのかという古い議論、時間の非対称、剥奪としての死、長生きが必ず良いとは限らない可能性、そして有限であることが意味を作る側面を検討する。
+  - id: happiness-paradox
+    title: やる夫は幸福を目指すほど遠ざかるようです
+    path: /books/happiness-paradox
+    category: thought
+    order: 200
+    question: 幸福を目標にすると、なぜかえって手に入りにくくなるのか。そもそも幸福は測れるのか。
+    plot: 幸福度を上げる計画を立てて疲弊したやる夫が、良い出来事にも悪い出来事にも慣れてしまう適応、経験する自己と記憶する自己のずれ、快楽装置につながれることを拒む直観、そして意味と快楽が一致しない場面を扱う。
+  - id: animal-moral-status
+    title: やる夫の犬は家族で豚は食料のようです
+    path: /books/animal-moral-status
+    category: thought
+    order: 210
+    question: 同じように痛みを感じる動物を、片方は愛し片方は食べる区別に、どんな根拠があるのか。
+    plot: ペットを飼い始めた翌週に焼肉を食べていた自分に気づいたやる夫が、感覚を持つことと道徳的配慮、知能を基準にすることの帰結、文化と慣習の重み、畜産の実態と代替肉、そして線をどこに引くかの責任に向き合う。
+  - id: future-generations
+    title: やる夫はまだ存在しない人に借りがあるようです
+    path: /books/future-generations
+    category: thought
+    order: 220
+    question: これから生まれる人に義務を負うと言うが、こちらの選択次第で誰が生まれるかも変わるのに、誰に対する義務なのか。
+    plot: 百年後を見据えた投資の議論に加わったやる夫が、将来の利益を割り引くことの意味、同一人物が存在しなくなる問題、人数が増えれば良いのかという不快な結論、そして世代を超えた約束を制度に埋め込む方法を探る。
+  - id: distant-strangers
+    title: やる夫は目の前の一人しか助けられないようです
+    path: /books/distant-strangers
+    category: thought
+    order: 230
+    question: 溺れる子を助ける義務があるなら、同じ金額で救える遠くの千人への義務はなぜ感じられないのか。
+    plot: 募金の前で足を止めたやる夫が、距離と関係が義務に関わるのかという問い、共感が数に反応しない性質、効果を測って寄付先を選ぶ運動、身近な人への偏愛は悪なのかという反論を通じて、実行可能な線を引き直す。
+  - id: historical-injustice
+    title: やる夫は生まれる前の出来事を謝るようです
+    path: /books/historical-injustice
+    category: thought
+    order: 240
+    question: 自分がしていない行いについて、なぜ謝罪や賠償を求められ、応じることに意味があるのか。
+    plot: 昔の出来事をめぐる声明文の起草を任されたやる夫が、集団の責任と個人の責任、続いている利益と不利益、時間の経過と証拠、和解が成立した事例と失敗した事例を比べ、何に対して誰が何を言うのかを詰める。
+  - id: obedience-to-authority
+    title: やる夫は命令されると残酷になれるようです
+    path: /books/obedience-to-authority
+    category: thought
+    order: 250
+    question: 普通の人が組織の中では容易に加害者になるのはなぜか。それは性格の問題ではないのか。
+    plot: 自分だけは違うと考えていたやる夫が、権威への服従の実験とその再検討、役割が人を変える状況の力、分業が薄める責任感、書類の上での抽象化、そして踏みとどまった少数派に共通していた条件を調べる。
+  - id: leadership-myth
+    title: やる夫のリーダー像は状況ごとに正反対になるようです
+    path: /books/leadership-myth
+    category: thought
+    order: 260
+    question: 優れた指導者の条件を並べると、なぜ互いに矛盾する徳目ばかりになるのか。
+    plot: 成功した経営者の伝記を読み漁って混乱したやる夫が、成功例だけを見る偏り、結果からさかのぼって語られるカリスマ、状況に応じて求められる資質の変化、従う側が作る指導者像を通じて、再現できる部分だけを取り出す。
+  - id: honor-and-insult
+    title: やる夫は損をしてでも侮辱に反撃するようです
+    path: /books/honor-and-insult
+    category: thought
+    order: 270
+    question: 割に合わないと分かっていながら報復に走るのは、なぜ愚かではないのか。
+    plot: 明らかに損な喧嘩を買ってしまったやる夫が、不公平な提案を拒む実験、報復する意思を示すことの抑止効果、法が届かない社会で育つ名誉の規範、面子と謝罪の作法を通じて、感情が果たす戦略的な役割を読み解く。
+  - id: forgery-and-value
+    title: やる夫の贋作は見分けがつかないのに価値がないようです
+    path: /books/forgery-and-value
+    category: thought
+    order: 280
+    question: 見た目が完全に同じなら、なぜ本物と贋作で価値が変わるのか。鑑賞しているのは何なのか。
+    plot: 精巧な模写に感動した直後に贋作だと知らされて興ざめしたやる夫が、由来と真正性、作者の意図と制作の歴史、複製技術と一回性、生成された作品をどう扱うかという現在の問題まで、価値の在処を追いかける。
+  - id: music-or-noise
+    title: やる夫の音楽は隣人には騒音のようです
+    path: /books/music-or-noise
+    category: thought
+    order: 290
+    question: 同じ空気の振動が、ある人には音楽で別の人には雑音になるのはなぜか。心地よさは物理で決まるのか。
+    plot: 苦情をきっかけに考え始めたやる夫が、倍音と協和の物理、音律が妥協の産物であること、不協和が求められてきた歴史、慣れと期待が快を作る仕組みを通じて、美的判断が共有できる範囲を見定める。
+  - id: narrative-understanding
+    title: やる夫は物語にしないと他人が分からないようです
+    path: /books/narrative-understanding
+    category: thought
+    order: 300
+    question: 出来事を筋の通った物語にすると理解した気になるのに、それはなぜ理解と言えないことがあるのか。
+    plot: 同僚の行動を一つの動機で説明して外したやる夫が、原因と理由の違い、後から作られる一貫性、伝記や歴史叙述の型、統計的な説明との衝突を通じて、物語がもたらす理解の力と危うさを同時に扱う。
+  - id: humor-limits
+    title: やる夫の冗談は笑えなくなったようです
+    path: /books/humor-limits
+    category: thought
+    order: 310
+    question: 人はなぜ笑うのか。笑ってはいけない冗談があるとして、その線は誰がどう引くのか。
+    plot: 場を凍らせた一言を反省するやる夫が、優越と不一致と緊張の解放という笑いの説明、権力の上下で意味が変わる揶揄、風刺が果たしてきた役割、内輪と公開の違いを通じて、笑いの倫理を実務的に整理する。
+  - id: memory-rewrites
+    title: やる夫の思い出は本人の知らぬ間に書き換わるようです
+    path: /books/memory-rewrites
+    category: thought
+    order: 320
+    question: 鮮明に覚えている出来事ほど、なぜ事実と食い違うことがあるのか。
+    plot: 家族と記憶が食い違って驚いたやる夫が、思い出すたびに作り直される記憶、暗示で植えつけられる体験、目撃証言と冤罪、印象的な出来事の記憶の脆さを知り、記憶に支えられた自己像との付き合い方を考える。
+  - id: private-pain
+    title: やる夫の痛みは他人に伝わらないのに点数をつけられるようです
+    path: /books/private-pain
+    category: thought
+    order: 330
+    question: 本人にしか感じられないはずの痛みを、なぜ数値で申告させ、他人が評価できるのか。
+    plot: 診察室で痛みを十段階で答えるよう求められて困惑したやる夫が、内面を語る言葉をどう習得したのか、私的な感覚だけで言葉は成り立つのかという議論、詐病を疑われる患者、そして測定という営みの前提に踏み込む。
+  - id: machine-with-mind
+    title: やる夫は機械に心を感じてしまうようです
+    path: /books/machine-with-mind
+    category: thought
+    order: 340
+    question: 中身が計算だと知っていながら、相手に心があるように感じてしまうのはなぜか。感じることは間違いなのか。
+    plot: 対話プログラムに礼を言っている自分に気づいたやる夫が、振る舞いから心を読み取る人間の癖、外から区別できないなら違いはあるのかという問い、他人の心を確かめられない事実、そして道徳的な配慮を向ける条件を検討する。
+  - id: secular-religion
+    title: やる夫の科学は宗教を消せなかったようです
+    path: /books/secular-religion
+    category: thought
+    order: 350
+    question: 説明の役割を科学が引き受けたのに、宗教が消えるどころか形を変えて続くのはなぜか。
+    plot: 世俗化するという予測が外れた事実に興味を持ったやる夫が、宗教が担ってきた説明以外の機能、儀礼と共同体、不安と意味づけ、政治との結びつき、そして宗教的でないものが宗教の形をとる現象を観察する。
+  - id: funeral-for-the-dead
+    title: やる夫は届かないと知りながら手を合わせるようです
+    path: /books/funeral-for-the-dead
+    category: thought
+    order: 360
+    question: 死者に何をしても本人には届かないのに、葬儀や墓や供養をやめられないのはなぜか。
+    plot: 簡素な葬儀を提案して親族と対立したやる夫が、儀礼が残された者にもたらすもの、死者との約束を守る義務、遺体の扱いをめぐる規範、故人の意思と遺族の必要の衝突を通じて、届かない行為の宛先を考える。
+  - id: tolerance-paradox
+    title: やる夫の寛容は不寛容を許せないようです
+    path: /books/tolerance-paradox
+    category: thought
+    order: 370
+    question: あらゆる立場を認める社会は、それを壊そうとする立場も認めなければならないのか。
+    plot: 表現の自由を掲げて板挟みになったやる夫が、寛容が自滅する条件、線を引く基準としての害と扇動、私的な場と公的な場の違い、法規制と社会的な非難の使い分けを通じて、守るべきものを守るための例外の書き方を探す。
