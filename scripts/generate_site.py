@@ -7,6 +7,7 @@ nothing here is meant to be hand-edited or committed as generated output.
 from __future__ import annotations
 
 import argparse
+import re
 import shutil
 import sys
 import tempfile
@@ -51,6 +52,27 @@ SITEMAP_PATH = ROOT / "docs" / "sitemap.xml"
 BOOKS_DIR = ROOT / "docs" / "books"
 START_MARKER = "<!-- BEGIN GENERATED CATALOG -->"
 END_MARKER = "<!-- END GENERATED CATALOG -->"
+
+# Multi-part documents split their body across docs/books/{id}/README.md
+# (part 1), README.2.md (part 2), README.3.md (part 3), ... Numbering must
+# start at 1 and be contiguous; see docs/BUILD.md.
+PART_FILE_PATTERN = re.compile(r"^README(?:\.(?P<n>[1-9][0-9]*))?\.md$")
+
+_ROMAN_NUMERAL_TABLE: tuple[tuple[int, str], ...] = (
+    (1000, "M"), (900, "CM"), (500, "D"), (400, "CD"),
+    (100, "C"), (90, "XC"), (50, "L"), (40, "XL"),
+    (10, "X"), (9, "IX"), (5, "V"), (4, "IV"), (1, "I"),
+)
+
+
+def to_roman(number: int) -> str:
+    symbols = []
+    remainder = number
+    for value, symbol in _ROMAN_NUMERAL_TABLE:
+        while remainder >= value:
+            symbols.append(symbol)
+            remainder -= value
+    return "".join(symbols)
 
 SITE_ORIGIN = "https://reki2000.github.io"
 SITE_BASE_PATH = "/genai-textbooks"
@@ -226,9 +248,32 @@ def documents_by_category(
     return [(category, grouped[category["id"]]) for category in categories]
 
 
-def reading_minutes(document: dict[str, Any]) -> int:
-    source_path = ROOT / "docs" / document["path"].removeprefix("/") / "README.md"
-    return count_document(source_path)["reading_minutes"]
+def discover_parts(document: dict[str, Any]) -> list[Path]:
+    """Ordered part files for a document: README.md, README.2.md, README.3.md,
+    ... Numbering must start at 1 and be contiguous."""
+    directory = ROOT / "docs" / document["path"].removeprefix("/")
+    numbered: dict[int, Path] = {}
+    for candidate in directory.glob("README*.md"):
+        match = PART_FILE_PATTERN.match(candidate.name)
+        if not match:
+            continue
+        number = int(match["n"]) if match["n"] else 1
+        numbered[number] = candidate
+    expected = set(range(1, len(numbered) + 1))
+    if set(numbered) != expected:
+        fail(
+            f"document {document['id']} has non-contiguous parts "
+            f"{sorted(numbered)}, expected 1..{len(numbered)}"
+        )
+    return [numbered[number] for number in sorted(numbered)]
+
+
+def parts_reading_minutes(document: dict[str, Any]) -> list[int]:
+    return [count_document(path)["reading_minutes"] for path in discover_parts(document)]
+
+
+def reading_minutes_label(document: dict[str, Any]) -> str:
+    return "+".join(str(minutes) for minutes in parts_reading_minutes(document)) + "分"
 
 
 def page_url(document: dict[str, Any]) -> str:
@@ -248,6 +293,16 @@ def nav_href(document: dict[str, Any]) -> str:
     return f"{SITE_BASE_PATH}{document['path']}/"
 
 
+def part_href(document: dict[str, Any], part_index: int) -> str:
+    """Site-root-relative link to one part of a multi-part document. Part 1
+    keeps the directory-style nav_href; later parts link straight to their
+    README.N route, which docsify's history-mode router resolves to
+    README.N.md the same way it already resolves any other clean route."""
+    if part_index == 0:
+        return nav_href(document)
+    return f"{SITE_BASE_PATH}{document['path']}/README.{part_index + 1}"
+
+
 def render_sidebar(
     categories: list[dict[str, Any]], documents: list[dict[str, Any]]
 ) -> str:
@@ -260,10 +315,18 @@ def render_sidebar(
     for category, category_documents in documents_by_category(categories, documents):
         lines.append(f"- {category['title']}")
         for document in category_documents:
-            minutes = reading_minutes(document)
-            lines.append(
-                f"  - [{document['title']} ({minutes}分)]({nav_href(document)})"
-            )
+            parts = discover_parts(document)
+            label = reading_minutes_label(document)
+            if len(parts) == 1:
+                lines.append(
+                    f"  - [{document['title']} ({label})]({nav_href(document)})"
+                )
+            else:
+                lines.append(f"  - **{document['title']}** ({label})")
+                for index in range(len(parts)):
+                    lines.append(
+                        f"    - [{to_roman(index + 1)}部]({part_href(document, index)})"
+                    )
         lines.append("")
     return "\n".join(lines).rstrip() + "\n"
 
@@ -276,10 +339,10 @@ def render_top_page_catalog(
         lines.append(f"### {category['title']}")
         lines.append("")
         for document in category_documents:
-            minutes = reading_minutes(document)
+            label = reading_minutes_label(document)
             lines.extend(
                 [
-                    f"#### [{document['title']}]({nav_href(document)}) ({minutes}分)",
+                    f"#### [{document['title']}]({nav_href(document)}) ({label})",
                     f"問い：{document['question']}",
                     f"プロット：{document['plot']}",
                     "",
