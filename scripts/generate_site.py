@@ -7,6 +7,7 @@ nothing here is meant to be hand-edited or committed as generated output.
 from __future__ import annotations
 
 import argparse
+import re
 import shutil
 import sys
 import tempfile
@@ -51,6 +52,8 @@ SITEMAP_PATH = ROOT / "docs" / "sitemap.xml"
 BOOKS_DIR = ROOT / "docs" / "books"
 START_MARKER = "<!-- BEGIN GENERATED CATALOG -->"
 END_MARKER = "<!-- END GENERATED CATALOG -->"
+
+PART_FILE_RE = re.compile(r"^part-(\d+)\.md$")
 
 SITE_ORIGIN = "https://reki2000.github.io"
 SITE_BASE_PATH = "/genai-textbooks"
@@ -226,9 +229,23 @@ def documents_by_category(
     return [(category, grouped[category["id"]]) for category in categories]
 
 
-def reading_minutes(document: dict[str, Any]) -> int:
-    source_path = ROOT / "docs" / document["path"].removeprefix("/") / "README.md"
-    return count_document(source_path)["reading_minutes"]
+def document_source_files(document: dict[str, Any]) -> list[Path]:
+    """README.md plus any part-N.md continuations, in reading order."""
+    directory = ROOT / "docs" / document["path"].removeprefix("/")
+    parts = []
+    for path in directory.glob("part-*.md"):
+        if match := PART_FILE_RE.match(path.name):
+            parts.append((int(match.group(1)), path))
+    parts.sort(key=lambda item: item[0])
+    return [directory / "README.md"] + [path for _, path in parts]
+
+
+def reading_time_label(document: dict[str, Any]) -> str:
+    minutes = [
+        count_document(path)["reading_minutes"]
+        for path in document_source_files(document)
+    ]
+    return "+".join(str(m) for m in minutes) + "分"
 
 
 def page_url(document: dict[str, Any]) -> str:
@@ -260,9 +277,9 @@ def render_sidebar(
     for category, category_documents in documents_by_category(categories, documents):
         lines.append(f"- {category['title']}")
         for document in category_documents:
-            minutes = reading_minutes(document)
+            label = reading_time_label(document)
             lines.append(
-                f"  - [{document['title']} ({minutes}分)]({nav_href(document)})"
+                f"  - [{document['title']} ({label})]({nav_href(document)})"
             )
         lines.append("")
     return "\n".join(lines).rstrip() + "\n"
@@ -276,10 +293,10 @@ def render_top_page_catalog(
         lines.append(f"### {category['title']}")
         lines.append("")
         for document in category_documents:
-            minutes = reading_minutes(document)
+            label = reading_time_label(document)
             lines.extend(
                 [
-                    f"#### [{document['title']}]({nav_href(document)}) ({minutes}分)",
+                    f"#### [{document['title']}]({nav_href(document)}) ({label})",
                     f"問い：{document['question']}",
                     f"プロット：{document['plot']}",
                     "",
