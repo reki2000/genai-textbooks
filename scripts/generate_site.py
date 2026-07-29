@@ -272,10 +272,6 @@ def parts_reading_minutes(document: dict[str, Any]) -> list[int]:
     return [count_document(path)["reading_minutes"] for path in discover_parts(document)]
 
 
-def reading_minutes_label(document: dict[str, Any]) -> str:
-    return "+".join(str(minutes) for minutes in parts_reading_minutes(document)) + "分"
-
-
 def page_url(document: dict[str, Any]) -> str:
     """Absolute URL for a book page. Trailing slash matches the docs/books/<id>/
     directory + index.html layout, since GitHub Pages (no Jekyll pretty URLs)
@@ -316,16 +312,17 @@ def render_sidebar(
         lines.append(f"- {category['title']}")
         for document in category_documents:
             parts = discover_parts(document)
-            label = reading_minutes_label(document)
+            minutes = parts_reading_minutes(document)
             if len(parts) == 1:
                 lines.append(
-                    f"  - [{document['title']} ({label})]({nav_href(document)})"
+                    f"  - [{document['title']} ({minutes[0]}分)]({nav_href(document)})"
                 )
             else:
-                lines.append(f"  - **{document['title']}** ({label})")
                 for index in range(len(parts)):
+                    roman = to_roman(index + 1)
                     lines.append(
-                        f"    - [{to_roman(index + 1)}部]({part_href(document, index)})"
+                        f"  - [{document['title']} {roman}部({minutes[index]}分)]"
+                        f"({part_href(document, index)})"
                     )
         lines.append("")
     return "\n".join(lines).rstrip() + "\n"
@@ -339,10 +336,17 @@ def render_top_page_catalog(
         lines.append(f"### {category['title']}")
         lines.append("")
         for document in category_documents:
-            label = reading_minutes_label(document)
+            parts = discover_parts(document)
+            minutes = parts_reading_minutes(document)
+            heading = f"#### [{document['title']}]({nav_href(document)}) ({minutes[0]}分)"
+            for index in range(1, len(parts)):
+                roman = to_roman(index + 1)
+                heading += (
+                    f" ・ [{roman}部({minutes[index]}分)]({part_href(document, index)})"
+                )
             lines.extend(
                 [
-                    f"#### [{document['title']}]({nav_href(document)}) ({label})",
+                    heading,
                     f"問い：{document['question']}",
                     f"プロット：{document['plot']}",
                     "",
