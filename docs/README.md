@@ -1,4 +1,4 @@
-# genai-textbooks
+# やる夫で学ぶ
 
 Short Textbooks on Various Topics Written by Generative AI
 
