@@ -10,5 +10,7 @@ Short Textbooks on Various Topics Written by Generative AI
 
 コンテンツの内容は品質の向上のため改訂されることがあります。
 
+このような学習テキストを生成するためのスキルも公開しています。詳細は [GitHub リポジトリ](https://github.com/reki2000/genai-textbooks) をご覧ください。
+
 <!-- BEGIN GENERATED CATALOG -->
 <!-- END GENERATED CATALOG -->
