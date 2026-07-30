@@ -305,8 +305,6 @@ def render_sidebar(
     lines = [
         "<!-- Generated from docs/**/catalog.yml. Do not edit directly. -->",
         "",
-        f"- [🏠 トップ]({SITE_BASE_PATH}/)",
-        "",
     ]
     for category, category_documents in documents_by_category(categories, documents):
         lines.append(f"- {category['title']}")
@@ -388,6 +386,24 @@ def render_book_extra_head(document: dict[str, Any]) -> str:
     )
 
 
+def render_site_extra_head() -> str:
+    url = SITE_URL + "/"
+    return (
+        f'  <link rel="canonical" href="{url}">\n'
+        f'  <meta name="keywords" content="やる夫,教科書,生成AI,対話形式,再発見学習">\n'
+        f'  <meta property="og:type" content="website">\n'
+        f'  <meta property="og:site_name" content="{SITE_TITLE}">\n'
+        f'  <meta property="og:title" content="{SITE_TITLE}">\n'
+        f'  <meta property="og:description" content="{SITE_DESCRIPTION}">\n'
+        f'  <meta property="og:url" content="{url}">\n'
+        f'  <meta name="twitter:card" content="summary">\n'
+    )
+
+
+def render_not_found_extra_head() -> str:
+    return '  <meta name="robots" content="noindex">\n'
+
+
 def render_sitemap(documents: list[dict[str, Any]]) -> str:
     urls = [SITE_URL + "/"] + [page_url(document) for document in documents]
     lines = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
@@ -414,8 +430,8 @@ def generate(categories: list[dict[str, Any]], documents: list[dict[str, Any]], 
 
     write_file(out_docs / "_sidebar.md", sidebar)
     write_file(out_docs / "README.md", top_page)
-    write_file(out_docs / "index.html", render_shell(SITE_TITLE, SITE_DESCRIPTION))
-    write_file(out_docs / "404.html", render_shell(SITE_TITLE, SITE_DESCRIPTION))
+    write_file(out_docs / "index.html", render_shell(SITE_TITLE, SITE_DESCRIPTION, render_site_extra_head()))
+    write_file(out_docs / "404.html", render_shell(SITE_TITLE, SITE_DESCRIPTION, render_not_found_extra_head()))
 
     for document in documents:
         relative_path = Path(document["path"].removeprefix("/")) / "index.html"
