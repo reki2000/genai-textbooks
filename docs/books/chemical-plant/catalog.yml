@@ -1,7 +1,6 @@
 documents:
 - id: chemical-plant
   title: やる夫が新型電池を量産するそうです
-  path: /books/chemical-plant
   category: engineering
   created: '2026-07-19T07:45:15+00:00'
   question: フラスコで一度成功した反応を、そのまま巨大工場で再現できないのはなぜか──その反応、工場になるのか。

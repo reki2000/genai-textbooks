@@ -1,7 +1,6 @@
 documents:
 - id: energy-policy
   title: やる夫が夢見るエネルギー政策
-  path: /books/energy-policy
   category: society
   created: '2026-07-07T09:17:26+09:00'
   question: 安さ、安定供給、脱炭素、安全保障を同時に満たすエネルギーミックスはどう設計できるのか。

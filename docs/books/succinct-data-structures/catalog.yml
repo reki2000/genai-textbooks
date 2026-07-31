@@ -1,0 +1,7 @@
+documents:
+- id: succinct-data-structures
+  title: やる夫が1ビットも無駄にできないようです
+  category: math-information
+  created: '2026-08-01T05:35:12+09:00'
+  question: 情報理論上の最小容量に近づきながら、巨大なデータを展開せず高速に検索・走査するにはどう表現すればよいのか。
+  plot: 512MBの防災端末へ1億件を収めようとして失敗したやる夫が、rank・select、Elias–Fano、簡潔木、wavelet matrix、FM-indexを組み立て、圧縮率・更新・実機性能のトレードオフを学ぶ。

@@ -1,7 +1,6 @@
 documents:
 - id: payroll-calculation
   title: やる夫の給与明細
-  path: /books/payroll-calculation
   category: society
   created: '2026-07-25T07:46:51+09:00'
   question: 昇給したのに手取りが減るのはなぜか、例外だらけの給与実務で何を払い、何を止め、誰へ渡せばよいのか。

@@ -1,7 +1,6 @@
 documents:
 - id: control-engineering
   title: やる夫が中国拳法で戦うロボットを作るようです
-  path: /books/control-engineering
   category: engineering
   created: '2026-07-22T10:55:08+00:00'
   question: 決めた通りに動くだけのロボットはなぜ倒れるのか、立つ・歩く・走る・跳ぶ・蹴る・転んで起き上がるを貫く制御の原理は何か。

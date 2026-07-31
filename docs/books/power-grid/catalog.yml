@@ -1,7 +1,6 @@
 documents:
 - id: power-grid
   title: やる夫で学ぶ電力系統
-  path: /books/power-grid
   category: engineering
   created: '2026-07-07T09:17:26+09:00'
   question: 電気を在庫できない社会で、需要と供給、周波数、安定度をどう保つのか。

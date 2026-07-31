@@ -1,0 +1,7 @@
+documents:
+- id: topological-sensor-coverage
+  title: やる夫が位相幾何学を応用するようです
+  category: math-information
+  created: '2026-08-01T05:34:03+09:00'
+  question: センサーの正確な座標や被覆地図がなくても、通信関係だけから監視領域の穴を検出し被覆を証明できるのか。
+  plot: 通信グラフの連結性だけで完全被覆を宣言したやる夫が、Čech複体とVietoris–Rips複体、ホモロジー、パーシステントホモロジー、相対基本類を組み立て、見えない被覆穴を線形代数で発見し塞いでいく。

@@ -1,7 +1,6 @@
 documents:
 - id: education
   title: やる夫が文部科学大臣になったようです
-  path: /books/education
   category: society
   created: '2026-07-05T18:29:34+09:00'
   question: 教育は予算や制度を増やせば良くなるのか、学力や格差を左右する要因は何か。

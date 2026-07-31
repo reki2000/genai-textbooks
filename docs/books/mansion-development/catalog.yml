@@ -1,7 +1,6 @@
 documents:
 - id: mansion-development
   title: やる夫がマンションを建てて50年経ったそうです
-  path: /books/mansion-development
   category: engineering
   created: '2026-07-19T07:50:14+00:00'
   question: 都心200戸のマンションは、企画・資金・法規・交渉・販売をどう経て決まり、50年後・80年後に何を住民へ残すのか。
