@@ -36,7 +36,7 @@ description: やる夫（生徒）とやらない夫（教師）の対話を通�
 | 目的 | 完成例 |
 |---|---|
 | 数式を丁寧に再発見する標準形 | `general-relativity` |
-| CS・機械学習の短い改善連鎖 | `weather-forcast` |
+| CS・機械学習の短い改善連鎖 | `weather-forecasting` |
 | 制度・社会科学、モラルハザードと数値検算 | `local-government` |
 | 歴史的失敗を巡る構成を講義にしない | `cold-medicine` |
 | 反復トイ例の育て方 | `economics-japan-bank` |

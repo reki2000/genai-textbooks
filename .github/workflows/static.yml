@@ -32,7 +32,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Build site from catalog
+      - name: Build site from source files
         run: |
           python3 -m pip install -r requirements-dev.txt
           python3 scripts/generate_site.py
@@ -47,7 +47,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Generate site from catalog
+      - name: Generate site from source files
         run: |
           python3 -m pip install -r requirements-dev.txt
           python3 scripts/generate_site.py

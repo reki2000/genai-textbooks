@@ -57,6 +57,7 @@ END_MARKER = "<!-- END GENERATED CATALOG -->"
 # (part 1), README.2.md (part 2), README.3.md (part 3), ... Numbering must
 # start at 1 and be contiguous; see docs/BUILD.md.
 PART_FILE_PATTERN = re.compile(r"^README(?:\.(?P<n>[1-9][0-9]*))?\.md$")
+DOCUMENT_ID_PATTERN = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 
 _ROMAN_NUMERAL_TABLE: tuple[tuple[int, str], ...] = (
     (1000, "M"), (900, "CM"), (500, "D"), (400, "CD"),
@@ -167,12 +168,10 @@ def load_catalog() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
         category_orders.add(order)
 
     document_ids: set[str] = set()
-    document_paths: set[str] = set()
     registered_files: set[Path] = set()
     required_document_fields = (
         "id",
         "title",
-        "path",
         "category",
         "created",
         "question",
@@ -183,38 +182,40 @@ def load_catalog() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     ):
         document = require_mapping(raw_document, f"documents[{index}]")
         require_fields(document, required_document_fields, f"documents[{index}]")
+        unknown_fields = sorted(set(document) - set(required_document_fields))
+        if unknown_fields:
+            fail(
+                f"documents[{index}] has unknown fields: "
+                f"{', '.join(unknown_fields)}"
+            )
         document_id = document["id"]
-        path = document["path"]
         category_id = document["category"]
-        if not isinstance(document_id, str) or not document_id:
-            fail(f"documents[{index}].id must be a non-empty string")
+        if not isinstance(document_id, str) or not DOCUMENT_ID_PATTERN.fullmatch(
+            document_id
+        ):
+            fail(
+                f"documents[{index}].id must contain only lowercase ASCII "
+                "letters, digits, and single hyphens"
+            )
         for field in ("title", "question", "plot"):
             if not isinstance(document[field], str) or not document[field]:
                 fail(f"document {document_id} has an invalid {field}")
         if document_id in document_ids:
             fail(f"duplicate document id: {document_id}")
-        if not isinstance(path, str) or not path.startswith("/books/"):
-            fail(f"document {document_id} has an invalid path: {path!r}")
-        if path in document_paths:
-            fail(f"duplicate document path: {path}")
         if category_id not in category_ids:
             fail(f"document {document_id} references unknown category: {category_id}")
         parse_created(document["created"], f"document {document_id}.created")
-        relative_path = Path(path.removeprefix("/"))
-        if ".." in relative_path.parts or relative_path.suffix:
-            fail(f"document {document_id} has an unsafe path: {path!r}")
-        source_path = ROOT / "docs" / relative_path / "README.md"
-        if not source_path.is_file():
-            fail(f"document {document_id} points to missing file: {source_path}")
-        expected_catalog_path = source_path.parent / CATALOG_NAME
+        expected_catalog_path = BOOKS_DIR / document_id / CATALOG_NAME
         if catalog_path != expected_catalog_path:
             fail(
                 f"document {document_id} must be defined in "
                 f"{expected_catalog_path.relative_to(ROOT)}, not "
                 f"{catalog_path.relative_to(ROOT)}"
             )
+        source_path = expected_catalog_path.parent / "README.md"
+        if not source_path.is_file():
+            fail(f"document {document_id} points to missing file: {source_path}")
         document_ids.add(document_id)
-        document_paths.add(path)
         registered_files.add(source_path.resolve())
 
     actual_files = {path.resolve() for path in (ROOT / "docs" / "books").glob("*/README.md")}
@@ -248,10 +249,14 @@ def documents_by_category(
     return [(category, grouped[category["id"]]) for category in categories]
 
 
+def document_path(document: dict[str, Any]) -> str:
+    return f"/books/{document['id']}"
+
+
 def discover_parts(document: dict[str, Any]) -> list[Path]:
     """Ordered part files for a document: README.md, README.2.md, README.3.md,
     ... Numbering must start at 1 and be contiguous."""
-    directory = ROOT / "docs" / document["path"].removeprefix("/")
+    directory = BOOKS_DIR / document["id"]
     numbered: dict[int, Path] = {}
     for candidate in directory.glob("README*.md"):
         match = PART_FILE_PATTERN.match(candidate.name)
@@ -277,7 +282,7 @@ def page_url(document: dict[str, Any]) -> str:
     directory + index.html layout, since GitHub Pages (no Jekyll pretty URLs)
     only resolves extensionless paths via directory + index.html, not via
     filename-without-extension lookup."""
-    return f"{SITE_URL}{document['path']}/"
+    return f"{SITE_URL}{document_path(document)}/"
 
 
 def nav_href(document: dict[str, Any]) -> str:
@@ -286,7 +291,7 @@ def nav_href(document: dict[str, Any]) -> str:
     carry the full subpath (/genai-textbooks/...); a bare /books/... link would
     drop the subpath on client-side navigation and 404. The trailing slash
     loads docs/books/<id>/README.md via docsify's directory convention."""
-    return f"{SITE_BASE_PATH}{document['path']}/"
+    return f"{SITE_BASE_PATH}{document_path(document)}/"
 
 
 def part_href(document: dict[str, Any], part_index: int) -> str:
@@ -296,7 +301,7 @@ def part_href(document: dict[str, Any], part_index: int) -> str:
     README.N.md the same way it already resolves any other clean route."""
     if part_index == 0:
         return nav_href(document)
-    return f"{SITE_BASE_PATH}{document['path']}/README.{part_index + 1}"
+    return f"{SITE_BASE_PATH}{document_path(document)}/README.{part_index + 1}"
 
 
 def render_sidebar(
@@ -434,7 +439,7 @@ def generate(categories: list[dict[str, Any]], documents: list[dict[str, Any]], 
     write_file(out_docs / "404.html", render_shell(SITE_TITLE, SITE_DESCRIPTION, render_not_found_extra_head()))
 
     for document in documents:
-        relative_path = Path(document["path"].removeprefix("/")) / "index.html"
+        relative_path = Path(document_path(document).removeprefix("/")) / "index.html"
         page_title = f"{document['title']} - {SITE_TITLE}"
         page = render_shell(page_title, document["question"], render_book_extra_head(document))
         write_file(out_docs / relative_path, page)
