@@ -31,42 +31,80 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
 @@EXTRA_HEAD@@  <style>
-    #mobile-sidebar-toggle {
+    /* Move docsify's sidebar toggle from the bottom-left to the top-left, push
+       the sidebar content down so the site name clears it, and render it as a
+       compact button with white bars on a theme-colored background. */
+    .sidebar-toggle,
+    body.close .sidebar-toggle {
+      top: 0;
+      bottom: auto;
+      width: auto;
+      padding: 14px 16px 14px 14px;
+      background-color: var(--theme-color, #42b983);
+      border-bottom-right-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    }
+
+    .sidebar-toggle span {
+      background-color: #fff;
+    }
+
+    .sidebar {
+      padding-top: 76px;
+    }
+
+    /* Drag handle between the sidebar and the content (desktop only). */
+    #sidebar-resizer {
       display: none;
     }
 
-    @media (max-width: 768px) {
-      #mobile-sidebar-toggle {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
+    @media (min-width: 769px) {
+      .sidebar {
+        width: var(--sidebar-width, 300px);
+      }
+
+      .content {
+        left: var(--sidebar-width, 300px);
+      }
+
+      body.close .sidebar {
+        transform: translateX(calc(-1 * var(--sidebar-width, 300px)));
+      }
+
+      #sidebar-resizer {
+        display: block;
         position: fixed;
-        left: 1rem;
-        top: 1rem;
-        z-index: 1000;
-        padding: 0.8rem 1rem;
-        border: 0;
-        border-radius: 999px;
-        background: #2563eb;
-        color: #fff;
-        box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25);
-        font-size: 0.95rem;
-        font-weight: 700;
-        line-height: 1;
+        top: 0;
+        bottom: 0;
+        left: calc(var(--sidebar-width, 300px) - 3px);
+        width: 6px;
+        z-index: 25;
+        cursor: col-resize;
+        touch-action: none;
       }
 
-      #mobile-sidebar-toggle:hover {
-        background: #1d4ed8;
+      #sidebar-resizer:hover,
+      body.resizing #sidebar-resizer {
+        background-color: var(--theme-color, #42b983);
+        opacity: 0.35;
       }
 
-      #mobile-sidebar-toggle .icon {
-        font-size: 1.1rem;
+      body.close #sidebar-resizer {
+        display: none;
       }
 
-      .sidebar-toggle {
-        display: none !important;
+      body.resizing {
+        cursor: col-resize;
+        user-select: none;
       }
 
+      body.resizing .sidebar,
+      body.resizing .content {
+        transition: none;
+      }
+    }
+
+    @media (max-width: 768px) {
       .markdown-section {
         max-width: 95%;
       }
@@ -101,37 +139,80 @@
   <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-python.min.js"></script>
   <script>
-    function addMobileSidebarButton() {
-      if (document.getElementById('mobile-sidebar-toggle')) {
-        return
+    // Drag the border between the sidebar and the content to resize it.
+    // The width lives in --sidebar-width and is remembered per browser.
+    (function () {
+      const MIN_WIDTH = 180
+      const MAX_WIDTH = 640
+      const STORAGE_KEY = 'sidebarWidth'
+
+      function setWidth(width) {
+        document.documentElement.style.setProperty('--sidebar-width', width + 'px')
       }
 
-      const toggle = document.querySelector('.sidebar-toggle')
-      if (!toggle) {
-        setTimeout(addMobileSidebarButton, 200)
-        return
+      let width = 300
+      try {
+        const stored = parseInt(localStorage.getItem(STORAGE_KEY), 10)
+        if (stored >= MIN_WIDTH && stored <= MAX_WIDTH) {
+          width = stored
+          setWidth(width)
+        }
+      } catch (error) {
+        // localStorage can be unavailable (private mode); fall back to default.
       }
 
-      const button = document.createElement('button')
-      button.id = 'mobile-sidebar-toggle'
-      button.type = 'button'
-      button.setAttribute('aria-label', '目次を開く')
-      button.innerHTML = '<span>目次</span>'
-      button.addEventListener('click', function (event) {
+      const resizer = document.createElement('div')
+      resizer.id = 'sidebar-resizer'
+      document.body.appendChild(resizer)
+
+      let dragging = false
+
+      resizer.addEventListener('pointerdown', function (event) {
+        dragging = true
+        resizer.setPointerCapture(event.pointerId)
+        document.body.classList.add('resizing')
         event.preventDefault()
-        event.stopPropagation()
-        document.body.classList.toggle('close')
       })
 
-      document.body.appendChild(button)
-    }
+      resizer.addEventListener('pointermove', function (event) {
+        if (!dragging) {
+          return
+        }
+        width = Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, Math.round(event.clientX)))
+        setWidth(width)
+      })
 
-    window.addEventListener('load', function () {
-      addMobileSidebarButton()
+      function stopDragging() {
+        if (!dragging) {
+          return
+        }
+        dragging = false
+        document.body.classList.remove('resizing')
+        try {
+          localStorage.setItem(STORAGE_KEY, String(width))
+        } catch (error) {
+          // Ignore storage failures; the width still applies for this session.
+        }
+      }
+
+      resizer.addEventListener('pointerup', stopDragging)
+      resizer.addEventListener('pointercancel', stopDragging)
+    })()
+  </script>
+  <script>
+    // On mobile the sidebar is shown by `body.close`; close it after picking an
+    // entry. docsify only does this by itself below 600px, but our layout keeps
+    // the mobile sidebar up to 768px.
+    document.addEventListener('click', function (event) {
+      if (window.innerWidth > 768) {
+        return
+      }
+      const target = event.target
+      if (!target || !target.closest || !target.closest('.sidebar a')) {
+        return
+      }
+      document.body.classList.remove('close')
     })
-    document.addEventListener('DOMContentLoaded', function () {
-      addMobileSidebarButton()
-    });
   </script>
 </body>
 
