@@ -427,7 +427,9 @@ $$\mu([0,1])=\sum_{x\in[0,1]}\mu({x})$$
 **やる夫**：
 有理数は、
 
-$$\mathbb{Q}=\left{\frac{p}{q}\mid p,q\in\mathbb{Z},q\neq0\right}$$
+$$
+\mathbb{Q}=\frac{p}{q}\mid p,q\in\mathbb{Z},q\neq0
+$$
 
 だお。
 任意の有理数 $a<b$ の間には、
