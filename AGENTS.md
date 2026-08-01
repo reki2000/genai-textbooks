@@ -16,7 +16,6 @@ categories:
 ```yaml
 documents:
   - id: japan-food
-    title: やる夫と牛丼と食料政策
     category: social
     created: '2026-07-16T12:10:45+00:00'
     question: 食料自給率を上げれば本当に安全なのか？
@@ -24,6 +23,7 @@ documents:
 ```
 
 教材の公開パスは `id` から `/books/{ID}` として自動生成される。
+教材タイトルは `catalog.yml` ではなく、`README.md` の先頭行にある `# ` 見出しを用いる。
 
 `created` には、旧 `docs/books/{ID}.md` と現行の本文パスを含む Git 履歴上の初出コミット日時を設定する。教材はカテゴリ内で `created` の昇順に表示し、同一日時の場合は `id` の昇順。
 

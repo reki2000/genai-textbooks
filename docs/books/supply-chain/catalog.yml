@@ -1,6 +1,5 @@
 documents:
 - id: supply-chain
-  title: やる夫が全世界同時発売したいようです
   category: engineering
   created: '2026-08-01T05:49:06+09:00'
   question: 地域の小さな製品を世界同時発売し、需要変動や災害にも耐えて届け続ける供給網はどう設計・運営すればよいのか。

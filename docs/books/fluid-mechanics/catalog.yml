@@ -1,6 +1,5 @@
 documents:
 - id: fluid-mechanics
-  title: やる夫で学ぶ流体力学 ── 水と空気の法則を再発見する
   category: natural-science
   created: '2026-08-01T05:41:33+09:00'
   question: 水や空気の複雑な運動を、質量・運動量・エネルギーの保存と粘性からどう記述し、装置の挙動へ結びつけるのか。

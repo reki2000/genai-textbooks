@@ -29,6 +29,7 @@ build/                 ← 生成ファイル（git 除外）
 
 - `docs/**/catalog.yml` を `scripts/generate_site.py` がビルド時に統合し、`docs/` のソースを `build/` にコピーして生成ファイルを追加・上書き
 - カテゴリは `docs/catalog.yml`、教材情報は対応する `docs/books/{id}/catalog.yml` に置く
+- 教材のタイトルは `catalog.yml` には書かず、本文 `README.md` の先頭行にある `# ` 見出しから取得する
 - 教材の `created` には、旧 `docs/books/{id}.md` と現行パスを含む Git 履歴上の初出コミット日時をタイムゾーン付き ISO 8601 形式で記録し、カテゴリ内ではその昇順（同一日時は `id` の昇順）で表示する
 - 教材の公開パスは `id` から `/books/{id}` として自動生成する
 - 教材情報を `docs/books/{id}/catalog.yml` 以外に置いた場合や、IDが重複した場合はビルドエラー
@@ -56,7 +57,23 @@ docs/books/{id}/
 
 ## 開発時の手順
 
-### ローカルビルド
+### 開発サーバ（推奨）
+
+以下を実行し、表示された URL をブラウザで開く：
+
+```bash
+python3 scripts/dev_server.py
+```
+
+`docs/`、サイト生成スクリプト、テンプレートを監視し、変更すると自動的に再ビルドしてブラウザを再読み込みする。ビルドエラーが起きた場合は、ターミナルにエラーを表示したまま直前の正常なプレビューを維持し、次の変更時に再試行する。
+
+標準では `127.0.0.1:3000` を使用する。変更する場合：
+
+```bash
+python3 scripts/dev_server.py --host 0.0.0.0 --port 8000
+```
+
+### 手動ビルド
 
 教材ファイルを編集したら必ず実行：
 
@@ -64,7 +81,7 @@ docs/books/{id}/
 python3 scripts/generate_site.py
 ```
 
-### ローカル確認
+### 手動でのローカル確認
 
 ```bash
 npx docsify serve build

@@ -77,7 +77,7 @@ Bには大きな気泡があり、中央部には柔らかい未硬化部分も�
 被着材が引っ張られれば、接着層も変形する。
 厚い層では変形量が大きくなり、内部応力や端部の変形も変わる。
 薄すぎれば表面の凹凸を埋められず、厚すぎれば気泡、収縮、変形、硬化不均一が問題になる。
-最適値は接着剤と継手によって違う。
+最適値は接着剤と継手によって違う。[^5]
 
 **やる夫**：
 接着剤を選ぶだけではなく、厚さまで設計変数なのかお。
@@ -227,7 +227,7 @@ Hは位置を保った。
 
 **やる夫**：
 黒い石みたいな塊が入ってるお。
-ラベルには、火より古い接着、とだけ書いてある。
+ラベルには、石器時代の樺皮タールを思わせる接着標本、とだけ書いてある。[^1][^2]
 最先端を探しているのに、いきなり石器時代へ戻るのかお。
 
 **やらない夫**：
@@ -410,7 +410,7 @@ UGの発売日は少し延期だお。
 
 **やらない夫**：
 その考えを、ペタゴンの接着剤面に書け。
-接着剤は単一成分ではなく、母材樹脂、硬化に関わる成分、靱性を与える成分、粘度を整える成分、充填材などが役割を分担する配合物だ。
+接着剤は単一成分ではなく、母材樹脂、硬化に関わる成分、靱性を与える成分、粘度を整える成分、充填材などが役割を分担する配合物だ。[^8]
 ただし物質名を暗記しても設計にはならない。
 何を変えるために入れるかを理解しろ。
 
@@ -638,7 +638,7 @@ Sは広い範囲が伸び、変形し、熱としてエネルギーを失って�
 
 **やらない夫**：
 材料の応答は、荷重の大きさだけでなく時間に依存する。
-短時間ではばねのように戻り、長時間では液体のように流れる性質を粘弾性という。
+短時間ではばねのように戻り、長時間では液体のように流れる性質を粘弾性という。[^7]
 
 **やる夫**：
 同じ接着剤でも、速く引けば硬く見え、ゆっくり引けば柔らかく見えることがあるお。
@@ -864,7 +864,7 @@ MはHより変形し、Lより荷重を支え、亀裂も途中で曲がった�
 試験までの保管時間も違うお。
 
 **やらない夫**：
-接着剤の性能と、接着工程の能力を混同するな。
+接着剤の性能と、接着工程の能力を混同するな。[^3][^6]
 材料メーカーが理想条件で得た性能を、現場工程が再現できるとは限らない。
 
 **やる夫**：
@@ -1141,7 +1141,7 @@ Fの破断面が妙にきれいだお。
 処理後に汚染させれば元へ戻る。
 
 **やる夫**：
-表面処理の順番、処理から接着までの待ち時間、保管方法、触れてよい道具まで工程になるお。
+表面処理の順番、処理から接着までの待ち時間、保管方法、触れてよい道具まで工程になるお。[^3][^4]
 表面は材料名だけでは決まらず、履歴を持つんだお。
 
 **やらない夫**：
@@ -1408,7 +1408,7 @@ $$
 **やらない夫**：
 検査で品質を作ることはできない。
 検査は工程から漏れた異常を見つける最後の網だ。
-最も確実なのは、欠陥を作りにくい工程を管理することだ。
+最も確実なのは、欠陥を作りにくい工程を管理することだ。[^6]
 
 **やる夫**：
 表面状態は接着後に直接確認しにくい。
@@ -1699,14 +1699,15 @@ Nは許容変位内。
 
 ---
 
-## 参考資料
+## 参考文献
 
 本作は学習用フィクションであり、個別の接着作業手順を示すものではない。構造接着では、対象製品に適用される規格、材料メーカーの技術資料、認定済み工程、安全データ、および有資格者の判断を優先すること。
 
-1. Niekus, M. J. L. Th. et al., “Middle Paleolithic complex technology and a Neandertal tar-backed tool from the Dutch North Sea,” *Proceedings of the National Academy of Sciences*, 2019. 先史時代の樺皮タールと石器固定に関する研究。
-2. Schmidt, P. et al., “On the performance of birch tar made with different techniques,” *Heritage Science*, 2021. 樺皮タールの接着性能を重ねせん断試験で比較した研究。
-3. NASA, *Process Specification for Adhesive Bonding*, PRC-1001. 接着工程、表面処理、材料管理、硬化管理に関する工程仕様。
-4. Palmieri, F. L. et al., *Surface Preparation and Bonding on Aerospace Composite Materials*, NASA, 2013. 再現性のある接着における表面処理の重要性を扱う。
-5. Hart-Smith, L. J., *Analysis and Design of Advanced Composite Bonded Joints*, NASA, 1974. 単純重ね、2重重ね、スカーフ、段付き継手などの解析と設計。
-6. Kutscha, E. O., *Robust Bonding Through Process Control*, NASA, 2018. 完成後検査だけでなく工程管理によって接着品質を保証する考え方。
-7. Sun, S. et al., “A review on mechanical properties of pressure sensitive adhesives,” *International Journal of Adhesion and Adhesives*, 2013. 感圧接着剤の粘着、せん断保持、剥離と粘弾性の関係を整理したレビュー。
+[^1]: Niekus, M. J. L. Th. et al., “Middle Paleolithic complex technology and a Neandertal tar-backed tool from the Dutch North Sea,” *Proceedings of the National Academy of Sciences*, 2019. 先史時代に樺皮タールを用いて石器を固定した事例を報告する。本文第2幕の標本の導入に対応する。
+[^2]: Schmidt, P. et al., “On the performance of birch tar made with different techniques,” *Heritage Science*, 2021. 樺皮タールの製法による接着性能を重ねせん断試験で比較した研究。本文第2幕の古代接着剤の性能比較に対応する。
+[^3]: NASA, *Process Specification for Adhesive Bonding*, PRC-1001. 接着工程、表面処理、材料管理、硬化管理に関する工程仕様。本文第5幕および第7幕の再現可能な工程管理に対応する。
+[^4]: Palmieri, F. L. et al., *Surface Preparation and Bonding on Aerospace Composite Materials*, NASA, 2013. 再現性のある接着における表面処理と保管管理の重要性を扱う。本文第7幕の表面状態の議論に対応する。
+[^5]: Hart-Smith, L. J., *Analysis and Design of Advanced Composite Bonded Joints*, NASA, 1974. 単純重ね、2重重ね、スカーフ、段付き継手などの解析と設計を扱う。本文第1幕および第8幕の継手形状の議論に対応する。
+[^6]: Kutscha, E. O., *Robust Bonding Through Process Control*, NASA, 2018. 完成後検査だけでなく工程管理によって接着品質を保証する考え方を扱う。本文第5幕および第8幕の品質保証に対応する。
+[^7]: Sun, S. et al., “A review on mechanical properties of pressure sensitive adhesives,” *International Journal of Adhesion and Adhesives*, 2013. 感圧接着剤の粘着、せん断保持、剥離と粘弾性の関係を整理したレビュー。本文第4幕に対応する。
+[^8]: Kinloch, A. J., *Adhesion and Adhesives: Science and Technology*, Chapman and Hall, 1987. ぬれ、界面、破壊靱性、接着継手の力学を体系的に扱う。本文第1幕、第4幕、第7幕の、強度を単一の材料定数ではなく界面と亀裂進展の問題として扱う議論に対応する。

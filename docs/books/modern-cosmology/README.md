@@ -1,4 +1,4 @@
-# やる夫で学ぶ現代宇宙論――宇宙の履歴を再発明する
+# やる夫で学ぶ現代宇宙論 ── 宇宙の履歴を再発明する
 
 ---
 
@@ -1672,7 +1672,7 @@ $r_s$ と $D_A$ を同時に変えて同じ $\theta_*$ を作れる。
 テンソル摂動、つまり原始重力波はBモードを作りうるけど、後期宇宙の重力レンズもEをBへ変換するお。
 
 **やらない夫**：
-だからBモードを見つけたら即インフレーション重力波、とは言えない。
+だからBモードを見つけたら即インフレーション重力波、とは言えない。[^2]
 前景放射とレンズBモードを分離する必要がある。
 
 **やる夫**：
@@ -1681,7 +1681,7 @@ CMB1枚の中に、バリオン密度、暗黒物質密度、初期スペクト�
 
 **できる子**：
 ただし模型依存。
-6パラメータ $\Lambda$CDM 内で高精度。
+6パラメータ $\Lambda$CDM 内で高精度。[^1]
 模型を拡張すれば誤差と縮退は増える。
 
 **やる夫**：
@@ -2358,8 +2358,8 @@ $\Lambda$CDMを越える初期または後期宇宙の物理。
 
 **できる子**：
 JWSTはセファイド混雑誤差の一部を検査した。
-HST距離梯子を支持する解析もある。
-TRGB・JAGBを用いる解析は、より中間的な値を与えることがある。
+HST距離梯子を支持する解析もある。[^4]
+TRGB・JAGBを用いる解析は、より中間的な値を与えることがある。[^5]
 結論は方法依存性を含む。
 
 **やる夫**：
@@ -2392,7 +2392,7 @@ CMBから $\Lambda$CDMで後期へ外挿した値と、一部の弱レンズ・�
 
 **やる夫**：
 解析する尺度、非線形物理、銀河固有形状、測光赤方偏移、バリオンフィードバックで結果が変わる。
-新しい大規模解析ではCMBとの整合性が改善する場合もあり、全観測が同じ有意な不一致を示すわけではないお。
+新しい大規模解析ではCMBとの整合性が改善する場合もあり、全観測が同じ有意な不一致を示すわけではないお。[^6]
 
 **やらない夫**：
 よし。
@@ -2400,7 +2400,7 @@ CMBから $\Lambda$CDMで後期へ外挿した値と、一部の弱レンズ・�
 
 **やる夫**：
 多数の銀河とクエーサーの3次元分布から、複数赤方偏移のBAO尺度を高精度で測る。
-CMBや超新星と組み合わせて $w_0w_a$ 模型を当てると、データ組合せによっては $w=-1$ の宇宙定数から時間変化する暗黒エネルギーを好む兆候が出るお。
+CMBや超新星と組み合わせて $w_0w_a$ 模型を当てると、データ組合せによっては $w=-1$ の宇宙定数から時間変化する暗黒エネルギーを好む兆候が出るお。[^3]
 
 **やらない夫**：
 それで宇宙定数は棄却されたか。
@@ -2611,11 +2611,11 @@ $$S_8=\sigma_8\sqrt{\frac{\Omega_m}{0.3}}$$
 
 ---
 
-## 参考資料
+## 参考文献
 
-1. Planck Collaboration, *Planck 2018 results. VI. Cosmological parameters*, Astronomy & Astrophysics 641, A6 (2020), arXiv:1807.06209.
-2. Planck Collaboration, *Planck 2018 results. X. Constraints on inflation*, Astronomy & Astrophysics 641, A10 (2020), arXiv:1807.06211.
-3. DESI Collaboration, *DESI DR2 Results II: Measurements of Baryon Acoustic Oscillations and Cosmological Constraints*, arXiv:2503.14738.
-4. A. G. Riess et al., *JWST Validates HST Distance Measurements: Selection of Supernova Subsample Explains Differences in JWST Estimates of Local H0*, arXiv:2408.11770.
-5. W. L. Freedman et al., *Status Report on the Chicago-Carnegie Hubble Program: Three Independent Astrophysical Determinations of the Hubble Constant Using the James Webb Space Telescope*, arXiv:2408.06153.
-6. B. Stölzner et al., *KiDS-Legacy: Consistency of cosmic shear measurements and joint cosmological constraints with DES Y3*, arXiv:2503.19442.
+[^1]: Planck Collaboration, *Planck 2018 results. VI. Cosmological parameters*, *Astronomy & Astrophysics* 641, A6 (2020), arXiv:1807.06209. 6パラメータの $\Lambda$CDM によるCMB温度・偏光データの宇宙論的パラメータ制約を示す。本文第6幕と第9幕の基準模型に対応する。
+[^2]: Planck Collaboration, *Planck 2018 results. X. Constraints on inflation*, *Astronomy & Astrophysics* 641, A10 (2020), arXiv:1807.06211. CMB温度・偏光データからインフレーション模型と原始揺らぎへの制約を検討する。本文第6幕と第7幕のBモード・原始重力波の注意に対応する。
+[^3]: DESI Collaboration, *DESI DR2 Results II: Measurements of Baryon Acoustic Oscillations and Cosmological Constraints*, arXiv:2503.14738. BAOの複数赤方偏移での測定と、CMB・超新星との組合せによる宇宙論的制約を報告する。本文第9幕の時間変化する暗黒エネルギーの兆候に対応する。
+[^4]: A. G. Riess et al., *JWST Validates HST Distance Measurements: Selection of Supernova Subsample Explains Differences in JWST Estimates of Local H0*, arXiv:2408.11770. JWST観測を用いて距離梯子の系統誤差を検討し、HST距離測定との整合性を論じる。本文第9幕のハッブル定数の距離梯子に対応する。
+[^5]: W. L. Freedman et al., *Status Report on the Chicago-Carnegie Hubble Program: Three Independent Astrophysical Determinations of the Hubble Constant Using the James Webb Space Telescope*, arXiv:2408.06153. JWSTを用いる複数の距離指標からハッブル定数を検討する。本文第9幕の独立な距離梯子の比較に対応する。
+[^6]: B. Stölzner et al., *KiDS-Legacy: Consistency of cosmic shear measurements and joint cosmological constraints with DES Y3*, arXiv:2503.19442. 宇宙せん断の解析と他の観測との整合性を検討する。本文第9幕の $S_8$ の緊張を単純化しない議論に対応する。

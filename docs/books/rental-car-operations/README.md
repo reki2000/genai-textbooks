@@ -1,6 +1,4 @@
-# やる夫がレンタカー業務を競争力に変えるようです
-
-## その事務作業、競争力になるかお？ ── 業務改善・BPR・失敗学・AI・究極のCoE
+# やる夫が最強のレンタカー業務をつくるようです ―― 業務改善・BPR・失敗学・AI・究極のCoE
 
 ---
 
@@ -851,7 +849,7 @@ Excelでできることと、Excelへ任せてよい責任は別だお。
 正しい式で間違った対象を集計することもあるお。
 
 **やらない夫**：
-計算式だけ直しても検証は終わらないと分かったな。
+計算式だけ直しても検証は終わらないと分かったな。[^ref-5]
 三つ目。
 遺伝学の論文に付属したExcelファイルでは、遺伝子記号が日付へ自動変換される誤りが広く見つかった。
 2016年の調査では、対象とした遺伝子リスト付きExcel論文のおよそ5本に1本に変換誤りがあった。[^ref-3]
@@ -1407,14 +1405,14 @@ Virginia Masonの医療現場では、職員が患者安全の懸念を報告し
 本人が最後に触ったから直接原因には見えるけど、同じ失敗を作る条件が仕事に埋まっているお。
 
 **やらない夫**：
-それを**潜在条件**と呼ぶ。
+それを**潜在条件**と呼ぶ。[^ref-11][^ref-12]
 人の操作は事故の直前に見えるから目立つ。
 だが再発防止で見るべきは、操作へ至る設計、負荷、情報、道具、権限だ。
 では顛末書は無意味か。
 
 **やる夫**：
 事実を時系列で残し、本人が見たものを知る資料にはなるお。
-でも謝罪文で終わらせず、「なぜその判断が合理的に見えたか」を調べるお。
+でも謝罪文で終わらせず、「なぜその判断が合理的に見えたか」を調べるお。[^ref-13]
 最初の失敗は、最後に触った人を原因そのものだと思ったことだお。
 残る疑問は、人の間違いにも種類があるのかだお。
 
@@ -2028,7 +2026,7 @@ PDFは変更履歴が残るなら不要かもしれないお。
 顧客に社内の分業を背負わせないお。
 
 **やらない夫**：
-古典的なBPRの例に、Fordの買掛金処理がある。
+古典的なBPRの例に、Fordの買掛金処理がある。[^ref-16][^ref-17]
 請求書、発注、受入を買掛部門が照合する仕事を、人員削減だけで改善しようとした。
 しかし比較対象のMazdaがはるかに少人数で処理しているのを見て、請求書を中心にした仕事そのものを見直し、発注と受入の情報をデータベースで一致させる方向へ再設計したと紹介されている。
 何が違う。
@@ -2604,7 +2602,7 @@ SlackのDM、担当者のメモ、備考の「特別対応」、ローカルExce
 **やる夫**：
 測定対象へ圧力をかけると、人は現実ではなく測定境界を動かすことがあるお。
 正本の件数を外部の総数と突合し、未登録需要も測る。
-KPIは人を裁く一枚の数字でなく、システムの能力不足を見つける道具にするお。
+KPIは人を裁く一枚の数字でなく、システムの能力不足を見つける道具にするお。[^ref-19]
 
 ---
 
@@ -2670,7 +2668,7 @@ Virginia MasonはToyota Production Systemを医療へ応用し、患者安全上
 事故件数と、危険を事故前に捕まえた報告件数を分けるお。
 
 **やらない夫**：
-Toyotaの現場で異常時に止める考えを、事務へ移すと何になる。
+Toyotaの現場で異常時に止める考えを、事務へ移すと何になる。[^ref-6]
 
 **やる夫**：
 請求差分、車両所在矛盾、契約外の処理を見つけた担当者が、納期を恐れず該当案件を止められることだお。
@@ -3717,7 +3715,7 @@ AIサービスが新モデルへ自動更新された。
 モデル変更時に何を固定し、何を試す。
 
 **やる夫**：
-出力スキーマ、許可コード、必須項目、エラー形式を固定する。
+出力スキーマ、許可コード、必須項目、エラー形式を固定する。[^ref-30]
 モデル・プロンプト・検索資料・評価データの版を記録する。
 変更前後で回帰試験し、一部案件へ段階展開するお。
 
@@ -3821,7 +3819,7 @@ AI確率だけで状態を確定しないお。
 第7幕を閉じろ。
 
 **やる夫**：
-AIはチャットの便利機能から業務へ出た瞬間、データ、評価、権限、説明、異議申立て、変更管理を背負うお。
+AIはチャットの便利機能から業務へ出た瞬間、データ、評価、権限、説明、異議申立て、変更管理を背負うお。[^ref-29]
 自由文の分類・抽出・下書きに使い、決定的な計算と高影響判断を規則と人で囲む。
 「人が最後に見る」「AIがそう言った」は責任設計の代わりにならないお。
 次は、AIだけでなくサービス自体が毎月変わる世界で、標準をどう生かすかだお。
@@ -6170,13 +6168,13 @@ AIへ全部聞いて、自動化の見積りをできる夫へ投げていたお
     PHEが公表した最大ファイルサイズ超過について、古いExcel形式の行数上限との関係を取材した二次資料である。
     本文では当局が確認した事実と報道による技術的説明を分け、単一原因へ過度に単純化しないようにした。
 
-5. U.S. Senate Permanent Subcommittee on Investigations, [JPMorgan Chase Whale Trades: A Case History of Derivatives Risks and Abuses](https://www.hsgac.senate.gov/wp-content/uploads/imo/media/doc/REPORT%20-%20JPMorgan%20Chase%20Whale%20Trades%20%284-11-13%29.pdf), 2013.
+[^ref-5]: U.S. Senate Permanent Subcommittee on Investigations, [JPMorgan Chase Whale Trades: A Case History of Derivatives Risks and Abuses](https://www.hsgac.senate.gov/wp-content/uploads/imo/media/doc/REPORT%20-%20JPMorgan%20Chase%20Whale%20Trades%20%284-11-13%29.pdf), 2013.
    モデル、スプレッドシート、リスク指標、ガバナンスを含む複合的な事例である。
    単一のセル誤りへ還元せず、データ、計算、承認、監視、目標の組合せを調べるための参考にした。
 
 #### 標準化、失敗学、安全
 
-6. Toyota Motor Corporation, [Toyota Production System: Evolution of the Toyota Production System](https://www.toyota-global.com/company/history_of_toyota/75years/data/automotive_business/production/system/change.html).
+[^ref-6]: Toyota Motor Corporation, [Toyota Production System: Evolution of the Toyota Production System](https://www.toyota-global.com/company/history_of_toyota/75years/data/automotive_business/production/system/change.html).
    ジャスト・イン・タイム、自働化、異常時に止める考えの歴史を示す企業資料である。
    本文では製造手法をそのまま事務へ移植せず、異常を流さない、見えるようにする、原因を除くという機能へ翻訳した。
 
@@ -6196,15 +6194,15 @@ AIへ全部聞いて、自動化の見積りをできる夫へ投げていたお
     1985年から1987年に起きた放射線治療装置の過剰照射事故を、ソフトウェア、インターフェース、調査、報告、組織の複数側面から検討した論文である。
     本文では、警告文を足すだけでなく、危険な状態を物理・論理的に成立させにくくする設計へつなげた。
 
-11. James Reason, *Human Error*, Cambridge University Press, 1990.
+[^ref-11]: James Reason, *Human Error*, Cambridge University Press, 1990.
     スリップ、ラプス、ミステイク等の区別や、個人だけでなくシステム条件を見るための基本文献である。
     本文の分類は、処分を自動決定する診断名ではなく、対策を選ぶための見取り図として使った。
 
-12. James Reason, *Managing the Risks of Organizational Accidents*, Ashgate, 1997.
+[^ref-12]: James Reason, *Managing the Risks of Organizational Accidents*, Ashgate, 1997.
     多層防護、潜在条件、組織事故を考える基礎文献である。
     いわゆるスイスチーズモデルを、穴を一列に描けば説明が終わる図ではなく、防護の設計と劣化を問う道具として扱った。
 
-13. Sidney Dekker, *The Field Guide to Understanding 'Human Error'*, 3rd ed., CRC Press, 2014.
+[^ref-13]: Sidney Dekker, *The Field Guide to Understanding 'Human Error'*, 3rd ed., CRC Press, 2014.
     事故後の知識で当時の行動を断罪する後知恵バイアスを避け、行為者に見えていた世界を再構成する考えの参考文献である。
 
 [^ref-14]: Post Office Horizon IT Inquiry, [Completed List of Issues](https://www.postofficehorizoninquiry.org.uk/publications/completed-list-issues).
@@ -6217,18 +6215,18 @@ AIへ全部聞いて、自動化の見積りをできる夫へ投げていたお
 
 #### BPR、流れ、測定
 
-16. Michael Hammer, James Champy, *Reengineering the Corporation: A Manifesto for Business Revolution*, HarperBusiness, 1993.
+[^ref-16]: Michael Hammer, James Champy, *Reengineering the Corporation: A Manifesto for Business Revolution*, HarperBusiness, 1993.
     Fordの買掛金処理、IBM Credit等、部門内の小改善を越えて業務を再設計する古典的事例の出典である。
     数値や劇的効果は版や二次資料で表現が異なるため、本文では特定の削減率を強調せず、照合の前提を変える、案件を一人が端から端まで扱うという設計原理を取り上げた。
 
-17. Michael Hammer, [Reengineering Work: Don't Automate, Obliterate](https://hbr.org/1990/07/reengineering-work-dont-automate-obliterate), Harvard Business Review, 1990.
+[^ref-17]: Michael Hammer, [Reengineering Work: Don't Automate, Obliterate](https://hbr.org/1990/07/reengineering-work-dont-automate-obliterate), Harvard Business Review, 1990.
     既存工程をそのまま高速化するのではなく、仕事の前提を問い直すBPRの原論文である。
 
 [^ref-18]: John D. C. Little, [A Proof for the Queuing Formula: L = λW](https://pubsonline.informs.org/doi/10.1287/opre.9.3.383), Operations Research 9(3), 1961.
     安定した系で、平均仕掛り、平均到着・処理率、平均滞留時間を結ぶLittleの法則の原典である。
     本文では単位と観測境界をそろえ、変動中の短い期間へ機械的に当てはめない注意を置いた。
 
-19. W. Edwards Deming, *Out of the Crisis*, MIT Press, 1986.
+[^ref-19]: W. Edwards Deming, *Out of the Crisis*, MIT Press, 1986.
     システム、変動、経営責任、数値目標の副作用を考える基本文献である。
     本文の共通原因・特殊原因、数値だけで管理する危険の背景とした。
 
@@ -6270,11 +6268,11 @@ AIへ全部聞いて、自動化の見積りをできる夫へ投げていたお
     2024年7月19日にWindowsホストへ影響したコンテンツ設定更新について、組織自身が技術的経緯と初期対策を説明した報告である。
     本文では、コード以外の設定・コンテンツ変更にも、段階配信、監視、停止、回復設計が必要だという例にした。
 
-29. National Institute of Standards and Technology, [AI Risk Management Framework (AI RMF 1.0)](https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf), 2023.
+[^ref-29]: National Institute of Standards and Technology, [AI Risk Management Framework (AI RMF 1.0)](https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf), 2023.
     AIリスクをGovern、Map、Measure、Manageの機能で扱う任意フレームワークである。
     本文の業務影響の把握、文脈別評価、継続監視、リスク対応の参考とした。
 
-30. National Institute of Standards and Technology, [Secure Software Development Framework (SSDF) Version 1.1](https://csrc.nist.gov/pubs/sp/800/218/final), 2022.
+[^ref-30]: National Institute of Standards and Technology, [Secure Software Development Framework (SSDF) Version 1.1](https://csrc.nist.gov/pubs/sp/800/218/final), 2022.
     安全なソフトウェア開発を組織的な実践へ落とす枠組みである。
     市民開発を無条件に禁止せず、リスクに応じて正式開発、レビュー、保護、対応を厚くする考えの参考とした。
 

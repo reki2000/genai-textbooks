@@ -1,6 +1,5 @@
 documents:
 - id: cryptography
-  title: やる夫が最強の暗号を作るようです
   category: math-information
   created: '2026-08-01T05:47:37+09:00'
   question: 攻撃者に方式を知られても秘密・真正性・完全性を守れる暗号システムは、どのような仮定と部品から組み立てられるのか。

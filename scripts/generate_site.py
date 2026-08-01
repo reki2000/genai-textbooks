@@ -116,6 +116,18 @@ def parse_created(value: Any, label: str) -> datetime:
     return created
 
 
+def title_from_source(source_path: Path, document_id: str) -> str:
+    """Return the title text from the first H1 line of a book source."""
+    first_line = source_path.read_text(encoding="utf-8").split("\n", 1)[0]
+    first_line = first_line.removeprefix("\ufeff")
+    if not first_line.startswith("# ") or not first_line[2:].strip():
+        fail(
+            f"document {document_id} must start with a non-empty level-1 "
+            f"heading: {source_path.relative_to(ROOT)}"
+        )
+    return first_line[2:].strip()
+
+
 def load_catalog() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     catalog_paths = sorted(DOCS_DIR.rglob(CATALOG_NAME))
     if not catalog_paths:
@@ -171,7 +183,6 @@ def load_catalog() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     registered_files: set[Path] = set()
     required_document_fields = (
         "id",
-        "title",
         "category",
         "created",
         "question",
@@ -197,7 +208,7 @@ def load_catalog() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
                 f"documents[{index}].id must contain only lowercase ASCII "
                 "letters, digits, and single hyphens"
             )
-        for field in ("title", "question", "plot"):
+        for field in ("question", "plot"):
             if not isinstance(document[field], str) or not document[field]:
                 fail(f"document {document_id} has an invalid {field}")
         if document_id in document_ids:
@@ -215,6 +226,7 @@ def load_catalog() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
         source_path = expected_catalog_path.parent / "README.md"
         if not source_path.is_file():
             fail(f"document {document_id} points to missing file: {source_path}")
+        document["title"] = title_from_source(source_path, document_id)
         document_ids.add(document_id)
         registered_files.add(source_path.resolve())
 
@@ -304,6 +316,13 @@ def part_href(document: dict[str, Any], part_index: int) -> str:
     return f"{SITE_BASE_PATH}{document_path(document)}/README.{part_index + 1}"
 
 
+def sidebar_title(document: dict[str, Any], multi_part: bool = False) -> str:
+    title = re.split(r"[―─]", document["title"], maxsplit=1)[0].rstrip()
+    if multi_part:
+        title = re.sub(r"\s+[IVXLCDM]+$", "", title)
+    return title
+
+
 def render_sidebar(
     categories: list[dict[str, Any]], documents: list[dict[str, Any]]
 ) -> str:
@@ -318,13 +337,14 @@ def render_sidebar(
             minutes = parts_reading_minutes(document)
             if len(parts) == 1:
                 lines.append(
-                    f"  - [{document['title']} ({minutes[0]}分)]({nav_href(document)})"
+                    f"  - [{sidebar_title(document)} ({minutes[0]}分)]({nav_href(document)})"
                 )
             else:
                 for index in range(len(parts)):
                     roman = to_roman(index + 1)
                     lines.append(
-                        f"  - [{document['title']} {roman}部({minutes[index]}分)]"
+                        f"  - [{sidebar_title(document, multi_part=True)} "
+                        f"{roman}部({minutes[index]}分)]"
                         f"({part_href(document, index)})"
                     )
         lines.append("")

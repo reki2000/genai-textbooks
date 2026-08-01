@@ -1,6 +1,5 @@
 documents:
 - id: railway-diaglam
-  title: やる夫が鉄道ダイヤを守るようです
   category: engineering
   created: '2026-07-31T21:53:23+09:00'
   question: 限られた線路・車両・乗務員で、安全を守りながら遅延と混乱を抑えるダイヤと運行管理はどう設計するのか。

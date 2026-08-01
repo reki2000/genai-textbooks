@@ -1,6 +1,5 @@
 documents:
 - id: orbital-mechanics-moon
-  title: やる夫で学ぶ軌道力学
   category: natural-science
   created: '2026-07-05T12:38:41+09:00'
   question: 月へ行って帰るには、なぜ一直線ではなく軌道を設計しなければならないのか。
