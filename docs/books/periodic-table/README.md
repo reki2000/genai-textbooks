@@ -245,7 +245,7 @@
 
 **やる夫**：
 違うお。
-四元素説は、物質を少数の言葉で語れる。
+4元素説は、物質を少数の言葉で語れる。
 でも何を混ぜれば何ができるか、何グラム増減するか、どうすれば元へ戻るかを言えない。
 間違っている場合に、間違いだと判定する方法もないお。
 
@@ -2492,7 +2492,7 @@ $$
 先代が出していた「賢者の石、製作承ります」の看板、あれは板がまだ丈夫だお。
 裏返して、こう書くお。
 
-**金は作れません**
+**金は作れません**。
 
 **やらない夫**：
 客が来ないだろう。
@@ -2500,7 +2500,7 @@ $$
 **やる夫**：
 その下に、小さく続きを書くお。
 
-**ただし、お手持ちの金が本物かどうかは調べます**
+**ただし、お手持ちの金が本物かどうかは調べます**。
 
 **やらない夫**：
 ……商売になるのか。
@@ -2548,7 +2548,7 @@ $$
 
 [^7]: Stanislao Cannizzaro, *Sunto di un corso di filosofia chimica*, 1858. アボガドロの考えを用いて原子量と分子量を整理し、19世紀中葉の化学式と原子量の混乱を解く重要な基礎となった。本文7幕に対応する。
 
-[^8]: J. R. Partington, *A Short History of Chemistry*, 3rd ed., Macmillan, 1957; Aaron J. Ihde, *The Development of Modern Chemistry*, Dover Publications, 1984. 四元素説、気体化学、フロギストン説、化学革命、原子論、周期律に至る歴史的経過の総合的な参照資料。
+[^8]: J. R. Partington, *A Short History of Chemistry*, 3rd ed., Macmillan, 1957; Aaron J. Ihde, *The Development of Modern Chemistry*, Dover Publications, 1984. 4元素説、気体化学、フロギストン説、化学革命、原子論、周期律に至る歴史的経過の総合的な参照資料。
 
 [^9]: Jöns Jacob Berzelius, “Essay on the Cause of Chemical Proportions, and on Some Circumstances Relating to Them,” *Annals of Philosophy*, 1813–1814. 元素のラテン名の頭文字（衝突する場合は二文字目を添える）を記号とする表記法を提案し、ドルトンの図形記号に代えて印刷可能な化学式の体系を与えた。本文7-1に対応する。
 

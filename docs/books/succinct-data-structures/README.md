@@ -648,7 +648,7 @@ $$
 問い合わせは、
 
 $$
-\operatorname{rank}_1(i) = S[\operatorname{super}(i)] + L[\operatorname{block}(i)] + \operatorname{popcount}(\operatorname{remainder}(i)) 
+\operatorname{rank}_1(i) = S[\operatorname{super}(i)] + L[\operatorname{block}(i)] + \operatorname{popcount}(\operatorname{remainder}(i))
 $$
 
 だお。
@@ -1416,7 +1416,7 @@ $n$ ノードならちょうど $2n$ ビットで表せるお。
 
 **やる夫**：
 $$
-\operatorname{excess}(i) = \operatorname{rank}_1(i)-\operatorname{rank}_0(i) 
+\operatorname{excess}(i) = \operatorname{rank}_1(i)-\operatorname{rank}_0(i)
 $$
 
 だお。
@@ -1922,7 +1922,7 @@ annb$aa
 $F$ は全文字を辞書順に並べた列になる。
 
 **やる夫**：
-この例なら、 
+この例なら、
 $$
 F=\texttt{aaabnn}
 $$

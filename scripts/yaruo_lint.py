@@ -462,6 +462,11 @@ def rule_table_delimiter(lines: list[str], result: Result) -> list[str]:
 
 FOOTNOTE_TAIL_RE = re.compile(r"\[\^[^]\n]+\]$")
 TERMINAL_CHARS = frozenset("。．.!！?？…")
+# 言いさし・場面転換の記号で終わる発言には句点を付けない。罫線の `──`(U+2500) だけ
+# でなく、ダッシュ `――`(U+2015)、`—`(U+2014)、`–`(U+2013)、波ダッシュ `〜`(U+301C)
+# も同じ用法で使われている。既存56冊では `──` 48件すべてが句点なしで、`――` も
+# 10対5で句点なしが多数だった。
+TRAILING_OFF_RE = re.compile(r"[─―—–〜~]+$")
 CLOSING_CHARS = frozenset("」』）】〕〉》〗〙〛")
 
 
@@ -522,7 +527,7 @@ def rule_dialogue_period(lines: list[str], result: Result) -> list[str]:
         end = _semantic_end(body)
         if not end:
             continue
-        if end.endswith("──") or end[-1] in TERMINAL_CHARS:
+        if TRAILING_OFF_RE.search(end) or end[-1] in TERMINAL_CHARS:
             continue
         if end[-1] in "、，,：:；;":
             result.add(
