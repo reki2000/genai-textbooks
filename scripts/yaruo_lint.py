@@ -461,6 +461,7 @@ def rule_table_delimiter(lines: list[str], result: Result) -> list[str]:
 # --------------------------------------------------------------------------
 
 FOOTNOTE_TAIL_RE = re.compile(r"\[\^[^]\n]+\]$")
+SCENE_TRANSITION_RE = re.compile(r"^〜〜\s*\S(?:.*\S)?\s*〜〜$")
 TERMINAL_CHARS = frozenset("。．.!！?？…")
 CLOSING_CHARS = frozenset("」』）】〕〉》〗〙〛")
 
@@ -506,7 +507,7 @@ def rule_dialogue_period(lines: list[str], result: Result) -> list[str]:
         stop = start + 1
         while stop < len(lines):
             body = split_eol(lines[stop])[0]
-            if stop in speakers or SECTION_LINE.match(body):
+            if stop in speakers or SECTION_LINE.match(body) or SCENE_TRANSITION_RE.match(body.strip()):
                 break
             stop += 1
 
@@ -720,8 +721,11 @@ def rule_notation(lines: list[str], result: Result) -> list[str]:
 # 節の解析（会話診断・構造検査の共通土台）
 # --------------------------------------------------------------------------
 
-HEADING_RE = re.compile(r"^(##|###)\s+(.+?)\s*$")
+HEADING_RE = re.compile(r"^(#{1,6})\s+(.+?)\s*$")
 FENCE_RE = re.compile(r"^\s*```")
+# 節として切り出す見出しレベル。`####` は既定では節にしないが、見出しである以上
+# 発言は終える（下記 parse_sections を参照）。
+DEFAULT_SECTION_LEVELS = ("##", "###")
 # 実効往復と会話量は主役2名だけで数える。これは解析ではなくルール側のフィルタ。
 LEAD_SPEAKERS = ("やる夫", "やらない夫")
 
@@ -734,6 +738,8 @@ class Section:
     speakers: list[str] = field(default_factory=list)
     speech_lines: list[int] = field(default_factory=list)
     speech_texts: list[str] = field(default_factory=list)
+    # 各発言の話者行の行番号（1始まり）。集計で証拠位置を示すために持つ。
+    speech_starts: list[int] = field(default_factory=list)
 
     def should_check(self) -> bool:
         if not self.speakers:
@@ -801,7 +807,14 @@ LEAD_SPEAKER_RE = re.compile(
 )
 
 
-def parse_sections(lines: list[str]) -> list[Section]:
+def parse_sections(
+    lines: list[str], levels: tuple[str, ...] = DEFAULT_SECTION_LEVELS
+) -> list[Section]:
+    """見出しで区切った節を返す。`levels` に無い見出しは節を切らない。
+
+    どのレベルであれ、見出し行は発言を終える。`####` を発言本文へ取り込むと、
+    その見出しの字数が直前の発言へ加算され、発言長の診断が狂うため。
+    """
     sections: list[Section] = []
     current: Section | None = None
     in_speech = False
@@ -812,10 +825,11 @@ def parse_sections(lines: list[str]) -> list[Section]:
             in_fence = not in_fence
         heading = HEADING_RE.match(body) if not in_fence else None
         if heading:
-            if current is not None:
-                sections.append(current)
-            current = Section(heading.group(1), heading.group(2), line_no)
             in_speech = False
+            if heading.group(1) in levels:
+                if current is not None:
+                    sections.append(current)
+                current = Section(heading.group(1), heading.group(2), line_no)
             continue
         if current is None:
             continue
@@ -824,6 +838,7 @@ def parse_sections(lines: list[str]) -> list[Section]:
             current.speakers.append(speaker.group(1))
             current.speech_lines.append(0)
             current.speech_texts.append("")
+            current.speech_starts.append(line_no)
             in_speech = True
             continue
         if in_speech:
@@ -1164,6 +1179,77 @@ def rule_dialogue_shape(lines: list[str], result: Result) -> list[str]:
 
 
 # --------------------------------------------------------------------------
+# --stats（受け入れレビューの横断表）
+# --------------------------------------------------------------------------
+#
+# yaruo-review の Step 2 が要求する横断表を、レビュアーが毎回その場限りの
+# スクリプトで出し直さないための集計。二者レビューで双方が同じ数字を見るための
+# 共通の土台でもある。
+#
+# **ここに載せるのは、話者行から機械的に確定する量だけとする。** 「承認語」
+# 「素朴案」のような語の一致で数えるものは、候補生成であって測定ではないので
+# 載せない。件数を主張にするには全件の目視が要る（yaruo-review/SKILL.md）。
+
+
+def _act_buckets(sections: list[Section]) -> list[tuple[str, list[Section]]]:
+    """`##` 見出しごとに、その配下の節をまとめる。発言の無い幕は落とす。"""
+    buckets: list[tuple[str, list[Section]]] = []
+    for section in sections:
+        if section.level == "##":
+            buckets.append((section.title, []))
+            continue
+        if buckets and section.speech_texts:
+            buckets[-1][1].append(section)
+    return [(title, members) for title, members in buckets if members]
+
+
+def _speaker_totals(members: list[Section]) -> dict[str, tuple[int, int]]:
+    """話者ごとの (発言数, 総字数) を返す。"""
+    totals: dict[str, tuple[int, int]] = {}
+    for section in members:
+        for speaker, text in zip(section.speakers, section.speech_texts):
+            count, chars = totals.get(speaker, (0, 0))
+            totals[speaker] = (count + 1, chars + len(text))
+    return totals
+
+
+def report_stats(path: Path, lines: list[str]) -> None:
+    """幕別の話者バランスと見出し末の話者を出す。**診断であって合否に使わない。**"""
+    sections = parse_sections(lines, levels=("##", "###", "####"))
+    print(f"{path}: 集計（診断。合否に使わない。主役2名 {'／'.join(LEAD_SPEAKERS)} のみ）")
+
+    print("  [幕別の話者バランス] 発言字数は話者行・空行を除く本文のみ")
+    for title, members in _act_buckets(sections):
+        totals = _speaker_totals(members)
+        overall = sum(chars for _, chars in totals.values())
+        columns = []
+        for speaker in LEAD_SPEAKERS:
+            count, chars = totals.get(speaker, (0, 0))
+            average = chars // count if count else 0
+            share = f"{chars * 100 // overall}%" if overall else "-"
+            columns.append(f"{speaker} {count}発言/{chars}字/平均{average}/比{share}")
+        print(f"    {title}")
+        print(f"      {'  '.join(columns)}")
+
+    closers = [
+        (section.speech_starts[-1], section.speakers[-1], section.level, section.title)
+        for section in sections
+        if section.speech_texts and section.level in ("###", "####")
+    ]
+    tally: dict[str, int] = {}
+    for _, speaker, _, _ in closers:
+        tally[speaker] = tally.get(speaker, 0) + 1
+    levels = {level: sum(1 for _, _, lv, _ in closers if lv == level) for level in ("###", "####")}
+    print(
+        f"  [見出し末の話者] 母数 {len(closers)}"
+        f"（### {levels['###']} / #### {levels['####']}）"
+        f" ── {'、'.join(f'{name} {count}' for name, count in sorted(tally.items()))}"
+    )
+    for line_no, speaker, level, title in closers:
+        print(f"    L{line_no:<5} {speaker:<6} {level} {title}")
+
+
+# --------------------------------------------------------------------------
 # レジストリと CLI
 # --------------------------------------------------------------------------
 
@@ -1231,8 +1317,20 @@ def main() -> int:
     parser.add_argument("--rules", help="適用するルールIDをカンマ区切りで指定する")
     parser.add_argument("--verbose", action="store_true", help="info も表示する")
     parser.add_argument("--list-rules", action="store_true", help="ルール一覧を表示する")
+    parser.add_argument(
+        "--stats",
+        action="store_true",
+        help="受け入れレビュー用の横断表を出す（診断。合否に使わない）",
+    )
     args = parser.parse_args()
 
+    if args.stats:
+        if not args.paths:
+            parser.error("集計対象のパスを指定する")
+        for path in args.paths:
+            with open(path, encoding="utf-8", newline="") as handle:
+                report_stats(path, handle.readlines())
+        return 0
     if args.list_rules:
         for rule in REGISTRY:
             mark = "fix" if rule.fixable else "   "

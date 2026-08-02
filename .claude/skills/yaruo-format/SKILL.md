@@ -26,7 +26,7 @@ python3 scripts/yaruo_lint.py docs/books/<id>/README.md --check   # 0件を確�
 | `dialogue-frame` | 発言外枠のカギカッコ、行頭の全角空白 |
 | `emphasis-flanking` | 約物に隣接して壊れた `**` |
 | `table-delimiter` | GFM 表の区切り行、表の行頭空白 |
-| `dialogue-period` | 発言末の句点 |
+| `dialogue-period` | 発言末の句点（`〜〜 翌朝 〜〜` 等の場面転換カードは発言境界として除外） |
 
 1. `--check` を実行する。
 2. error があれば `--fix` を適用する。

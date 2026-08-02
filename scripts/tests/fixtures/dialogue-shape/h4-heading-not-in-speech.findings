@@ -1,0 +1,4 @@
+h4-heading-not-in-speech.md:3: info: [dialogue-shape] 1-1　小見出しが発言へ混入しないこと (1実効往復、2発言、発言字数 6〜7〜8、瞬発2／短い推論0／展開0／錨0、計14字)
+h4-heading-not-in-speech.md:3: warning: [dialogue-shape] 4実効往復未満: 1-1　小見出しが発言へ混入しないこと（核心概念なら不足、1実効往復、2発言、発言字数 6〜7〜8、瞬発2／短い推論0／展開0／錨0、計14字）
+h4-heading-not-in-speech.md:3: info: [dialogue-shape] 会話量が少ない: 1-1　小見出しが発言へ混入しないこと (14字 < 1200字)
+h4-heading-not-in-speech.md: error 0件、warning 1件、info 2件
