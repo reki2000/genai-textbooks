@@ -1580,10 +1580,10 @@ AIが異常を検知し、必要時だけ職員へ通知します！！
 
 ## 参考文献
 
-[^1]: OECD, *Society at a Glance 2024*, “Fertility trends across the OECD: Underlying drivers and the role for policy,” 2024. 保育、育児休業、住宅費、雇用、男女の家事・育児分担などが出生行動と関連する一方、これらの政策だけで人口置換水準への回復を期待するのは難しく、低出生率社会への適応も同時に必要だと論じる。citeturn138173search0turn138173search4
+[^1]: OECD, *Society at a Glance 2024*, “Fertility trends across the OECD: Underlying drivers and the role for policy,” 2024. 保育、育児休業、住宅費、雇用、男女の家事・育児分担などが出生行動と関連する一方、これらの政策だけで人口置換水準への回復を期待するのは難しく、低出生率社会への適応も同時に必要だと論じる。
 
-[^2]: OECD, *Society at a Glance 2024*, 2024. 低出生率への対応として、移民、就業参加の拡大、生産性向上、健康状態の改善などを組み合わせる必要を示している。citeturn138173search0turn138173search2
+[^2]: OECD, *Society at a Glance 2024*, 2024. 低出生率への対応として、移民、就業参加の拡大、生産性向上、健康状態の改善などを組み合わせる必要を示している。
 
-[^3]: United Nations Department of Economic and Social Affairs, Population Division, *World Population Prospects 2024: Summary of Results*, 2024. 世界各地の人口転換、出生率低下、高齢化、移民を含む複数の人口経路を扱い、人口規模・年齢構成・空間配置の変化への準備を求めている。citeturn152346search0turn152346search2turn152346search11
+[^3]: United Nations Department of Economic and Social Affairs, Population Division, *World Population Prospects 2024: Summary of Results*, 2024. 世界各地の人口転換、出生率低下、高齢化、移民を含む複数の人口経路を扱い、人口規模・年齢構成・空間配置の変化への準備を求めている。
 
-[^4]: 国立社会保障・人口問題研究所『日本の将来推計人口（令和5年推計）』2023年。出生、死亡、国際人口移動に仮定を置くコーホート要因法を用い、出生3仮定・死亡3仮定の基本推計など、複数の推計を公表している。citeturn152346search1turn152346search6
+[^4]: 国立社会保障・人口問題研究所『日本の将来推計人口（令和5年推計）』2023年。出生、死亡、国際人口移動に仮定を置くコーホート要因法を用い、出生3仮定・死亡3仮定の基本推計など、複数の推計を公表している。
