@@ -752,9 +752,14 @@ class Section:
 
     @property
     def turns(self) -> int:
-        """同一話者の連続ブロックを畳み込んだ実効往復数。"""
+        """同一話者の連続ブロックを畳み込んだ実効往復数。
+
+        主役2名の往復だけを数える。脇役の割り込みは往復を切らない。
+        """
         collapsed: list[str] = []
         for speaker in self.speakers:
+            if speaker not in LEAD_SPEAKERS:
+                continue
             if not collapsed or collapsed[-1] != speaker:
                 collapsed.append(speaker)
         return len(collapsed) // 2
@@ -802,19 +807,24 @@ class Section:
         )
 
 
-LEAD_SPEAKER_RE = re.compile(
-    rf"^\*\*({'|'.join(LEAD_SPEAKERS)})\*\*[^*:：\n]*[:：]\s*$"
-)
-
-
 def parse_sections(
-    lines: list[str], levels: tuple[str, ...] = DEFAULT_SECTION_LEVELS
+    lines: list[str],
+    levels: tuple[str, ...] = DEFAULT_SECTION_LEVELS,
+    names: set[str] | None = None,
 ) -> list[Section]:
     """見出しで区切った節を返す。`levels` に無い見出しは節を切らない。
 
     どのレベルであれ、見出し行は発言を終える。`####` を発言本文へ取り込むと、
     その見出しの字数が直前の発言へ加算され、発言長の診断が狂うため。
+
+    **発言は全話者で切る。** 以前は主役2名の話者行でしか切らなかったため、
+    脇役の話者行とその本文が直前の主役の発言へ加算され、4人以上を出す教材で
+    「長大な発言」が実在しない件数だけ発火していた（57冊で1801件中177件）。
+    `yaruo_markdown` の方針どおり、解析器は全話者を返し、「主役2名だけを
+    数える」は `Section.turns` と `report_stats` のフィルタで表現する。
     """
+    if names is None:
+        names = speaker_names(lines)
     sections: list[Section] = []
     current: Section | None = None
     in_speech = False
@@ -833,7 +843,9 @@ def parse_sections(
             continue
         if current is None:
             continue
-        speaker = LEAD_SPEAKER_RE.match(body) if not in_fence else None
+        speaker = SPEAKER_LINE.match(body) if not in_fence else None
+        if speaker and speaker.group(1) not in names:
+            speaker = None
         if speaker:
             current.speakers.append(speaker.group(1))
             current.speech_lines.append(0)
@@ -1216,9 +1228,12 @@ def _speaker_totals(members: list[Section]) -> dict[str, tuple[int, int]]:
 def report_stats(path: Path, lines: list[str]) -> None:
     """幕別の話者バランスと見出し末の話者を出す。**診断であって合否に使わない。**"""
     sections = parse_sections(lines, levels=("##", "###", "####"))
-    print(f"{path}: 集計（診断。合否に使わない。主役2名 {'／'.join(LEAD_SPEAKERS)} のみ）")
+    print(f"{path}: 集計（診断。合否に使わない）")
 
-    print("  [幕別の話者バランス] 発言字数は話者行・空行を除く本文のみ")
+    print(
+        f"  [幕別の話者バランス] 主役2名 {'／'.join(LEAD_SPEAKERS)} のみ。"
+        "比は脇役を含む幕の総字数に対する割合。発言字数は話者行・空行を除く本文のみ"
+    )
     for title, members in _act_buckets(sections):
         totals = _speaker_totals(members)
         overall = sum(chars for _, chars in totals.values())
@@ -1241,7 +1256,7 @@ def report_stats(path: Path, lines: list[str]) -> None:
         tally[speaker] = tally.get(speaker, 0) + 1
     levels = {level: sum(1 for _, _, lv, _ in closers if lv == level) for level in ("###", "####")}
     print(
-        f"  [見出し末の話者] 母数 {len(closers)}"
+        f"  [見出し末の話者] 脇役を含む実際の最終話者。母数 {len(closers)}"
         f"（### {levels['###']} / #### {levels['####']}）"
         f" ── {'、'.join(f'{name} {count}' for name, count in sorted(tally.items()))}"
     )

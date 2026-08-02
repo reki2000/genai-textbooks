@@ -1,0 +1,4 @@
+side-speaker-splits-speech.md:16: info: [dialogue-shape] 1-1　脇役の発言が主役の発言長へ加算されないこと (1実効往復、4発言、発言字数 30〜66〜106、瞬発1／短い推論1／展開2／錨0、計268字)
+side-speaker-splits-speech.md:16: warning: [dialogue-shape] 4実効往復未満: 1-1　脇役の発言が主役の発言長へ加算されないこと（核心概念なら不足、1実効往復、4発言、発言字数 30〜66〜106、瞬発1／短い推論1／展開2／錨0、計268字）
+side-speaker-splits-speech.md:16: info: [dialogue-shape] 会話量が少ない: 1-1　脇役の発言が主役の発言長へ加算されないこと (268字 < 1200字)
+side-speaker-splits-speech.md: error 0件、warning 1件、info 2件
