@@ -38,7 +38,7 @@ documents:
 
 ## 検査・整形スクリプト
 
-`scripts/yaruo_lint.py` が唯一の入口。`--check` / `--fix` / `--rules <id>` / `--verbose`、一覧は `--list-rules`。
+`scripts/yaruo_lint.py` が唯一の入口。`--check` / `--fix` / `--rules <id>` / `--verbose` / `--stats`、一覧は `--list-rules`。
 
 ```bash
 python3 scripts/yaruo_lint.py docs/books/{ID}/README.md --check --verbose
