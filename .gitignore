@@ -6,6 +6,8 @@
 /build/
 
 # Development artifacts
-/scripts/check-generated-files.sh
-/discussion/
 __pycache__/
+**./*.pyc
+
+# local discussion logs
+/discussion/

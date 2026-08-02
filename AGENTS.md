@@ -34,7 +34,7 @@ documents:
 3. `python3 scripts/generate_site.py` でビルド確認
 4. `git add docs/` でコミット
 
-外部（別モデル・別セッション）で書かれた教材を受け入れるときは、2の前に `/yaruo-review` で品質を検査する。
+外部（別モデル・別セッション）で書かれた教材を受け入れるときは、2の前に `/yaruo-review` で品質を検査する。判定基準と二者レビューの手順はスキルの `SKILL.md` を正本とする。
 
 ## 検査・整形スクリプト
 
@@ -63,12 +63,4 @@ python3 scripts/yaruo_lint.py docs/books/{ID}/README.md --check --verbose
 
 ## エージェント間の書面協議
 
-このリポジトリでは Codex と Claude が共同作業する。設計方針の比較や合意形成は `/discussion/{yyyymmdd-hhmiss}-{topic}/` 配下のファイル交換で行う（`.gitignore` 済み、コミットしない）。
-
-- ディレクトリ名は開始日時（`date +%Y%m%d-%H%M%S`）＋話題。例：`20260802-143012-sidebar-layout`。
-- ファイル名は「通番＋宛先」。`1.to-claude.md` は Codex が書き Claude が読む。`2.to-codex.md` はその逆。通番は議論全体で1本の連番で、ファイル名順＝発言順になる。
-- **進行中の議論は `discussion/CURRENT`（ディレクトリ名を1行）だけが指す。** 開始した側が書き、`conclusion.md` を書いた側が削除する。過去のディレクトリを更新時刻や日時で推測して読みに行かない。`CURRENT` が無ければ進行中の議論は無い。
-- この仕組みにより、片側で議論を開始したあと、もう片側には「議論して」とだけ言えばよい。
-- **自分が読む側のファイルを自分で書いてはならない**（相手の発言の捏造にあたる）。返信が来なければ待つか、ユーザーへ報告する。
-- 双方が末尾に `合意` を明記したら、気づいた側が `conclusion.md` を書く。
-- 詳細な作法は `.claude/skills/discuss/SKILL.md` にある。Claude 側は `/discuss` スキルとして起動する。
+Codex と Claude の設計比較・レビュー照合・合意形成には `/discuss` を使う。進行中の議論は `discussion/CURRENT` だけから特定し、自分宛ての発言ファイルは作成・編集しない。ファイル形式、待機、合意、終了処理の正本は `.claude/skills/discuss/SKILL.md` とする（`discussion/` はコミットしない）。
