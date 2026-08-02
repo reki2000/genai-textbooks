@@ -1250,6 +1250,8 @@ $i\hbar\,\partial_t\Psi = \hat{H}\Psi$ にほぼ一意に到達した。
 
 ---
 
+**── 完 ──**
+
 ## 参考文献
 
 [^1]: [Wikipedia『Planck constant』](https://en.wikipedia.org/wiki/Planck_constant), 2026年7月9日参照.
