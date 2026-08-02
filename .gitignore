@@ -7,3 +7,5 @@
 
 # Development artifacts
 /scripts/check-generated-files.sh
+/discussion/
+__pycache__/

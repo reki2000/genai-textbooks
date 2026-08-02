@@ -46,3 +46,12 @@ documents:
 概算：ファイルサイズ ÷ 3
 
 正確な集計が必要なら `/yaruo-count` スキルを使用。
+
+## エージェント間の書面協議
+
+このリポジトリでは Codex と Claude が共同作業する。設計方針の比較や合意形成は `/discussion/{topic}/` 配下のファイル交換で行う（`.gitignore` 済み、コミットしない）。
+
+- ファイル名は宛先を表す。`to-claude.N.md` は Codex が書き Claude が読む。`to-codex.N.md` はその逆。通番 N で往復する。
+- **自分が読む側のファイルを自分で書いてはならない**（相手の発言の捏造にあたる）。返信が来なければ待つか、ユーザーへ報告する。
+- 双方が末尾に `合意` を明記したら、気づいた側が `conclusion.md` を書く。
+- 詳細な作法は `.claude/skills/discuss/SKILL.md` にある。Claude 側は `/discuss` スキルとして起動する。
