@@ -49,9 +49,12 @@ documents:
 
 ## エージェント間の書面協議
 
-このリポジトリでは Codex と Claude が共同作業する。設計方針の比較や合意形成は `/discussion/{topic}/` 配下のファイル交換で行う（`.gitignore` 済み、コミットしない）。
+このリポジトリでは Codex と Claude が共同作業する。設計方針の比較や合意形成は `/discussion/{yyyymmdd-hhmiss}-{topic}/` 配下のファイル交換で行う（`.gitignore` 済み、コミットしない）。
 
-- ファイル名は宛先を表す。`to-claude.N.md` は Codex が書き Claude が読む。`to-codex.N.md` はその逆。通番 N で往復する。
+- ディレクトリ名は開始日時（`date +%Y%m%d-%H%M%S`）＋話題。例：`20260802-143012-sidebar-layout`。
+- ファイル名は「通番＋宛先」。`1.to-claude.md` は Codex が書き Claude が読む。`2.to-codex.md` はその逆。通番は議論全体で1本の連番で、ファイル名順＝発言順になる。
+- **進行中の議論は `discussion/CURRENT`（ディレクトリ名を1行）だけが指す。** 開始した側が書き、`conclusion.md` を書いた側が削除する。過去のディレクトリを更新時刻や日時で推測して読みに行かない。`CURRENT` が無ければ進行中の議論は無い。
+- この仕組みにより、片側で議論を開始したあと、もう片側には「議論して」とだけ言えばよい。
 - **自分が読む側のファイルを自分で書いてはならない**（相手の発言の捏造にあたる）。返信が来なければ待つか、ユーザーへ報告する。
 - 双方が末尾に `合意` を明記したら、気づいた側が `conclusion.md` を書く。
 - 詳細な作法は `.claude/skills/discuss/SKILL.md` にある。Claude 側は `/discuss` スキルとして起動する。
