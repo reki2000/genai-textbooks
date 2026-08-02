@@ -237,10 +237,12 @@ def _emphasis_line(body: str) -> tuple[str, bool, list[str]]:
         for m in RUN_RE.finditer(masked)
         if m.start() == 0 or masked[m.start() - 1] != "\\"
     ]
+    # 長さ2でない `*` の連続は違反ではない。単独 `*` はイタリックまたは箇条書き、
+    # `***` は複合強調になり得る。bold の対応と flanking だけを独立に診断するので、
+    # 同じ行に `*書名*` があっても壊れた `**強調**` を見落とさない。
+    runs = [m for m in runs if len(m.group()) == 2]
     if not runs:
         return body, False, []
-    if any(len(m.group()) != 2 for m in runs):
-        return body, False, ["長さ2以外の * の連続があるためスキップ"]
 
     inserts: list[int] = []
     warns: list[str] = []
@@ -842,11 +844,29 @@ def parse_sections(lines: list[str]) -> list[Section]:
 # --------------------------------------------------------------------------
 
 END_MARKER = "**── 完 ──**"
-# `**── I部 完 ──**` のような分冊の部完結マーカーも正当な形として認める。
-END_MARKER_OK_RE = re.compile(r"^\*\*[─—―-]{2,4}\s*(?:\S+\s+)?完\s*[─—―-]{2,4}\*\*$")
-END_MARKER_LIKE_RE = re.compile(
-    r"^\*{0,2}\s*[─—―-]{0,4}\s*(?:\S+\s+)?完\s*[─—―-]{0,4}\s*\*{0,2}$"
+# 終端マーカーの解析は1本。`**── I部 完 ──**` のような分冊の部完結も同じ形とみなし、
+# 接頭辞を group(1) に取る。正規の形かどうかは、罫線と太字が揃っているかで決まる。
+END_MARKER_RE = re.compile(
+    r"^(?P<bold_open>\*{0,2})\s*(?P<rule_open>[─—―-]{0,4})\s*"
+    r"(?:(?P<prefix>\S+)\s+)?完\s*"
+    r"(?P<rule_close>[─—―-]{0,4})\s*(?P<bold_close>\*{0,2})$"
 )
+
+
+def _canonical_end_marker(match: re.Match[str]) -> str:
+    prefix = match.group("prefix")
+    return f"**── {prefix} 完 ──**" if prefix else END_MARKER
+
+
+def _is_canonical_end_marker(match: re.Match[str]) -> bool:
+    return (
+        match.group("bold_open") == "**"
+        and match.group("bold_close") == "**"
+        and len(match.group("rule_open")) >= 2
+        and len(match.group("rule_close")) >= 2
+    )
+
+
 ACT_RE = re.compile(r"^第(\d+)幕")
 SECTION_NO_RE = re.compile(r"^(\d+)-(\d+)(?=[　\s])")
 FORBIDDEN_HEADINGS = (
@@ -900,36 +920,56 @@ def rule_structure(lines: list[str], result: Result) -> list[str]:
                 "（設問の箇条書きだけにせず、誤答→手掛かり→自己修正の対話にする）",
             )
 
+    return lines
+
+
+# --------------------------------------------------------------------------
+# rule: end-marker（旧 check_dialogue_constraints の終端マーカー検査 + 正規化）
+# --------------------------------------------------------------------------
+
+def rule_end_marker(lines: list[str], result: Result) -> list[str]:
+    """終端マーカーを `**── 完 ──**` へ揃える。分冊の部完結の接頭辞は保つ。"""
+    out = list(lines)
     marker_lines: list[int] = []
     bodies = [split_eol(line)[0] for line in lines]
+
     for line_no, body in enumerate(bodies, 1):
         text = body.strip()
-        if not text or not END_MARKER_LIKE_RE.match(text):
+        if not text:
             continue
-        if END_MARKER_OK_RE.match(text):
+        match = END_MARKER_RE.match(text)
+        if not match:
+            continue
+        if _is_canonical_end_marker(match):
             marker_lines.append(line_no)
-        else:
-            result.add(
-                line_no, "error", "structure",
-                f"終端マーカーの表記揺れ: 『{text}』（`{END_MARKER}` に統一する）",
-            )
+            continue
+        canonical = _canonical_end_marker(match)
+        newline = split_eol(lines[line_no - 1])[1]
+        out[line_no - 1] = canonical + newline
+        marker_lines.append(line_no)
+        result.add(
+            line_no, "error", "end-marker",
+            f"終端マーカーの表記揺れ: 『{text}』（`{canonical}` に統一する）",
+        )
+
     if not marker_lines:
         result.add(
-            None, "warning", "structure",
+            None, "warning", "end-marker",
             f"終端マーカー `{END_MARKER}` が無い（終幕の後に `---` と併せて置く）",
         )
-    else:
-        previous = next(
-            (bodies[i - 1].strip() for i in range(marker_lines[0] - 1, 0, -1)
-             if bodies[i - 1].strip()),
-            "",
+        return out
+
+    previous = next(
+        (bodies[i - 1].strip() for i in range(marker_lines[0] - 1, 0, -1)
+         if bodies[i - 1].strip()),
+        "",
+    )
+    if previous != "---":
+        result.add(
+            marker_lines[0], "warning", "end-marker",
+            f"終端マーカーの直前が `---` でない（現在は『{previous[:30]}』）",
         )
-        if previous != "---":
-            result.add(
-                marker_lines[0], "warning", "structure",
-                f"終端マーカーの直前が `---` でない（現在は『{previous[:30]}』）",
-            )
-    return lines
+    return out
 
 
 # --------------------------------------------------------------------------
@@ -1038,42 +1078,54 @@ def rule_dialogue_shape(lines: list[str], result: Result) -> list[str]:
                 f"{MANY_TURNS}実効往復超: {section.title}"
                 f"（核心概念が二つ競合していないか確認、{shape}）",
             )
+        # 会話量は info。節の粒度は教材ごとに正当に異なり、既存56冊では
+        # <1200字が全節の60%で発火して情報を持たなかった。合否に使わない。
         if section.total_chars < SECTION_CHAR_MIN:
             result.add(
-                section.line, "warning", "dialogue-shape",
+                section.line, "info", "dialogue-shape",
                 f"会話量が少ない: {section.title}"
-                f" ({section.total_chars}字 < {SECTION_CHAR_MIN}字、{shape})",
+                f" ({section.total_chars}字 < {SECTION_CHAR_MIN}字)",
             )
         elif section.total_chars > SECTION_CHAR_MAX:
             result.add(
-                section.line, "warning", "dialogue-shape",
+                section.line, "info", "dialogue-shape",
                 f"会話量が多い: {section.title}"
-                f" ({section.total_chars}字 > {SECTION_CHAR_MAX}字、{shape})",
+                f" ({section.total_chars}字 > {SECTION_CHAR_MAX}字)",
             )
 
-        long_speeches = sum(1 for n in section.speech_lines if n > SPEECH_LINE_LIMIT)
-        if long_speeches:
-            result.add(
-                section.line, "warning", "dialogue-shape",
-                f"{SPEECH_LINE_LIMIT}行超の発言が{long_speeches}件: {section.title}",
-            )
-        oversized = sum(1 for n in section.speech_chars if n > SPEECH_CHAR_REVIEW)
+        # 行数と字数は同じ「長すぎる発言」の2つの判定軸。1件として発火させ、
+        # 診断には両方を書く（字数だけにすると行数のみ超過する節を見落とす）。
+        over_lines = [
+            index
+            for index, count in enumerate(section.speech_lines, 1)
+            if count > SPEECH_LINE_LIMIT
+        ]
+        over_chars = [
+            index
+            for index, count in enumerate(section.speech_chars, 1)
+            if count > SPEECH_CHAR_REVIEW
+        ]
+        oversized = sorted(set(over_lines) | set(over_chars))
         if oversized:
             result.add(
                 section.line, "warning", "dialogue-shape",
-                f"{SPEECH_CHAR_REVIEW}字超の発言が{oversized}件: {section.title}"
-                "（感情の頂点または不可分な導出か確認）",
+                f"長大な発言が{len(oversized)}件: {section.title}"
+                f"（{SPEECH_LINE_LIMIT}行超 {len(over_lines)}件／"
+                f"{SPEECH_CHAR_REVIEW}字超 {len(over_chars)}件、"
+                f"{'・'.join(f'{i}発言目' for i in oversized)}。"
+                "感情の頂点または不可分な導出か確認）",
             )
 
         band_counts = section.band_counts()
         if len(section.speech_texts) >= 8:
             dominant_label, dominant_count = max(band_counts, key=lambda item: item[1])
             if dominant_count / len(section.speech_texts) >= UNIFORM_BAND_RATIO:
+                # テンポの偏りは yaruo-review が読む順序を決める材料であって合否ではない。
                 result.add(
-                    section.line, "warning", "dialogue-shape",
+                    section.line, "info", "dialogue-shape",
                     f"発言長が「{dominant_label}」へ"
                     f"{dominant_count}/{len(section.speech_texts)}件集中: "
-                    f"{section.title}（テンポ一定でないか確認、{shape}）",
+                    f"{section.title}（テンポ一定でないか確認）",
                 )
 
         # 節末の理解の所有権。教師の長い発言で閉じていれば講義的総括の疑いがある。
@@ -1131,6 +1183,7 @@ REGISTRY: tuple[Rule, ...] = (
     Rule("table-delimiter", "GFM 表の区切り行", True, rule_table_delimiter),
     Rule("dialogue-period", "発言末の句点", True, rule_dialogue_period),
     Rule("notation", "金額・割合の半角算用数字表記", True, rule_notation),
+    Rule("end-marker", "終端マーカー `**── 完 ──**`", True, rule_end_marker),
     Rule("invisible-chars", "制御文字・私用領域文字の混入", False, rule_invisible_chars),
     Rule("structure", "幕・節番号、終端マーカー、禁止見出し", False, rule_structure),
     Rule("footnotes", "脚注の未使用・未定義", False, rule_footnotes),
