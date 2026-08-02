@@ -1,5 +1,10 @@
 # Repository instructions
 
+## コマンドラインツール
+
+- `ripgrep` (`rg`) が利用可能なら、ファイル内検索には `grep` より `rg`、ファイル一覧の取得には `find` より `rg --files` を積極的に使う。
+- [`rtk`](https://github.com/rtk-ai/rtk) が利用可能なら、対応するコマンド（`rtk git`、`rtk test`、`rtk lint`、`rtk rg` など）を積極的に使い、出力を必要十分な内容に絞る。未対応の操作や、生の完全な出力が必要な場合は通常のコマンドを使う。
+
 ## catalog.yml 構造
 
 カテゴリはトップページの隣の `docs/catalog.yml` で定義：
