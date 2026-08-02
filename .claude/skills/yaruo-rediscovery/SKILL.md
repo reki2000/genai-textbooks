@@ -19,7 +19,7 @@ description: やる夫（生徒）とやらない夫（教師）の対話で、�
 | 脚注を付ける | [citation.md](references/citation.md)（書式の正本） |
 | 分量削減を頼まれた | [condense.md](references/condense.md) |
 | 構成が単調・講義的になった | [anti-patterns.md](references/anti-patterns.md) の該当項目だけ |
-| 完成後・改訂後 | `python3 .claude/skills/yaruo-rediscovery/scripts/check_dialogue_constraints.py <教材.md>` |
+| 完成後・改訂後 | `python3 scripts/yaruo_lint.py <教材.md> --check --verbose` |
 
 完成例は既定では読まない。導入がテーマ説明に流れる、教師の講義が続く、数式の展開が不自然になる、といった症状が出たときだけ `references/sample-intro-buddhism.md`、`references/sample-intro-chemical-plant.md`、`references/sample.md` から該当する1本を読む。特殊な作風が要るときは `rg '^#{2,3} ' docs/books/<id>/README.md` で見出しを確認し、該当する1〜3節だけ読む。既存教材の続編・改訂では、その教材自身を第一の参照元とする。内容・数式・固有名詞は流用しない。
 
@@ -90,14 +90,14 @@ description: やる夫（生徒）とやらない夫（教師）の対話で、�
 
 ### Step 5: 納品する
 
-リポジトリ直下から実行する（スクリプトはスキル配下にあるため `scripts/` 直下として探さない）。
+リポジトリ直下から実行する。
 
 ```
-python3 .claude/skills/yaruo-rediscovery/scripts/check_dialogue_constraints.py <教材.md>
+python3 scripts/yaruo_lint.py <教材.md> --check --verbose
 ```
 
-- **error は必ず解消する**（exit 1）。脚注の未使用・未定義、節番号の破れ、終端マーカーと見出しの揺れ、冒頭の全体説明節、金額・割合の表記。表記違反は `normalize_financial_numbers.py <教材.md> --apply` で機械修正できる。
-- **warning は人が内容を見て可否を判断する。機械的に0を目指さない。** 節ごとの内訳は `--verbose`。特に会話量の字数 warning は、節の粒度が教材ごとに正当に異なるため、それ単独を品質の指標にしない。
+- **error は必ず解消する**（exit 1）。脚注の未使用・未定義、節番号の破れ、終端マーカーと見出しの揺れ、冒頭の全体説明節、金額・割合の表記、制御文字・私用領域文字の混入。`--fix` で機械修正できるルールは `--list-rules` の `fix` 印で分かる（`invisible-chars` は文意の判断を伴うので手で消す）。
+- **warning は人が内容を見て可否を判断する。機械的に0を目指さない。** 節ごとの内訳（実効往復・発言長分布・高速区間）は `--verbose` の info に出る。**info は診断であって合否ではない。**
 
 スクリプトが見ないのは、素朴な案が藁人形でないか、ツアー部分が20%以内か、数式の途中式と検算が足りているか、伏線が回収されているか、感情曲線が隣接節で反復していないか。ここだけを人手で確認する。
 

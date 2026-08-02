@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 """scripts/yaruo_lint.py の golden fixture 回帰。
 
-`fixtures/<rule-id>/<case>.md` を、そのルールだけ有効にして `--fix` した結果が
-`<case>.expected` とバイト一致することを確認する。さらに2回目の `--fix` で
-変化しないこと（冪等性）と、直後の `--check` が fixable な error を残さないこと
-を確認する。
+`fixtures/<rule-id>/<case>.md` を、そのルールだけ有効にして検査する。
+
+- **fixable なルール**：`--fix` の結果が `<case>.expected` とバイト一致すること、
+  2回目の `--fix` で変化しないこと（冪等性）、直後の `--check` が error を残さない
+  ことを確認する。
+- **fixable でないルール**：本文が変化しないことと、`--check` の報告が
+  `<case>.findings` と一致することを確認する。
 
     python3 scripts/tests/run_lint_tests.py
 
@@ -41,13 +44,29 @@ def main() -> int:
                 continue
             rule = rule_dir.name
             for source in sorted(rule_dir.glob("*.md")):
-                expected_path = source.with_suffix(".expected")
-                if not expected_path.exists():
-                    failures.append(f"{rule}/{source.name}: .expected が無い")
-                    continue
                 cases += 1
                 work = work_root / f"{rule}__{source.name}"
                 shutil.copy(source, work)
+
+                findings_path = source.with_suffix(".findings")
+                if findings_path.exists():
+                    # 修正しないルール。本文が変わらないことと報告の一致を見る。
+                    check = run(str(work), "--check", "--verbose", "--rules", rule)
+                    produced = check.stdout.replace(str(work), source.name)
+                    if work.read_bytes() != source.read_bytes():
+                        failures.append(f"{rule}/{source.name}: 本文を変更してしまった")
+                    elif produced != findings_path.read_text(encoding="utf-8"):
+                        failures.append(
+                            f"{rule}/{source.name}: 報告が .findings と不一致\n"
+                            f"--- produced ---\n{produced}"
+                            f"--- expected ---\n{findings_path.read_text(encoding='utf-8')}"
+                        )
+                    continue
+
+                expected_path = source.with_suffix(".expected")
+                if not expected_path.exists():
+                    failures.append(f"{rule}/{source.name}: .expected も .findings も無い")
+                    continue
 
                 run(str(work), "--fix", "--rules", rule)
                 produced = work.read_bytes()

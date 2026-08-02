@@ -1,0 +1,10 @@
+artifacts.md:3: error: [invisible-chars] col 25: BMP 私用領域 U+E200 (<名前なし>)
+artifacts.md:3: error: [invisible-chars] col 30: BMP 私用領域 U+E202 (<名前なし>)
+artifacts.md:3: error: [invisible-chars] col 48: BMP 私用領域 U+E201 (<名前なし>)
+artifacts.md:4: error: [invisible-chars] col 6: ZERO WIDTH SPACE U+200B (ZERO WIDTH SPACE)
+artifacts.md:4: error: [invisible-chars] col 14: ZERO WIDTH JOINER U+200D (ZERO WIDTH JOINER)
+artifacts.md:4: error: [invisible-chars] col 21: WORD JOINER U+2060 (WORD JOINER)
+artifacts.md:5: error: [invisible-chars] col 5: REPLACEMENT CHARACTER U+FFFD (REPLACEMENT CHARACTER)
+artifacts.md:5: error: [invisible-chars] col 11: 制御文字 (Cc) U+000B (<名前なし>)
+artifacts.md:5: error: [invisible-chars] col 17: 制御文字 (Cc) U+000C (<名前なし>)
+artifacts.md: error 9件、warning 0件、info 0件
