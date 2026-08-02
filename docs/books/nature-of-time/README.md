@@ -2045,34 +2045,34 @@ $$A\prec B$$
 
 ---
 
-[^1]: Aristotle, *Physics*, Book IV. 時間を運動や変化との関係から論じ、「前と後に関する運動の数」として扱った。時間を独立した物質ではなく、変化・順序・測定との関係で捉える古典的議論。
+1. Aristotle, *Physics*, Book IV. 時間を運動や変化との関係から論じ、「前と後に関する運動の数」として扱った。時間を独立した物質ではなく、変化・順序・測定との関係で捉える古典的議論。
 
-[^2]: Augustinus, *Confessiones*, Book XI. 過去・現在・未来の存在と、時間について問われなければ分かるが説明しようとすると分からなくなるという問題を論じた。
+2. Augustinus, *Confessiones*, Book XI. 過去・現在・未来の存在と、時間について問われなければ分かるが説明しようとすると分からなくなるという問題を論じた。
 
-[^3]: Walter Rudin, *Principles of Mathematical Analysis*, McGraw-Hill. 実数の完備性、極限、連続性、微分の標準的定式化。
+3. Walter Rudin, *Principles of Mathematical Analysis*, McGraw-Hill. 実数の完備性、極限、連続性、微分の標準的定式化。
 
-[^4]: Abraham Robinson, *Non-standard Analysis*, North-Holland, 1966. 無限小を含む超実数を用いて解析学を構成する非標準解析の基礎。
+4. Abraham Robinson, *Non-standard Analysis*, North-Holland, 1966. 無限小を含む超実数を用いて解析学を構成する非標準解析の基礎。
 
-[^5]: James R. Munkres, *Topology*, Pearson. 位相空間、連結性、同相写像、多様体の基本概念。
+5. James R. Munkres, *Topology*, Pearson. 位相空間、連結性、同相写像、多様体の基本概念。
 
-[^6]: Albert Einstein, “Zur Elektrodynamik bewegter Körper,” *Annalen der Physik*, 17, 891–921, 1905. 同時性の相対性、ローレンツ変換、固有時間の基礎。
+6. Albert Einstein, “Zur Elektrodynamik bewegter Körper,” *Annalen der Physik*, 17, 891–921, 1905. 同時性の相対性、ローレンツ変換、固有時間の基礎。
 
-[^7]: Hermann Minkowski, “Raum und Zeit,” 1908. 空間と時間を4次元時空として統一的に扱う幾何学的表現。
+7. Hermann Minkowski, “Raum und Zeit,” 1908. 空間と時間を4次元時空として統一的に扱う幾何学的表現。
 
-[^8]: Albert Einstein, “Die Grundlage der allgemeinen Relativitätstheorie,” *Annalen der Physik*, 49, 769–822, 1916. 計量、固有時間、重力と時空幾何学の関係。
+8. Albert Einstein, “Die Grundlage der allgemeinen Relativitätstheorie,” *Annalen der Physik*, 49, 769–822, 1916. 計量、固有時間、重力と時空幾何学の関係。
 
-[^9]: Huw Price, *Time’s Arrow and Archimedes’ Point*, Oxford University Press, 1996. 時間反転対称な物理法則と、熱力学的・因果的時間非対称性の関係。
+9. Huw Price, *Time’s Arrow and Archimedes’ Point*, Oxford University Press, 1996. 時間反転対称な物理法則と、熱力学的・因果的時間非対称性の関係。
 
-[^10]: David Z. Albert, *Time and Chance*, Harvard University Press, 2000. 低エントロピーの過去境界条件と時間の矢。
+10. David Z. Albert, *Time and Chance*, Harvard University Press, 2000. 低エントロピーの過去境界条件と時間の矢。
 
-[^11]: Rolf Landauer, “Irreversibility and Heat Generation in the Computing Process,” *IBM Journal of Research and Development*, 5(3), 183–191, 1961. 情報消去と熱散逸の関係。
+11. Rolf Landauer, “Irreversibility and Heat Generation in the Computing Process,” *IBM Journal of Research and Development*, 5(3), 183–191, 1961. 情報消去と熱散逸の関係。
 
-[^12]: Edward N. Lorenz, “Deterministic Nonperiodic Flow,” *Journal of the Atmospheric Sciences*, 20(2), 130–141, 1963. 決定論的方程式における初期値鋭敏性と予測限界。
+12. Edward N. Lorenz, “Deterministic Nonperiodic Flow,” *Journal of the Atmospheric Sciences*, 20(2), 130–141, 1963. 決定論的方程式における初期値鋭敏性と予測限界。
 
-[^13]: Hugh Everett III, “‘Relative State’ Formulation of Quantum Mechanics,” *Reviews of Modern Physics*, 29(3), 454–462, 1957. 波動関数のユニタリ発展を維持し、測定結果を相対状態として扱う多世界的解釈の基礎。
+13. Hugh Everett III, “‘Relative State’ Formulation of Quantum Mechanics,” *Reviews of Modern Physics*, 29(3), 454–462, 1957. 波動関数のユニタリ発展を維持し、測定結果を相対状態として扱う多世界的解釈の基礎。
 
-[^14]: Wojciech H. Zurek, “Decoherence, einselection, and the quantum origins of the classical,” *Reviews of Modern Physics*, 75, 715–775, 2003. 環境との相互作用によるデコヒーレンスと、準古典的な状態の成立。
+14. Wojciech H. Zurek, “Decoherence, einselection, and the quantum origins of the classical,” *Reviews of Modern Physics*, 75, 715–775, 2003. 環境との相互作用によるデコヒーレンスと、準古典的な状態の成立。
 
-[^15]: John Earman, *Bangs, Crunches, Whimpers, and Shrieks*, Oxford University Press, 1995. 一般相対論における時空の大域構造、特異点、決定論などの哲学的・物理的問題。
+15. John Earman, *Bangs, Crunches, Whimpers, and Shrieks*, Oxford University Press, 1995. 一般相対論における時空の大域構造、特異点、決定論などの哲学的・物理的問題。
 
-[^16]: Rafael D. Sorkin, “Causal Sets: Discrete Gravity,” in *Lectures on Quantum Gravity*, Springer, 2005. 時空を出来事の因果的半順序から構成する因果集合の考え方。
+16. Rafael D. Sorkin, “Causal Sets: Discrete Gravity,” in *Lectures on Quantum Gravity*, Springer, 2005. 時空を出来事の因果的半順序から構成する因果集合の考え方。

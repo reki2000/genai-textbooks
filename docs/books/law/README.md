@@ -1403,35 +1403,35 @@
 ---
 ## 参考文献
 
-[^1]: 参議院法制局「六法」。六法が、①憲法・民法・商法・民事訴訟法・刑法・刑事訴訟法、②特定分野の法令集、③主要法令を収録した六法全書の略称、という複数の意味で使われることを解説する。https://houseikyoku.sangiin.go.jp/column/column098.htm
+1. 参議院法制局「六法」。六法が、①憲法・民法・商法・民事訴訟法・刑法・刑事訴訟法、②特定分野の法令集、③主要法令を収録した六法全書の略称、という複数の意味で使われることを解説する。https://houseikyoku.sangiin.go.jp/column/column098.htm
 
-[^2]: 国立国会図書館「近代法制の整備と明治憲法の制定」。不平等条約改正と近代化を背景に、箕作麟祥がフランスの主要法典を翻訳し、「六法」の概念と多くの法律用語を紹介したこと、ボアソナードが旧刑法・治罪法・旧民法の起草に関与したことを説明する。https://www.ndl.go.jp/en/d_exhibitions/honyaku/342
+2. 国立国会図書館「近代法制の整備と明治憲法の制定」。不平等条約改正と近代化を背景に、箕作麟祥がフランスの主要法典を翻訳し、「六法」の概念と多くの法律用語を紹介したこと、ボアソナードが旧刑法・治罪法・旧民法の起草に関与したことを説明する。https://www.ndl.go.jp/en/d_exhibitions/honyaku/342
 
-[^3]: e-Gov法令検索「日本国憲法」。最高法規、基本的人権、国会、内閣、司法、違憲審査など、日本の統治構造の根拠条文。https://elaws.e-gov.go.jp/document?lawid=321CONSTITUTION
+3. e-Gov法令検索「日本国憲法」。最高法規、基本的人権、国会、内閣、司法、違憲審査など、日本の統治構造の根拠条文。https://elaws.e-gov.go.jp/document?lawid=321CONSTITUTION
 
-[^4]: e-Gov法令検索「民法」。私人間の基本的な権利義務、法律行為、契約、物権、親族、相続、不法行為等を規定する。https://elaws.e-gov.go.jp/document?lawid=129AC0000000089
+4. e-Gov法令検索「民法」。私人間の基本的な権利義務、法律行為、契約、物権、親族、相続、不法行為等を規定する。https://elaws.e-gov.go.jp/document?lawid=129AC0000000089
 
-[^5]: e-Gov法令検索「刑法」。犯罪と刑罰、故意・過失、正当防衛、緊急避難、責任能力等の基本規定を置く。https://elaws.e-gov.go.jp/document?lawid=140AC0000000045
+5. e-Gov法令検索「刑法」。犯罪と刑罰、故意・過失、正当防衛、緊急避難、責任能力等の基本規定を置く。https://elaws.e-gov.go.jp/document?lawid=140AC0000000045
 
-[^6]: 裁判所「裁判所が扱う事件」。民事事件、行政事件、刑事事件、家事事件、少年事件等の違いを概説する。https://www.courts.go.jp/saiban/syurui/index.html
+6. 裁判所「裁判所が扱う事件」。民事事件、行政事件、刑事事件、家事事件、少年事件等の違いを概説する。https://www.courts.go.jp/saiban/syurui/index.html
 
-[^7]: 裁判所「民事訴訟」。裁判官が双方の言い分を聴き、証拠を調べ、判決または和解によって紛争解決を図る手続を説明する。https://www.courts.go.jp/saiban/syurui/syurui_minzi/minzi_25_20/index.html
+7. 裁判所「民事訴訟」。裁判官が双方の言い分を聴き、証拠を調べ、判決または和解によって紛争解決を図る手続を説明する。https://www.courts.go.jp/saiban/syurui/syurui_minzi/minzi_25_20/index.html
 
-[^8]: 裁判所「刑事事件」。捜査、令状、起訴、公判、黙秘権など刑事手続の概略を説明する。https://www.courts.go.jp/saiban/syurui/syurui_keizi/index.html
+8. 裁判所「刑事事件」。捜査、令状、起訴、公判、黙秘権など刑事手続の概略を説明する。https://www.courts.go.jp/saiban/syurui/syurui_keizi/index.html
 
-[^9]: 有斐閣「ポケット六法令和8年版」。基本六法を中心に、学習・実務上必要な主要法令を収録する現代の小型六法の構成例。https://www.yuhikaku.co.jp/static/pokeroku-reiwa8/index.html
+9. 有斐閣「ポケット六法令和8年版」。基本六法を中心に、学習・実務上必要な主要法令を収録する現代の小型六法の構成例。https://www.yuhikaku.co.jp/static/pokeroku-reiwa8/index.html
 
-[^10]: 有斐閣「六法全書令和8年版収録法令」。六法全書が基本六法だけでなく、行政、社会、経済、環境など多数の法令を収録することを確認できる。https://www.yuhikaku.co.jp/static/hourei01.html
+10. 有斐閣「六法全書令和8年版収録法令」。六法全書が基本六法だけでなく、行政、社会、経済、環境など多数の法令を収録することを確認できる。https://www.yuhikaku.co.jp/static/hourei01.html
 
-[^11]: 参議院法制局「法令用語と法解釈」。法令用語には日常語と異なる使い分けがあり、「及び」「並びに」「又は」「若しくは」「みなす」「推定する」などが正確な立案・適用のための言葉の技術であることを説明する。https://houseikyoku.sangiin.go.jp/column/column018.htm
+11. 参議院法制局「法令用語と法解釈」。法令用語には日常語と異なる使い分けがあり、「及び」「並びに」「又は」「若しくは」「みなす」「推定する」などが正確な立案・適用のための言葉の技術であることを説明する。https://houseikyoku.sangiin.go.jp/column/column018.htm
 
-[^12]: 参議院法制局「『改め文』―法令の一部改正方式―」。一部改正法の改め文が元の法律に溶け込んで新しい規範になる「溶け込み方式」であり、元法と対照しなければ内容を正確に理解できないことを説明する。https://houseikyoku.sangiin.go.jp/column/column050.htm
+12. 参議院法制局「『改め文』―法令の一部改正方式―」。一部改正法の改め文が元の法律に溶け込んで新しい規範になる「溶け込み方式」であり、元法と対照しなければ内容を正確に理解できないことを説明する。https://houseikyoku.sangiin.go.jp/column/column050.htm
 
-[^13]: 内閣法制局「法律ができるまで」。主管省庁による原案作成、省庁間調整、内閣法制局の予備審査・最終審査、閣議、国会提出、成立、公布までの過程を説明する。https://www.clb.go.jp/recent-laws/process/
+13. 内閣法制局「法律ができるまで」。主管省庁による原案作成、省庁間調整、内閣法制局の予備審査・最終審査、閣議、国会提出、成立、公布までの過程を説明する。https://www.clb.go.jp/recent-laws/process/
 
-[^14]: 参議院法制局「法律の施行期日」。公布後に準備期間を置くこと、確定日または政令で定める日などによって施行期日を設定する方法を説明する。https://houseikyoku.sangiin.go.jp/column/column022.htm
+14. 参議院法制局「法律の施行期日」。公布後に準備期間を置くこと、確定日または政令で定める日などによって施行期日を設定する方法を説明する。https://houseikyoku.sangiin.go.jp/column/column022.htm
 
-[^15]: 参議院法制局「経過措置と遡及適用」および「経過規定と旧法令の効力」。法改正時の法的安定性、経過措置、「なお従前の例による」と「なおその効力を有する」の違いを説明する。https://houseikyoku.sangiin.go.jp/column/column009.htm および https://houseikyoku.sangiin.go.jp/column/column051.htm
+15. 参議院法制局「経過措置と遡及適用」および「経過規定と旧法令の効力」。法改正時の法的安定性、経過措置、「なお従前の例による」と「なおその効力を有する」の違いを説明する。https://houseikyoku.sangiin.go.jp/column/column009.htm および https://houseikyoku.sangiin.go.jp/column/column051.htm
 
-[^16]: 参議院法制局「調整規定」。複数の改正法の施行順序が競合する場合に、施行順に応じて文言を調整する規定の実例を紹介する。https://houseikyoku.sangiin.go.jp/column/column059.htm
+16. 参議院法制局「調整規定」。複数の改正法の施行順序が競合する場合に、施行順に応じて文言を調整する規定の実例を紹介する。https://houseikyoku.sangiin.go.jp/column/column059.htm
 

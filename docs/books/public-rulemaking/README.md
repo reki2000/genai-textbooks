@@ -2061,7 +2061,7 @@ AIが地区別排出量を予測し、毎時間ルートを最適化！！
 
 [^6]: S. Michie, M. M. van Stralen, and R. West, “The Behaviour Change Wheel: A New Method for Characterising and Designing Behaviour Change Interventions,” *Implementation Science*, 6, 42, 2011. 行動には能力、機会、動機が必要であるとするCOM-Bモデルを提示した。本文7-1では、行政実務向けの遵守の六角形と対応づけた。
 
-[^7]: H. A. Simon, *Administrative Behavior: A Study of Decision-Making Processes in Administrative Organization*, Macmillan, 1947. 人間が完全な情報と無限の計算能力を持つという前提ではなく、限定された認知と情報の下で意思決定することを行政組織の分析へ導入した。本文全体の、市民と職員を理想的計算機として扱わない立場に対応する。
+7. H. A. Simon, *Administrative Behavior: A Study of Decision-Making Processes in Administrative Organization*, Macmillan, 1947. 人間が完全な情報と無限の計算能力を持つという前提ではなく、限定された認知と情報の下で意思決定することを行政組織の分析へ導入した。本文全体の、市民と職員を理想的計算機として扱わない立場に対応する。
 
-[^8]: J. Reason, *Managing the Risks of Organizational Accidents*, Ashgate, 1997. 事故を個人の失敗だけに還元せず、組織的条件、防護層、報告文化を含むシステムとして捉える考え方を示した。本文3-2と8-1で、報告減少を安全向上と誤認せず、危険情報を制度改善へ使う場面に対応する。
+8. J. Reason, *Managing the Risks of Organizational Accidents*, Ashgate, 1997. 事故を個人の失敗だけに還元せず、組織的条件、防護層、報告文化を含むシステムとして捉える考え方を示した。本文3-2と8-1で、報告減少を安全向上と誤認せず、危険情報を制度改善へ使う場面に対応する。
 

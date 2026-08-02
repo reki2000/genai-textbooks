@@ -1154,4 +1154,3 @@ R2P は理念としては強力だが、**発動の鍵が、麻痺しうる安�
 [^20]: [Wikipedia『Srebrenica massacre』](https://en.wikipedia.org/wiki/Srebrenica_massacre), 2026年7月10日参照.
 [^21]: [Wikipedia『Responsibility to protect』](https://en.wikipedia.org/wiki/Responsibility_to_protect), 2026年7月10日参照.
 [^22]: [Wikipedia『Long Peace』](https://en.wikipedia.org/wiki/Long_Peace), 2026年7月10日参照.
-[^23]: [Wikipedia『Casualties of the Russo-Ukrainian war』](https://en.wikipedia.org/wiki/Casualties_of_the_Russo-Ukrainian_war), 2026年7月10日参照.

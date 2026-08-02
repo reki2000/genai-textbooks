@@ -2792,22 +2792,22 @@ Elias–Fano、RRR、FM-indexの効果が大きくなるお。
 
 ---
 
-[^1]: G. Jacobson, “Space-efficient static trees and graphs,” *Proceedings of the 30th Annual Symposium on Foundations of Computer Science*, pp. 549–554, 1989. 木やビット列に対する簡潔表現と、rank/selectを用いた操作の基礎となった研究。本文第2幕および第4幕の、補助索引によってビット列と木を操作する議論に対応する。
+1. G. Jacobson, “Space-efficient static trees and graphs,” *Proceedings of the 30th Annual Symposium on Foundations of Computer Science*, pp. 549–554, 1989. 木やビット列に対する簡潔表現と、rank/selectを用いた操作の基礎となった研究。本文第2幕および第4幕の、補助索引によってビット列と木を操作する議論に対応する。
 
-[^2]: R. Raman, V. Raman, and S. S. Rao, “Succinct indexable dictionaries with applications to encoding k-ary trees, prefix sums and multisets,” *Proceedings of the 13th Annual ACM-SIAM Symposium on Discrete Algorithms*, pp. 233–242, 2002. ビット列をエントロピーに近い容量で表しながらrank/selectを実現する構造を示した。本文第7幕のRRRビットベクトルに対応する。
+2. R. Raman, V. Raman, and S. S. Rao, “Succinct indexable dictionaries with applications to encoding k-ary trees, prefix sums and multisets,” *Proceedings of the 13th Annual ACM-SIAM Symposium on Discrete Algorithms*, pp. 233–242, 2002. ビット列をエントロピーに近い容量で表しながらrank/selectを実現する構造を示した。本文第7幕のRRRビットベクトルに対応する。
 
-[^3]: P. Elias, “Efficient storage and retrieval by content and address of static files,” *Journal of the ACM*, 21(2), pp. 246–260, 1974. 単調整数列の上位部と下位部を分離する符号化の基礎。本文第3幕のElias–Fano表現に対応する。
+3. P. Elias, “Efficient storage and retrieval by content and address of static files,” *Journal of the ACM*, 21(2), pp. 246–260, 1974. 単調整数列の上位部と下位部を分離する符号化の基礎。本文第3幕のElias–Fano表現に対応する。
 
-[^4]: R. Fano, “On the number of bits required to implement an associative memory,” Memorandum 61, Computer Structures Group, Project MAC, MIT, 1971. 単調列を上位部と下位部へ分ける表現に関する初期研究。Eliasの方式と合わせてElias–Fanoと呼ばれる。
+4. R. Fano, “On the number of bits required to implement an associative memory,” Memorandum 61, Computer Structures Group, Project MAC, MIT, 1971. 単調列を上位部と下位部へ分ける表現に関する初期研究。Eliasの方式と合わせてElias–Fanoと呼ばれる。
 
-[^5]: D. Okanohara and K. Sadakane, “Practical entropy-compressed rank/select dictionary,” *Proceedings of the 9th Workshop on Algorithm Engineering and Experiments*, pp. 60–70, 2007. rank/select対応ビットベクトルを実用上高速に実装する構成を扱う。本文第2幕および第7幕の、理論容量と実測性能を区別する議論に対応する。
+5. D. Okanohara and K. Sadakane, “Practical entropy-compressed rank/select dictionary,” *Proceedings of the 9th Workshop on Algorithm Engineering and Experiments*, pp. 60–70, 2007. rank/select対応ビットベクトルを実用上高速に実装する構成を扱う。本文第2幕および第7幕の、理論容量と実測性能を区別する議論に対応する。
 
-[^6]: R. Grossi, A. Gupta, and J. S. Vitter, “High-order entropy-compressed text indexes,” *Proceedings of the 14th Annual ACM-SIAM Symposium on Discrete Algorithms*, pp. 841–850, 2003. Wavelet Treeを用いた圧縮索引の代表的研究。本文第5幕の多値列操作に対応する。
+6. R. Grossi, A. Gupta, and J. S. Vitter, “High-order entropy-compressed text indexes,” *Proceedings of the 14th Annual ACM-SIAM Symposium on Discrete Algorithms*, pp. 841–850, 2003. Wavelet Treeを用いた圧縮索引の代表的研究。本文第5幕の多値列操作に対応する。
 
-[^7]: F. Claude, G. Navarro, and A. Ordóñez, “The Wavelet Matrix: An Efficient Wavelet Tree for Large Alphabets,” *Information Systems*, 47, pp. 15–32, 2015. Wavelet Treeを階層ごとの連続ビット列として配置するWavelet Matrixを整理した研究。本文第5幕のキャッシュ局所性とポインタ削減に対応する。
+7. F. Claude, G. Navarro, and A. Ordóñez, “The Wavelet Matrix: An Efficient Wavelet Tree for Large Alphabets,” *Information Systems*, 47, pp. 15–32, 2015. Wavelet Treeを階層ごとの連続ビット列として配置するWavelet Matrixを整理した研究。本文第5幕のキャッシュ局所性とポインタ削減に対応する。
 
-[^8]: M. Burrows and D. J. Wheeler, “A Block-sorting Lossless Data Compression Algorithm,” Digital Equipment Corporation, Technical Report 124, 1994. Burrows–Wheeler変換を提示した技術報告。本文第6幕のBWT列とLF-mappingに対応する。
+8. M. Burrows and D. J. Wheeler, “A Block-sorting Lossless Data Compression Algorithm,” Digital Equipment Corporation, Technical Report 124, 1994. Burrows–Wheeler変換を提示した技術報告。本文第6幕のBWT列とLF-mappingに対応する。
 
-[^9]: P. Ferragina and G. Manzini, “Opportunistic data structures with applications,” *Proceedings of the 41st Annual Symposium on Foundations of Computer Science*, pp. 390–398, 2000. BWTとrankを利用し、圧縮したまま全文検索を行うFM-indexを提示した。本文第6幕の後方検索と自己索引に対応する。
+9. P. Ferragina and G. Manzini, “Opportunistic data structures with applications,” *Proceedings of the 41st Annual Symposium on Foundations of Computer Science*, pp. 390–398, 2000. BWTとrankを利用し、圧縮したまま全文検索を行うFM-indexを提示した。本文第6幕の後方検索と自己索引に対応する。
 
-[^10]: G. Navarro, *Compact Data Structures: A Practical Approach*, Cambridge University Press, 2016. ビットベクトル、木、列、全文索引を含む簡潔・圧縮データ構造を体系的に扱う。本文全体の理論および実装上の背景に対応する。
+10. G. Navarro, *Compact Data Structures: A Practical Approach*, Cambridge University Press, 2016. ビットベクトル、木、列、全文索引を含む簡潔・圧縮データ構造を体系的に扱う。本文全体の理論および実装上の背景に対応する。

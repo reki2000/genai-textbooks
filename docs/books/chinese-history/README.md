@@ -2611,32 +2611,32 @@ EUより翻訳制度が未整備で、ハプスブルク帝国より移動速度
 ---
 ## 参考文献
 
-[^1]: Mark Edward Lewis, *The Early Chinese Empires: Qin and Han*, Harvard University Press, 2007. 秦漢の中央集権、郡県、帝国社会の形成について。
-[^2]: Mark Edward Lewis, *China Between Empires: The Northern and Southern Dynasties*, Harvard University Press, 2009. 五胡十六国・南北朝の移住、民族形成、仏教、南北社会について。
-[^3]: David A. Graff, *Medieval Chinese Warfare, 300–900*, Routledge, 2002. 南北朝から隋唐の軍事制度と国家形成について。
-[^4]: Jonathan Karam Skaff, *Sui-Tang China and Its Turko-Mongol Neighbors*, Oxford University Press, 2012. 隋唐と草原諸勢力の複合的な政治文化について。
-[^5]: Valerie Hansen, *The Silk Road: A New History*, Oxford University Press, 2012. オアシス都市、ソグド商人、宗教・文書・交易について。
-[^6]: Denis C. Twitchett and Herbert Franke eds., *The Cambridge History of China, Volume 6: Alien Regimes and Border States, 907–1368*, Cambridge University Press, 1994. 遼・西夏・金・元の複合統治について。
-[^7]: Morris Rossabi, *Khubilai Khan: His Life and Times*, University of California Press, 1988. クビライ政権と元の多地域統治について。
-[^8]: Timothy Brook, *The Confusions of Pleasure: Commerce and Culture in Ming China*, University of California Press, 1998. 明代の商業化、銀、社会変動について。
-[^9]: Frederic Wakeman Jr., *The Great Enterprise: The Manchu Reconstruction of Imperial Order in Seventeenth-Century China*, University of California Press, 1985. 明清交代と清の征服について。
-[^10]: Pamela Kyle Crossley, *A Translucent Mirror: History and Identity in Qing Imperial Ideology*, University of California Press, 1999. 満洲アイデンティティと清の複数的皇帝像について。
-[^11]: Evelyn S. Rawski, *The Last Emperors: A Social History of Qing Imperial Institutions*, University of California Press, 1998. 清宮廷の満洲語・多言語制度、八旗、帝国儀礼について。
-[^12]: Peter C. Perdue, *China Marches West: The Qing Conquest of Central Eurasia*, Harvard University Press, 2005. 清・ジュンガル戦争と中央ユーラシア統合について。
-[^13]: James A. Millward, *Eurasian Crossroads: A History of Xinjiang*, Columbia University Press, 2007. 新疆のオアシス社会、清統治、近代民族形成について。
-[^14]: Patricia Buckley Ebrey, *The Cambridge Illustrated History of China*, Cambridge University Press, 2nd ed., 2010. 王朝史、社会史、家族・宗教・都市の概観について。
-[^15]: Charles Holcombe, *A History of East Asia*, Cambridge University Press, 2nd ed., 2017. 中国、日本、朝鮮、ベトナムを接続する東アジア史について。
-[^16]: Nicolas Di Cosmo, *Ancient China and Its Enemies*, Cambridge University Press, 2002. 匈奴と農耕・草原関係について。
-[^17]: Peter B. Golden, *Central Asia in World History*, Oxford University Press, 2011. 突厥、回鶻、モンゴルなど中央ユーラシア諸集団の連続と再編について。
-[^18]: Endymion Wilkinson, *Chinese History: A New Manual*, Harvard University Asia Center, 6th ed., 2022. 地名、制度、史料、民族名称の確認に使用。
-[^19]: Edward J. M. Rhoads, *Manchus and Han: Ethnic Relations and Political Power in Late Qing and Early Republican China*, University of Washington Press, 2000. 満洲・漢関係と清末民初の民族政治について。
-[^20]: David Der-wei Wang ed., *A New Literary History of Modern China*, Harvard University Press, 2017. 近代の言語・文体・国民文化形成の背景について。
+1. Mark Edward Lewis, *The Early Chinese Empires: Qin and Han*, Harvard University Press, 2007. 秦漢の中央集権、郡県、帝国社会の形成について。
+2. Mark Edward Lewis, *China Between Empires: The Northern and Southern Dynasties*, Harvard University Press, 2009. 五胡十六国・南北朝の移住、民族形成、仏教、南北社会について。
+3. David A. Graff, *Medieval Chinese Warfare, 300–900*, Routledge, 2002. 南北朝から隋唐の軍事制度と国家形成について。
+4. Jonathan Karam Skaff, *Sui-Tang China and Its Turko-Mongol Neighbors*, Oxford University Press, 2012. 隋唐と草原諸勢力の複合的な政治文化について。
+5. Valerie Hansen, *The Silk Road: A New History*, Oxford University Press, 2012. オアシス都市、ソグド商人、宗教・文書・交易について。
+6. Denis C. Twitchett and Herbert Franke eds., *The Cambridge History of China, Volume 6: Alien Regimes and Border States, 907–1368*, Cambridge University Press, 1994. 遼・西夏・金・元の複合統治について。
+7. Morris Rossabi, *Khubilai Khan: His Life and Times*, University of California Press, 1988. クビライ政権と元の多地域統治について。
+8. Timothy Brook, *The Confusions of Pleasure: Commerce and Culture in Ming China*, University of California Press, 1998. 明代の商業化、銀、社会変動について。
+9. Frederic Wakeman Jr., *The Great Enterprise: The Manchu Reconstruction of Imperial Order in Seventeenth-Century China*, University of California Press, 1985. 明清交代と清の征服について。
+10. Pamela Kyle Crossley, *A Translucent Mirror: History and Identity in Qing Imperial Ideology*, University of California Press, 1999. 満洲アイデンティティと清の複数的皇帝像について。
+11. Evelyn S. Rawski, *The Last Emperors: A Social History of Qing Imperial Institutions*, University of California Press, 1998. 清宮廷の満洲語・多言語制度、八旗、帝国儀礼について。
+12. Peter C. Perdue, *China Marches West: The Qing Conquest of Central Eurasia*, Harvard University Press, 2005. 清・ジュンガル戦争と中央ユーラシア統合について。
+13. James A. Millward, *Eurasian Crossroads: A History of Xinjiang*, Columbia University Press, 2007. 新疆のオアシス社会、清統治、近代民族形成について。
+14. Patricia Buckley Ebrey, *The Cambridge Illustrated History of China*, Cambridge University Press, 2nd ed., 2010. 王朝史、社会史、家族・宗教・都市の概観について。
+15. Charles Holcombe, *A History of East Asia*, Cambridge University Press, 2nd ed., 2017. 中国、日本、朝鮮、ベトナムを接続する東アジア史について。
+16. Nicolas Di Cosmo, *Ancient China and Its Enemies*, Cambridge University Press, 2002. 匈奴と農耕・草原関係について。
+17. Peter B. Golden, *Central Asia in World History*, Oxford University Press, 2011. 突厥、回鶻、モンゴルなど中央ユーラシア諸集団の連続と再編について。
+18. Endymion Wilkinson, *Chinese History: A New Manual*, Harvard University Asia Center, 6th ed., 2022. 地名、制度、史料、民族名称の確認に使用。
+19. Edward J. M. Rhoads, *Manchus and Han: Ethnic Relations and Political Power in Late Qing and Early Republican China*, University of Washington Press, 2000. 満洲・漢関係と清末民初の民族政治について。
+20. David Der-wei Wang ed., *A New Literary History of Modern China*, Harvard University Press, 2017. 近代の言語・文体・国民文化形成の背景について。
 
-[^21]: 集英社『封神演義 1』作品紹介。殷末を舞台に太公望の封神計画を描く藤崎竜版の公式書誌。https://www.shueisha.co.jp/books/items/contents.html?isbn=978-4-08-619584-3
-[^22]: 週刊ヤングジャンプ『キングダム』公式人物紹介。嬴政を秦王として統一を目指す人物に描く作品上の設定確認に使用。https://youngjump.jp/kingdom/character/01shin/01.html
-[^23]: 潮出版社『横山光輝で読む「項羽と劉邦」』および『項羽と劉邦―若き獅子たち』作品紹介。https://www.usio.co.jp/books/ushio_shinsyo/24848
-[^24]: 潮出版社、横山光輝『三国志』公式案内。桃園の誓いから蜀漢末までを描く全60巻の作品範囲確認に使用。https://www.usio.co.jp/comic/comics/12171
-[^25]: British Film Institute, “Red Cliff.” 映画が赤壁の戦いを中心にした作品であることの確認に使用。https://bfidatadigipres.github.io/art%20of%20action%3Cbr%3E%20celebrating%20the%20real%20action%20stars%20of%20cinema/2024/11/02/red-cliff/
-[^26]: 秋田書店『天幕のジャードゥーガル 第1巻』作品紹介。13世紀モンゴル帝国、ファーティマ、ドレゲネを中心とする設定確認に使用。https://www.akitashoten.co.jp/comics/4253264468
-[^27]: 講談社『蒼穹の昴』シリーズ公式案内。清末を扱う小説・映像作品群の確認に使用。https://book-sp.kodansha.co.jp/topics/sokyu/
-[^28]: The Criterion Collection, *The Last Emperor*. 1908年に即位した溥儀の生涯を扱う映画の範囲確認に使用。https://www.criterion.com/films/254-the-last-emperor
+21. 集英社『封神演義 1』作品紹介。殷末を舞台に太公望の封神計画を描く藤崎竜版の公式書誌。https://www.shueisha.co.jp/books/items/contents.html?isbn=978-4-08-619584-3
+22. 週刊ヤングジャンプ『キングダム』公式人物紹介。嬴政を秦王として統一を目指す人物に描く作品上の設定確認に使用。https://youngjump.jp/kingdom/character/01shin/01.html
+23. 潮出版社『横山光輝で読む「項羽と劉邦」』および『項羽と劉邦―若き獅子たち』作品紹介。https://www.usio.co.jp/books/ushio_shinsyo/24848
+24. 潮出版社、横山光輝『三国志』公式案内。桃園の誓いから蜀漢末までを描く全60巻の作品範囲確認に使用。https://www.usio.co.jp/comic/comics/12171
+25. British Film Institute, “Red Cliff.” 映画が赤壁の戦いを中心にした作品であることの確認に使用。https://bfidatadigipres.github.io/art%20of%20action%3Cbr%3E%20celebrating%20the%20real%20action%20stars%20of%20cinema/2024/11/02/red-cliff/
+26. 秋田書店『天幕のジャードゥーガル 第1巻』作品紹介。13世紀モンゴル帝国、ファーティマ、ドレゲネを中心とする設定確認に使用。https://www.akitashoten.co.jp/comics/4253264468
+27. 講談社『蒼穹の昴』シリーズ公式案内。清末を扱う小説・映像作品群の確認に使用。https://book-sp.kodansha.co.jp/topics/sokyu/
+28. The Criterion Collection, *The Last Emperor*. 1908年に即位した溥儀の生涯を扱う映画の範囲確認に使用。https://www.criterion.com/films/254-the-last-emperor

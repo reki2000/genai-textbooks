@@ -1313,7 +1313,7 @@ $$
 
 **できる子**：
 記号表を確定。
-式の中の原子数は未確定として、別扱いで記録する。[^9]
+式の中の原子数は未確定として、別扱いで記録する。[^4]
 
 ---
 
@@ -2189,7 +2189,7 @@ $$
 のちに、この族はさらに増える。
 ラジウムの崩壊から生じる重い単原子気体――ラドン――が加わり、
 また「絶対に反応しない」も厳密には正しくなく、強い条件下でキセノンはフッ素と化合物を作ることが示される。
-性質は「反応しない」ではなく「反応しにくい」へ修正される。[^10]
+性質は「反応しない」ではなく「反応しにくい」へ修正される。[^5]
 
 ---
 
@@ -2540,16 +2540,16 @@ $$
 
 [^3]: H. G. J. Moseley, “The High-Frequency Spectra of the Elements,” *Philosophical Magazine*, 1913–1914. 元素固有のX線と原子番号の関係を示し、周期表の順序が原子量ではなく核電荷に対応することを明確にした。本文10-1に対応する。
 
-[^4]: Antoine-Laurent Lavoisier, *Traité Élémentaire de Chimie*, 1789. 質量測定を基礎とする化学、燃焼の酸素説、単純物質の操作的な分類に関する基礎資料。本文3幕から5幕に対応する。
+[^4]: Jöns Jacob Berzelius, “Essay on the Cause of Chemical Proportions, and on Some Circumstances Relating to Them,” *Annals of Philosophy*, 1813–1814. 元素のラテン名の頭文字（衝突する場合は二文字目を添える）を記号とする表記法を提案し、ドルトンの図形記号に代えて印刷可能な化学式の体系を与えた。本文7-1に対応する。
 
-[^5]: John Dalton, *A New System of Chemical Philosophy*, Vol. 1, 1808. 化学元素を原子からなるものとして扱い、化合物の一定比と倍数比例を原子の整数比で説明した。本文6幕に対応する。
+[^5]: Lord Rayleigh and William Ramsay, “Argon, a New Constituent of the Atmosphere,” *Philosophical Transactions of the Royal Society A*, 1895; William Ramsay and Morris W. Travers, “On the Companions of Argon,” *Proceedings of the Royal Society of London*, 1898; Neil Bartlett, “Xenon Hexafluoroplatinate(V),” *Proceedings of the Chemical Society*, 1962. 大気窒素と化合物由来窒素の密度差、比熱比による単原子分子の決定、液体空気の分留と輝線スペクトルによるネオン・クリプトン・キセノンの同定、および希ガスが化合物を作りうることの発見に対応する。本文10-1に対応する。
 
-[^6]: Amedeo Avogadro, “Essay on a Manner of Determining the Relative Masses of the Elementary Molecules of Bodies,” 1811. 同温・同圧の等体積の気体が同数の分子を含むという仮説を提示した。本文7幕に対応する。
+6. Antoine-Laurent Lavoisier, *Traité Élémentaire de Chimie*, 1789. 質量測定を基礎とする化学、燃焼の酸素説、単純物質の操作的な分類に関する基礎資料。本文3幕から5幕に対応する。
 
-[^7]: Stanislao Cannizzaro, *Sunto di un corso di filosofia chimica*, 1858. アボガドロの考えを用いて原子量と分子量を整理し、19世紀中葉の化学式と原子量の混乱を解く重要な基礎となった。本文7幕に対応する。
+7. John Dalton, *A New System of Chemical Philosophy*, Vol. 1, 1808. 化学元素を原子からなるものとして扱い、化合物の一定比と倍数比例を原子の整数比で説明した。本文6幕に対応する。
 
-[^8]: J. R. Partington, *A Short History of Chemistry*, 3rd ed., Macmillan, 1957; Aaron J. Ihde, *The Development of Modern Chemistry*, Dover Publications, 1984. 4元素説、気体化学、フロギストン説、化学革命、原子論、周期律に至る歴史的経過の総合的な参照資料。
+8. Amedeo Avogadro, “Essay on a Manner of Determining the Relative Masses of the Elementary Molecules of Bodies,” 1811. 同温・同圧の等体積の気体が同数の分子を含むという仮説を提示した。本文7幕に対応する。
 
-[^9]: Jöns Jacob Berzelius, “Essay on the Cause of Chemical Proportions, and on Some Circumstances Relating to Them,” *Annals of Philosophy*, 1813–1814. 元素のラテン名の頭文字（衝突する場合は二文字目を添える）を記号とする表記法を提案し、ドルトンの図形記号に代えて印刷可能な化学式の体系を与えた。本文7-1に対応する。
+9. Stanislao Cannizzaro, *Sunto di un corso di filosofia chimica*, 1858. アボガドロの考えを用いて原子量と分子量を整理し、19世紀中葉の化学式と原子量の混乱を解く重要な基礎となった。本文7幕に対応する。
 
-[^10]: Lord Rayleigh and William Ramsay, “Argon, a New Constituent of the Atmosphere,” *Philosophical Transactions of the Royal Society A*, 1895; William Ramsay and Morris W. Travers, “On the Companions of Argon,” *Proceedings of the Royal Society of London*, 1898; Neil Bartlett, “Xenon Hexafluoroplatinate(V),” *Proceedings of the Chemical Society*, 1962. 大気窒素と化合物由来窒素の密度差、比熱比による単原子分子の決定、液体空気の分留と輝線スペクトルによるネオン・クリプトン・キセノンの同定、および希ガスが化合物を作りうることの発見に対応する。本文10-1に対応する。
+10. J. R. Partington, *A Short History of Chemistry*, 3rd ed., Macmillan, 1957; Aaron J. Ihde, *The Development of Modern Chemistry*, Dover Publications, 1984. 4元素説、気体化学、フロギストン説、化学革命、原子論、周期律に至る歴史的経過の総合的な参照資料。

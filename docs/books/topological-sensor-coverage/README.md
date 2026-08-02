@@ -2603,10 +2603,10 @@ $$
 
 ---
 
-[^1]: Vin de Silva and Robert Ghrist, “Coverage in Sensor Networks via Persistent Homology,” *Algebraic & Geometric Topology*, Vol. 7, pp. 339–358, 2007, DOI: 10.2140/agt.2007.7.339. 強信号・弱信号および境界近傍情報からRips複体の対を構成し、包含が誘導するトップ次元相対ホモロジー写像の非零性によって、境界近傍を除く領域の被覆を保証する十分条件を示した。本文6-1、7-2、8-1の基礎となる。
+1. Vin de Silva and Robert Ghrist, “Coverage in Sensor Networks via Persistent Homology,” *Algebraic & Geometric Topology*, Vol. 7, pp. 339–358, 2007, DOI: 10.2140/agt.2007.7.339. 強信号・弱信号および境界近傍情報からRips複体の対を構成し、包含が誘導するトップ次元相対ホモロジー写像の非零性によって、境界近傍を除く領域の被覆を保証する十分条件を示した。本文6-1、7-2、8-1の基礎となる。
 
-[^2]: Vin de Silva and Robert Ghrist, “Coordinate-free Coverage in Sensor Networks with Controlled Boundaries via Homology,” *The International Journal of Robotics Research*, Vol. 25, No. 12, pp. 1205–1222, 2006, DOI: 10.1177/0278364906072252. 座標・方向・確率分布を仮定せず、通信接続と制御された境界からホモロジーを用いて被覆を検証する枠組みを示した。本文1幕から5幕までの問題設定と、相対ホモロジーによる被覆の考え方に対応する。
+2. Vin de Silva and Robert Ghrist, “Coordinate-free Coverage in Sensor Networks with Controlled Boundaries via Homology,” *The International Journal of Robotics Research*, Vol. 25, No. 12, pp. 1205–1222, 2006, DOI: 10.1177/0278364906072252. 座標・方向・確率分布を仮定せず、通信接続と制御された境界からホモロジーを用いて被覆を検証する枠組みを示した。本文1幕から5幕までの問題設定と、相対ホモロジーによる被覆の考え方に対応する。
 
-[^3]: Allen Hatcher, *Algebraic Topology*, Cambridge University Press, 2002. 単体ホモロジー、相対ホモロジー、長完全列、nerveに関連する標準的な背景を与える。本文4幕と7幕では、係数体を $\mathbb F_2$ に固定して線形代数として計算した。
+3. Allen Hatcher, *Algebraic Topology*, Cambridge University Press, 2002. 単体ホモロジー、相対ホモロジー、長完全列、nerveに関連する標準的な背景を与える。本文4幕と7幕では、係数体を $\mathbb F_2$ に固定して線形代数として計算した。
 
-[^4]: Herbert Edelsbrunner and John Harer, *Computational Topology: An Introduction*, American Mathematical Society, 2010. 単体複体、Čech複体、Vietoris–Rips複体、ホモロジー計算、パーシステントホモロジーの計算的背景を扱う。本文3幕、4幕、6幕の概念整理に対応する。
+4. Herbert Edelsbrunner and John Harer, *Computational Topology: An Introduction*, American Mathematical Society, 2010. 単体複体、Čech複体、Vietoris–Rips複体、ホモロジー計算、パーシステントホモロジーの計算的背景を扱う。本文3幕、4幕、6幕の概念整理に対応する。
