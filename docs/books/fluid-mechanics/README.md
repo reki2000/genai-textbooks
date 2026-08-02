@@ -1229,7 +1229,7 @@ $$-dp\,dA\,ds=-dp\,dV$$
 高さ変化$dz$に対して重力仕事は$-g\,dz$、運動エネルギー変化は$d(U^2/2)$。
 仕事とエネルギーの関係から
 
-$$-rac{dp}{\rho}-g\,dz=d\left(\frac{U^2}{2}\right)$$
+$$-\frac{dp}{\rho}-g\,dz=d\left(\frac{U^2}{2}\right)$$
 
 整理して
 
@@ -1239,7 +1239,7 @@ $$d\left(\frac{p}{\rho}+\frac{U^2}{2}+gz\right)=0$$
 
 $$
 \boxed{
-\frac{p}{\rho}+rac{U^2}{2}+gz=\text{一定}
+\frac{p}{\rho}+\frac{U^2}{2}+gz=\text{一定}
 }
 $$
 

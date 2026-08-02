@@ -6,49 +6,28 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import sys
 from pathlib import Path
 from typing import Any, Iterable
 
+# 話者行の判定規則は scripts/yaruo_markdown.py が正本。yaruo_lint.py と共有する。
+sys.path.insert(0, str(Path(__file__).resolve().parents[4] / "scripts"))
 
-FULLWIDTH_SPACE = "　"
-# 話者行・登場人物欄の判定規則は format_dialogue.py / fix_dialogue_periods.py と
-# 同一。check_dialogue_constraints.py は主役2名に限定した同等版。ここを変えるとき
-# は各スクリプトの SPEAKER_RE とロースター走査も同期すること。
-SPEAKER_LINE = re.compile(r"^\*\*([^*\n]+)\*\*[^*:：\n]*[:：]\s*$")
-ROSTER_LINE = re.compile(r"^\*\*([^*\n]+)\*\*")
-SECTION_LINE = re.compile(r"^(?:---\s*$|#{1,6}\s)")
-DEFAULT_SPEAKERS = {"やる夫", "やらない夫"}
+from yaruo_markdown import (  # noqa: E402
+    FULLWIDTH_SPACE,
+    is_speaker_line,
+    speaker_names,
+)
 
 
 def countable_content_lines(source_path: Path) -> list[str]:
     """Return countable lines after excluding recognized speaker labels."""
     lines = source_path.read_text(encoding="utf-8").splitlines()
-    bodies = [line.lstrip(FULLWIDTH_SPACE) for line in lines]
-    marker_counts: dict[str, int] = {}
-    for body in bodies:
-        if match := SPEAKER_LINE.match(body):
-            name = match.group(1)
-            marker_counts[name] = marker_counts.get(name, 0) + 1
-
-    speaker_names = set(DEFAULT_SPEAKERS)
-    speaker_names.update(name for name, count in marker_counts.items() if count >= 2)
-    in_roster = False
-    for body in bodies:
-        if re.match(r"^##\s+登場人物\s*$", body):
-            in_roster = True
-            continue
-        if in_roster and SECTION_LINE.match(body):
-            in_roster = False
-        if in_roster and (match := ROSTER_LINE.match(body)):
-            speaker_names.add(match.group(1))
-
+    names = speaker_names(lines)
     return [
         line
-        for line, body in zip(lines, bodies)
-        if not (
-            (match := SPEAKER_LINE.match(body))
-            and match.group(1) in speaker_names
-        )
+        for line in lines
+        if not is_speaker_line(line.lstrip(FULLWIDTH_SPACE), names)
     ]
 
 
