@@ -1185,7 +1185,7 @@ REGISTRY: tuple[Rule, ...] = (
     Rule("notation", "金額・割合の半角算用数字表記", True, rule_notation),
     Rule("end-marker", "終端マーカー `**── 完 ──**`", True, rule_end_marker),
     Rule("invisible-chars", "制御文字・私用領域文字の混入", False, rule_invisible_chars),
-    Rule("structure", "幕・節番号、終端マーカー、禁止見出し", False, rule_structure),
+    Rule("structure", "幕・節番号、参考文献見出し、禁止見出し", False, rule_structure),
     Rule("footnotes", "脚注の未使用・未定義", False, rule_footnotes),
     Rule("dialogue-shape", "会話量・実効往復・発言長の診断", False, rule_dialogue_shape),
 )
