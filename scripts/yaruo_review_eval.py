@@ -92,7 +92,7 @@ def line_region_kinds(lines: list[str]) -> list[str]:
             regions.append("heading")
         elif body.lstrip().startswith("|"):
             regions.append("table")
-        elif not body.strip() or body.strip() == "---":
+        elif not body.strip() or body == "---":
             regions.append("other")
         else:
             regions.append("prose")

@@ -7,7 +7,7 @@ description: やる夫式教材（docs/books/*/README.md）の公開前に、レ
 
 対象は `yaruo-rediscovery` が生成した会話形式の教材（`docs/books/*/README.md`）。これは**公開前の機械lint**であり、書式の予防そのものは `yaruo-rediscovery` の「Markdown書式」指定が担う。
 
-主眼は、執筆時の指定を守っても混入する CommonMark/GFM のレンダリング崩れ（`emphasis-flanking`・`table-delimiter`）にある。残る2つは保険。
+主眼は、執筆時の指定を守っても混入する CommonMark/GFM のレンダリング崩れ（`emphasis-flanking`・`table-delimiter`）にある。構造区切り（`structure-delimiter`）も、見出し・完了マーカーの境界を標準形へ揃える。残るルールは保険。
 
 **すべてスクリプトで機械的に行う。手作業でやらない。** モデルが本文を読み直して書き直すより、バイト単位で修正するこの機械lintのほうが安く確実である。
 
@@ -27,6 +27,8 @@ python3 scripts/yaruo_lint.py docs/books/<id>/README.md --check   # 0件を確�
 | `emphasis-flanking` | 約物に隣接して壊れた `**` |
 | `table-delimiter` | GFM 表の区切り行、表の行頭空白 |
 | `dialogue-period` | 発言末の句点（`〜〜 翌朝 〜〜` 等の場面転換カードは発言境界として除外） |
+| `heading-level` | 幕見出しを `##`、節見出しを `###` に統一（`####` 以下を禁止） |
+| `structure-delimiter` | `##` / `###` の直前は空行1行＋`---`、直後は `---` なしの空行1行に統一 |
 
 1. `--check` を実行する。
 2. error があれば `--fix` を適用する。
