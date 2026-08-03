@@ -43,7 +43,7 @@ documents:
 
 ## 検査・整形スクリプト
 
-`scripts/yaruo_lint.py` が唯一の入口。`--check` / `--fix` / `--rules <id>` / `--verbose` / `--stats`、一覧は `--list-rules`。
+書式・数値制約の検査は `scripts/yaruo_lint.py` が唯一の入口。`--check` / `--fix` / `--rules <id>` / `--verbose` / `--stats`、一覧は `--list-rules`。
 
 ```bash
 python3 scripts/yaruo_lint.py docs/books/{ID}/README.md --check --verbose
@@ -52,6 +52,8 @@ python3 scripts/yaruo_lint.py docs/books/{ID}/README.md --check --verbose
 - **error** は必ず解消する。**warning** は人が内容を見て判断する。**info は診断であって合否に使わない。**
 - 話者行・非散文領域の判定は `scripts/yaruo_markdown.py` が正本。`yaruo_lint.py` と `count_textbooks.py` が共有する。
 - ルールを変えたら `python3 scripts/tests/run_lint_tests.py` を実行する（fixture は `scripts/tests/fixtures/<ルールID>/`）。
+
+会話の同型反復は `scripts/yaruo_beat_repetition.py`（`--show` / `--beats` / `--units`）。lint とは別系統で、**合否ではなくレビュー時の候補区間の絞り込み**に使う。ラベル体系と指標の正本は `.claude/skills/yaruo-review/references/beat-labels.md`。
 
 ## ビルドシステム
 
