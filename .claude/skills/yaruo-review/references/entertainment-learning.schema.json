@@ -1,0 +1,395 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://genai-textbooks.local/schemas/entertainment-learning-v0.1.0.json",
+  "title": "Entertainment-learning textbook pilot evaluation",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "document_kind",
+    "book_id",
+    "source_path",
+    "source_sha256",
+    "evaluator",
+    "structure",
+    "core_concepts",
+    "book_scores",
+    "unit_ledgers",
+    "unit_scores",
+    "gates",
+    "dull_runs",
+    "model_states",
+    "notes"
+  ],
+  "properties": {
+    "schema_version": {"const": "0.1.0-pilot"},
+    "document_kind": {"const": "evaluation"},
+    "book_id": {"type": "string", "minLength": 1},
+    "source_path": {"type": "string", "minLength": 1},
+    "source_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "evaluator": {"$ref": "#/$defs/evaluator"},
+    "structure": {"$ref": "#/$defs/structure"},
+    "core_concepts": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/coreConcept"}
+    },
+    "book_scores": {
+      "type": "object",
+      "required": ["E1", "E2", "E3", "L1", "L2", "L3", "S1"],
+      "properties": {
+        "E1": {"$ref": "#/$defs/score"},
+        "E2": {"$ref": "#/$defs/score"},
+        "E3": {"$ref": "#/$defs/score"},
+        "L1": {"$ref": "#/$defs/score"},
+        "L2": {"$ref": "#/$defs/score"},
+        "L3": {"$ref": "#/$defs/score"},
+        "S1": {"$ref": "#/$defs/score"}
+      },
+      "additionalProperties": false
+    },
+    "unit_ledgers": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/unitLedger"}
+    },
+    "unit_scores": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/unitScore"}
+    },
+    "gates": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/gate"}
+    },
+    "dull_runs": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/dullRun"}
+    },
+    "model_states": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/modelState"}
+    },
+    "notes": {"type": "array", "items": {"type": "string"}}
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "evaluator": {
+      "type": "object",
+      "required": ["name", "model", "rubric_author", "evaluated_at", "mode"],
+      "properties": {
+        "name": {"enum": ["codex", "claude", "human", "other"]},
+        "model": {"type": "string"},
+        "rubric_author": {"type": "boolean"},
+        "evaluated_at": {"type": ["string", "null"]},
+        "mode": {"enum": ["pilot", "low_cost", "high_quality"]}
+      },
+      "additionalProperties": false
+    },
+    "range": {
+      "type": "object",
+      "required": ["start_line", "end_line"],
+      "properties": {
+        "start_line": {"type": "integer", "minimum": 1},
+        "end_line": {"type": "integer", "minimum": 1}
+      },
+      "additionalProperties": false
+    },
+    "scope": {
+      "type": "object",
+      "required": ["start_line", "end_line", "unit_ids"],
+      "properties": {
+        "start_line": {"type": "integer", "minimum": 1},
+        "end_line": {"type": "integer", "minimum": 1},
+        "unit_ids": {"type": "array", "items": {"type": "string"}}
+      },
+      "additionalProperties": false
+    },
+    "evidence": {
+      "type": "object",
+      "required": [
+        "claim_type",
+        "line",
+        "quote",
+        "region_kind",
+        "scope",
+        "compared_lines",
+        "expected",
+        "note"
+      ],
+      "properties": {
+        "claim_type": {"enum": ["presence", "absence", "comparison", "sequence"]},
+        "line": {"type": ["integer", "null"], "minimum": 1},
+        "quote": {"type": ["string", "null"]},
+        "region_kind": {
+          "type": ["string", "null"],
+          "enum": ["prose", "speaker_label", "heading", "table", "math", "code", "other", null]
+        },
+        "scope": {"anyOf": [{"$ref": "#/$defs/scope"}, {"type": "null"}]},
+        "compared_lines": {
+          "type": "array",
+          "items": {"type": "integer", "minimum": 1}
+        },
+        "expected": {"type": ["string", "null"]},
+        "note": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "unit": {
+      "type": "object",
+      "required": [
+        "unit_id",
+        "unit_kind",
+        "act_id",
+        "act_title",
+        "title",
+        "start_line",
+        "end_line",
+        "char_count",
+        "sampled"
+      ],
+      "properties": {
+        "unit_id": {"type": "string"},
+        "unit_kind": {"enum": ["section", "bare_act"]},
+        "act_id": {"type": "string"},
+        "act_title": {"type": "string"},
+        "title": {"type": "string"},
+        "start_line": {"type": "integer", "minimum": 1},
+        "end_line": {"type": "integer", "minimum": 1},
+        "char_count": {"type": "integer", "minimum": 0},
+        "sampled": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "excludedRange": {
+      "type": "object",
+      "required": ["start_line", "end_line", "reason"],
+      "properties": {
+        "start_line": {"type": "integer", "minimum": 1},
+        "end_line": {"type": "integer", "minimum": 1},
+        "reason": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "actDiagnostic": {
+      "type": "object",
+      "required": ["act_id", "title", "start_line", "end_line", "section_count", "subdivided"],
+      "properties": {
+        "act_id": {"type": "string"},
+        "title": {"type": "string"},
+        "start_line": {"type": "integer", "minimum": 1},
+        "end_line": {"type": "integer", "minimum": 1},
+        "section_count": {"type": "integer", "minimum": 0},
+        "subdivided": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "structure": {
+      "type": "object",
+      "required": [
+        "unit_policy",
+        "line_count",
+        "act_count",
+        "subdivided_act_count",
+        "subdivision_rate",
+        "acts",
+        "units",
+        "excluded_ranges",
+        "sampled_unit_ids"
+      ],
+      "properties": {
+        "unit_policy": {"const": "section-or-bare-act-v1"},
+        "line_count": {"type": "integer", "minimum": 1},
+        "act_count": {"type": "integer", "minimum": 1},
+        "subdivided_act_count": {"type": "integer", "minimum": 0},
+        "subdivision_rate": {"type": "number", "minimum": 0, "maximum": 1},
+        "acts": {"type": "array", "items": {"$ref": "#/$defs/actDiagnostic"}},
+        "units": {"type": "array", "items": {"$ref": "#/$defs/unit"}},
+        "excluded_ranges": {"type": "array", "items": {"$ref": "#/$defs/excludedRange"}},
+        "sampled_unit_ids": {"type": "array", "items": {"type": "string"}}
+      },
+      "additionalProperties": false
+    },
+    "score": {
+      "type": "object",
+      "required": ["value", "confidence", "evidence", "absence_evidence", "defect_types", "rationale"],
+      "properties": {
+        "value": {"type": ["integer", "null"], "minimum": 0, "maximum": 4},
+        "confidence": {"enum": ["low", "medium", "high", null]},
+        "evidence": {"type": "array", "items": {"$ref": "#/$defs/evidence"}},
+        "absence_evidence": {"type": "array", "items": {"$ref": "#/$defs/evidence"}},
+        "defect_types": {"type": "array", "items": {"type": "string"}},
+        "rationale": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "unitScore": {
+      "type": "object",
+      "required": ["unit_id", "scores", "notes"],
+      "properties": {
+        "unit_id": {"type": "string"},
+        "scores": {
+          "type": "object",
+          "required": ["E1", "E3", "L1", "L2", "L3", "S1"],
+          "properties": {
+            "E1": {"$ref": "#/$defs/score"},
+            "E3": {"$ref": "#/$defs/score"},
+            "L1": {"$ref": "#/$defs/score"},
+            "L2": {"$ref": "#/$defs/score"},
+            "L3": {"$ref": "#/$defs/score"},
+            "S1": {"$ref": "#/$defs/score"}
+          },
+          "additionalProperties": false
+        },
+        "notes": {"type": "array", "items": {"type": "string"}}
+      },
+      "additionalProperties": false
+    },
+    "affect": {
+      "type": "object",
+      "required": ["before", "after", "intensity_delta", "evidence"],
+      "properties": {
+        "before": {"type": ["string", "null"]},
+        "after": {"type": ["string", "null"]},
+        "intensity_delta": {"type": ["integer", "null"], "minimum": -4, "maximum": 4},
+        "evidence": {"type": "array", "items": {"$ref": "#/$defs/evidence"}}
+      },
+      "additionalProperties": false
+    },
+    "initiative": {
+      "type": "object",
+      "required": ["opens", "turns", "closes", "evidence"],
+      "properties": {
+        "opens": {"type": ["string", "null"]},
+        "turns": {"type": ["string", "null"]},
+        "closes": {"type": ["string", "null"]},
+        "evidence": {"type": "array", "items": {"$ref": "#/$defs/evidence"}}
+      },
+      "additionalProperties": false
+    },
+    "enrichment": {
+      "type": "object",
+      "required": ["kind", "learning_duty", "next_question", "evidence"],
+      "properties": {
+        "kind": {"enum": ["history", "person", "source", "gag", "toy", "other"]},
+        "learning_duty": {"type": ["string", "null"]},
+        "next_question": {"type": ["string", "null"]},
+        "evidence": {"type": "array", "items": {"$ref": "#/$defs/evidence"}}
+      },
+      "additionalProperties": false
+    },
+    "hook": {
+      "type": "object",
+      "required": ["next_question", "partial_disclosure", "evidence"],
+      "properties": {
+        "next_question": {"type": ["string", "null"]},
+        "partial_disclosure": {"type": ["string", "null"]},
+        "evidence": {"type": "array", "items": {"$ref": "#/$defs/evidence"}}
+      },
+      "additionalProperties": false
+    },
+    "unitLedger": {
+      "type": "object",
+      "required": [
+        "unit_id", "section_role", "problem", "attempt", "friction", "diagnosis",
+        "revision", "test", "affect", "initiative", "enrichment", "hook", "notes"
+      ],
+      "properties": {
+        "unit_id": {"type": "string"},
+        "section_role": {
+          "type": ["string", "null"],
+          "enum": ["core_discovery", "setup", "test", "bridge", "reflection", null]
+        },
+        "problem": {"type": "array", "items": {"$ref": "#/$defs/evidence"}},
+        "attempt": {"type": "array", "items": {"$ref": "#/$defs/evidence"}},
+        "friction": {"type": "array", "items": {"$ref": "#/$defs/evidence"}},
+        "diagnosis": {"type": "array", "items": {"$ref": "#/$defs/evidence"}},
+        "revision": {"type": "array", "items": {"$ref": "#/$defs/evidence"}},
+        "test": {"type": "array", "items": {"$ref": "#/$defs/evidence"}},
+        "affect": {"$ref": "#/$defs/affect"},
+        "initiative": {"$ref": "#/$defs/initiative"},
+        "enrichment": {"type": "array", "items": {"$ref": "#/$defs/enrichment"}},
+        "hook": {"$ref": "#/$defs/hook"},
+        "notes": {"type": "array", "items": {"type": "string"}}
+      },
+      "additionalProperties": false
+    },
+    "cycle": {
+      "type": "object",
+      "required": ["attempt", "friction", "diagnosis", "revision", "test"],
+      "properties": {
+        "attempt": {"type": "array", "items": {"$ref": "#/$defs/evidence"}},
+        "friction": {"type": "array", "items": {"$ref": "#/$defs/evidence"}},
+        "diagnosis": {"type": "array", "items": {"$ref": "#/$defs/evidence"}},
+        "revision": {"type": "array", "items": {"$ref": "#/$defs/evidence"}},
+        "test": {"type": "array", "items": {"$ref": "#/$defs/evidence"}}
+      },
+      "additionalProperties": false
+    },
+    "coreConcept": {
+      "type": "object",
+      "required": ["concept_id", "label", "description", "evidence", "cycles", "notes"],
+      "properties": {
+        "concept_id": {"type": "string", "minLength": 1},
+        "label": {"type": "string", "minLength": 1},
+        "description": {"type": "string"},
+        "evidence": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/evidence"}},
+        "cycles": {"type": "array", "items": {"$ref": "#/$defs/cycle"}},
+        "notes": {"type": "array", "items": {"type": "string"}}
+      },
+      "additionalProperties": false
+    },
+    "gate": {
+      "type": "object",
+      "required": ["axis", "concept_id", "status", "evidence", "reason"],
+      "properties": {
+        "axis": {"enum": ["L1", "L2"]},
+        "concept_id": {"type": "string"},
+        "status": {"enum": ["pass", "fail", "uncertain"]},
+        "evidence": {"type": "array", "items": {"$ref": "#/$defs/evidence"}},
+        "reason": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "dullRun": {
+      "type": "object",
+      "required": ["axis", "unit_ids", "defect_type", "severity", "evidence", "intentional_pause_possible"],
+      "properties": {
+        "axis": {"enum": ["E1", "E2", "E3", "L1", "L2", "L3", "S1"]},
+        "unit_ids": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "defect_type": {"type": "string"},
+        "severity": {"enum": ["minor", "major", "critical"]},
+        "evidence": {"type": "array", "items": {"$ref": "#/$defs/evidence"}},
+        "intentional_pause_possible": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "modelUse": {
+      "type": "object",
+      "required": ["line", "quote"],
+      "properties": {
+        "line": {"type": "integer", "minimum": 1},
+        "quote": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "modelState": {
+      "type": "object",
+      "required": [
+        "model_id",
+        "introduced_at",
+        "state_version",
+        "derives_from",
+        "adds",
+        "limits_found",
+        "uses"
+      ],
+      "properties": {
+        "model_id": {"type": "string", "minLength": 1},
+        "introduced_at": {"$ref": "#/$defs/modelUse"},
+        "state_version": {"type": "integer", "minimum": 1},
+        "derives_from": {"type": "array", "items": {"type": "string", "pattern": "^.+@[1-9][0-9]*$"}},
+        "adds": {"type": "array", "items": {"type": "string"}},
+        "limits_found": {"type": "array", "items": {"type": "string"}},
+        "uses": {"type": "array", "items": {"$ref": "#/$defs/modelUse"}}
+      },
+      "additionalProperties": false
+    }
+  }
+}

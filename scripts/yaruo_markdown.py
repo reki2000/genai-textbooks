@@ -21,7 +21,9 @@ FULLWIDTH_SPACE = "　"
 # `**やる夫**：` および注記つきの `**やる夫**（老いて）：`。全角・半角コロン両対応。
 SPEAKER_LINE = re.compile(r"^\*\*([^*\n]+)\*\*[^*:：\n]*[:：]\s*$")
 ROSTER_LINE = re.compile(r"^\*\*([^*\n]+)\*\*")
-SECTION_LINE = re.compile(r"^(?:---\s*$|#{1,6}\s)")
+# 区切り行は空白を含まない `---` の完全一致とする。前後の改行数は
+# `yaruo_lint.py` の structure-delimiter が正規化する。
+SECTION_LINE = re.compile(r"^(?:---$|#{1,6}\s)")
 ROSTER_HEADING = re.compile(r"^##\s+登場人物\s*$")
 DEFAULT_SPEAKERS = frozenset({"やる夫", "やらない夫"})
 

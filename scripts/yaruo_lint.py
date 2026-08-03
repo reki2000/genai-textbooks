@@ -856,7 +856,7 @@ def parse_sections(
         if in_speech:
             if body.strip() == "":
                 continue
-            if body.strip() == "---":
+            if body == "---":
                 in_speech = False
                 continue
             current.speech_lines[-1] += 1
@@ -980,14 +980,26 @@ def rule_end_marker(lines: list[str], result: Result) -> list[str]:
         )
 
     if not marker_lines:
+        reference_index = next(
+            (i for i, body in enumerate(bodies) if body.strip() == "## 参考文献"),
+            len(out),
+        )
+        newline = split_eol(out[reference_index - 1])[1] if reference_index else "\n"
+        if not newline:
+            newline = "\n"
+        prefix = [] if _previous_nonempty(out, reference_index) == "---" else ["---" + newline]
+        inserted = prefix + [END_MARKER + newline, "---" + newline]
+        out[reference_index:reference_index] = inserted
         result.add(
-            None, "warning", "end-marker",
-            f"終端マーカー `{END_MARKER}` が無い（終幕の後に `---` と併せて置く）",
+            reference_index + len(prefix) + 1,
+            "error",
+            "end-marker",
+            f"終端マーカー `{END_MARKER}` と前後の区切り行を追加",
         )
         return out
 
     previous = next(
-        (bodies[i - 1].strip() for i in range(marker_lines[0] - 1, 0, -1)
+        (bodies[i - 1] for i in range(marker_lines[0] - 1, 0, -1)
          if bodies[i - 1].strip()),
         "",
     )
@@ -995,6 +1007,119 @@ def rule_end_marker(lines: list[str], result: Result) -> list[str]:
         result.add(
             marker_lines[0], "warning", "end-marker",
             f"終端マーカーの直前が `---` でない（現在は『{previous[:30]}』）",
+        )
+    return out
+
+
+# --------------------------------------------------------------------------
+# rule: structure-delimiter
+# --------------------------------------------------------------------------
+
+HEADING_DELIMITER_RE = re.compile(r"^#{1,6}\s+")
+
+
+def _previous_nonempty(lines: list[str], index: int) -> str:
+    for line in reversed(lines[:index]):
+        body, _ = split_eol(line)
+        if body.strip():
+            return body.strip()
+    return ""
+
+
+def _next_nonempty(lines: list[str], index: int) -> str:
+    for line in lines[index + 1 :]:
+        body, _ = split_eol(line)
+        if body.strip():
+            return body.strip()
+    return ""
+
+
+def rule_structure_delimiter(lines: list[str], result: Result) -> list[str]:
+    """`##` / `###` 見出しの前後を標準の境界へ揃える。
+
+    見出しの直前は「空行、`---`、見出し」、直後は空行1行とする。見出し
+    直後の `---` は、次の見出しの直前を兼ねる場合だけ残す。
+    """
+    out = list(lines)
+    targets = [
+        index for index, line in enumerate(out)
+        if split_eol(line)[0].startswith(("## ", "### "))
+    ]
+
+    for index in reversed(targets):
+        _, newline = split_eol(out[index])
+        newline = newline or "\n"
+
+        next_nonempty = index + 1
+        while next_nonempty < len(out) and not split_eol(out[next_nonempty])[0].strip():
+            next_nonempty += 1
+        if next_nonempty < len(out) and split_eol(out[next_nonempty])[0].strip() == "---":
+            following = next_nonempty + 1
+            while following < len(out) and not split_eol(out[following])[0].strip():
+                following += 1
+            keep = following < len(out) and split_eol(out[following])[0].startswith(("## ", "### "))
+            if not keep:
+                del out[next_nonempty]
+                result.add(next_nonempty + 1, "error", "structure-delimiter", "見出し直後の不要な区切り行を除去")
+
+        after_end = index + 1
+        while after_end < len(out) and not split_eol(out[after_end])[0].strip():
+            after_end += 1
+        if out[index + 1:after_end] != [newline]:
+            out[index + 1:after_end] = [newline]
+            result.add(index + 2, "error", "structure-delimiter", "見出し直後の空行を1行に統一")
+
+        previous = index - 1
+        while previous >= 0 and not split_eol(out[previous])[0].strip():
+            previous -= 1
+        if previous >= 0 and split_eol(out[previous])[0].strip() == "---":
+            separator = previous
+            if split_eol(out[separator])[0] != "---":
+                out[separator] = "---" + split_eol(out[separator])[1]
+                result.add(separator + 1, "error", "structure-delimiter", "区切り行を `---` の完全一致へ正規化")
+            if separator + 1 != index:
+                del out[separator + 1:index]
+                result.add(separator + 2, "error", "structure-delimiter", "区切り行と見出しの間の空行を除去")
+                index = separator + 1
+        else:
+            separator = index
+            out[separator:separator] = ["---" + newline]
+            index += 1
+            result.add(separator + 1, "error", "structure-delimiter", "見出し直前の区切り行を追加")
+
+        before = separator - 1
+        while before >= 0 and not split_eol(out[before])[0].strip():
+            before -= 1
+        if out[before + 1:separator] != [newline]:
+            out[before + 1:separator] = [newline]
+            result.add(separator, "error", "structure-delimiter", "区切り行直前の空行を1行に統一")
+    return out
+
+
+# --------------------------------------------------------------------------
+# rule: heading-level
+# --------------------------------------------------------------------------
+
+def rule_heading_level(lines: list[str], result: Result) -> list[str]:
+    """教材本文の幕・節見出しを `##` と `###` に限定する。"""
+    out = list(lines)
+    in_fence = False
+    for index, line in enumerate(out):
+        body, newline = split_eol(line)
+        if FENCE_RE.match(body):
+            in_fence = not in_fence
+            continue
+        if in_fence:
+            continue
+        heading = HEADING_RE.match(body)
+        if not heading or len(heading.group(1)) < 4:
+            continue
+        out[index] = f"### {heading.group(2)}{newline}"
+        result.add(
+            index + 1,
+            "error",
+            "heading-level",
+            f"節見出しのレベルが `{heading.group(1)}`（`###` に統一）",
         )
     return out
 
@@ -1009,11 +1134,18 @@ FOOTNOTE_BARE_RE = re.compile(r"参照[.。]?\s*$")
 
 
 def rule_footnotes(lines: list[str], result: Result) -> list[str]:
-    """脚注の未使用・未定義と、出典表記だけで解説が無い脚注を検査する。"""
+    """脚注の未使用・未定義と、出典表記だけで解説が無い脚注を検査する。
+
+    `## 参考文献` 内の未参照項目は、本文から脚注で呼ばれない番号付きの
+    文献紹介として許可する。本文中・他の付録にある未使用定義は従来どおり
+    取り残しとして error にする。
+    """
     definitions: dict[str, int] = {}
+    bibliography_definitions: set[str] = set()
     uses: dict[str, int] = {}
     bare: list[int] = []
     in_fence = False
+    in_references = False
     for line_no, line in enumerate(lines, 1):
         body = split_eol(line)[0]
         if FENCE_RE.match(body):
@@ -1021,9 +1153,13 @@ def rule_footnotes(lines: list[str], result: Result) -> list[str]:
             continue
         if in_fence:
             continue
+        if body.startswith("## "):
+            in_references = body.strip() == "## 参考文献"
         definition = FOOTNOTE_DEF_RE.match(body)
         if definition:
             definitions.setdefault(definition.group(1), line_no)
+            if in_references:
+                bibliography_definitions.add(definition.group(1))
             if FOOTNOTE_BARE_RE.search(definition.group(2)):
                 bare.append(line_no)
             continue
@@ -1031,6 +1167,12 @@ def rule_footnotes(lines: list[str], result: Result) -> list[str]:
             uses.setdefault(name, line_no)
 
     for name in sorted(definitions.keys() - uses.keys()):
+        if name in bibliography_definitions:
+            result.add(
+                definitions[name], "info", "footnotes",
+                f"本文未参照の文献紹介: [^{name}]",
+            )
+            continue
         result.add(
             definitions[name], "error", "footnotes",
             f"未使用の脚注定義: [^{name}]（節を削除・統合した際の取り残しでないか確認）",
@@ -1227,7 +1369,7 @@ def _speaker_totals(members: list[Section]) -> dict[str, tuple[int, int]]:
 
 def report_stats(path: Path, lines: list[str]) -> None:
     """幕別の話者バランスと見出し末の話者を出す。**診断であって合否に使わない。**"""
-    sections = parse_sections(lines, levels=("##", "###", "####"))
+    sections = parse_sections(lines, levels=("##", "###"))
     print(f"{path}: 集計（診断。合否に使わない）")
 
     print(
@@ -1285,6 +1427,8 @@ REGISTRY: tuple[Rule, ...] = (
     Rule("dialogue-period", "発言末の句点", True, rule_dialogue_period),
     Rule("notation", "金額・割合の半角算用数字表記", True, rule_notation),
     Rule("end-marker", "終端マーカー `**── 完 ──**`", True, rule_end_marker),
+    Rule("heading-level", "幕は ##、節は ###", True, rule_heading_level),
+    Rule("structure-delimiter", "タイトル・見出し・完了マーカーの区切り行", True, rule_structure_delimiter),
     Rule("invisible-chars", "制御文字・私用領域文字の混入", False, rule_invisible_chars),
     Rule("structure", "幕・節番号、参考文献見出し、禁止見出し", False, rule_structure),
     Rule("footnotes", "脚注の未使用・未定義", False, rule_footnotes),
