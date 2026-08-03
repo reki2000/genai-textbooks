@@ -872,7 +872,7 @@ def parse_sections(
 
 END_MARKER = "**── 完 ──**"
 # 終端マーカーの解析は1本。`**── I部 完 ──**` のような分冊の部完結も同じ形とみなし、
-# 接頭辞を group(1) に取る。正規の形かどうかは、罫線と太字が揃っているかで決まる。
+# 接頭辞を group(1) に取る。罫線・太字・空白は正規形へ厳密に統一する。
 END_MARKER_RE = re.compile(
     r"^(?P<bold_open>\*{0,2})\s*(?P<rule_open>[─—―-]{0,4})\s*"
     r"(?:(?P<prefix>\S+)\s+)?完\s*"
@@ -886,12 +886,7 @@ def _canonical_end_marker(match: re.Match[str]) -> str:
 
 
 def _is_canonical_end_marker(match: re.Match[str]) -> bool:
-    return (
-        match.group("bold_open") == "**"
-        and match.group("bold_close") == "**"
-        and len(match.group("rule_open")) >= 2
-        and len(match.group("rule_close")) >= 2
-    )
+    return match.group(0).strip() == _canonical_end_marker(match)
 
 
 ACT_RE = re.compile(r"^第(\d+)幕")
@@ -1035,12 +1030,35 @@ def _next_nonempty(lines: list[str], index: int) -> str:
 
 
 def rule_structure_delimiter(lines: list[str], result: Result) -> list[str]:
-    """`##` / `###` 見出しの前後を標準の境界へ揃える。
+    """見出しと終端マーカーの区切りを標準の境界へ揃える。
 
     見出しの直前は「空行、`---`、見出し」、直後は空行1行とする。見出し
-    直後の `---` は、次の見出しの直前を兼ねる場合だけ残す。
+    直後の `---` は、次の見出しの直前を兼ねる場合だけ残す。終端マーカー
+    の直前も「空行、`---`、終端マーカー」とする。
     """
     out = list(lines)
+
+    # 終端マーカーの直前の区切り行は、本文から空行で分離する。end-marker
+    # ルールが先に表記を正規化するため、ここでは正規形だけを対象にできる。
+    marker_targets = [
+        index for index, line in enumerate(out)
+        if END_MARKER_RE.match(split_eol(line)[0].strip())
+    ]
+    for index in reversed(marker_targets):
+        _, newline = split_eol(out[index])
+        newline = newline or "\n"
+        separator = index - 1
+        while separator >= 0 and not split_eol(out[separator])[0].strip():
+            separator -= 1
+        if separator < 0 or split_eol(out[separator])[0].strip() != "---":
+            continue
+        before = separator - 1
+        while before >= 0 and not split_eol(out[before])[0].strip():
+            before -= 1
+        if out[before + 1:separator] != [newline]:
+            out[before + 1:separator] = [newline]
+            result.add(separator + 1, "error", "structure-delimiter", "終端マーカー直前の区切り行の前に空行を1行挿入")
+
     targets = [
         index for index, line in enumerate(out)
         if split_eol(line)[0].startswith(("## ", "### "))
