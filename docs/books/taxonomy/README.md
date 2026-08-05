@@ -1371,4 +1371,3 @@ DNAを読み書きする仕組みが、古細菌と真核生物でよく似て�
 [^9]: L. Sagan (Margulis), [“On the origin of mitosing cells”](https://doi.org/10.1016/0022-5193(67)90079-3), *Journal of Theoretical Biology* 14, 255–274 (1967). ミトコンドリアと葉緑体の細胞内共生説。対応：第5幕。
 [^10]: H. Ochman, J. G. Lawrence, and E. A. Groisman, [“Lateral gene transfer and the nature of bacterial innovation”](https://doi.org/10.1038/35012500), *Nature* 405, 299–304 (2000). 細菌における水平伝播の規模と、系統樹が網状になることの整理。対応：第5幕。
 [^11]: W. M. Stanley, [“Isolation of a Crystalline Protein Possessing the Properties of Tobacco-Mosaic Virus”](https://doi.org/10.1126/science.81.2113.644), *Science* 81, 644–645 (1935). タバコモザイクウイルスの結晶化。対応：第6幕。
----

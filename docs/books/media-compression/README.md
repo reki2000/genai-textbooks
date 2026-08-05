@@ -2266,6 +2266,7 @@ AIが圧縮を全部やるようになったら、
 
 ---
 **── 完 ──**
+
 ---
 [^jpeg-t81]: ITU-T, [Recommendation T.81 — Digital compression and coding of continuous-tone still images](https://www.w3.org/Graphics/JPEG/itu-t81.pdf). JPEGの8×8 DCT、MCU、ハフマン符号化、マーカー、バイトスタッフィングの規範仕様。
 [^jpeg-jfif]: C-Cube Microsystems, [JPEG File Interchange Format Version 1.02](https://www.w3.org/Graphics/JPEG/jfif3.pdf). APP0の`JFIF`識別子、画素密度、thumbnail等の交換形式。
