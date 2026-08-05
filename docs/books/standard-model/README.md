@@ -7,6 +7,49 @@
 
 **やらない夫** ── 物理学の教師。
 
+**できる子** ── やる夫の姪。中学生だが数学に強く、曖昧な説明を短い質問で切り分ける。
+
+**できる夫** ── 科学教室の企画役。理解も告知も速いが、ときどき内容の完成より先に予定を確定する。
+
+---
+## 序幕　残り三つの力を、日曜までに
+
+**できる夫**：
+やる夫君、前回の『一般相対性理論を一晩で再発明する』、大好評でした。
+続編の告知をもう出しました。題名は『残り三つの力を、日曜までに』です。
+
+**やる夫**：
+勝手に出すなお！
+
+**できる夫**：
+できる子さんの感想が来ています。
+「重力は幾何学だと分かった。では電磁気力と、原子核の中の二つの力は何なのか」。
+これは続編をやるしかありません。
+
+**やる夫**：
+……まあ、そこはやる夫も気になってたお。
+重力は時空の曲率だったお。残りの三つも、似た筋で片付くはずだお。
+
+**できる子**：
+質問は三つ。
+
+なぜ力は四つで、なぜその形なの。
+質量はどこから来るの。
+その理論が思いつきでないことを、どうやって確かめたの。
+
+**できる夫**：
+三問なら日曜に間に合います。
+投影資料の最後には、すでに「標準模型、再発明成功」と入れておきました。
+
+**やる夫**：
+また結論を先に印刷したのかお！
+やらない夫、助けてくれお。今度も暗記じゃなく、説明できるところまで行きたいお。
+
+**やらない夫**：
+いいだろう。だが先に警告しておく。
+重力のときは、出発点の等価原理を一日で腹に落とせた。
+今回は出発点にたどり着くまでに、お前の常識が三回死ぬ。
+
 ---
 ## 第1幕　シュレーディンガーが壊れる日
 
@@ -624,6 +667,30 @@ $\alpha$ が定数なら $\partial_\mu\alpha = 0$ で消えるけど、局所変
 第2幕で先送りにした『保存流の製造機』──ラグランジアン形式とネーターの定理の一般形だ。
 これがないと、この先すべての場面で素手で戦うことになる。
 
+**できる夫**：
+中間報告をお願いします。投影資料の一枚目に「力の正体は対称性」と入れました。
+
+**できる子**：
+標語では困る。
+いまの段階で言えているのは、どこまで。
+
+**やる夫**：
+言えているのは二つだお。
+対称性が一つあれば保存量が一つ出る。これはネーターの定理で、証明はまだ一般形を組んでないお。
+もう一つ、位相の基準を場所ごとに選び直す自由を要請すると、素の微分では理論が壊れる。
+これは計算した。$\partial_\mu\phi \to e^{i\alpha}(\partial_\mu\phi + i(\partial_\mu\alpha)\phi)$ で、余計な項が出るお。
+
+**できる子**：
+力の話はまだ出ていない。
+
+**やる夫**：
+まだだお。いま言えるのは『壊れた分を打ち消す何かが要る』までだお。
+その何かが力の正体だという保証は、この時点では一つもないお。
+
+**できる子**：
+それでいい。
+標語より、いま何を証明していないかを言えるほうが信用できる。
+
 ---
 ## 第4幕　道具の構築 ── 対称性を担ぐ数学
 
@@ -925,20 +992,28 @@ $A_\mu$ の運動項なんて簡単だお。
 $$\mathcal{L}_A = -\frac{1}{2}\partial_\mu A_\nu\partial^\mu A^\nu$$
 
 微分の2乗、シンプルイズベストだお。
-
-**やらない夫**：
-では判定してもらおう。ゲージ変換 $A_\mu \to A_\mu + \frac{1}{e}\partial_\mu\alpha$ を代入しろ。
-
-**やる夫**：
-$\partial_\mu A'_\nu = \partial_\mu A_\nu + \frac{1}{e}\partial_\mu\partial_\nu\alpha$ だから、2乗を展開すると
+判定は待たなくていいお、自分で代入するお。
+ゲージ変換は $A_\mu \to A_\mu + \frac{1}{e}\partial_\mu\alpha$ だから、
+$\partial_\mu A'_\nu = \partial_\mu A_\nu + \frac{1}{e}\partial_\mu\partial_\nu\alpha$。2乗を展開して──
 
 $$\mathcal{L}'_A = \mathcal{L}_A - \frac{1}{e}\partial_\mu A_\nu\partial^\mu\partial^\nu\alpha - \frac{1}{2e^2}(\partial_\mu\partial_\nu\alpha)(\partial^\mu\partial^\nu\alpha)$$
 
-余計な項が2つも残るお。**不合格** だお。ぐぬぬ。
+……手が止まったお。余計な項が2つも残るお。
+$\partial_\mu\partial_\nu\alpha$ は $\mu$ と $\nu$ について対称で、
+掛かってる $\partial_\mu A_\nu$ のほうには反対称化がかかってないお。だから逃げ場がないお。
+
+**不合格** だお。自分で言い出して自分で潰したお。ぐぬぬ。
 位相の基準を選び直しただけで $A_\mu$ の『エネルギー』が変わる理論になっちゃう。
 これは4-3で自分たちが課した要請への違反だお。
 
-……ゲージ変換で不変な $A_\mu$ の組み合わせを探さないといけないお。
+**やらない夫**：
+判定を待たずに転べるようになったのは進歩だ。
+死因も自分で言えている。$\partial_\mu\partial_\nu\alpha$ の対称性が消えないのが原因だ、と。
+その死因が、次の一手をもう指している。
+
+**やる夫**：
+……そうだお。対称なゴミが消えないなら、**反対称に組めばいい** んだお。
+ゲージ変換で不変な $A_\mu$ の組み合わせを探さないといけないお。
 あ、答えは電磁気学が知ってるはずだお。電場と磁場はゲージ変換で不変だったお。
 でも今は『電磁気の記憶』に頼らず、この理論の論理だけで再発明したいお。
 
@@ -1030,6 +1105,34 @@ $$\partial_\mu F^{\mu\nu} = 0$$
 
 **マクスウェル方程式が出たお**。
 電磁気学を1ミリも仮定せずに、『位相の基準は場所ごとに自由』の一言から。
+
+**できる夫**：
+すばらしい。「ゲージ原理から電磁気学が導かれる」と告知に足しておきます。
+
+**できる子**：
+待って。
+本当に何も仮定していないのか、入れたものを全部数えて。
+
+**やる夫**：
+……数えるお。
+入れたのは、局所位相不変性、ローレンツ不変性、微分は2階まで、の三つだお。
+それと $A_\mu$ が **ベクトル場1本** だという仮定。
+この四つから、$F_{\mu\nu}F^{\mu\nu}$ 以外に書ける項が実質なくなって、マクスウェル方程式が出たお。
+
+**できる子**：
+つまり「何も仮定しなかった」ではなく、「四つの仮定で書ける形が一つしかなかった」。
+
+**やる夫**：
+その言い方のほうが正確だお。訂正するお。
+それでも驚きは減らないお。四つとも電気や磁気について何も言ってないのに、
+出てきた答えがクーロンの法則とファラデーの法則だったんだお。
+
+**できる子**：
+なら合格。
+「導かれる」ではなく「一意に決まる」と書き直して。
+
+**できる夫**：
+告知の文言を差し替えます。
 
 ---
 ### 4-5　QEDの完成 ── そして質量の禁止令
@@ -1153,22 +1256,51 @@ $$A_\mu = A_\mu^a\frac{\sigma^a}{2}, \qquad D_\mu = \partial_\mu - igA_\mu$$
 U(1)でさんざん鍛えたんだから、記号を差し替えるだけだお。
 
 **やらない夫**：
-では判定してもらおう。
-まず $A_\mu$ の変換則から。U(1) のときと同じ要求──$D_\mu\psi \to U D_\mu\psi$──から逆算すると、
-今回はこうなる（導出は同じ手順だ、$U$ が行列になっただけ）
+記号の差し替えで済むかどうかは、差し替えてから言え。
+$A_\mu$ の変換則を出せ。要求は U(1) のときと一字一句同じだ──$D_\mu\psi \to U D_\mu\psi$。
+4-3で $\delta A_\mu$ を逆算したのと同じ手順を、$U$ が行列のまま踏め。
+
+**やる夫**：
+答えは見えてるお。U(1) では $A_\mu \to A_\mu + \frac{1}{e}\partial_\mu\alpha$ だったんだから、
+回転角が3つに増えただけで
+
+$$A_\mu \to A_\mu + \frac{1}{g}(\partial_\mu\alpha^a)\frac{\sigma^a}{2}$$
+
+**やらない夫**：
+代入しろ。
+
+**やる夫**：
+要求は $(\partial_\mu - igA'_\mu)(U\psi) = U(\partial_\mu - igA_\mu)\psi$ だお。
+左辺を展開すると $(\partial_\mu U)\psi + U\partial_\mu\psi - igA'_\mu U\psi$、
+右辺は $U\partial_\mu\psi - igUA_\mu\psi$。$\psi$ は任意だから、$U\partial_\mu\psi$ を消して
+
+$$(\partial_\mu U) - igA'_\mu U = -igUA_\mu$$
+
+……あれ。ここで $A'_\mu$ を取り出すには、$U$ を **右から** 剥がすしかないお。
+$A'_\mu U = UA_\mu - \frac{i}{g}\partial_\mu U$ の右から $U^\dagger$ を掛けて
 
 $$A_\mu \to U A_\mu U^\dagger - \frac{i}{g}(\partial_\mu U)U^\dagger$$
 
-**やる夫**：
-まず退化検算をさせてほしいお。$U$ が1×1、つまり $U = e^{i\alpha}$ のただの数なら、
-$UA_\mu U^\dagger = A_\mu$（数は可換）、$-\frac{i}{g}(\partial_\mu U)U^\dagger = -\frac{i}{g}i(\partial_\mu\alpha) = \frac{1}{g}\partial_\mu\alpha$。
-合わせて $A_\mu + \frac{1}{g}\partial_\mu\alpha$──**4-3の変換則にぴったり戻る** お。上位互換の形だお。
+やる夫の完コピ案、**不合格** だお。
+第1項が $UA_\mu U^\dagger$ であって $A_\mu$ じゃないお。
+$A_\mu$ と $U$ を勝手にすれ違わせて $UU^\dagger = 1$ で消せると思い込んでたお。
+数なら消える、行列だと消えない。ぐぬぬ。
 
-で、行列の場合を見比べると……
-第2項が $\partial_\mu\alpha$ の対応物なのは分かるお。
-でも第1項、U(1) なら $UA_\mu U^\dagger = e^{i\alpha}A_\mu e^{-i\alpha} = A_\mu$ で消えてた回転が、
-行列だと $UA_\mu U^\dagger \neq A_\mu$ で **残る** お。
-$A_\mu$ 自身も回されるんだお。……嫌な予感がしてきたお。
+**やらない夫**：
+どこで思い込んだかを言え。
+
+**やる夫**：
+「回転角が3つに増えただけ」と言った瞬間だお。
+U(1) の $\alpha$ は数だから、位相を掛ける操作と $A_\mu$ を足す操作が独立だったお。
+行列だと、$A_\mu$ 自身がその回転の **担ぎ手** になるお。
+
+退化検算はしておくお。$U$ が1×1、つまり $U = e^{i\alpha}$ のただの数なら、
+$UA_\mu U^\dagger = A_\mu$（数は可換）、$-\frac{i}{g}(\partial_\mu U)U^\dagger = -\frac{i}{g}i(\partial_\mu\alpha) = \frac{1}{g}\partial_\mu\alpha$。
+合わせて $A_\mu + \frac{1}{g}\partial_\mu\alpha$──**4-3の変換則にぴったり戻る** お。
+やる夫の完コピ案は、可換な場合にだけ正しい式だったんだお。上位互換の形だお。
+
+そして第1項が残るということは、$A_\mu$ 自身も回されるということだお。
+……嫌な予感がしてきたお。
 
 **やらない夫**：
 その予感を計算で確かめろ。お前の完コピ案 $F_{\mu\nu} = \partial_\mu A_\nu - \partial_\nu A_\mu$ は
@@ -1679,28 +1811,95 @@ $\chi$ は消滅したんじゃない。**ゲージ場の縦偏極に転職し�
 破れた方向の数だけゲージ場が重くなり、残った方向のゲージ場は質量ゼロで残る。
 
 **やらない夫**：
-その設計を実行したのがグラショウ、ワインバーグ、サラムの **電弱理論** だ[^11]。
-構成だけ与えるから、玩具模型からの類推で構造を読み取れ。
+その設計を実際に組んだ理論が、1960年代に出ている。
+名前は後で言う。先に設定だけ渡すから、結論は自分で出せ。
 
   - ゲージ群は $SU(2) \times U(1)$。ゲージ場は SU(2) の3本 $W^{1,2,3}_\mu$ と U(1) の1本 $B_\mu$、計4本。
+  - 生成子は SU(2) が $T^a = \sigma^a/2$、U(1) が超電荷 $Y/2$。スカラーには $Y = 1$ を割り当てる。
   - スカラー場は複素2成分（SU(2)ダブレット）$\phi = \begin{pmatrix}\phi^+\\ \phi^0\end{pmatrix}$、自由度4。
   - メキシカンハット型ポテンシャルで、真空は $\langle\phi\rangle = \frac{1}{\sqrt2}\begin{pmatrix}0\\ v\end{pmatrix}$
 
+問いは一つだ。**4つの生成子のうち、この真空を消すものはどれだ。**
+
 **やる夫**：
-類推で読むお。
-群の変換方向は $3 + 1 = 4$ 本。この真空を動かす方向と動かさない方向を数えると……
-やらない夫、これ計算すると、4方向のうち **3方向が真空を動かして、
-1方向だけ **──$W^3$ と $B$ のある特定の混ぜ合わせだけ──**が真空を不変に保つ** んだお？
+一つずつ当てるお。$\langle\phi\rangle$ は $\frac{1}{\sqrt2}(0, v)^T$ だお。
+
+$$T^1\langle\phi\rangle = \frac{1}{2}\begin{pmatrix}0&1\\1&0\end{pmatrix}\frac{1}{\sqrt2}\begin{pmatrix}0\\ v\end{pmatrix} = \frac{v}{2\sqrt2}\begin{pmatrix}1\\ 0\end{pmatrix} \neq 0$$
+
+$$T^2\langle\phi\rangle = \frac{v}{2\sqrt2}\begin{pmatrix}-i\\ 0\end{pmatrix} \neq 0, \qquad T^3\langle\phi\rangle = \frac{v}{2\sqrt2}\begin{pmatrix}0\\ -1\end{pmatrix} \neq 0$$
+
+$$\frac{Y}{2}\langle\phi\rangle = \frac{1}{2}\cdot\frac{1}{\sqrt2}\begin{pmatrix}0\\ v\end{pmatrix} = \frac{v}{2\sqrt2}\begin{pmatrix}0\\ 1\end{pmatrix} \neq 0$$
+
+……4つとも真空を動かすお。全部破れて、光子が残らないお。**不合格** だお。
 
 **やらない夫**：
-そうなっている。手を動かした結果だけ言えば：
+問いを正確に読め。俺は「4つのうちどれか」とは言ったが、
+「4つのうち **1つ** か」とは言っていない。
 
-  - 真空を動かす3方向 → ゴールドストーン3個 → 全部食われて、
-    **$W^+, W^-, Z$ の3つの重いゲージ粒子** が生まれる。$m_W = \dfrac{gv}{2}$。
-  - 真空を保つ1方向（$W^3$ と $B$ の直交する側の混合）→ 食うものなし →
-    **質量ゼロのまま残る。これが光子だ**。
+**やる夫**：
+……あ。**足していいのかお**。
+生成子の一次結合も生成子だお。いま並べた4本を見比べると──
+$T^3$ が $(0,-1)$、$Y/2$ が $(0,+1)$。**この2本だけ、同じ方向で符号が逆** だお！
+
+$$\left(T^3 + \frac{Y}{2}\right)\langle\phi\rangle = \frac{v}{2\sqrt2}\left[\begin{pmatrix}0\\ -1\end{pmatrix} + \begin{pmatrix}0\\ 1\end{pmatrix}\right] = 0$$
+
+**消えたお！！**
+しかも他に候補はないお。$T^1$ と $T^2$ は上成分を作るけど、
+$T^3$ も $Y/2$ も下成分しか作らないから、上成分を打ち消す相手がいないお。
+**真空を消す方向はちょうど1本、$T^3 + Y/2$ だけ** だお。
+
+だから勘定はこうだお。4方向のうち3方向が破れ、1方向が残る。
+
+  - 破れた3方向 → ゴールドストーン3個 → 全部食われて、
+    **$W^+, W^-, Z$ の3つの重いゲージ粒子**。
+  - 残った1方向 → 食うものなし → **質量ゼロのまま。これが光子だお**。
   - スカラーの自由度勘定：$4 - 3(\text{食われた}) = 1$。実スカラーが1個残る。
-    谷を横切る方向の励起、玩具模型の $h$ ──これが **ヒッグス粒子** だ。
+    谷を横切る方向の励起、玩具模型の $h$ ──これが **ヒッグス粒子** だお。
+
+**やらない夫**：
+いま自分で書いた「残った方向」に、名前を付けろ。
+真空を消す生成子は、破れた後も保存する荷を定義する。
+
+**やる夫**：
+$Q = T^3 + \dfrac{Y}{2}$ ……これが **電荷** だお。
+ダブレットの上成分は $T^3 = +1/2$、$Y/2 = 1/2$ で $Q = 1$。だから $\phi^+$。
+下成分は $T^3 = -1/2$ で $Q = 0$。だから $\phi^0$。
+最初に付いてた肩の記号が、いま出した式の答え合わせになってるお。
+
+電荷の定義式が、真空が何を壊さなかったかから **出てきた** お。
+電荷は最初からあった量じゃなくて、**生き残った対称性の名前** だったんだお。
+
+**やらない夫**：
+では混合の中身も出せ。共変微分の中で $W^3$ と $B$ は
+
+$$g W^3_\mu T^3 + g' B_\mu \frac{Y}{2}$$
+
+の形で入る。この和が $\langle\phi\rangle$ に作用したとき、消える組み合わせが光子だ。
+
+**やる夫**：
+下成分だけ見ればいいお。$T^3$ が $-\frac12$、$Y/2$ が $+\frac12$ を出すから、係数は
+
+$$-\frac{g}{2}W^3_\mu + \frac{g'}{2}B_\mu$$
+
+これがゼロになる向きが光子だお。規格化して
+
+$$A_\mu = \frac{g'W^3_\mu + gB_\mu}{\sqrt{g^2+g'^2}}, \qquad Z_\mu = \frac{gW^3_\mu - g'B_\mu}{\sqrt{g^2+g'^2}}$$
+
+直交する側が $Z$ だお。混合角を $\cos\theta_W = g/\sqrt{g^2+g'^2}$ で定義すると
+
+$$\tan\theta_W = \frac{g'}{g}$$
+
+質量は $|D_\mu\langle\phi\rangle|^2$ から読むお。$W^1, W^2$ からは $m_W = \dfrac{gv}{2}$、
+$Z$ の側は係数に $\sqrt{g^2+g'^2}$ が立つから
+
+$$m_Z = \frac{v}{2}\sqrt{g^2+g'^2} = \frac{gv}{2\cos\theta_W} = \frac{m_W}{\cos\theta_W}$$
+
+**質量比が予言になったお**。$m_W$ と $m_Z$ は独立じゃなくて、混合角で縛られてるお。
+
+**やらない夫**：
+それがグラショウ、ワインバーグ、サラムの **電弱理論** だ[^11]。
+いまお前が15分で通した道を、彼らは10年かけて通っている。
+では、この幕の最初に貼った張り紙を見ろ。
 
 **やる夫**：
 **4-5の張り紙、回収だお！！**
@@ -1727,6 +1926,29 @@ $v = (\sqrt2G_F)^{-1/2} = (\sqrt2 \times 1.17\times10^{-5})^{-1/2}\mathrm{GeV} \
 $$m_W = \frac{gv}{2} \approx \frac{0.65 \times 246}{2} \approx 80\ \mathrm{GeV}$$
 
 5-1の桁見積もり（100 GeV級）と整合だお。しかも今度は桁じゃなくて **値の予言** だお。
+さっき出した比の式も使うお。弱混合角は $\sin^2\theta_W \approx 0.23$、つまり $\cos\theta_W \approx 0.88$ だから
+
+$$m_Z = \frac{m_W}{\cos\theta_W} \approx \frac{80}{0.88} \approx 91\ \mathrm{GeV}$$
+
+**できる夫**：
+数字が二つ出ました。投影資料に「80と91」と大きく載せます。
+
+**できる子**：
+その二つは、独立した二つの予言なの。
+
+**やる夫**：
+違うお。独立なのは $v$ の1個だけだお。
+$v$ は $G_F$ の測定値から決まって、$g$ と混合角は電磁気側の測定と結ばれてる。
+$m_W$ と $m_Z$ は、そこから出てくる **従属** の数字だお。
+だから片方が合って片方が外れたら、理論の負けだお。
+
+**できる子**：
+なら、これは二つの予言ではなく、一つの理論に対する二重の検査。
+そう書いて。
+外れ方まで先に言える説明は、当てにいく説明より強いから。
+
+**やらない夫**：
+正しい読み方だ。実験の話は第6幕でやる。
 
 ---
 ### 5-5　フェルミオンの質量 ── 電子も水飴の中
@@ -1762,8 +1984,34 @@ SU(2) 変換で $\psi_L$ だけが回って $\psi_R$ が回らないなら、こ
 ラグランジアンに書けないなら、ゲージ不変な相互作用を書いておいて、
 真空の $v$ に質量を作らせる。ヒッグス機構の使い回しだお。
 
-左巻きダブレット・右巻き一重項・ヒッグスダブレットの3つを組み合わせて、
-全部の変換がちょうど相殺するゲージ不変な項を作ると……この形だお
+**やらない夫**：
+方針は正しい。だが「ゲージ不変な項」を当てずっぽうで書くな。
+禁止された $\bar\psi_L\psi_R$ を、添字の勘定として **どこが不足しているか** から言え。
+
+**やる夫**：
+添字で見るお。$\psi_L$ は SU(2) ダブレットだから、添字を1本持ってるお。
+$\psi_R$ は一重項だから添字ゼロ。だから $\bar\psi_L\psi_R$ は
+
+$$(\bar\psi_L)_i\,\psi_R \qquad (i = 1,2)$$
+
+で、**$i$ が1本余る** お。縮約されてない添字が残ってるから、
+SU(2) 変換すると $U^\dagger$ が1個だけ残って相殺しないお。これが不合格の正体だお。
+
+**やらない夫**：
+では処方は。
+
+**やる夫**：
+余った添字を潰す相手を連れてくればいいお。
+**ダブレットの添字を1本持った場**──ちょうど手元にあるお。**ヒッグス場 $\phi_i$** だお。
+
+$$(\bar\psi_L)_i\,\phi_i\,\psi_R$$
+
+$\bar\psi_L$ 側の $U^\dagger$ と $\phi$ 側の $U$ が食い合って、SU(2) では不変だお。
+超電荷も勘定するお。$\phi$ の $Y = 1$ を含めて三つの $Y$ の和がゼロになるように
+$\psi_L$ と $\psi_R$ の割り当てを取れば、U(1) 側も通るお。
+
+つまり質量項が禁止されたのは、**相手が足りなかった** からだお。
+一人では立てない項に、真空に満ちている場を第三者として挟んだんだお。
 
 $$\mathcal{L}_{\rm Yukawa} = -y\bar\psi_L\phi\psi_R + (\text{複素共役})$$
 
@@ -1809,10 +2057,51 @@ SU(3) は真空に破られない。グルーオンは質量ゼロのままだ�
 
 **やらない夫**：
 鋭いが、こちらの短距離性は質量ではなく非可換性の帰結だ。
-4-6で見たゲージ場の自己相互作用が SU(3) では強烈に効いて、
-色荷を引き離そうとするとエネルギーが増え続け、クォークとグルーオンは
-単独で取り出せない（**閉じ込め**）。力が届かないのではなく、荷が外に出られない。
-この機構の詳細は今日は踏み込まない。宣言だけしておく。
+そして、その非可換性の効き方は、お前が4-6で自分で見つけた項から読める。
+先に電磁気で足場を作れ。QED で、電子の電荷は距離によってどう見えるか。
+
+**やる夫**：
+真空偏極だお。裸の電子のまわりに仮想の電子・陽電子対が湧いて、
+陽電子側が電子に引き寄せられる。誘電体の中と同じで、遠くから見ると
+裸の電荷が **遮蔽** されて小さく見えるお。
+近づくほど遮蔽の内側に入るから、実効的な結合は **短距離で強くなる**。
+
+**やらない夫**：
+では SU(3) で、その絵に何が足されるか。4-6の $g^2A^4$ と $g(\partial A)A^2$ を思い出せ。
+
+**やる夫**：
+……グルーオン自身が色荷を持ってるお。
+QED の光子は電荷を持たないから、真空に湧くのはクォーク対だけだお。
+でも SU(3) では、湧くのが **グルーオン対** でもいいお。
+そしてグルーオンは荷を運ぶだけじゃなく荷を持ってるから、
+クォーク対と同じ向きに遮蔽するとは限らないお。
+
+**やらない夫**：
+その通りで、符号が逆になる。計算すると結合の走り方は
+
+$$\mu\frac{\partial g}{\partial\mu} = -\frac{g^3}{16\pi^2}\left(\frac{11}{3}N_c - \frac{2}{3}n_f\right)$$
+
+第1項がグルーオン自身の寄与、第2項がクォーク対の寄与だ[^17]。
+
+**やる夫**：
+数字を入れるお。色は3種、クォークは6種だから
+
+$$\frac{11}{3}\times 3 - \frac{2}{3}\times 6 = 11 - 4 = 7 > 0$$
+
+括弧が正だから、右辺は **負** ──エネルギーを上げると $g$ が **減る** お。
+QED と真逆だお。グルーオン側の 11 がクォーク側の 4 を押し切ってるお。
+
+つまり短距離では結合が弱くて、遠ざかるほど強くなるお。
+これが **漸近自由** で、遠距離で強くなる側が **閉じ込め** だお。
+色荷を引き離そうとするとエネルギーが増え続けて、
+クォークもグルーオンも単独では取り出せない。
+力が届かないんじゃなくて、荷が外に出られないんだお。
+
+**やらない夫**：
+1973年、グロス、ウィルチェック、ポリツァーがこの符号を示した[^17]。
+遮蔽ではなく **反遮蔽** ──場を媒介する当人が荷を持つ、という非可換ゲージ理論の個性が、
+そのまま強い力の二つの顔になる。
+閉じ込めの厳密な証明は今も未解決だが、符号の由来はここまでで説明がつく。
 
 以上で部品が出揃った。人類が知る、重力以外のすべての力の理論──**標準模型**：
 
@@ -1836,13 +2125,31 @@ $$\boxed{ SU(3)_色 \times SU(2)_弱 \times U(1) + \text{h}   }$$
 実測値は？
 
 **やらない夫**：
-実験：$a_e = 0.00115965218\ldots$──有効数字十数桁で測られていて、
+先に自分で出せ。最初の補正は1949年にシュウィンガーが計算した1ループの1個だけで、
+答えは $a_e = \dfrac{\alpha}{2\pi}$ だ[^13]。$\alpha \approx 1/137.04$ を入れろ。
+
+**やる夫**：
+$2\pi \times 137.04 \approx 861$ だから
+
+$$a_e^{(1)} = \frac{\alpha}{2\pi} \approx \frac{1}{861} \approx 0.001161$$
+
+**やらない夫**：
+実験値は $a_e = 0.00115965218\ldots$ だ。並べて見ろ。
+
+**やる夫**：
+0.001161 と 0.0011597。**3桁目まで合ってるお**。
+$\alpha$ と $2\pi$ しか使ってないお。4-5で書いた3行のラグランジアンから、
+図を1枚描いて割り算しただけだお。
+残りのずれ 0.1% ちょっとが、2ループ以降の分だお。
+
+**やらない夫**：
+そこから先が総力戦になる。実験値は有効数字十数桁で測られていて、
 理論計算（数万個の項に及ぶ補正の足し上げだ）と **12桁目まで一致** する[^13]。
 東京・ロサンゼルス間の距離を髪の毛の太さ以下の誤差で言い当てる精度だ。
 人類の持つすべての理論の中で、最も精密に検証された予言と言っていい。
 
 **やる夫**：
-12桁……。4-5の3行のラグランジアンが、そこまで現実と噛み合ってるのかお。
+やる夫が3桁で満足してた同じ式が、12桁まで持つのかお……。
 『位相の基準は場所ごとに自由』なんていう、観念的にすら聞こえる要請から出発した理論が。
 
 **やらない夫**：
@@ -1853,24 +2160,33 @@ Z が媒介する反応は電荷のやり取りを伴わない。**中性カレ�
 理論が『存在するはずだ』と先に言った。
 
 **やる夫**：
-後出しじゃない、正真正銘の予言だお。で、結果は。
+それは5-4でやる夫が数えた『残り1本』の相棒だお。
+真空を消す方向が光子、直交する側が $Z$。$Z$ を出さずに済ませる選択肢はなかったお。
+理論の都合で足したんじゃなくて、**足さないと勘定が合わない** んだお。
 
 **やらない夫**：
 1973年、CERN の泡箱ガーガメルが、ニュートリノが電荷を変えずに散乱する事象を検出した[^14]。
 中性カレントの発見だ。電弱理論の最初の関門突破だった。
 
 2本目。理論は W と Z の **質量の値** まで事前に指定していた。
-第5幕でお前が出した $m_W = gv/2$ に加え、混合角の測定値を入れると
-$m_W \approx 80\mathrm{GeV}$、$m_Z \approx 91\mathrm{GeV}$[^15]。
-当時の加速器では手も足も出ない重さで、CERN は W・Z を作るためだけに
-加速器を陽子・反陽子衝突型に改造した。
+お前の第5幕の数字を、そのまま検査票にしろ。
 
 **やる夫**：
-粒子1個の予言のために加速器を作り変えたのかお。結果は。
+$m_W \approx 80\ \mathrm{GeV}$、$m_Z \approx m_W/\cos\theta_W \approx 91\ \mathrm{GeV}$。
+やる夫が出した2つの数だお。しかも独立じゃなくて、比が縛られてるお。
+片方だけ合っても勝ちにならない検査だお。
 
 **やらない夫**：
+当時の加速器では手も足も出ない重さで、CERN は W・Z を作るためだけに
+加速器を陽子・反陽子衝突型に改造した。
 1983年、UA1・UA2 実験が W を、続いて Z を直接検出。
-質量は **予言値どおり** だった。ルビアとファン・デル・メーアは翌年ノーベル賞[^15]。
+測定値は $m_W \approx 80.4\ \mathrm{GeV}$、$m_Z \approx 91.2\ \mathrm{GeV}$[^15]。
+お前の紙の上の2つの数と、比まで含めて合った。
+ルビアとファン・デル・メーアは翌年ノーベル賞[^15]。
+
+**やる夫**：
+$0.65$ と $246$ と $0.88$ を掛けたり割ったりしただけの数字が、
+地下のトンネルで実際に生まれた粒子の重さと合うのかお……。
 
 そして3本目。最後まで残った未確認の登場人物がいたはずだ。
 
@@ -1941,6 +2257,49 @@ $\Gamma$ と $A_\mu$、リーマンテンソルと $F_{\mu\nu}$──ここま�
 **やらない夫**：
 そうだ。二つの物語は同じ崖の上で終わる。
 崖の先はまだ誰も知らない。
+
+**できる子**：
+序幕の三問へ答えて。
+
+**やる夫**：
+一つ目。力が四つでその形になる理由。
+力の種類はゲージ群の指定で決まって、力の形は共変微分が一意に決めるお。
+$SU(3)$ が強い力、$SU(2)\times U(1)$ が弱い力と電磁気力。
+相互作用の形を手で選ぶ余地はなくて、群を選んだ時点で全部決まるお。
+
+二つ目。質量の出どころ。
+ゲージ不変性は質量項を禁止するお。だから質量はラグランジアンには書けないお。
+真空が $\langle\phi\rangle \neq 0$ で凍ることで、破れた方向のゲージ場が重くなって、
+残った方向が光子として軽いまま残る。フェルミオンは湯川結合で真空から質量をもらう。
+質量は粒子の属性じゃなくて、**真空との関わり方** だお。
+
+三つ目。思いつきでないことの確かめ方。
+理論を作ったあとで測った数じゃなくて、測る前に指定した数で確かめるお。
+中性カレントは観測ゼロの時点で要求され、$m_W$ と $m_Z$ は加速器が作られる前に
+比まで縛られてて、ヒッグス粒子は48年後に 125 GeV で出てきたお。
+$a_e$ は3行のラグランジアンから12桁だお。
+
+**できる子**：
+一つ目と二つ目は合格。
+三つ目に一つ足りない。当たった話しかしていない。
+
+**やる夫**：
+……そうだお。外れる可能性がどこにあったかも言うお。
+$m_W$ と $m_Z$ の比が合わなければ、そこで死んでたお。
+ヒッグス粒子が 125 GeV で見つかっても、結合が質量に比例していなければ死んでたお。
+実際にそこは精査されて、比例が確かめられてるお。
+そして重力は、この手順ではまだ組めていないお。標準模型は **未完成のまま合格した理論** だお。
+
+**できる子**：
+それで合格。
+どこで負けるはずだったかを言える説明は、当たった話だけの説明より強いから。
+
+**できる夫**：
+投影資料の最後の見出しを「標準模型、再発明成功」から差し替えます。
+「四つの力のうち三つ。残り一つは、まだ誰も」でどうでしょう。
+
+**やらない夫**：
+それでいい。二つの物語は、そこで同じ崖に着く。
 今日はここまでにしよう。
 
 ---
@@ -1949,19 +2308,20 @@ $\Gamma$ と $A_\mu$、リーマンテンソルと $F_{\mu\nu}$──ここま�
 ---
 ## 参考文献
 
-[^1]: [Wikipedia『Klein–Gordon equation』](https://en.wikipedia.org/wiki/Klein%E2%80%93Gordon_equation), 2026年7月9日参照.
-[^2]: [Wikipedia『Positron』](https://en.wikipedia.org/wiki/Positron), 2026年7月9日参照.
-[^3]: [Wikipedia『Noether's theorem』](https://en.wikipedia.org/wiki/Noether%27s_theorem), 2026年7月9日参照.
-[^4]: [Wikipedia『Photon』](https://en.wikipedia.org/wiki/Photon), 2026年7月9日参照.
-[^5]: [Wikipedia『Nucleon』](https://en.wikipedia.org/wiki/Nucleon), 2026年7月9日参照.
-[^6]: [Wikipedia『Isospin』](https://en.wikipedia.org/wiki/Isospin), 2026年7月9日参照.
-[^7]: [Wikipedia『Yang–Mills theory』](https://en.wikipedia.org/wiki/Yang%E2%80%93Mills_theory), 2026年7月9日参照.
-[^8]: [Wikipedia『Fermi's interaction』](https://en.wikipedia.org/wiki/Fermi%27s_interaction), 2026年7月9日参照.
-[^9]: [Wikipedia『Goldstone boson』](https://en.wikipedia.org/wiki/Goldstone_boson), 2026年7月9日参照.
-[^10]: [Wikipedia『Higgs mechanism』](https://en.wikipedia.org/wiki/Higgs_mechanism), 2026年7月9日参照.
-[^11]: [Wikipedia『Electroweak interaction』](https://en.wikipedia.org/wiki/Electroweak_interaction), 2026年7月9日参照.
-[^12]: [Wikipedia『Wu experiment』](https://en.wikipedia.org/wiki/Wu_experiment), 2026年7月9日参照.
-[^13]: [Wikipedia『Anomalous magnetic dipole moment』](https://en.wikipedia.org/wiki/Anomalous_magnetic_dipole_moment), 2026年7月9日参照.
-[^14]: [Wikipedia『Gargamelle』](https://en.wikipedia.org/wiki/Gargamelle), 2026年7月9日参照.
-[^15]: [Wikipedia『W and Z bosons』](https://en.wikipedia.org/wiki/W_and_Z_bosons), 2026年7月9日参照.
-[^16]: [Wikipedia『Higgs boson』](https://en.wikipedia.org/wiki/Higgs_boson), 2026年7月9日参照.
+[^1]: O. Klein, [“Quantentheorie und fünfdimensionale Relativitätstheorie”](https://doi.org/10.1007/BF01397481), *Zeitschrift für Physik* 37, 895–906 (1926); W. Gordon, [“Der Comptoneffekt nach der Schrödingerschen Theorie”](https://doi.org/10.1007/BF01390840), *Zeitschrift für Physik* 40, 117–133 (1926); E. Schrödinger, [“Quantisierung als Eigenwertproblem (Vierte Mitteilung)”](https://doi.org/10.1002/andp.19263861802), *Annalen der Physik* 81, 109–139 (1926); W. Pauli and V. Weisskopf, “Über die Quantisierung der skalaren relativistischen Wellengleichung”, *Helvetica Physica Acta* 7, 709–731 (1934). 相対論版を先に書いて微細構造で失望した経緯と、場としての再解釈。対応：第1幕、第2幕。
+[^2]: P. A. M. Dirac, [“The Quantum Theory of the Electron”](https://doi.org/10.1098/rspa.1928.0023), *Proceedings of the Royal Society A* 117, 610–624 (1928); C. D. Anderson, [“The Positive Electron”](https://doi.org/10.1103/PhysRev.43.491), *Physical Review* 43, 491–494 (1933). 平方根の1次化と、空孔理論が予言した陽電子の発見。対応：第1幕。
+[^3]: E. Noether, “Invariante Variationsprobleme”, *Nachrichten von der Gesellschaft der Wissenschaften zu Göttingen*, 235–257 (1918); 英訳 [M. A. Tavel, arXiv:physics/0503066](https://arxiv.org/abs/physics/0503066). 連続対称性と保存量の対応の一次資料。対応：第2幕、第4幕。
+[^4]: R. L. Workman et al. (Particle Data Group), [“Review of Particle Physics”](https://doi.org/10.1093/ptep/ptac097), *Progress of Theoretical and Experimental Physics* 2022, 083C01 (2022), “Gauge and Higgs Bosons” の節. 光子質量の実験上限（$<10^{-18}\,\mathrm{eV}$ 水準）。対応：4-5。
+[^5]: R. L. Workman et al. (Particle Data Group), [“Review of Particle Physics”](https://doi.org/10.1093/ptep/ptac097), *Progress of Theoretical and Experimental Physics* 2022, 083C01 (2022), “Baryons” の節. 陽子・中性子の質量（938.272 MeV と 939.565 MeV）。対応：4-6。
+[^6]: W. Heisenberg, [“Über den Bau der Atomkerne. I”](https://doi.org/10.1007/BF01342433), *Zeitschrift für Physik* 77, 1–11 (1932). 陽子と中性子を1つの粒子の2状態として扱うアイソスピンの原論文。対応：4-6。
+[^7]: C. N. Yang and R. L. Mills, [“Conservation of Isotopic Spin and Isotopic Gauge Invariance”](https://doi.org/10.1103/PhysRev.96.191), *Physical Review* 96, 191–195 (1954); C. N. Yang, *Selected Papers 1945–1980 with Commentary* (W. H. Freeman, 1983), 1954年講演への注記. 非可換ゲージ理論の原論文と、パウリの質問の逸話に関する本人の回想。対応：4-6。
+[^8]: E. Fermi, [“Versuch einer Theorie der β-Strahlen. I”](https://doi.org/10.1007/BF01351864), *Zeitschrift für Physik* 88, 161–177 (1934); Particle Data Group, [“Review of Particle Physics”](https://doi.org/10.1093/ptep/ptac097) (2022), “Physical Constants” の節（$G_F = 1.1663788\times10^{-5}\,\mathrm{GeV}^{-2}$）. 4点接触相互作用と、その結合定数の現代値。対応：5-1。
+[^9]: J. Goldstone, [“Field Theories with «Superconductor» Solutions”](https://doi.org/10.1007/BF02812722), *Il Nuovo Cimento* 19, 154–164 (1961); J. Goldstone, A. Salam, and S. Weinberg, [“Broken Symmetries”](https://doi.org/10.1103/PhysRev.127.965), *Physical Review* 127, 965–970 (1962); Y. Nambu and G. Jona-Lasinio, [“Dynamical Model of Elementary Particles Based on an Analogy with Superconductivity. I”](https://doi.org/10.1103/PhysRev.122.345), *Physical Review* 122, 345–358 (1961). 自発的対称性の破れと質量ゼロ粒子の定理。対応：5-3。
+[^10]: F. Englert and R. Brout, [“Broken Symmetry and the Mass of Gauge Vector Mesons”](https://doi.org/10.1103/PhysRevLett.13.321), *Physical Review Letters* 13, 321–323 (1964); P. W. Higgs, [“Broken Symmetries and the Masses of Gauge Bosons”](https://doi.org/10.1103/PhysRevLett.13.508), *Physical Review Letters* 13, 508–509 (1964); G. S. Guralnik, C. R. Hagen, and T. W. B. Kibble, [“Global Conservation Laws and Massless Particles”](https://doi.org/10.1103/PhysRevLett.13.585), *Physical Review Letters* 13, 585–587 (1964). 1964年にほぼ同時に到達した3グループの原論文。対応：5-4。
+[^11]: S. L. Glashow, [“Partial-Symmetries of Weak Interactions”](https://doi.org/10.1016/0029-5582(61)90469-2), *Nuclear Physics* 22, 579–588 (1961); S. Weinberg, [“A Model of Leptons”](https://doi.org/10.1103/PhysRevLett.19.1264), *Physical Review Letters* 19, 1264–1266 (1967); G. ’t Hooft and M. Veltman, [“Regularization and Renormalization of Gauge Fields”](https://doi.org/10.1016/0550-3213(72)90279-9), *Nuclear Physics B* 44, 189–213 (1972). $SU(2)\times U(1)$ の構成、$Q = T^3 + Y/2$ と混合角、およびくりこみ可能性の証明。対応：5-2、5-4、第6幕。
+[^12]: C. S. Wu, E. Ambler, R. W. Hayward, D. D. Hoppes, and R. P. Hudson, [“Experimental Test of Parity Conservation in Beta Decay”](https://doi.org/10.1103/PhysRev.105.1413), *Physical Review* 105, 1413–1415 (1957). 弱い相互作用のパリティ非保存の一次報告。対応：5-5。
+[^13]: J. Schwinger, [“On Quantum-Electrodynamics and the Magnetic Moment of the Electron”](https://doi.org/10.1103/PhysRev.73.416), *Physical Review* 73, 416–417 (1948); X. Fan, T. G. Myers, B. A. D. Sukra, and G. Gabrielse, [“Measurement of the Electron Magnetic Moment”](https://doi.org/10.1103/PhysRevLett.130.071801), *Physical Review Letters* 130, 071801 (2023). 1ループの $a_e = \alpha/2\pi$ と、現在の測定精度。対応：第6幕。
+[^14]: F. J. Hasert et al. (Gargamelle Collaboration), [“Observation of Neutrino-like Interactions without Muon or Electron in the Gargamelle Neutrino Experiment”](https://doi.org/10.1016/0370-2693(73)90499-1), *Physics Letters B* 46, 138–140 (1973). 中性カレントの発見。対応：第6幕。
+[^15]: G. Arnison et al. (UA1 Collaboration), [“Experimental Observation of Isolated Large Transverse Energy Electrons with Associated Missing Energy at $\sqrt{s} = 540$ GeV”](https://doi.org/10.1016/0370-2693(83)91177-2), *Physics Letters B* 122, 103–116 (1983); M. Banner et al. (UA2 Collaboration), [“Observation of Single Isolated Electrons of High Transverse Momentum in Events with Missing Transverse Energy at the CERN $\bar{p}p$ Collider”](https://doi.org/10.1016/0370-2693(83)91605-2), *Physics Letters B* 122, 476–485 (1983); 質量の現代値は Particle Data Group, [“Review of Particle Physics”](https://doi.org/10.1093/ptep/ptac097) (2022)（$m_W = 80.377$ GeV、$m_Z = 91.1876$ GeV）. 対応：第6幕。
+[^16]: ATLAS Collaboration, [“Observation of a New Particle in the Search for the Standard Model Higgs Boson with the ATLAS Detector at the LHC”](https://doi.org/10.1016/j.physletb.2012.08.020), *Physics Letters B* 716, 1–29 (2012); CMS Collaboration, [“Observation of a New Boson at a Mass of 125 GeV with the CMS Experiment at the LHC”](https://doi.org/10.1016/j.physletb.2012.08.021), *Physics Letters B* 716, 30–61 (2012). ヒッグス粒子の発見。対応：第6幕。
+[^17]: D. J. Gross and F. Wilczek, [“Ultraviolet Behavior of Non-Abelian Gauge Theories”](https://doi.org/10.1103/PhysRevLett.30.1343), *Physical Review Letters* 30, 1343–1346 (1973); H. D. Politzer, [“Reliable Perturbative Results for Strong Interactions?”](https://doi.org/10.1103/PhysRevLett.30.1346), *Physical Review Letters* 30, 1346–1349 (1973). ベータ関数の符号と漸近自由。対応：5-5。
