@@ -139,6 +139,21 @@ $-108.8$ eV と $-79.0$ eV……**30 eVもズレてる**。
 **力学の枠組みそのものを新しく作り直す**必要がある。
 これから6幕かけてそれをやる。
 
+**やる夫**：
+待つお。作り直す前に、引っかかってることがあるお。
+ボーア模型は**間違ってる**んだおね。軌道も量子化条件も根拠がないお。
+なのに水素のスペクトルは、実験と小数点以下まで合ってたお。
+
+間違った模型が、なんで水素だけ当たったんだお。
+たまたま数字が合っただけなら、それこそ気持ち悪いお。
+
+**やらない夫**：
+良い引っかかり方だ。それは新しい枠組みができるまで答えられない。
+新しい枠組みで水素を解いたとき、ボーアの答えが**どういう理由で**再現されるかを見る。
+そこまで持っておけ。
+
+> **伏線③**：間違ったボーア模型は、なぜ水素でだけ当たったのか？ → 第6-3幕で回収
+
 ---
 ## 第2幕　粒子は波である
 
@@ -228,7 +243,71 @@ $\lambda = h/p = 6.63 \times 10^{-34} / 3.82 \times 10^{-24} \approx 1.7 \times 
 じゃあ……何が波打ってるんだお？
 
 **やらない夫**：
-答えは次の幕で出す。
+候補を出せ。お前が消去法をやるんだ。
+
+**やる夫**：
+案1だお。電子の**電荷が空間に薄く広がって**波打ってるんだお。
+電子が点じゃなくて、水風船みたいに広がってて、
+その濃い薄いが波になってるお。
+これなら2つのスリットを同時に通れるお。
+
+**やらない夫**：
+検出器は何を見た。
+
+**やる夫**：
+……1点だお。
+電荷が広がってるなら、スクリーンの広い範囲に薄く電荷が付くはずだお。
+でも実際は、1個飛ばしたら1個分の電荷が1点に着弾するお。
+半分の電荷が左に、半分が右に、なんてことは起きないお。
+案1はダメだお。
+
+**やらない夫**：
+次。
+
+**やる夫**：
+案2だお。**確率そのものが波打ってる**んだお。
+「この辺に見つかる確率が高い／低い」が空間で波になってて、
+その山と谷が干渉縞になるんだお。
+これなら着弾は1点でいいし、何度も繰り返せば縞になるお。
+
+**やらない夫**：
+スリットを1つだけ開けたときの、点 $x$ での確率を $P_1(x)$、
+もう一方だけを開けたときを $P_2(x)$ とする。
+両方開けたときの確率はいくつだ。
+
+**やる夫**：
+確率の波が重なるんだから、$P_1(x) + P_2(x)$ ……。
+
+**やらない夫**：
+干渉縞の暗線では、両方開けたときの確率はいくつだ。
+
+**やる夫**：
+ゼロだお。真っ暗だから電子が来ないお。
+
+**やらない夫**：
+$P_1(x)$ と $P_2(x)$ は。
+
+**やる夫**：
+片方だけ開ければ、そこにも電子は来るお。だから両方とも正だお。
+……正の数2つを足してゼロになるお？　ならないお。
+
+**確率は非負**だお。非負の量をいくら重ねても、**打ち消し合えない**お。
+干渉には「引き算」が要るのに、確率には引き算がないお。
+案2もダメだお。
+
+**やらない夫**：
+では、波打っている量が満たすべき条件を書け。
+
+**やる夫**：
+一つ、重ね合わせると**打ち消し合える**こと。だから符号か、もっと一般に位相を持つお。
+二つ、その量そのものは観測されないお。観測されるのは1点への着弾だお。
+三つ、その量から**非負の確率**を作る手続きがあるお。
+
+……観測できない量が波打っていて、そこから確率を作る。
+波打ってるのは、確率じゃなくて**確率のもと**だお。
+
+**やらない夫**：
+その「もと」に名前が付くのが次の幕だ。
 今ここで確認しておくべきことは、
 干渉パターンが存在する以上、電子には**位相**がある、ということだ。
 2つの経路の位相差が強め合いと弱め合いを決めている。
@@ -336,30 +415,33 @@ $\psi$ が波みたいに空間に広がってるってことは、
 
 **やらない夫**：
 では確率密度を計算してみろ。
-自由粒子の波を $\psi(x,t) = \sin(kx - \omega t)$ として、
-確率密度 $\rho = |\psi|^2 = \sin^2(kx - \omega t)$ の空間積分を考える。
-半波長分の区間 $[0, \pi/k]$ で積分してみろ。
+自由粒子の波を $\psi(x,t) = \sin(kx - \omega t)$ とすると、
+確率密度 $\rho = |\psi|^2 = \sin^2(kx - \omega t)$ だ。
+この $\rho$ を $x$ の関数として見て、何がおかしいか言え。
 
 **やる夫**：
-$\int_0^{\pi/k} \sin^2(kx - \omega t)\,dx$。
-$\sin^2$ の積分公式を使うと……
+$\sin^2$ だから、$0$ 以上で……確率密度としては符号は問題ないお。
+グラフの形は、山と谷が交互に……
 
-$$= \frac{\pi}{2k} - \frac{1}{2k}\sin\left(\frac{2\pi k}{k} - 2\omega t\right)\cdot\frac{1}{2} + \cdots$$
+……あっ、**谷がゼロになる**お。
+$kx - \omega t = 0, \pi, 2\pi, \dots$ のところで $\sin^2 = 0$ だお。
+つまり半波長ごとに、**粒子が絶対に見つからない点**が並ぶお。
 
-ちょっと待つお。$\sin^2 u = (1 - \cos 2u)/2$ だから
-
-$$\int_0^{\pi/k} \frac{1 - \cos(2kx - 2\omega t)}{2}\,dx = \frac{\pi}{2k} - \frac{\sin(2\pi - 2\omega t) - \sin(-2\omega t)}{4k}$$
-
-$\sin(2\pi - 2\omega t) = -\sin(2\omega t)$ で、$\sin(-2\omega t) = -\sin(2\omega t)$ だから……
-この区間ではたまたま消えるけど、任意の区間ではどうだお。
-もっと一般に、$\sin^2(kx - \omega t)$ の山の位置自体が時間とともに移動するから、
-ある有限区間にいる確率は**時間とともに振動する**お。
+自由粒子は、何にもぶつからずに空っぽの空間を飛んでるお。
+なのに、$\pi/k$ ごとに「ここには絶対いない」という点が等間隔で並ぶお。
+空間のどこにも特別な場所がないのに、特別な点が出てくるお。おかしいお。
 
 **やらない夫**：
-全空間で積分しても問題が出る。
-$\sin^2$ は空間で周期的にゼロになる——つまり粒子が絶対にいない場所が波長ごとに現れる。
-自由粒子でそれはおかしい。
+時間についてはどうだ。ある1点 $x_0$ を固定して見ろ。
 
+**やる夫**：
+$\rho(x_0, t) = \sin^2(kx_0 - \omega t)$ だから、時間とともに $0$ と $1$ の間を振動するお。
+その点にいる確率が、周期的にゼロになったり最大になったりするお。
+粒子が**現れたり消えたり**してるお。
+
+**やらない夫**：
+実数の波では、$|\psi|^2$ が波そのものの振動を引きずる。
+波の位相が確率に漏れている、と言ってもいい。
 では複素数の場合はどうだ。
 $\psi(x,t) = e^{i(kx - \omega t)}$ として $|\psi|^2$ を計算してみろ。
 
@@ -371,7 +453,9 @@ $|\psi|^2 = |e^{i(kx-\omega t)}|^2 = e^{i(kx-\omega t)} \cdot e^{-i(kx-\omega t)
 
 **やらない夫**：
 自由粒子が一様に存在する確率密度が空間的にも時間的にも一定。自然だろう。
-$\sin$ 波だと確率が振動して粒子が現れたり消えたりする。不自然だ。
+$e^{i\theta}$ では、位相が回っても絶対値が動かない。
+だから位相は $\psi$ の中に残り、確率密度へは漏れない。
+干渉に必要な位相を持ちながら、確率は静かにしていられる。
 
 一般化すると、確率の保存が問題になる。
 規格化条件 $\int |\psi|^2 dx = 1$ が時間で変わらないことを**ユニタリ性**という。
@@ -671,7 +755,41 @@ $\hat{A} = \hat{A}^\dagger$ のとき**エルミート演算子**という。
 1. 固有値は全て実数（→ 測定値は実数）
 2. 異なる固有値の固有関数は直交する（→ 正規直交基底が作れる）
 
-位置 $\hat{x}$ も運動量 $\hat{p}$ もエルミートだ。確認は省略するが、
+位置 $\hat{x}$ は実数を掛けるだけだから、$\langle\phi|x\psi\rangle = \langle x\phi|\psi\rangle$ で明らかにエルミートだ。
+$\hat{p} = -i\hbar\,\partial_x$ はどうだ。$i$ が付いているぞ。やってみろ。
+
+**やる夫**：
+定義どおり $\langle \phi | \hat{p}\psi \rangle$ を書くお。
+
+$$\langle \phi | \hat{p}\psi \rangle = \int_{-\infty}^{\infty} \phi^*\left(-i\hbar\frac{\partial \psi}{\partial x}\right) dx = -i\hbar \int_{-\infty}^{\infty} \phi^*\frac{\partial \psi}{\partial x}\,dx$$
+
+微分が $\psi$ に付いてるお。これを $\phi$ 側へ移すには**部分積分**だお。
+
+$$-i\hbar\left(\Big[\phi^*\psi\Big]_{-\infty}^{\infty} - \int_{-\infty}^{\infty} \frac{\partial \phi^*}{\partial x}\psi\,dx\right)$$
+
+**やらない夫**：
+第1項をどう扱う。
+
+**やる夫**：
+規格化可能な波動関数は、$|x| \to \infty$ で $\psi \to 0$、$\phi \to 0$ だお。
+そうじゃないと $\int|\psi|^2 dx = 1$ にできないお。
+だから**境界項は消える**お。
+
+$$\langle \phi | \hat{p}\psi \rangle = i\hbar \int_{-\infty}^{\infty} \frac{\partial \phi^*}{\partial x}\psi\,dx = \int_{-\infty}^{\infty} \left(-i\hbar\frac{\partial \phi}{\partial x}\right)^{*}\psi\,dx = \langle \hat{p}\phi | \psi \rangle$$
+
+最後は、$\left(-i\hbar\,\partial_x \phi\right)^* = +i\hbar\,\partial_x \phi^*$ を使ったお。
+複素共役を取ると $i$ の符号が変わるから、部分積分で出たマイナスとちょうど打ち消し合うお。
+
+$\langle \phi | \hat{p}\psi \rangle = \langle \hat{p}\phi | \psi \rangle$ だから、$\hat{p}^\dagger = \hat{p}$。エルミートだお。
+
+**やらない夫**：
+$i$ を付けた理由がここにある。
+$\partial_x$ 単独は部分積分で符号が反転するから**反**エルミートだ。
+$-i\hbar$ を掛けることで、複素共役の符号反転と相殺してエルミートになる。
+運動量演算子に $i$ が入っているのは趣味ではなく、測定値を実数にするための要請だ。
+
+なお、境界項が消える条件 $\Psi \to 0$ は後でもう一度使う。覚えておけ。
+
 要点は『量子力学の物理量 ＝ エルミート演算子』ということだ。
 
 ---
@@ -903,6 +1021,13 @@ $$= \frac{i\hbar}{2m}\int \left(-\frac{\partial^2\Psi^*}{\partial x^2}\Psi + \Ps
 $$= 0$$
 
 **確率保存！** ✓。
+これ、4-4で $\hat p$ のエルミート性を確かめたときと**同じ部分積分**だお。
+境界項が消える条件も同じ $\Psi \to 0$ だお。
+
+**やらない夫**：
+道具は二度使われる。
+$\hat p$ がエルミートであることと、確率が保存することは、同じ性質の別の顔だ。
+どちらも「規格化可能な波動関数は無限遠でゼロになる」という一点に乗っている。
 
 **やらない夫**：
 4条件を全て満たす。しかもこれは自由粒子の場合だ。
@@ -925,6 +1050,11 @@ $$\boxed{i\hbar\frac{\partial \Psi}{\partial t} = \hat{H}\,\Psi = \left[-\frac{\
 右辺 $\hat{H}\Psi$ はハミルトニアン（全エネルギー演算子）の作用。
 $i$ が位相回転を保証して確率を保存する。
 4つの条件がこの形をほぼ一意に決めたんだお。
+
+**やらない夫**：
+シュレーディンガー自身は1926年に、これを「量子化＝固有値問題」として提出した[^11]。
+歴史的には、彼はド・ブロイの波を古典力学の変分原理へ載せる道筋で到達している。
+順序は違うが、着地点は同じだ。
 
 ---
 ### 5-4　時間非依存シュレーディンガー方程式
@@ -967,7 +1097,9 @@ $|\Psi|^2$ は干渉項のせいで時間に依存する——異なるエネル
 ### 6-1　箱の中の粒子 ── 最終検証
 
 **やらない夫**：
-第4幕で先取りした結果を、今度はSEから正式に導出する。
+ここから3つの系で検証する。箱、調和振動子、水素だ。
+この3つは解析的に解ける数少ない例で、標準的な教科書でも同じ順序で並ぶ[^12]。
+まず第4幕で先取りした結果を、今度はSEから正式に導出する。
 $V = 0$（$0 < x < L$）、$V = \infty$（外）。箱の中でのSEは：
 
 $$-\frac{\hbar^2}{2m}\frac{d^2\psi}{dx^2} = E\psi$$
@@ -1197,13 +1329,11 @@ $i\hbar\,\partial_t\Psi = \hat{H}\Psi$ にほぼ一意に到達した。
 我々が扱ったのは**1粒子・非相対論的**なシュレーディンガー方程式だ。
 ここから先には：
 - **多粒子系**：パウリの排他律、スレーター行列式
-- **スピン**：波動関数からは出ない内部自由度。ディラック方程式が必要
+- **スピン**：軌道の波動関数からは出てこない内部自由度。非相対論の枠内でもパウリ方程式として外挿的に導入でき、ディラック方程式では要請せずとも自然に現れる
 - **場の量子論**：粒子の生成と消滅。調和振動子の $\hat{a}^\dagger$ がここで本領を発揮する
 
 どれも今日作った道具——ヒルベルト空間、演算子、固有値、交換子——の上に立つ。
 土台は完成した。あとは建物を積んでいくだけだ。
----
-*おわり*
 
 ---
 **── 完 ──**
@@ -1211,13 +1341,26 @@ $i\hbar\,\partial_t\Psi = \hat{H}\Psi$ にほぼ一意に到達した。
 ---
 ## 参考文献
 
-[^1]: [Wikipedia『Planck constant』](https://en.wikipedia.org/wiki/Planck_constant), 2026年7月9日参照.
-[^2]: [Wikipedia『Balmer series』](https://en.wikipedia.org/wiki/Balmer_series), 2026年7月9日参照.
-[^3]: [Wikipedia『Bohr model』](https://en.wikipedia.org/wiki/Bohr_model), 2026年7月9日参照.
-[^4]: [Wikipedia『Helium atom』](https://en.wikipedia.org/wiki/Helium_atom), 2026年7月9日参照.
-[^5]: [Wikipedia『Photoelectric effect』](https://en.wikipedia.org/wiki/Photoelectric_effect), 2026年7月9日参照.
-[^6]: [Wikipedia『Matter wave』](https://en.wikipedia.org/wiki/Matter_wave), 2026年7月9日参照.
-[^7]: [Wikipedia『Davisson–Germer experiment』](https://en.wikipedia.org/wiki/Davisson%E2%80%93Germer_experiment), 2026年7月9日参照.
-[^8]: [Wikipedia『Born rule』](https://en.wikipedia.org/wiki/Born_rule), 2026年7月9日参照.
-[^9]: [Wikipedia『Hidden-variable theory』](https://en.wikipedia.org/wiki/Hidden-variable_theory), 2026年7月9日参照.
-[^10]: [Wikipedia『Bell's theorem』](https://en.wikipedia.org/wiki/Bell%27s_theorem), 2026年7月9日参照.
+[^1]: Max Planck, "Ueber das Gesetz der Energieverteilung im Normalspectrum," *Annalen der Physik*, 4(3), 553–563, 1901, DOI: 10.1002/andp.19013090310. 黒体放射のスペクトルを説明するためにエネルギー量子 $\varepsilon = h\nu$ を導入し、定数 $h$ の値を放射測定から決定した論文。本文第1幕の紫外破綻とプランク定数に対応する。
+
+[^2]: Johann Jakob Balmer, "Notiz über die Spectrallinien des Wasserstoffs," *Annalen der Physik*, 25(5), 80–87, 1885, DOI: 10.1002/andp.18852610506. 水素の可視スペクトル4本を単一の整数比の公式で表した論文。本文第1幕のバルマー系列と656nmの計算に対応する。
+
+[^3]: Niels Bohr, "On the Constitution of Atoms and Molecules, Part I," *Philosophical Magazine*, 26(151), 1–25, 1913, DOI: 10.1080/14786441308634955. 角運動量の量子化条件を古典軌道に課して水素のエネルギー準位とリュードベリ定数を導いた論文。本文第1幕のボーア模型、ボーア半径0.053nm、および第6-3幕の「なぜ水素でだけ当たったのか」に対応する。
+
+[^4]: Gordon W. F. Drake, ed., *Springer Handbook of Atomic, Molecular, and Optical Physics*, Springer, 2006, DOI: 10.1007/978-0-387-26308-3. ヘリウム原子の基底状態エネルギーを含む原子データと計算手法をまとめる。本文第1幕のヘリウム $-79.0$ eV とボーア模型の予測 $-108.8$ eV の対比に対応する。
+
+[^5]: Albert Einstein, "Über einen die Erzeugung und Verwandlung des Lichtes betreffenden heuristischen Gesichtspunkt," *Annalen der Physik*, 17(6), 132–148, 1905, DOI: 10.1002/andp.19053220607. 光電効果を光量子仮説で説明し、$E = h\nu$ を光そのものの性質として提示した論文。本文第2幕の光の粒子性に対応する。
+
+[^6]: Louis de Broglie, *Recherches sur la théorie des quanta*, Doctoral thesis, Faculté des Sciences de Paris, 1924. 光の二重性を物質へ逆転させ、運動量 $p$ の粒子に波長 $\lambda = h/p$ を対応させた学位論文。本文第2幕のド・ブロイ波長0.17nmの計算に対応する。
+
+[^7]: Clinton Davisson and Lester H. Germer, "Diffraction of Electrons by a Crystal of Nickel," *Physical Review*, 30(6), 705–740, 1927, DOI: 10.1103/PhysRev.30.705. ニッケル単結晶による電子線の回折を測定し、ド・ブロイの関係を実験的に確認した論文。本文第2幕の「電子は波である」に対応する。
+
+[^8]: Max Born, "Zur Quantenmechanik der Stoßvorgänge," *Zeitschrift für Physik*, 37(12), 863–867, 1926, DOI: 10.1007/BF01397477. 散乱問題を通じて波動関数の絶対値の2乗を確率として解釈することを提案した論文。本文第3幕の確率振幅と第4-3幕のボルンの規則に対応する。
+
+[^9]: John S. Bell, "On the Einstein Podolsky Rosen Paradox," *Physics Physique Fizika*, 1(3), 195–200, 1964, DOI: 10.1103/PhysicsPhysiqueFizika.1.195. 局所的な隠れた変数理論が満たすべき不等式を導き、量子力学の予測がそれを破ることを示した論文。本文第3幕の隠れた変数説に対応する。
+
+[^10]: Alain Aspect, Jean Dalibard, and Gérard Roger, "Experimental Test of Bell's Inequalities Using Time-Varying Analyzers," *Physical Review Letters*, 49(25), 1804–1807, 1982, DOI: 10.1103/PhysRevLett.49.1804. 測定方向を飛行中に切り替える構成でベルの不等式の破れを観測した実験。本文第3幕の隠れた変数の棄却に対応する。
+
+[^11]: Erwin Schrödinger, "Quantisierung als Eigenwertproblem (Erste Mitteilung)," *Annalen der Physik*, 384(4), 361–376, 1926, DOI: 10.1002/andp.19263840404. 量子化をエネルギー固有値問題として定式化し、水素原子のスペクトルを波動方程式の固有値として導いた論文。本文第5幕の方程式の一意化と第6-3幕の水素原子に対応する。
+
+[^12]: David J. Griffiths and Darrell F. Schroeter, *Introduction to Quantum Mechanics*, 3rd ed., Cambridge University Press, 2018, DOI: 10.1017/9781316995433. 波動関数、演算子とエルミート性、箱・調和振動子・水素原子の解、および角運動量を体系的に扱う標準的な学部教科書。本文第4幕の道具立てと第6幕の3つの検証全体に対応する。

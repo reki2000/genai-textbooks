@@ -105,17 +105,34 @@ def symbolize(turns: list[dict[str, Any]], ranks: dict[str, int]) -> str:
     return "".join(turn_symbol(turn, ranks) for turn in turns)
 
 
+def loose_turn_symbol(turn: dict[str, Any], ranks: dict[str, int]) -> str:
+    """役割と非散文の有無だけを使う粗い記号。長さ級・終端型は境界1文字で
+    記号ごと変わってしまい、型は同じでも新規性を高く誤判定させる。層2の
+    厳密記号が取りこぼす候補を拾うための補助記号（層2単独では合否に使わない）。"""
+    role = min(ranks.get(turn["who"], ROLE_SLOTS - 1), ROLE_SLOTS - 1)
+    nonprose = 1 if turn["nonprose"] else 0
+    code = role * NONPROSE_SLOTS + nonprose
+    return chr(ord("A") + code)
+
+
+def loose_symbolize(turns: list[dict[str, Any]], ranks: dict[str, int]) -> str:
+    return "".join(loose_turn_symbol(turn, ranks) for turn in turns)
+
+
 # --------------------------------------------------------------------------
 # 層2 反復指標
 # --------------------------------------------------------------------------
 
 
 def monotony(symbols: str) -> float:
-    """周期1〜3の反復が列をどれだけ占めるか。`ABABAB` を直接捉える。"""
+    """周期反復が列をどれだけ占めるか。`ABABAB` のような短周期だけでなく、
+    「摩擦→導出→提示」のような長い型の反復も拾えるよう、周期の上限は
+    ターン数に応じて可変にする（固定3だと3ターンより長い型の反復を測れない）。"""
     if len(symbols) < 4:
         return 0.0
+    max_period = max(3, min(6, len(symbols) // 2))
     best = 0
-    for period in (1, 2, 3):
+    for period in range(1, max_period + 1):
         if len(symbols) <= period:
             continue
         streak = 0
@@ -272,6 +289,7 @@ def analyze(path: Path, beats: dict[str, list[str]] | None = None) -> dict[str, 
                 "end_line": unit["end_line"],
                 "turn_count": len(turns),
                 "symbols": symbols,
+                "loose_symbols": None if beats else loose_symbolize(turns, ranks),
                 "monotony": round(monotony(symbols), 3),
                 "turns": turns,
             }
@@ -314,6 +332,48 @@ def analyze(path: Path, beats: dict[str, list[str]] | None = None) -> dict[str, 
             index = end + 1
         else:
             index += 1
+
+    # 長さ級・終端型は境界1文字で記号が変わり、型は同じでも新規性を高く
+    # 誤判定させうる（表層の既知の取りこぼし）。役割と非散文だけの粗い記号で
+    # 同じ検定をかけ直し、厳密ランに載らない単位も候補として拾う。
+    # あくまで層3へ回す候補であり、合否には使わない。
+    candidates: list[dict[str, Any]] = []
+    if not beats:
+        loose_novelty: list[float | None] = [None]
+        for previous, current in zip(units, units[1:]):
+            loose_novelty.append(round(edit_ratio(previous["loose_symbols"], current["loose_symbols"]), 3))
+        loose_finite = [value for value in loose_novelty if value is not None]
+        loose_median = median(loose_finite)
+        loose_threshold = loose_median * LOW_RATIO
+        confirmed = {unit_id for run in runs for unit_id in run["unit_ids"]}
+
+        index = 1
+        while index < len(units):
+            if loose_novelty[index] is not None and loose_novelty[index] < loose_threshold:
+                end = index
+                while (
+                    end + 1 < len(units)
+                    and loose_novelty[end + 1] is not None
+                    and loose_novelty[end + 1] < loose_threshold
+                ):
+                    end += 1
+                members = units[index - 1 : end + 1]
+                member_ids = [member["unit_id"] for member in members]
+                # 厳密ランに完全に含まれる区間は既に確定済みなので重複報告しない。
+                if not all(unit_id in confirmed for unit_id in member_ids):
+                    pair_values = [loose_novelty[position] for position in range(index, end + 1)]
+                    depth = (median(pair_values) / loose_median) if loose_median else 1.0
+                    candidates.append(
+                        {
+                            "unit_ids": member_ids,
+                            "defect_type": "loose-novelty-candidate",
+                            "novelty": pair_values,
+                            "depth": round(depth, 3),
+                        }
+                    )
+                index = end + 1
+            else:
+                index += 1
 
     # 層3を与えた場合だけ、指示偏重と単純正答のランを別立てで検出する。
     # これは同型反復とは独立の欠陥で、1単位でも成立しうるため run 検出に畳まない。
@@ -399,6 +459,7 @@ def analyze(path: Path, beats: dict[str, list[str]] | None = None) -> dict[str, 
         "monotony_median": round(monotony_median, 3),
         "threshold": round(threshold, 3),
         "runs": runs,
+        "candidates": candidates,
         "beat_summary": beat_summary,
         "marked_units": marked_units,
         "monotone_units": monotone_units,
@@ -466,7 +527,8 @@ def main() -> int:
         print(
             f"{report['book_id']:22s} layer={report['layer']:7s} units={report['unit_count']:3d} "
             f"median_N={report['novelty_median']:.3f} median_M={report['monotony_median']:.3f} "
-            f"runs={len(report['runs'])}[{flags}] monotone={len(report['monotone_units'])}"
+            f"runs={len(report['runs'])}[{flags}] monotone={len(report['monotone_units'])} "
+            f"candidates={len(report['candidates'])}"
         )
         if args.units:
             for unit in report["units"]:
@@ -511,6 +573,13 @@ def main() -> int:
             )
             if args.show:
                 show_run(report, run, args.turns)
+        for candidate in report["candidates"]:
+            print(
+                f"    ? candidate  loose-novelty-candidate      "
+                f"{len(candidate['unit_ids'])}単位 depth={candidate['depth']:.2f} "
+                f"{candidate['unit_ids'][0]}…{candidate['unit_ids'][-1]}　"
+                f"（層3で要確認・層2非確定）"
+            )
 
     if args.json:
         payload = [

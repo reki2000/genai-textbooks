@@ -1035,6 +1035,11 @@ def rule_structure_delimiter(lines: list[str], result: Result) -> list[str]:
     見出しの直前は「空行、`---`、見出し」、直後は空行1行とする。見出し
     直後の `---` は、次の見出しの直前を兼ねる場合だけ残す。終端マーカー
     の直前も「空行、`---`、終端マーカー」とする。
+
+    どの区切りにも属さない `---` が直前の空行なしで現れた場合、markdown は
+    それを水平線ではなく直前行の setext 見出しとして解釈してしまう。タイトル
+    直後と終端マーカー直後は区切り行の意図が明らかなので空行を補い、それ以外
+    は空行の打ち間違いとみなして `---` を空行へ置き換える。
     """
     out = list(lines)
 
@@ -1111,6 +1116,27 @@ def rule_structure_delimiter(lines: list[str], result: Result) -> list[str]:
         if out[before + 1:separator] != [newline]:
             out[before + 1:separator] = [newline]
             result.add(separator, "error", "structure-delimiter", "区切り行直前の空行を1行に統一")
+
+    # 上のパスで見出し・終端マーカーに付く区切り行は空行で分離済み。ここへ残る
+    # のは、直前が本文のまま setext 見出しに化けている `---` だけ。
+    protected = non_prose_lines(out)
+    for index in reversed(range(1, len(out))):
+        if index in protected or split_eol(out[index])[0].strip() != "---":
+            continue
+        previous = split_eol(out[index - 1])[0].strip()
+        if not previous:
+            continue
+        newline = split_eol(out[index])[1] or "\n"
+        if previous.startswith("# ") or END_MARKER_RE.match(previous):
+            out.insert(index, newline)
+            result.add(index + 1, "error", "structure-delimiter", "区切り行の直前に空行を1行挿入")
+            continue
+        following = split_eol(out[index + 1])[0].strip() if index + 1 < len(out) else ""
+        if following:
+            out[index] = newline
+        else:
+            del out[index]
+        result.add(index + 1, "error", "structure-delimiter", "空行の代わりに置かれた `---` を空行へ置換")
     return out
 
 

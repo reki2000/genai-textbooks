@@ -7,11 +7,45 @@
 
 **やらない夫** ── 物理学の教師。
 
+**できる子** ── やる夫の姪。中学生だが数学に強く、曖昧な説明を短い質問で切り分ける。
+
+**できる夫** ── 科学教室の企画役。理解も告知も速いが、ときどき内容の完成より先に予定を確定する。
+
+---
+## 序幕　今夜までに、重力を説明せよ
+
+**できる夫**：
+やる夫君、今夜18時の科学教室、告知を出しました。
+題名は『一般相対性理論を一晩で再発明する』です。
+できる子さんが「重力は力なのか、空間の曲がりなのか」と質問を送ってくれたので、ちょうどいいですね。
+
+**やる夫**：
+待つお。やる夫は姪っ子に「一般相対論くらい説明できる」と見栄を張っただけだお。
+特殊相対論を一通り学んだところで、場の方程式はまだ表紙しか見てないお。
+
+**できる子**：
+質問は3つ。
+なぜ重力だけを幾何学にできるの。
+曲がりを座標の見かけとどう区別するの。
+最後の方程式は、なぜその形でなければならないの。
+
+**できる夫**：
+すばらしいです。三問なら18時に間に合います。
+投影資料の最後には、すでに「アインシュタイン方程式、再発明成功」と入れておきました。
+
+**やる夫**：
+結論を先に印刷するなお！
+やらない夫、助けてくれお。あと一日で、暗記じゃなく説明できるところまで行きたいお。
+
+**やらない夫**：
+アインシュタインは正しい場の方程式へ戻るまで、1913年のエントヴルフ理論から約2年かかった。
+お前は今日一日だ。ただし完成品を覚えるのでなく、間違った候補を自分で捨てて進め。
+できる子の三問に答えられたら合格だ。
+
 ---
 ## 第1幕　ニュートンが壊れる日
 
 **やる夫**：
-やる夫、特殊相対論を一通り学んだお。
 光速 c が情報伝達の上限で、因果律はライトコーンの中でしか成り立たない。
 ここまではいいお。
 
@@ -667,11 +701,46 @@ $$\frac{d^2x^i}{dt^2} \approx -\frac{\partial\Phi}{\partial x^i}$$
 その通り。投げたボールの軌道が空間内で派手に曲がって見えるのは、
 時間方向のわずかな歪みが、光速の2乗という巨大な換算率で空間の運動に効くからだ。
 
-ここまでの構造を確認する：
+**できる夫**：
+中間報告をお願いします。投影資料には「GPSも一般相対論で動く」と書きました。
+数字はまだ空欄です。
+
+**できる子**：
+「使われている」だけでは説明にならない。
+$g_{00}$ から、地上とGPS衛星の時計の差を概算できる？
+
+**やらない夫**：
+弱場では静止時計の固有時間は
+
+$$d\tau \approx \left(1+\frac{\Phi}{c^2}\right)dt$$
+
+だ。地球の外で $\Phi=-GM/r$、地球半径を $R\approx 6.37\times10^6\,\mathrm{m}$、
+GPS衛星の高度を $h\approx 2.02\times10^7\,\mathrm{m}$ として差を出せ。
+
+**やる夫**：
+衛星のほうがポテンシャルが高いから、地上より時計が速いお。
+
+$$\frac{\Delta\tau}{\tau}\approx\frac{GM}{c^2}
+\left(\frac{1}{R}-\frac{1}{R+h}\right)\approx 5.3\times10^{-10}$$
+
+1日を掛けると、一般相対論の寄与だけで **約46マイクロ秒/日** 進むお。
+衛星の運動による特殊相対論の遅れが約7マイクロ秒/日あるから、差し引き約38マイクロ秒/日。
+光は1マイクロ秒で約300m進む。補正しなければ測位誤差は一日で約11kmも育つお[^6]。
+
+**できる子**：
+合格。
+時間の曲がりが、地図上の誤差になった。
+
+**やらない夫**：
+ここまでの構造を、お前の言葉で確認しろ。
+
+**やる夫**：
 
 $$g_{\mu\nu} \;\longrightarrow\; \Gamma^\mu{}_{\alpha\beta} \;\longrightarrow\; \text{測地線方程式}$$
 
-計量が運動のすべてを支配する。残る大物は、4-1と4-2で二度もお前が指摘した宿題──
+計量から接続が決まり、接続から自由落下の軌道が決まる。
+つまり計量が運動のすべてを支配するお。
+残る大物は、4-1と4-2で二度も引っかかった宿題──
 『座標の歪みと本物の歪みを分離する装置』だ。
 
 ---
@@ -724,13 +793,57 @@ $$g_{\mu\nu} \;\longrightarrow\; \Gamma^\mu{}_{\alpha\beta} \;\longrightarrow\; 
 
 **やる夫**：
 $[\nabla_\mu, \nabla_\nu]V^\rho$ を展開するお……
-$\partial\Gamma$ の項と $\Gamma\Gamma$ の項が生き残って、$V$ の微分は全部相殺して……
+まず内側だけ共変微分にして、外側を普通に微分してみるお。
+
+$$\partial_\mu(\nabla_\nu V^\rho)-\partial_\nu(\nabla_\mu V^\rho)$$
+
+を展開すると、$\partial_\mu\partial_\nu V^\rho$ は交換して消えるけど、
+
+$$
+(\partial_\mu\Gamma^\rho{}_{\nu\sigma}-\partial_\nu\Gamma^\rho{}_{\mu\sigma})V^\sigma
++\Gamma^\rho{}_{\nu\sigma}\partial_\mu V^\sigma
+-\Gamma^\rho{}_{\mu\sigma}\partial_\nu V^\sigma
+$$
+
+になったお。$V$ の1階微分が残ってる。
+これでは点での $V$ だけでなく、勝手に選んだベクトル場の周囲の変化まで答えに混ざるお。
+曲率テンソルになってないお。
+
+**やらない夫**：
+失敗の場所を言え。外側は $\partial$ ではなく $\nabla$ だ。
+$\nabla_\nu V^\rho$ は上付き $\rho$ と下付き $\nu$ を持つから、その両方へ接続の補正が要る。
+捩れなしなら下付き $\nu$ 由来の項は交換子の差で相殺する。残る上付き添字の補正を書け。
+
+**やる夫**：
+外側から
+
+$$
++\Gamma^\rho{}_{\mu\lambda}\nabla_\nu V^\lambda
+-\Gamma^\rho{}_{\nu\lambda}\nabla_\mu V^\lambda
+$$
+
+が足されるお。中の $\nabla V=\partial V+\Gamma V$ も開くと、
+さっき残った $\Gamma\partial V$ と、新しく出た $\Gamma\partial V$ が符号反対で全部消える。
+代わりに $\Gamma\Gamma V$ が残るお。
+
+$$
+[\nabla_\mu,\nabla_\nu]V^\rho
+=\Bigl(
+\partial_\mu\Gamma^\rho{}_{\nu\sigma}
+-\partial_\nu\Gamma^\rho{}_{\mu\sigma}
++\Gamma^\rho{}_{\mu\lambda}\Gamma^\lambda{}_{\nu\sigma}
+-\Gamma^\rho{}_{\nu\lambda}\Gamma^\lambda{}_{\mu\sigma}
+\Bigr)V^\sigma
+$$
+
+今度は $V$ の微分がない。点でのベクトルに線形な作用として切り出せたお。
+だから係数を
 
 $$[\nabla_\mu, \nabla_\nu]\,V^\rho = R^\rho{}_{\sigma\mu\nu}\,V^\sigma$$
 
 $$R^\rho{}_{\sigma\mu\nu} = \partial_\mu \Gamma^\rho{}_{\nu\sigma} - \partial_\nu \Gamma^\rho{}_{\mu\sigma} + \Gamma^\rho{}_{\mu\lambda}\Gamma^\lambda{}_{\nu\sigma} - \Gamma^\rho{}_{\nu\lambda}\Gamma^\lambda{}_{\mu\sigma}$$
 
-出たお。**リーマン曲率テンソル**。
+と定義すればいい。出たお。**リーマン曲率テンソル**。
 ……でも添字4本て多すぎないかお。何をそんなに指定する必要があるんだお。
 
 **やらない夫**：
@@ -942,15 +1055,38 @@ $g$ の2階微分から作られ、対称で、恒等的に $\nabla_\mu G^{\mu\n
 まず右辺──重力の源──を決めろ。
 
 **やる夫**：
-ニュートンでは質量密度 ρ。でもSRでは $E = mc^2$ だからエネルギーも源のはず。
-運動量の流れや圧力も仲間だお。全部まとめて **エネルギー・運動量テンソル** $T^{\mu\nu}$。
-$T^{00}$ がエネルギー密度、$T^{0i}$ が運動量密度、$T^{ij}$ が応力。
-対称2階テンソル、成分10個。保存則は
+ニュートンと同じく、源は質量密度 $\rho$ でいいお。
+左辺を難しくしても、右辺まで難しくする必要はないお。
+
+**やらない夫**：
+では、鏡張りの箱の中を光が往復しているとする。
+光子の静止質量はゼロだ。お前の $\rho$ なら、光のエネルギーは重力を生まないのか。
+
+**やる夫**：
+それはおかしいお。$E=mc^2$ なら、箱へ光のエネルギーを足した分だけ系の重力も増えるはずだお。
+質量密度でなく **エネルギー密度** にすればいいお。
+
+**やらない夫**：
+まだ足りない。箱に対して動く観測者には、その光はエネルギーだけでなく運動量の流れを持つ。
+壁で反射すると圧力、つまり応力も及ぼす。
+特殊相対論の座標変換では、エネルギー密度・運動量密度・圧力が互いに混ざる。
+一つだけを源に選べば、観測者を替えた瞬間に方程式の形が壊れる。
+
+**やる夫**：
+右辺も、時空の座標変換に耐える一組の量にしないといけないのかお。
+エネルギー密度、運動量密度、運動量の流れである応力を一つにまとめると、
+**エネルギー・運動量テンソル** $T^{\mu\nu}$ になるお。
+$T^{00}$ がエネルギー密度、$T^{0i}$ と $T^{i0}$ がエネルギー・運動量の流れ、
+$T^{ij}$ が圧力やせん断を含む応力。
+対称2階テンソルで、独立成分は10個だお[^12]。
+
+局所的なエネルギーと運動量の保存則は
 
 $$\nabla_\mu T^{\mu\nu} = 0$$
 
 **やらない夫**：
-よし。では左辺だ。どう作る。
+質量密度という最初の候補を、光と座標変換で捨てられたな。
+では左辺をどう作る。
 
 **やる夫**：
 条件を並べる前に、一番単純なのを試させてほしいお。
@@ -1037,9 +1173,9 @@ $\nabla_\mu R^{\mu\nu}$ は……4-7でやったお。
 **エネルギー・運動量が保存しない理論** になっちゃうお！！ 不合格だお！
 
 **やらない夫**：
-慰めておくと、アインシュタイン本人もほぼこの場所で2年間立ち往生した
-（1913年の『エントヴルフ理論』は共変性を諦めた間違った方程式で、
-1915年11月まで正解に辿り着けなかった）[^2]。
+序幕で話した2年間の立ち往生が、この失敗だ。
+1913年のエントヴルフ理論は一般共変性を満たさず、
+アインシュタインは1915年11月に正しい方程式へ戻った[^2]。
 だがお前には、本人が当時整理しきれていなかった道具がもうある。
 
 **やる夫**：
@@ -1059,6 +1195,29 @@ $G^{\mu\nu} + \Lambda g^{\mu\nu}$ も全条件を満たす。
 この $\Lambda$ が **宇宙定数** ──
 アインシュタインが静的宇宙のために入れ、撤回し、
 宇宙の加速膨張の発見（1998年）で復活した項だ[^9]。
+
+**やる夫**：
+ちょっと待つお。$\Lambda g_{\mu\nu}$ は左辺にいるから「時空そのものの性質」に見える。
+でも右辺へ移せば、真空にエネルギーが詰まっている項にも見えるお。
+結局、$\Lambda$ は幾何なのか物質なのか、どっちなんだお。
+
+**やらない夫**：
+方程式を移項するだけなら、二つの書き方は同じだ。
+観測されるのは有効な $\Lambda$ の値であって、記帳する側ではない。
+難問は量子場が見積もる真空エネルギーと、宇宙膨張から推定される値が桁違いに合わないことだ。
+一般相対論は $\Lambda$ を入れる場所を許すが、その小さな値の由来までは説明しない[^13]。
+
+**できる子**：
+つまり、方程式の形がほぼ決まっても、定数の物理的起源は決まらない。
+「完成」と「未解決」を同じ箱に入れないで。
+
+**できる夫**：
+投影資料の「完全に完成」は「古典重力理論として完成」に直します。
+
+**やる夫**：
+修正が速いのは助かるお。
+
+**やらない夫**：
 最後に条件(4)。弱場極限で $G^{00} = \kappa T^{00}$ が
 $\nabla^2\Phi = 4\pi G\rho$ に一致することを要求すると、$\kappa$ が決まる
 
@@ -1070,6 +1229,8 @@ $$\kappa = \frac{8\pi G}{c^4}$$
 $$\boxed{\,G_{\mu\nu} = R_{\mu\nu} - \frac{1}{2}\,g_{\mu\nu}\,R = \frac{8\pi G}{c^4}\,T_{\mu\nu}\,}$$
 
 **アインシュタインの場の方程式**。
+ここでは局所的な重力現象に焦点を合わせて $\Lambda=0$ と書いた。
+宇宙定数を含めるなら左辺は $G_{\mu\nu}+\Lambda g_{\mu\nu}$ になる。
 等価原理という物理の直観から出発して、
 『テンソルで書け』『2階微分まで』『保存則と整合しろ』『ニュートンに帰着しろ』
 という要請を課したら、形が **ほぼ一意に** 決まってしまったお。
@@ -1124,26 +1285,83 @@ $G_{\mu\nu} = 0$、整理すると $R_{\mu\nu} = 0$ だお。
 
 $$ds^2 = -\left(1 - \frac{r_s}{r}\right)c^2\,dt^2 + \frac{dr^2}{1 - r_s/r} + r^2\,d\Omega^2, \qquad r_s = \frac{2GM}{c^2}$$
 
-この解から出る観測可能な予言を挙げろ。
+まず $r_s$ の意味を言え。
 
 **やる夫**：
-3つ知ってるお。
+$r_s$ は **シュバルツシルト半径**。太陽なら約3km、地球なら約9mmだお。
+天体がこの半径より内側まで縮めば、$r=r_s$ は外へ光を送れない事象の地平面になる。
+ブラックホールの境界だお。
 
-**水星の近日点移動**：ニュートンではケプラー楕円は閉じるけど、
-一般相対論では楕円が歳差する。100年あたり約43秒角──
-ニュートン理論でどうしても説明が残っていた観測値と一致するお[^6]。
+ただし $g_{rr}$ が発散するからといって、地平面そのものが物理的に壊れているとは限らないお。
+座標を替えれば $r=r_s$ の見かけの発散は消せる。
+本当に曲率が発散するのは $r=0$ のほうだお[^11]。
 
-**光の偏向**：太陽をかすめる光の曲がりは約1.75秒角で、
-ニュートン的な粒子計算のちょうど2倍（空間の曲がりの寄与が上乗せされる）。
-1919年エディントンの日食観測で確認だお[^5]。
+**やらない夫**：
+よし。今度は知っている検証を暗誦するな。
+この計量から、まず重力赤方偏移を出せ。
+半径 $r$ に静止する時計では $dr=d\Omega=0$ だ。
 
-**重力赤方偏移**：重力場中の光は周波数が下がる。
-パウンド＝レブカ実験、そしてGPSの時刻補正で毎日検証されてるお[^6]。
+**やる夫**：
+計量へ入れると
+
+$$d\tau=\sqrt{1-\frac{r_s}{r}}\,dt$$
+
+だお。深い場所ほど平方根が小さく、時計が遅い。
+半径 $r_\mathrm{e}$ で出した光を $r_\mathrm{r}$ で受けると、周波数比は
+
+$$
+\frac{\nu_\mathrm{r}}{\nu_\mathrm{e}}
+=\sqrt{\frac{1-r_s/r_\mathrm{e}}{1-r_s/r_\mathrm{r}}}
+$$
+
+になるお。$r_\mathrm{r}>r_\mathrm{e}$ なら比は1より小さいから、
+上へ届く光は **赤方偏移** する。
+パウンド＝レブカ実験やGPSの補正は、この時間成分の予言を検査しているんだお[^6]。
+
+**できる子**：
+一つ目は式から出た。
+光の偏向は $g_{00}$ だけで足りる？
+
+**やる夫**：
+弱場で $g_{00}$ はニュートンポテンシャルを再現するから、
+光を速い粒子のように扱う近似でも半分は出せるお。
+でもシュバルツシルト計量では
+
+$$g_{rr}=\frac{1}{1-r_s/r}\approx 1+\frac{r_s}{r}$$
+
+で、空間側もユークリッド空間からずれてる。
+ヌル測地線を弱場で解くと、時間の曲がりと空間の曲がりが同じだけ寄与して
+
+$$\delta\theta=\frac{4GM}{bc^2}$$
+
+になるお。太陽表面すれすれの $b\approx R_\odot$ なら約 **1.75秒角**。
+ニュートン的な粒子計算の約2倍で、足りなかった半分は $g_{rr}$ の寄与だったお[^5]。
+
+**やらない夫**：
+二つ目。では惑星軌道は。
+
+**やる夫**：
+測地線方程式をシュバルツシルト計量で解くと、楕円は一周しても完全には閉じない。
+一周あたりの近日点移動は弱場で
+
+$$\Delta\varphi=\frac{6\pi GM}{a(1-e^2)c^2}$$
+
+だお。水星の長半径 $a$ と離心率 $e$ を入れて公転回数を掛けると、
+ニュートン理論で説明し残していた **約43秒角/世紀** が出るお[^6]。
+
+**できる子**：
+三つとも、名前でなく計量の別の部分へ戻れた。
+重力赤方偏移は $g_{00}$、光の追加の曲がりは $g_{rr}$、近日点移動は測地線。
+検収合格。
+
+**できる夫**：
+18時です。投影資料の空欄へ、周波数比、1.75秒角、43秒角を入れました。
+「一晩で」は「一日で」に直しておきます。
 
 **やらない夫**：
 現代では重力波の直接検出（2015年、LIGO）、
 ブラックホールシャドウの撮像（2019年、EHT）まで加わり、
-100年以上あらゆる検証に耐え続けている[^6]。
+検証の範囲はさらに広がった[^14][^15]。
 
 お前が歩いた道を振り返れ。
 
@@ -1167,17 +1385,45 @@ failした支流の理論はラプラスやノルドシュトレムが先に踏�
 『$R_{\mu\nu} = \kappa T_{\mu\nu}$ は保存則で死ぬ』──
 単純な案が **なぜだめか** を一個ずつ潰したら、残った道が一本しかなかったお。
 
-……でもやらない夫、最後に一つだけ。
-
-**やらない夫**：
-何だ。
+**できる子**：
+序幕の三問へ答えて。
 
 **やる夫**：
-この理論、量子力学とは……
+重力だけを幾何学にできるのは、物体の種類によらず自由落下が同じだから。
+座標の見かけと本当の曲がりは、共変微分の交換子から作ったリーマンテンソルで区別する。
+場の方程式の形は、2階の対称テンソル、保存則、ニュートン極限を同時に要求すると
+アインシュタインテンソルが残るからだお。
+
+**できる子**：
+合格。
+最初の三行より長くなったけど、三行とも根拠がついた。
 
 **やらない夫**：
-それは別の、まだ誰も解いていない話だ。
-今日はここまでにしよう。
+ただし「残った道が一本」で全物理が終わったわけではない。
+シュバルツシルト解の曲率を座標によらない量で測ると
+
+$$
+R_{\mu\nu\rho\sigma}R^{\mu\nu\rho\sigma}
+=\frac{48G^2M^2}{c^4r^6}
+$$
+
+となり、$r=0$ で発散する。
+$r=r_s$ の発散は座標で消せたが、こちらはリーマンテンソルから作ったスカラーだから消せない。
+古典的な一般相対論が、自分で「ここから先は記述できない」と告げる場所だ。
+
+**やる夫**：
+そこで量子力学との両立が具体的な問題になるのかお。
+地平面の近くでは量子場からブラックホール蒸発が出て、
+中心では古典理論の曲率が発散する。
+ただ「量子重力は未解決」と言うんじゃなく、二つの理論を同時に必要とする現場が見えたお[^16]。
+
+**できる夫**：
+最後の見出しは「完成」ではなく「次の未解決問題」にします。
+空欄も一枚、残しておきます。
+
+**できる子**：
+それならいい。
+分からない場所を隠さない説明は、続きを考えられる説明だから。
 
 ---
 **── 完 ──**
@@ -1185,14 +1431,19 @@ failした支流の理論はラプラスやノルドシュトレムが先に踏�
 ---
 ## 参考文献
 
-[^1]: [Wikipedia『Speed of gravity』](https://en.wikipedia.org/wiki/Speed_of_gravity), 2026年7月9日参照.
-[^2]: [Wikipedia『History of general relativity』](https://en.wikipedia.org/wiki/History_of_general_relativity), 2026年7月9日参照.
-[^3]: [Wikipedia『Eötvös experiment』](https://en.wikipedia.org/wiki/E%C3%B6tv%C3%B6s_experiment), 2026年7月9日参照.
-[^4]: [Wikipedia『MICROSCOPE (satellite)』](https://en.wikipedia.org/wiki/MICROSCOPE_(satellite)), 2026年7月9日参照.
-[^5]: [Wikipedia『Eddington experiment』](https://en.wikipedia.org/wiki/Eddington_experiment), 2026年7月9日参照.
-[^6]: [Wikipedia『Tests of general relativity』](https://en.wikipedia.org/wiki/Tests_of_general_relativity), 2026年7月9日参照.
-[^7]: [Wikipedia『Theorema Egregium』](https://en.wikipedia.org/wiki/Theorema_Egregium), 2026年7月9日参照.
-[^8]: [Wikipedia『Nordström's theory of gravitation』](https://en.wikipedia.org/wiki/Nordstr%C3%B6m%27s_theory_of_gravitation), 2026年7月9日参照.
-[^9]: [Wikipedia『Cosmological constant』](https://en.wikipedia.org/wiki/Cosmological_constant), 2026年7月9日参照.
-[^10]: [Wikipedia『Introduction to general relativity』](https://en.wikipedia.org/wiki/Introduction_to_general_relativity), 2026年7月9日参照.
-[^11]: [Wikipedia『Schwarzschild metric』](https://en.wikipedia.org/wiki/Schwarzschild_metric), 2026年7月9日参照.
+[^1]: S. Carlip, [“Aberration and the Speed of Gravity”](https://doi.org/10.1016/S0375-9601(99)00580-8), *Physics Letters A* 267, 81–87 (2000). ラプラスの速度下限と、相対論的な場では速度依存項が光行差を相殺することを論じる。対応：第1幕。
+[^2]: A. Einstein, [“Die Grundlage der allgemeinen Relativitätstheorie”](https://doi.org/10.1002/andp.19163540702), *Annalen der Physik* 49, 769–822 (1916); M. Janssen and J. Renn, [“Untying the Knot: How Einstein Found His Way Back to Field Equations…”](https://doi.org/10.1007/978-0-8176-4454-0_28), in *The Genesis of General Relativity*, Vol. 2 (2007). 等価原理、一般共変な理論の完成、エントヴルフ理論からの歴史に対応：序幕、第2幕、第5幕。
+[^3]: C. M. Will, [“The Confrontation between General Relativity and Experiment”](https://doi.org/10.12942/lrr-2014-4), *Living Reviews in Relativity* 17, 4 (2014), Sec. 2.1. エトヴェシュ型実験を含む等価原理検証の標準レビュー。対応：第2幕。
+[^4]: P. Touboul et al. (MICROSCOPE Collaboration), [“MICROSCOPE Mission: Final Results of the Test of the Equivalence Principle”](https://doi.org/10.1103/PhysRevLett.129.121102), *Physical Review Letters* 129, 121102 (2022). $10^{-15}$ 水準の弱い等価原理検証。対応：第2幕。
+[^5]: F. W. Dyson, A. S. Eddington, and C. Davidson, [“A Determination of the Deflection of Light by the Sun’s Gravitational Field…”](https://doi.org/10.1098/rsta.1920.0009), *Philosophical Transactions of the Royal Society A* 220, 291–333 (1920). 1919年日食観測の一次報告。対応：第2幕、第6幕。
+[^6]: N. Ashby, [“Relativity in the Global Positioning System”](https://doi.org/10.12942/lrr-2003-1), *Living Reviews in Relativity* 6, 1 (2003); C. M. Will, [“The Confrontation between General Relativity and Experiment”](https://doi.org/10.12942/lrr-2014-4), *Living Reviews in Relativity* 17, 4 (2014). GPSの約46マイクロ秒/日と約7マイクロ秒/日の補正、重力赤方偏移、光偏向、水星近日点移動の標準レビュー。対応：第2幕、第4幕、第6幕。
+[^7]: B. Schutz, *A First Course in General Relativity*, 3rd ed. ([Cambridge University Press](https://doi.org/10.1017/9781108610865), 2022), Chs. 5–6; C. W. Misner, K. S. Thorne, and J. A. Wheeler, *Gravitation* (W. H. Freeman, 1973), Parts II–IV. 内在的曲率、接続、測地線、曲率テンソルの標準的解説。対応：第3幕、第4幕。
+[^8]: A. Einstein and A. D. Fokker, [“Die Nordströmsche Gravitationstheorie vom Standpunkt des absoluten Differentialkalküls”](https://doi.org/10.1002/andp.19143491009), *Annalen der Physik* 44, 321–328 (1914). ノルドシュトレムのスカラー重力理論を幾何学的に定式化した一次論文。対応：第5幕。
+[^9]: A. G. Riess et al., [“Observational Evidence from Supernovae for an Accelerating Universe and a Cosmological Constant”](https://doi.org/10.1086/300499), *The Astronomical Journal* 116, 1009–1038 (1998); S. Perlmutter et al., [“Measurements of $\Omega$ and $\Lambda$ from 42 High-Redshift Supernovae”](https://doi.org/10.1086/307221), *The Astrophysical Journal* 517, 565–586 (1999). 宇宙加速膨張の一次報告。対応：第5幕。
+[^10]: C. W. Misner, K. S. Thorne, and J. A. Wheeler, *Gravitation* (W. H. Freeman, 1973), p. 5. 物質と時空の相互関係を要約した表現の出典。対応：第5幕。
+[^11]: K. Schwarzschild, [“Über das Gravitationsfeld eines Massenpunktes nach der Einsteinschen Theorie”](https://doi.org/10.1007/BF01495339), *Sitzungsberichte der Königlich Preussischen Akademie der Wissenschaften* 7, 189–196 (1916); R. M. Wald, *General Relativity* ([University of Chicago Press](https://press.uchicago.edu/ucp/books/book/chicago/G/bo5952261.html), 1984), Ch. 6. シュバルツシルト解、地平面と曲率特異点。対応：第6幕。
+[^12]: B. Schutz, *A First Course in General Relativity*, 3rd ed. ([Cambridge University Press](https://doi.org/10.1017/9781108610865), 2022), Ch. 4. エネルギー密度・運動量密度・応力をまとめる $T^{\mu\nu}$ と局所保存則。対応：第5幕。
+[^13]: S. Weinberg, [“The Cosmological Constant Problem”](https://doi.org/10.1103/RevModPhys.61.1), *Reviews of Modern Physics* 61, 1–23 (1989). 真空エネルギーと観測される宇宙定数の不一致を整理した標準レビュー。対応：第5幕。
+[^14]: B. P. Abbott et al. (LIGO Scientific Collaboration and Virgo Collaboration), [“Observation of Gravitational Waves from a Binary Black Hole Merger”](https://doi.org/10.1103/PhysRevLett.116.061102), *Physical Review Letters* 116, 061102 (2016). 2015年の重力波直接検出の一次報告。対応：第6幕。
+[^15]: Event Horizon Telescope Collaboration, [“First M87 Event Horizon Telescope Results. I. The Shadow of the Supermassive Black Hole”](https://doi.org/10.3847/2041-8213/ab0ec7), *The Astrophysical Journal Letters* 875, L1 (2019). M87*のリング状画像と一般相対論的ブラックホールシャドウとの整合を報告。対応：第6幕。
+[^16]: S. W. Hawking, [“Particle Creation by Black Holes”](https://doi.org/10.1007/BF02345020), *Communications in Mathematical Physics* 43, 199–220 (1975); R. M. Wald, *Quantum Field Theory in Curved Spacetime and Black Hole Thermodynamics* ([University of Chicago Press](https://press.uchicago.edu/ucp/books/book/chicago/Q/bo3684008.html), 1994). ブラックホール蒸発と、重力・量子論が交わる問題。対応：終幕。
