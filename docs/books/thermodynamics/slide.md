@@ -405,9 +405,9 @@ $$\frac{dP}{dT}\approx-1.35\times10^7\ \mathrm{Pa/K}$$
 
 **熱として与えられるもの**　上限は $Q(1-T_0/T)$
 
-$$500℃\,(773\,\mathrm K):\ 1\ \mathrm{MJ}\times\left(1-\frac{308}{773}\right)\approx0.60\ \mathrm{MJ}$$
+$$500\,^\circ\mathrm{C}\,(773\,\mathrm K):\ 1\ \mathrm{MJ}\times\left(1-\frac{308}{773}\right)\approx0.60\ \mathrm{MJ}$$
 
-$$40℃\,(313\,\mathrm K):\ 1\ \mathrm{MJ}\times\left(1-\frac{308}{313}\right)\approx0.016\ \mathrm{MJ}$$
+$$40\,^\circ\mathrm{C}\,(313\,\mathrm K):\ 1\ \mathrm{MJ}\times\left(1-\frac{308}{313}\right)\approx0.016\ \mathrm{MJ}$$
 
 **電池**　熱源温度を一つ置けないのでこの式は使えない。電気は理想的にはそのままモーターで仕事へ移せるので上限はほぼ **1 MJ**。
 
