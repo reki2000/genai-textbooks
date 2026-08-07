@@ -7,8 +7,10 @@ nothing here is meant to be hand-edited or committed as generated output.
 from __future__ import annotations
 
 import argparse
+import json
 import re
 import shutil
+import subprocess
 import sys
 import tempfile
 from collections import defaultdict
@@ -387,7 +389,9 @@ def replace_generated_catalog(current: str, generated: str) -> str:
     return before + generated + after.lstrip("\n")
 
 
-def render_shell(title: str, description: str, extra_head: str = "") -> str:
+def render_shell(
+    title: str, description: str, extra_head: str = "", slide_doc_ids: list[str] | None = None
+) -> str:
     template = TEMPLATE_PATH.read_text(encoding="utf-8")
     return (
         template.replace("@@TITLE@@", title)
@@ -395,7 +399,34 @@ def render_shell(title: str, description: str, extra_head: str = "") -> str:
         .replace("@@BASE_PATH@@", SITE_BASE_PATH)
         .replace("@@SITE_TITLE@@", SITE_TITLE)
         .replace("@@EXTRA_HEAD@@", extra_head)
+        .replace("@@SLIDE_DOC_IDS@@", json.dumps(sorted(slide_doc_ids or [])))
     )
+
+
+def has_slide(document: dict[str, Any]) -> bool:
+    return (BOOKS_DIR / document["id"] / "slide.md").is_file()
+
+
+def render_slide_deck(document: dict[str, Any], out_docs: Path) -> None:
+    """Render docs/books/{id}/slide.md to build/books/{id}/slide.html via
+    marp-cli, if a slide.md is present for the document."""
+    source = BOOKS_DIR / document["id"] / "slide.md"
+    if not source.is_file():
+        return
+    dest = out_docs / "books" / document["id"] / "slide.html"
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        subprocess.run(
+            [
+                "npx", "--yes", "@marp-team/marp-cli@4",
+                str(source), "-o", str(dest), "--html", "--allow-local-files",
+                "--template", "bare",
+            ],
+            check=True,
+            cwd=ROOT,
+        )
+    except (subprocess.CalledProcessError, FileNotFoundError) as exc:
+        fail(f"document {document['id']} slide.md failed to render via marp-cli: {exc}")
 
 
 def render_book_extra_head(document: dict[str, Any]) -> str:
@@ -452,17 +483,25 @@ def generate(categories: list[dict[str, Any]], documents: list[dict[str, Any]], 
     sidebar = render_sidebar(categories, documents)
     current_top_page = (ROOT / "docs" / "README.md").read_text(encoding="utf-8")
     top_page = replace_generated_catalog(current_top_page, render_top_page_catalog(categories, documents))
+    slide_doc_ids = [document["id"] for document in documents if has_slide(document)]
 
     write_file(out_docs / "_sidebar.md", sidebar)
     write_file(out_docs / "README.md", top_page)
-    write_file(out_docs / "index.html", render_shell(SITE_TITLE, SITE_DESCRIPTION, render_site_extra_head()))
-    write_file(out_docs / "404.html", render_shell(SITE_TITLE, SITE_DESCRIPTION, render_not_found_extra_head()))
+    write_file(
+        out_docs / "index.html",
+        render_shell(SITE_TITLE, SITE_DESCRIPTION, render_site_extra_head(), slide_doc_ids),
+    )
+    write_file(
+        out_docs / "404.html",
+        render_shell(SITE_TITLE, SITE_DESCRIPTION, render_not_found_extra_head(), slide_doc_ids),
+    )
 
     for document in documents:
         relative_path = Path(document_path(document).removeprefix("/")) / "index.html"
         page_title = f"{document['title']} - {SITE_TITLE}"
-        page = render_shell(page_title, document["question"], render_book_extra_head(document))
+        page = render_shell(page_title, document["question"], render_book_extra_head(document), slide_doc_ids)
         write_file(out_docs / relative_path, page)
+        render_slide_deck(document, out_docs)
 
     write_file(out_docs / "sitemap.xml", render_sitemap(documents))
 
@@ -491,7 +530,7 @@ def main() -> int:
         print("catalog OK")
     else:
         print("generated: build/_sidebar.md, build/README.md, build/index.html, build/404.html, "
-              "build/books/*/index.html, build/sitemap.xml")
+              "build/books/*/index.html, build/books/*/slide.html, build/sitemap.xml")
     return 0
 
 
