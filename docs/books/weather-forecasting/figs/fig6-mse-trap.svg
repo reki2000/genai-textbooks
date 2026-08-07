@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 426" role="img" aria-label="図6　MSE の罠 ── 平均は「起こり得ない未来」になる">
+<title>図6　MSE の罠 ── 平均は「起こり得ない未来」になる</title>
+<defs><marker id="arw-7b7a75" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#7b7a75"/></marker></defs>
+<rect x="0.0" y="0.0" width="760.0" height="426.0" rx="10" fill="#fcfcfb" stroke="#e2e4e3" stroke-width="1"/>
+<text x="24.0" y="32.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="16" font-weight="700" fill="#0b0b0b" text-anchor="start">図6　MSE の罠 ── 平均は「起こり得ない未来」になる</text>
+<text x="24.0" y="54.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="400" fill="#52514e" text-anchor="start">前線が来れば12℃、来なければ22℃。MSE を最小にする単一予報は、確率ゼロの17℃</text>
+<line x1="76.0" y1="288.0" x2="340.0" y2="288.0" stroke="#7b7a75" stroke-width="1" stroke-linecap="round"/>
+<rect x="117.7" y="138.0" width="34.0" height="150.0" rx="4" fill="#2a78d6" stroke="none" stroke-width="1" opacity="0.2"/>
+<rect x="117.7" y="138.0" width="34.0" height="150.0" rx="4" fill="none" stroke="#2a78d6" stroke-width="1.8"/>
+<text x="134.7" y="126.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="700" fill="#2a78d6" text-anchor="middle">50%</text>
+<rect x="264.3" y="138.0" width="34.0" height="150.0" rx="4" fill="#eb6834" stroke="none" stroke-width="1" opacity="0.2"/>
+<rect x="264.3" y="138.0" width="34.0" height="150.0" rx="4" fill="none" stroke="#eb6834" stroke-width="1.8"/>
+<text x="281.3" y="126.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="700" fill="#eb6834" text-anchor="middle">50%</text>
+<line x1="208.0" y1="98.0" x2="208.0" y2="288.0" stroke="#e34948" stroke-width="2" stroke-linecap="round" stroke-dasharray="6 4"/>
+<text x="208.0" y="88.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12" font-weight="700" fill="#e34948" text-anchor="middle">MSE 最適解</text>
+<text x="208.0" y="228.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11.5" font-weight="700" fill="#e34948" text-anchor="middle">確率 0</text>
+<text x="134.7" y="307.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11.5" font-weight="700" fill="#2a78d6" text-anchor="middle">12℃</text>
+<text x="134.7" y="324.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#2a78d6" text-anchor="middle">前線通過</text>
+<text x="208.0" y="307.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11.5" font-weight="700" fill="#e34948" text-anchor="middle">17℃</text>
+<text x="208.0" y="324.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#e34948" text-anchor="middle">起こり得ない</text>
+<text x="281.3" y="307.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11.5" font-weight="700" fill="#eb6834" text-anchor="middle">22℃</text>
+<text x="281.3" y="324.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#eb6834" text-anchor="middle">前線来ず</text>
+<text x="32.0" y="292.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11" font-weight="400" fill="#52514e" text-anchor="start">確率</text>
+<text x="24.0" y="90.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="13" font-weight="700" fill="#0b0b0b" text-anchor="start">① 1 地点の気温</text>
+<text x="400.0" y="90.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="13" font-weight="700" fill="#0b0b0b" text-anchor="start">② 場全体でやると ── 低気圧が二重にボケる</text>
+<rect x="400.0" y="128.0" width="104.0" height="96.0" rx="6" fill="#ffffff" stroke="#e2e4e3" stroke-width="1"/>
+<circle cx="435.4" cy="176.0" r="30.0" fill="none" stroke="#2a78d6" stroke-width="1.4" opacity="0.35"/>
+<circle cx="435.4" cy="176.0" r="21.0" fill="none" stroke="#2a78d6" stroke-width="1.4" opacity="0.55"/>
+<circle cx="435.4" cy="176.0" r="12.0" fill="none" stroke="#2a78d6" stroke-width="1.4" opacity="0.75"/>
+<text x="435.4" y="181.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="13" font-weight="700" fill="#2a78d6" text-anchor="middle" opacity="1.0">L</text>
+<text x="452.0" y="241.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11" font-weight="400" fill="#52514e" text-anchor="middle">未来 A（50%）</text>
+<rect x="516.0" y="128.0" width="104.0" height="96.0" rx="6" fill="#ffffff" stroke="#e2e4e3" stroke-width="1"/>
+<circle cx="584.6" cy="176.0" r="30.0" fill="none" stroke="#eb6834" stroke-width="1.4" opacity="0.35"/>
+<circle cx="584.6" cy="176.0" r="21.0" fill="none" stroke="#eb6834" stroke-width="1.4" opacity="0.55"/>
+<circle cx="584.6" cy="176.0" r="12.0" fill="none" stroke="#eb6834" stroke-width="1.4" opacity="0.75"/>
+<text x="584.6" y="181.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="13" font-weight="700" fill="#eb6834" text-anchor="middle" opacity="1.0">L</text>
+<text x="568.0" y="241.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11" font-weight="400" fill="#52514e" text-anchor="middle">未来 B（50%）</text>
+<rect x="632.0" y="128.0" width="104.0" height="96.0" rx="6" fill="#ffffff" stroke="#e2e4e3" stroke-width="1"/>
+<circle cx="667.4" cy="176.0" r="24.0" fill="none" stroke="#e34948" stroke-width="1.4" opacity="0.35" stroke-dasharray="3 3"/>
+<circle cx="667.4" cy="176.0" r="16.8" fill="none" stroke="#e34948" stroke-width="1.4" opacity="0.55" stroke-dasharray="3 3"/>
+<circle cx="667.4" cy="176.0" r="9.6" fill="none" stroke="#e34948" stroke-width="1.4" opacity="0.75" stroke-dasharray="3 3"/>
+<text x="667.4" y="181.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11" font-weight="700" fill="#e34948" text-anchor="middle" opacity="0.55">L</text>
+<circle cx="700.6" cy="176.0" r="24.0" fill="none" stroke="#e34948" stroke-width="1.4" opacity="0.35" stroke-dasharray="3 3"/>
+<circle cx="700.6" cy="176.0" r="16.8" fill="none" stroke="#e34948" stroke-width="1.4" opacity="0.55" stroke-dasharray="3 3"/>
+<circle cx="700.6" cy="176.0" r="9.6" fill="none" stroke="#e34948" stroke-width="1.4" opacity="0.75" stroke-dasharray="3 3"/>
+<text x="700.6" y="181.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11" font-weight="700" fill="#e34948" text-anchor="middle" opacity="0.55">L</text>
+<text x="684.0" y="241.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11" font-weight="400" fill="#52514e" text-anchor="middle">MSE 最適解</text>
+<line x1="504.0" y1="176.0" x2="512.0" y2="176.0" stroke="#7b7a75" stroke-width="1.2" stroke-linecap="round" marker-end="url(#arw-7b7a75)"/>
+<line x1="620.0" y1="176.0" x2="628.0" y2="176.0" stroke="#7b7a75" stroke-width="1.2" stroke-linecap="round" marker-end="url(#arw-7b7a75)"/>
+<text x="684.0" y="258.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11" font-weight="700" fill="#e34948" text-anchor="middle">半分の深さの低気圧が2つ</text>
+<text x="684.0" y="274.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11" font-weight="700" fill="#e34948" text-anchor="middle">＝実在しない場</text>
+<text x="24.0" y="362.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11.5" font-weight="400" fill="#52514e" text-anchor="start">MSE を最小化する予報は「あり得る未来たちの条件付き平均」。未来が多峰なら、平均はどの山にも当たらない谷底になる。</text>
+<text x="24.0" y="379.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11.5" font-weight="400" fill="#52514e" text-anchor="start">鋭い前線を少しズレた位置に出すと有る所と無い所で二度罰せられる（double penalty）ので、モデルはぼかして両張りする。</text>
+<text x="24.0" y="396.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11.5" font-weight="400" fill="#52514e" text-anchor="start">欲しいのは平均という 1 点ではなく、未来の分布そのもの ── これが「予報は決定論的な単一予報であってはいけない」理由。</text>
+</svg>
