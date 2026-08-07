@@ -11,7 +11,8 @@ docs/                  ← ソースのみ（git 追跡対象）
 ├── _footer.md         ← フッター
 └── books/*/
     ├── README.md      ← 各教材本文
-    └── catalog.yml    ← 各教材のカタログ定義
+    ├── catalog.yml    ← 各教材のカタログ定義
+    └── figs/*.svg     ← 説明図（`scripts/figures/{ID}_figs.py` が生成。任意）
 
 build/                 ← 生成ファイル（git 除外）
 ├── index.html         ← トップページHTML（自動生成）
@@ -22,6 +23,7 @@ build/                 ← 生成ファイル（git 除外）
 ├── assets/            ← docs/ からコピー
 ├── sitemap.xml        ← サイトマップ（自動生成）
 ├── books/*/README.md  ← docs/ からコピー
+├── books/*/figs/      ← docs/ からコピー
 └── books/*/index.html ← 各教材SEOページ（自動生成）
 ```
 

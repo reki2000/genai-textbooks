@@ -41,6 +41,10 @@ documents:
 
 外部（別モデル・別セッション）で書かれた教材を受け入れるときは、2の前に `/yaruo-review` で品質を検査する。判定基準と二者レビューの手順はスキルの `SKILL.md` を正本とする。
 
+## 図版
+
+説明図は `/yaruo-figures` で追加する。図は手書きせず `scripts/figures/{ID}_figs.py` が生成し、`docs/books/{ID}/figs/*.svg` へ出力してコミットする。描画ヘルパと配色の正本は `scripts/figures/svgkit.py`。本文へは単独行の `![…](./figs/….svg)` で挿入する（単独行の画像は `yaruo_markdown.py` が非散文領域として扱う）。
+
 ## 検査・整形スクリプト
 
 書式・数値制約の検査は `scripts/yaruo_lint.py` が唯一の入口。`--check` / `--fix` / `--rules <id>` / `--verbose` / `--stats`、一覧は `--list-rules`。

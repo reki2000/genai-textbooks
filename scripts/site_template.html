@@ -110,6 +110,64 @@
       }
     }
 
+    /* Toggle button for the marp slide summary, shown top-right on books that
+       have one. Pressed (ON) swaps the article body for the slide iframe. */
+    #slide-summary-toggle {
+      position: fixed;
+      top: 10px;
+      right: 16px;
+      z-index: 30;
+      padding: 6px 14px;
+      border: none;
+      border-radius: 6px;
+      background-color: var(--theme-color, #42b983);
+      color: #fff;
+      font: inherit;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    }
+
+    #slide-summary-toggle:hover {
+      opacity: 0.85;
+    }
+
+    #slide-summary-toggle[aria-pressed="true"] {
+      background-color: #333;
+    }
+
+    #slide-frame {
+      display: none;
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 15;
+      border: none;
+      background: #fff;
+      width: 100%;
+      height: 100%;
+    }
+
+    @media (min-width: 769px) {
+      #slide-frame {
+        left: var(--sidebar-width, 300px);
+        /* iframe is a replaced element: percentage width resolves against
+           the fixed-position containing block (the viewport), not against
+           the space remaining after `left`, so it must be computed here
+           explicitly or the right edge overflows off-screen. */
+        width: calc(100% - var(--sidebar-width, 300px));
+      }
+    }
+
+    body.slide-mode .content {
+      display: none;
+    }
+
+    body.slide-mode #slide-frame {
+      display: block;
+    }
+
   </style>
 </head>
 
@@ -129,7 +187,78 @@
       markdown: {
         breaks: true,
       },
+      plugins: [],
     };
+
+    // Toggle button that swaps the article body for the marp slide deck
+    // (books/<id>/slide.html) on book pages that have one, and back again.
+    // Runs on every docsify route change since the shell markup is shared
+    // across all pages.
+    (function () {
+      var slideDocIds = @@SLIDE_DOC_IDS@@
+      if (!slideDocIds.length) {
+        return
+      }
+      var basePath = '@@BASE_PATH@@'
+      var buttonId = 'slide-summary-toggle'
+      var frameId = 'slide-frame'
+
+      function setSlideMode(on) {
+        document.body.classList.toggle('slide-mode', on)
+        var button = document.getElementById(buttonId)
+        if (button) {
+          button.setAttribute('aria-pressed', on ? 'true' : 'false')
+          button.textContent = on ? '本文' : '要約'
+        }
+      }
+
+      function updateSlideToggle() {
+        var path = window.location.pathname
+        if (path.indexOf(basePath) === 0) {
+          path = path.slice(basePath.length)
+        }
+        var match = path.match(/^\/books\/([^/]+)\//)
+        var docId = match && slideDocIds.indexOf(match[1]) !== -1 ? match[1] : null
+        var button = document.getElementById(buttonId)
+        var frame = document.getElementById(frameId)
+
+        if (!docId) {
+          if (button) button.remove()
+          if (frame) frame.remove()
+          document.body.classList.remove('slide-mode')
+          return
+        }
+
+        if (!button) {
+          button = document.createElement('button')
+          button.id = buttonId
+          button.type = 'button'
+          button.addEventListener('click', function () {
+            setSlideMode(!document.body.classList.contains('slide-mode'))
+          })
+          document.body.appendChild(button)
+        }
+
+        if (!frame) {
+          frame = document.createElement('iframe')
+          frame.id = frameId
+          document.body.appendChild(frame)
+        }
+
+        if (frame.getAttribute('data-doc-id') !== docId) {
+          frame.src = basePath + '/books/' + docId + '/slide.html'
+          frame.setAttribute('data-doc-id', docId)
+        }
+
+        // Each navigation lands on the article; the reader opts into the
+        // slide view explicitly via the toggle.
+        setSlideMode(false)
+      }
+
+      window.$docsify.plugins.push(function (hook) {
+        hook.doneEach(updateSlideToggle)
+      })
+    })()
   </script>
   <script src="https://cdn.jsdelivr.net/npm/docsify@4"></script>
   <script src="https://cdn.jsdelivr.net/npm/docsify-darklight-theme@3.2.0/dist/index.min.js"></script>
