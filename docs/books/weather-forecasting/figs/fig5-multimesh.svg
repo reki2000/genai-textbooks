@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 352" role="img" aria-label="図5　多重メッシュ ── 遠距離をホップ数で律速させない">
+<title>図5　多重メッシュ ── 遠距離をホップ数で律速させない</title>
+<defs><marker id="arw-7b7a75" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#7b7a75"/></marker><marker id="arw-1baf7a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1baf7a"/></marker></defs>
+<rect x="0.0" y="0.0" width="760.0" height="352.0" rx="10" fill="#fcfcfb" stroke="#e2e4e3" stroke-width="1"/>
+<text x="24.0" y="32.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="16" font-weight="700" fill="#0b0b0b" text-anchor="start">図5　多重メッシュ ── 遠距離をホップ数で律速させない</text>
+<text x="24.0" y="54.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="400" fill="#52514e" text-anchor="start">隣接間隔 200 km のメッシュだけでは 3000 km 先の影響を届けるのに 15 ホップ（＝深いネット）が要る</text>
+<text x="24.0" y="84.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="13" font-weight="700" fill="#0b0b0b" text-anchor="start">細メッシュのみ（1辺 200 km）</text>
+<circle cx="96.0" cy="128.0" r="4.5" fill="#ffffff" stroke="#7b7a75" stroke-width="1.4"/>
+<circle cx="133.9" cy="128.0" r="4.5" fill="#ffffff" stroke="#7b7a75" stroke-width="1.4"/>
+<circle cx="171.7" cy="128.0" r="4.5" fill="#ffffff" stroke="#7b7a75" stroke-width="1.4"/>
+<circle cx="209.6" cy="128.0" r="4.5" fill="#ffffff" stroke="#7b7a75" stroke-width="1.4"/>
+<circle cx="247.5" cy="128.0" r="4.5" fill="#ffffff" stroke="#7b7a75" stroke-width="1.4"/>
+<circle cx="285.3" cy="128.0" r="4.5" fill="#ffffff" stroke="#7b7a75" stroke-width="1.4"/>
+<circle cx="323.2" cy="128.0" r="4.5" fill="#ffffff" stroke="#7b7a75" stroke-width="1.4"/>
+<circle cx="361.1" cy="128.0" r="4.5" fill="#ffffff" stroke="#7b7a75" stroke-width="1.4"/>
+<circle cx="398.9" cy="128.0" r="4.5" fill="#ffffff" stroke="#7b7a75" stroke-width="1.4"/>
+<circle cx="436.8" cy="128.0" r="4.5" fill="#ffffff" stroke="#7b7a75" stroke-width="1.4"/>
+<circle cx="474.7" cy="128.0" r="4.5" fill="#ffffff" stroke="#7b7a75" stroke-width="1.4"/>
+<circle cx="512.5" cy="128.0" r="4.5" fill="#ffffff" stroke="#7b7a75" stroke-width="1.4"/>
+<circle cx="550.4" cy="128.0" r="4.5" fill="#ffffff" stroke="#7b7a75" stroke-width="1.4"/>
+<circle cx="588.3" cy="128.0" r="4.5" fill="#ffffff" stroke="#7b7a75" stroke-width="1.4"/>
+<circle cx="626.1" cy="128.0" r="4.5" fill="#ffffff" stroke="#7b7a75" stroke-width="1.4"/>
+<circle cx="664.0" cy="128.0" r="4.5" fill="#ffffff" stroke="#7b7a75" stroke-width="1.4"/>
+<circle cx="96.0" cy="128.0" r="7.0" fill="#2a78d6" stroke="none" stroke-width="1"/>
+<circle cx="664.0" cy="128.0" r="7.0" fill="#eb6834" stroke="none" stroke-width="1"/>
+<text x="96.0" y="154.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11" font-weight="700" fill="#2a78d6" text-anchor="middle">ここ</text>
+<text x="664.0" y="154.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11" font-weight="700" fill="#eb6834" text-anchor="middle">3000 km 上流</text>
+<path d="M102.0,122.0 Q114.9,104.0 126.9,122.0" fill="none" stroke="#7b7a75" stroke-width="1.2" stroke-linecap="round" marker-end="url(#arw-7b7a75)"/>
+<path d="M139.9,122.0 Q152.8,104.0 164.7,122.0" fill="none" stroke="#7b7a75" stroke-width="1.2" stroke-linecap="round" marker-end="url(#arw-7b7a75)"/>
+<path d="M177.7,122.0 Q190.7,104.0 202.6,122.0" fill="none" stroke="#7b7a75" stroke-width="1.2" stroke-linecap="round" marker-end="url(#arw-7b7a75)"/>
+<path d="M215.6,122.0 Q228.5,104.0 240.5,122.0" fill="none" stroke="#7b7a75" stroke-width="1.2" stroke-linecap="round" marker-end="url(#arw-7b7a75)"/>
+<path d="M253.5,122.0 Q266.4,104.0 278.3,122.0" fill="none" stroke="#7b7a75" stroke-width="1.2" stroke-linecap="round" marker-end="url(#arw-7b7a75)"/>
+<path d="M291.3,122.0 Q304.3,104.0 316.2,122.0" fill="none" stroke="#7b7a75" stroke-width="1.2" stroke-linecap="round" marker-end="url(#arw-7b7a75)"/>
+<path d="M329.2,122.0 Q342.1,104.0 354.1,122.0" fill="none" stroke="#7b7a75" stroke-width="1.2" stroke-linecap="round" marker-end="url(#arw-7b7a75)"/>
+<path d="M367.1,122.0 Q380.0,104.0 391.9,122.0" fill="none" stroke="#7b7a75" stroke-width="1.2" stroke-linecap="round" marker-end="url(#arw-7b7a75)"/>
+<path d="M404.9,122.0 Q417.9,104.0 429.8,122.0" fill="none" stroke="#7b7a75" stroke-width="1.2" stroke-linecap="round" marker-end="url(#arw-7b7a75)"/>
+<path d="M442.8,122.0 Q455.7,104.0 467.7,122.0" fill="none" stroke="#7b7a75" stroke-width="1.2" stroke-linecap="round" marker-end="url(#arw-7b7a75)"/>
+<path d="M480.7,122.0 Q493.6,104.0 505.5,122.0" fill="none" stroke="#7b7a75" stroke-width="1.2" stroke-linecap="round" marker-end="url(#arw-7b7a75)"/>
+<path d="M518.5,122.0 Q531.5,104.0 543.4,122.0" fill="none" stroke="#7b7a75" stroke-width="1.2" stroke-linecap="round" marker-end="url(#arw-7b7a75)"/>
+<path d="M556.4,122.0 Q569.3,104.0 581.3,122.0" fill="none" stroke="#7b7a75" stroke-width="1.2" stroke-linecap="round" marker-end="url(#arw-7b7a75)"/>
+<path d="M594.3,122.0 Q607.2,104.0 619.1,122.0" fill="none" stroke="#7b7a75" stroke-width="1.2" stroke-linecap="round" marker-end="url(#arw-7b7a75)"/>
+<path d="M632.1,122.0 Q645.1,104.0 657.0,122.0" fill="none" stroke="#7b7a75" stroke-width="1.2" stroke-linecap="round" marker-end="url(#arw-7b7a75)"/>
+<text x="676.0" y="108.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="700" fill="#52514e" text-anchor="end">15 ホップ</text>
+<text x="380.0" y="94.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11.5" font-weight="400" fill="#52514e" text-anchor="middle">1 回のメッセージパッシングで 200 km しか進めない</text>
+<text x="24.0" y="210.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="13" font-weight="700" fill="#0b0b0b" text-anchor="start">多重メッシュ（粗い辺を重ねる）</text>
+<circle cx="96.0" cy="254.0" r="4.5" fill="#ffffff" stroke="#7b7a75" stroke-width="1.4"/>
+<circle cx="133.9" cy="254.0" r="4.5" fill="#ffffff" stroke="#7b7a75" stroke-width="1.4"/>
+<circle cx="171.7" cy="254.0" r="4.5" fill="#ffffff" stroke="#7b7a75" stroke-width="1.4"/>
+<circle cx="209.6" cy="254.0" r="4.5" fill="#ffffff" stroke="#7b7a75" stroke-width="1.4"/>
+<circle cx="247.5" cy="254.0" r="4.5" fill="#ffffff" stroke="#7b7a75" stroke-width="1.4"/>
+<circle cx="285.3" cy="254.0" r="4.5" fill="#ffffff" stroke="#7b7a75" stroke-width="1.4"/>
+<circle cx="323.2" cy="254.0" r="4.5" fill="#ffffff" stroke="#7b7a75" stroke-width="1.4"/>
+<circle cx="361.1" cy="254.0" r="4.5" fill="#ffffff" stroke="#7b7a75" stroke-width="1.4"/>
+<circle cx="398.9" cy="254.0" r="4.5" fill="#ffffff" stroke="#7b7a75" stroke-width="1.4"/>
+<circle cx="436.8" cy="254.0" r="4.5" fill="#ffffff" stroke="#7b7a75" stroke-width="1.4"/>
+<circle cx="474.7" cy="254.0" r="4.5" fill="#ffffff" stroke="#7b7a75" stroke-width="1.4"/>
+<circle cx="512.5" cy="254.0" r="4.5" fill="#ffffff" stroke="#7b7a75" stroke-width="1.4"/>
+<circle cx="550.4" cy="254.0" r="4.5" fill="#ffffff" stroke="#7b7a75" stroke-width="1.4"/>
+<circle cx="588.3" cy="254.0" r="4.5" fill="#ffffff" stroke="#7b7a75" stroke-width="1.4"/>
+<circle cx="626.1" cy="254.0" r="4.5" fill="#ffffff" stroke="#7b7a75" stroke-width="1.4"/>
+<circle cx="664.0" cy="254.0" r="4.5" fill="#ffffff" stroke="#7b7a75" stroke-width="1.4"/>
+<circle cx="96.0" cy="254.0" r="7.0" fill="#2a78d6" stroke="none" stroke-width="1"/>
+<circle cx="664.0" cy="254.0" r="7.0" fill="#eb6834" stroke="none" stroke-width="1"/>
+<text x="96.0" y="280.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11" font-weight="700" fill="#2a78d6" text-anchor="middle">ここ</text>
+<text x="664.0" y="280.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11" font-weight="700" fill="#eb6834" text-anchor="middle">3000 km 上流</text>
+<path d="M102.0,249.0 Q114.9,238.0 127.9,249.0" fill="none" stroke="#dcdedd" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M139.9,249.0 Q152.8,238.0 165.7,249.0" fill="none" stroke="#dcdedd" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M177.7,249.0 Q190.7,238.0 203.6,249.0" fill="none" stroke="#dcdedd" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M215.6,249.0 Q228.5,238.0 241.5,249.0" fill="none" stroke="#dcdedd" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M253.5,249.0 Q266.4,238.0 279.3,249.0" fill="none" stroke="#dcdedd" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M291.3,249.0 Q304.3,238.0 317.2,249.0" fill="none" stroke="#dcdedd" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M329.2,249.0 Q342.1,238.0 355.1,249.0" fill="none" stroke="#dcdedd" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M367.1,249.0 Q380.0,238.0 392.9,249.0" fill="none" stroke="#dcdedd" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M404.9,249.0 Q417.9,238.0 430.8,249.0" fill="none" stroke="#dcdedd" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M442.8,249.0 Q455.7,238.0 468.7,249.0" fill="none" stroke="#dcdedd" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M480.7,249.0 Q493.6,238.0 506.5,249.0" fill="none" stroke="#dcdedd" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M518.5,249.0 Q531.5,238.0 544.4,249.0" fill="none" stroke="#dcdedd" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M556.4,249.0 Q569.3,238.0 582.3,249.0" fill="none" stroke="#dcdedd" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M594.3,249.0 Q607.2,238.0 620.1,249.0" fill="none" stroke="#dcdedd" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M632.1,249.0 Q645.1,238.0 658.0,249.0" fill="none" stroke="#dcdedd" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M658.0,262.0 Q522.0,316.0 386.0,262.0" fill="none" stroke="#1baf7a" stroke-width="2.2" stroke-linecap="round" marker-end="url(#arw-1baf7a)"/>
+<path d="M374.0,262.0 Q238.0,316.0 102.0,262.0" fill="none" stroke="#1baf7a" stroke-width="2.2" stroke-linecap="round" marker-end="url(#arw-1baf7a)"/>
+<circle cx="380.0" cy="254.0" r="6.0" fill="#1baf7a" stroke="none" stroke-width="1"/>
+<text x="380.0" y="224.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="700" fill="#1baf7a" text-anchor="middle">粗い段の辺なら 2 ホップ</text>
+<text x="24.0" y="334.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11.5" font-weight="400" fill="#52514e" text-anchor="start">GraphCast は正20面体を 7 段階に細分し、粗い段から細かい段までの辺をすべて重ねて 1 つのグラフにする。</text>
+</svg>

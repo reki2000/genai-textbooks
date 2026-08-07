@@ -25,6 +25,8 @@ ROSTER_LINE = re.compile(r"^\*\*([^*\n]+)\*\*")
 # `yaruo_lint.py` の structure-delimiter が正規化する。
 SECTION_LINE = re.compile(r"^(?:---$|#{1,6}\s)")
 ROSTER_HEADING = re.compile(r"^##\s+登場人物\s*$")
+# 単独行の画像（図版）。本文ではなく図として扱い、句点や表記の検査対象から外す。
+IMAGE_LINE = re.compile(r"^!\[[^\]]*\]\([^)\s]+\)$")
 DEFAULT_SPEAKERS = frozenset({"やる夫", "やらない夫"})
 
 
@@ -88,7 +90,7 @@ def is_speaker_line(body: str, names: set[str]) -> bool:
 
 
 def non_prose_lines(lines: list[str]) -> set[int]:
-    """フェンスコードと $$ 数式ブロックに属する 0-indexed 行番号を返す。
+    """フェンスコード・$$ 数式ブロック・単独行の画像の 0-indexed 行番号を返す。
 
     フェンス行・`$$` 行そのものも含む。1行内で `$$` が偶数個閉じている場合は
     ブロックに入らない（行内数式扱い）。
@@ -116,4 +118,6 @@ def non_prose_lines(lines: list[str]) -> set[int]:
             protected.add(index)
             if body.count("$$") % 2 == 1:
                 in_math = True
+        elif IMAGE_LINE.match(stripped.rstrip()):
+            protected.add(index)
     return protected
