@@ -1,0 +1,6 @@
+placement.md:11: warning: [term-english] 初出でない位置に英語を併記: 海馬（初出は L10。併記は初出へ移す）
+placement.md:13: warning: [term-english] 同じ英語を再び併記: （synapse）（L12 が初出。併記は初出の1回だけ）
+placement.md:13: warning: [term-english] 初出でない位置に英語を併記: シナプス（初出は L12。併記は初出へ移す）
+placement.md:14: warning: [term-english] 英語併記の括弧が半角: (receptor)（全角の （） へ揃える）
+placement.md: info: [term-english] 英語併記 3件
+placement.md: error 0件、warning 4件、info 1件
