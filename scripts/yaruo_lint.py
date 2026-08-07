@@ -1233,6 +1233,119 @@ def rule_footnotes(lines: list[str], result: Result) -> list[str]:
 
 
 # --------------------------------------------------------------------------
+# rule: term-english（専門用語の英語併記）
+# --------------------------------------------------------------------------
+
+# 全角括弧に収めた英語併記。`（long-term potentiation, LTP）` のように略語を
+# 続けてよい。数式や単位の括弧を拾わないよう、先頭は英字に限る。
+TERM_ENGLISH_RE = re.compile(r"（([A-Za-z][A-Za-z0-9 ,.'\-/&]*)）")
+# 日本語の直後に半角括弧で英語を書いたもの。全角括弧へ揃える。
+HALFWIDTH_ENGLISH_RE = re.compile(r"[ぁ-んァ-ヴー一-龥々]\(([A-Za-z][A-Za-z0-9 ,.'\-/&]*)\)")
+
+
+# 用語の直前に来る1字の平仮名。これらは送り仮名でなく助詞と見なす（`現象をシナプス`
+# の `を` を送り仮名と誤認すると、カタカナ語の初出判定が全部止まる）。
+PARTICLES = frozenset("をのがはにでともやかへねよ")
+
+
+def _script_of(char: str) -> str | None:
+    if "一" <= char <= "鿿" or char == "々":
+        return "kanji"
+    if "ァ" <= char <= "ヴ" or char in "ー・":
+        return "kata"
+    if "ぁ" <= char <= "ん":
+        return "hira"
+    return None
+
+
+def _annotated_term(body: str, paren: int) -> str | None:
+    """`（English）` の直前にある用語を切り出す。切り出せなければ None。
+
+    漢字だけ・カタカナだけの連なりを用語とみなす。`手続き記憶` のように送り仮名を
+    挟む語は境界が決められないので、初出判定の対象から外す（検査しないだけで、
+    併記そのものは正しい）。
+    """
+    if paren == 0:
+        return None
+    script = _script_of(body[paren - 1])
+    if script not in ("kanji", "kata"):
+        return None
+    start = paren - 1
+    while start > 0 and _script_of(body[start - 1]) == script:
+        start -= 1
+    if (
+        start >= 2
+        and _script_of(body[start - 1]) == "hira"
+        and body[start - 1] not in PARTICLES
+        and _script_of(body[start - 2]) in ("kanji", "kata")
+    ):
+        return None
+    term = body[start:paren]
+    return term if len(term) >= 2 else None
+
+
+def rule_term_english(lines: list[str], result: Result) -> list[str]:
+    """専門用語の英語併記を検査する。
+
+    併記すべき語を決めるのは人間の仕事で、機械にはできない。ここが見るのは
+    併記の**置き方**だけ——同じ英語を二度付けていないか、初出でない場所に
+    付けていないか、括弧が全角か。
+    """
+    protected = non_prose_lines(lines)
+    prose: list[tuple[int, str]] = []
+    in_references = False
+    for index, line in enumerate(lines):
+        body = split_eol(line)[0]
+        if body.startswith("## "):
+            in_references = body.strip() == "## 参考文献"
+        if index in protected or in_references:
+            continue
+        if body.startswith("#") or FOOTNOTE_DEF_RE.match(body):
+            continue
+        prose.append((index + 1, body))
+
+    seen_english: dict[str, int] = {}
+    annotations = 0
+    for position, (line_no, body) in enumerate(prose):
+        for match in HALFWIDTH_ENGLISH_RE.finditer(body):
+            result.add(
+                line_no, "warning", "term-english",
+                f"英語併記の括弧が半角: ({match.group(1)})（全角の （） へ揃える）",
+            )
+        for match in TERM_ENGLISH_RE.finditer(body):
+            annotations += 1
+            english = match.group(1).strip().lower()
+            first = seen_english.get(english)
+            if first is None:
+                seen_english[english] = line_no
+            else:
+                result.add(
+                    line_no, "warning", "term-english",
+                    f"同じ英語を再び併記: （{match.group(1)}）"
+                    f"（L{first} が初出。併記は初出の1回だけ）",
+                )
+            term = _annotated_term(body, match.start())
+            if term is None:
+                continue
+            earlier = None
+            if term in body[: match.start() - len(term)]:
+                earlier = line_no
+            else:
+                for previous_no, previous in prose[:position]:
+                    if term in previous:
+                        earlier = previous_no
+                        break
+            if earlier is not None:
+                result.add(
+                    line_no, "warning", "term-english",
+                    f"初出でない位置に英語を併記: {term}"
+                    f"（初出は L{earlier}。併記は初出へ移す）",
+                )
+    result.add(None, "info", "term-english", f"英語併記 {annotations}件")
+    return lines
+
+
+# --------------------------------------------------------------------------
 # rule: dialogue-shape（旧 check_dialogue_constraints の会話診断）
 # --------------------------------------------------------------------------
 
@@ -1476,6 +1589,7 @@ REGISTRY: tuple[Rule, ...] = (
     Rule("invisible-chars", "制御文字・私用領域文字の混入", False, rule_invisible_chars),
     Rule("structure", "幕・節番号、参考文献見出し、禁止見出し", False, rule_structure),
     Rule("footnotes", "脚注の未使用・未定義", False, rule_footnotes),
+    Rule("term-english", "専門用語の英語併記の置き方", False, rule_term_english),
     Rule("dialogue-shape", "会話量・実効往復・発言長の診断", False, rule_dialogue_shape),
 )
 
