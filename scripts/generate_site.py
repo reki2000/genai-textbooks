@@ -14,6 +14,7 @@ import subprocess
 import sys
 import tempfile
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -429,6 +430,22 @@ def render_slide_deck(document: dict[str, Any], out_docs: Path) -> None:
         fail(f"document {document['id']} slide.md failed to render via marp-cli: {exc}")
 
 
+def render_slide_decks(documents: list[dict[str, Any]], out_docs: Path) -> None:
+    """Render all slide.md decks concurrently, since each invokes marp-cli as
+    a separate subprocess and spends most of its time waiting on that
+    process rather than on the Python interpreter."""
+    targets = [document for document in documents if has_slide(document)]
+    if not targets:
+        return
+    with ThreadPoolExecutor(max_workers=len(targets)) as executor:
+        futures = {
+            executor.submit(render_slide_deck, document, out_docs): document
+            for document in targets
+        }
+        for future in as_completed(futures):
+            future.result()
+
+
 def render_book_extra_head(document: dict[str, Any]) -> str:
     url = page_url(document)
     return (
@@ -501,7 +518,8 @@ def generate(categories: list[dict[str, Any]], documents: list[dict[str, Any]], 
         page_title = f"{document['title']} - {SITE_TITLE}"
         page = render_shell(page_title, document["question"], render_book_extra_head(document), slide_doc_ids)
         write_file(out_docs / relative_path, page)
-        render_slide_deck(document, out_docs)
+
+    render_slide_decks(documents, out_docs)
 
     write_file(out_docs / "sitemap.xml", render_sitemap(documents))
 
