@@ -83,7 +83,7 @@ def fig_hm_amnesia_map() -> None:
     s.save("fig1-hm-amnesia-map.svg")
 
 
-# --- 図2（2-1）------------------------------------------------------------
+# --- 図2（2-3）------------------------------------------------------------
 def fig_neuron_and_synapse() -> None:
     """配線は既にあり、変えられるのは接点の効きだけ、という舞台を先に置く。"""
     s = Svg(760, 430, "図2　線を引き直すのではなく、接点の効きを変える",
@@ -156,7 +156,7 @@ def fig_neuron_and_synapse() -> None:
     s.save("fig2-neuron-and-synapse.svg")
 
 
-# --- 図3（2-5）------------------------------------------------------------
+# --- 図3（2-6）------------------------------------------------------------
 def _nmda_panel(s, px: float, title: str, glutamate: bool, depolarized: bool,
                 opened: bool) -> None:
     pw = 224
