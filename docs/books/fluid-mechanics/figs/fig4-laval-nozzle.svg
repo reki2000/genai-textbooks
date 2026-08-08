@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 430" role="img" aria-labelledby="title desc">
+<title id="title">図4　加速に必要な面積変化はMa=1で反転する</title>
+<desc id="desc">亜音速は収縮で加速し、喉部で音速、超音速は拡大でさらに加速する</desc>
+<defs><marker id="arw-2a78d6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2a78d6"/></marker><marker id="arw-1baf7a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1baf7a"/></marker></defs>
+<rect x="0.0" y="0.0" width="760.0" height="430.0" rx="10" fill="#fcfcfb" stroke="#e2e4e3" stroke-width="1"/>
+<text x="24.0" y="32.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="16" font-weight="700" fill="#0b0b0b" text-anchor="start">図4　加速に必要な面積変化はMa=1で反転する</text>
+<text x="24.0" y="54.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="400" fill="#52514e" text-anchor="start">亜音速は収縮で加速し、喉部で音速、超音速は拡大でさらに加速する</text>
+<path d="M70,118 C190,118 255,164 370,176 C485,164 550,118 690,102 L690,308 C550,292 485,246 370,234 C255,246 190,292 70,292 Z" fill="#eef7ff" stroke="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M70,118 C190,118 255,164 370,176 C485,164 550,118 690,102" fill="none" stroke="#0b0b0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M70,292 C190,292 255,246 370,234 C485,246 550,292 690,308" fill="none" stroke="#0b0b0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<line x1="370.0" y1="176.0" x2="370.0" y2="234.0" stroke="#e34948" stroke-width="2" stroke-linecap="round" stroke-dasharray="5 4"/>
+<text x="370.0" y="330.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12" font-weight="700" fill="#e34948" text-anchor="middle">喉部：Ma = 1</text>
+<line x1="105.0" y1="205.0" x2="173.0" y2="205.0" stroke="#2a78d6" stroke-width="2.3" stroke-linecap="round" marker-end="url(#arw-2a78d6)"/>
+<line x1="210.0" y1="205.0" x2="292.0" y2="205.0" stroke="#2a78d6" stroke-width="2.3" stroke-linecap="round" marker-end="url(#arw-2a78d6)"/>
+<line x1="305.0" y1="205.0" x2="401.0" y2="205.0" stroke="#2a78d6" stroke-width="2.3" stroke-linecap="round" marker-end="url(#arw-2a78d6)"/>
+<line x1="430.0" y1="205.0" x2="538.0" y2="205.0" stroke="#1baf7a" stroke-width="2.3" stroke-linecap="round" marker-end="url(#arw-1baf7a)"/>
+<line x1="545.0" y1="205.0" x2="669.0" y2="205.0" stroke="#1baf7a" stroke-width="2.3" stroke-linecap="round" marker-end="url(#arw-1baf7a)"/>
+<text x="190.0" y="82.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="14" font-weight="700" fill="#2a78d6" text-anchor="middle">亜音速 Ma &lt; 1</text>
+<text x="190.0" y="100.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11.5" font-weight="400" fill="#2a78d6" text-anchor="middle">dU &gt; 0 なら dA &lt; 0</text>
+<text x="552.0" y="64.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="14" font-weight="700" fill="#1baf7a" text-anchor="middle">超音速 Ma &gt; 1</text>
+<text x="552.0" y="82.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11.5" font-weight="400" fill="#1baf7a" text-anchor="middle">dU &gt; 0 なら dA &gt; 0</text>
+<rect x="150.0" y="360.0" width="460.0" height="42.0" rx="8" fill="#ffffff" stroke="#52514e" stroke-width="1"/>
+<text x="380.0" y="386.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="13" font-weight="700" fill="#0b0b0b" text-anchor="middle">dA/A = (Ma² − 1) dU/U　→　符号がMa=1で逆転</text>
+</svg>

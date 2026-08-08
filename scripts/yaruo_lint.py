@@ -718,6 +718,125 @@ def rule_notation(lines: list[str], result: Result) -> list[str]:
 
 
 # --------------------------------------------------------------------------
+# rule: circled-numbers
+# --------------------------------------------------------------------------
+
+CIRCLED_NUMBER_RE = re.compile("[①-⑳]")
+_CIRCLED_BASE = ord("①")
+
+
+def _circled_to_paren(char: str) -> str:
+    return f"({ord(char) - _CIRCLED_BASE + 1})"
+
+
+def rule_circled_numbers(lines: list[str], result: Result) -> list[str]:
+    """丸囲み数字（①②③…）を半角の `(1)(2)(3)…` へ書き換える。
+
+    丸囲み数字はフォント・環境によって欠落・文字化けしやすく、Webでは表示
+    されない場合がある。コードブロック・行内コード・TeX数式内は対象外。
+    """
+    protected = non_prose_lines(lines)
+    out: list[str] = []
+    for index, line in enumerate(lines):
+        line_number = index + 1
+        if index in protected:
+            out.append(line)
+            continue
+        body, newline = split_eol(line)
+        masked = INLINE_SKIP_RE.sub(lambda m: "\x00" * len(m.group()), body)
+        matches = list(CIRCLED_NUMBER_RE.finditer(masked))
+        if not matches:
+            out.append(line)
+            continue
+        parts: list[str] = []
+        last = 0
+        for m in matches:
+            replacement = _circled_to_paren(m.group())
+            result.add(
+                line_number,
+                "error",
+                "circled-numbers",
+                f"丸囲み数字を書き換える: {m.group()} → {replacement}",
+            )
+            parts.append(body[last:m.start()])
+            parts.append(replacement)
+            last = m.end()
+        parts.append(body[last:])
+        out.append("".join(parts) + newline)
+    return out
+
+
+# --------------------------------------------------------------------------
+# rule: unit-notation
+# --------------------------------------------------------------------------
+
+# 長い（複合）語を先に置く。`メートル`・`グラム` 単体は複合語をすべて処理した
+# 後に残ったものだけを対象にするため、この順序に依存する。
+UNIT_PATTERNS: tuple[tuple[re.Pattern[str], str], ...] = (
+    (re.compile("立方メートル"), "m³"),
+    (re.compile("平方センチメートル"), "cm²"),
+    (re.compile("平方ミリメートル"), "mm²"),
+    (re.compile("平方メートル"), "m²"),
+    (re.compile("キロメートル"), "km"),
+    (re.compile("センチメートル"), "cm"),
+    (re.compile("ミリメートル"), "mm"),
+    (re.compile("マイクロメートル"), "μm"),
+    (re.compile("ピコメートル"), "pm"),
+    (re.compile("メートル(?!法)"), "m"),
+    (re.compile("キログラム"), "kg"),
+    # `プログラム`・`ヒストグラム`・`エングラム`・`ダイヤグラム` のように
+    # グラムを含むが単位ではない語を、直前がカタカナのときに限り除外する。
+    (re.compile(r"(?<![゠-ヿ])グラム(?!染色|陽性|陰性)"), "g"),
+)
+
+
+def _masked_sub(
+    body: str,
+    pattern: re.Pattern[str],
+    replacement: str,
+    line_number: int,
+    result: Result,
+) -> str:
+    masked = INLINE_SKIP_RE.sub(lambda m: "\x00" * len(m.group()), body)
+    matches = list(pattern.finditer(masked))
+    if not matches:
+        return body
+    parts: list[str] = []
+    last = 0
+    for m in matches:
+        result.add(
+            line_number,
+            "error",
+            "unit-notation",
+            f"単位表記を書き換える: {m.group()} → {replacement}",
+        )
+        parts.append(body[last:m.start()])
+        parts.append(replacement)
+        last = m.end()
+    parts.append(body[last:])
+    return "".join(parts)
+
+
+def rule_unit_notation(lines: list[str], result: Result) -> list[str]:
+    """メートル・グラム系の単位のカタカナ表記を `m` `km` `g` `kg` 等へ揃える。
+
+    コードブロック・行内コード・TeX数式内は対象外。
+    """
+    protected = non_prose_lines(lines)
+    out: list[str] = []
+    for index, line in enumerate(lines):
+        line_number = index + 1
+        if index in protected:
+            out.append(line)
+            continue
+        body, newline = split_eol(line)
+        for pattern, replacement in UNIT_PATTERNS:
+            body = _masked_sub(body, pattern, replacement, line_number, result)
+        out.append(body + newline)
+    return out
+
+
+# --------------------------------------------------------------------------
 # 節の解析（会話診断・構造検査の共通土台）
 # --------------------------------------------------------------------------
 
@@ -1583,6 +1702,8 @@ REGISTRY: tuple[Rule, ...] = (
     Rule("table-delimiter", "GFM 表の区切り行", True, rule_table_delimiter),
     Rule("dialogue-period", "発言末の句点", True, rule_dialogue_period),
     Rule("notation", "金額・割合の半角算用数字表記", True, rule_notation),
+    Rule("circled-numbers", "丸囲み数字を (1)(2)(3) 等へ書き換え", True, rule_circled_numbers),
+    Rule("unit-notation", "メートル・グラム系単位を m/km/g/kg 等へ書き換え", True, rule_unit_notation),
     Rule("end-marker", "終端マーカー `**── 完 ──**`", True, rule_end_marker),
     Rule("heading-level", "幕は ##、節は ###", True, rule_heading_level),
     Rule("structure-delimiter", "タイトル・見出し・完了マーカーの区切り行", True, rule_structure_delimiter),

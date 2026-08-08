@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 430" role="img" aria-labelledby="title desc">
+<title id="title">図2　同じΔvでも、噴射方向で届く距離が24倍違う</title>
+<desc id="desc">LEOで3.09 km/s：外向きは地球へ衝突、進行方向なら月距離へ届く</desc>
+<defs><marker id="arw-e34948" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#e34948"/></marker><marker id="arw-1baf7a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1baf7a"/></marker></defs>
+<rect x="0.0" y="0.0" width="760.0" height="430.0" rx="10" fill="#fcfcfb" stroke="#e2e4e3" stroke-width="1"/>
+<text x="24.0" y="32.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="16" font-weight="700" fill="#0b0b0b" text-anchor="start">図2　同じΔvでも、噴射方向で届く距離が24倍違う</text>
+<text x="24.0" y="54.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="400" fill="#52514e" text-anchor="start">LEOで3.09 km/s：外向きは地球へ衝突、進行方向なら月距離へ届く</text>
+<rect x="28.0" y="80.0" width="340.0" height="288.0" rx="8" fill="#fff" stroke="#e2e4e3" stroke-width="1"/>
+<text x="198.0" y="108.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="14" font-weight="700" fill="#e34948" text-anchor="middle">外向きに噴射</text>
+<circle cx="120.0" cy="218.0" r="34.0" fill="#eaf4ff" stroke="#2a78d6" stroke-width="1.8"/>
+<text x="120.0" y="222.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11" font-weight="700" fill="#2a78d6" text-anchor="middle">地球</text>
+<circle cx="120.0" cy="218.0" r="48.0" fill="none" stroke="#7b7a75" stroke-width="1" stroke-dasharray="4 4"/>
+<circle cx="120.0" cy="170.0" r="5.0" fill="#0b0b0b" stroke="none" stroke-width="1"/>
+<line x1="120.0" y1="165.0" x2="186.0" y2="165.0" stroke="#e34948" stroke-width="2.5" stroke-linecap="round" marker-end="url(#arw-e34948)"/>
+<path d="M120,170 C220,136 284,196 160,245" fill="none" stroke="#e34948" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="272.0" y="205.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11.5" font-weight="700" fill="#e34948" text-anchor="middle">衝突</text>
+<text x="198.0" y="298.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12" font-weight="700" fill="#0b0b0b" text-anchor="middle">遠地点 &lt; 16,160 km</text>
+<text x="198.0" y="320.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11.5" font-weight="700" fill="#e34948" text-anchor="middle">近地点 ≈ 4,800 km（地球内部）</text>
+<text x="198.0" y="348.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11" font-weight="400" fill="#52514e" text-anchor="middle">a = 8,080 km</text>
+<rect x="392.0" y="80.0" width="340.0" height="288.0" rx="8" fill="#fff" stroke="#e2e4e3" stroke-width="1"/>
+<text x="562.0" y="108.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="14" font-weight="700" fill="#1baf7a" text-anchor="middle">進行方向に噴射</text>
+<circle cx="484.0" cy="218.0" r="34.0" fill="#eaf4ff" stroke="#2a78d6" stroke-width="1.8"/>
+<text x="484.0" y="222.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11" font-weight="700" fill="#2a78d6" text-anchor="middle">地球</text>
+<circle cx="484.0" cy="218.0" r="48.0" fill="none" stroke="#7b7a75" stroke-width="1" stroke-dasharray="4 4"/>
+<circle cx="484.0" cy="170.0" r="5.0" fill="#0b0b0b" stroke="none" stroke-width="1"/>
+<line x1="484.0" y1="165.0" x2="550.0" y2="165.0" stroke="#1baf7a" stroke-width="2.5" stroke-linecap="round" marker-end="url(#arw-1baf7a)"/>
+<path d="M484,170 C710,133 710,303 484,266" fill="none" stroke="#1baf7a" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="662.0" y="218.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11.5" font-weight="700" fill="#1baf7a" text-anchor="middle">月距離</text>
+<text x="562.0" y="298.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12" font-weight="700" fill="#0b0b0b" text-anchor="middle">長半径 ≈ 195,000 km</text>
+<text x="562.0" y="320.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11.5" font-weight="700" fill="#1baf7a" text-anchor="middle">遠地点 ≈ 月の距離</text>
+<text x="562.0" y="348.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11" font-weight="400" fill="#52514e" text-anchor="middle">a = 195,000 km</text>
+<text x="380.0" y="397.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="13" font-weight="700" fill="#0b0b0b" text-anchor="middle">速度ベクトルと同じ向きなら、Δvが運動エネルギー増加へ最も効く</text>
+<text x="380.0" y="417.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#7b7a75" text-anchor="middle">軌道形状は模式化（数値は本文のvis-viva計算）</text>
+</svg>
