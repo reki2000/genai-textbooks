@@ -5,7 +5,7 @@ AI-Generated Japanese Short Textbooks: "Yaruo"-Style Dialogue Collection and AI 
 [公開サイト](https://reki2000.github.io/genai-textbooks/)
 
 - GitHub Pages で公開されるテキスト本体（`docs/books/*/README.md`）。公開用の目次・サイドバー・各教材ページ（SEO用meta含む）は各 `README.md` の隣にある `catalog.yml` を `scripts/generate_site.py` がビルド時に統合して自動生成する（`scripts/site_template.html` 参照）
-- 「やる夫で学ぶ」形式の教材を執筆・検査・公開するための Claude Code / Codex 用スキル 6 種（`.claude/skills/`、`.codex/skills/`）
+- 「やる夫で学ぶ」形式の教材を執筆・検査・公開するための Claude Code / Codex 用スキル 8 種（`.claude/skills/`、`.codex/skills/`）
 
 ## Claude Code / Codex 用スキル
 
@@ -18,6 +18,8 @@ AI-Generated Japanese Short Textbooks: "Yaruo"-Style Dialogue Collection and AI 
 | `yaruo-format` | 教材の**書式整形**。Markdown の強調、表、会話表記などを lint・修正する | 整形／フォーマット／lint／太字や表の崩れ |
 | `yaruo-proofread` | 教材の**校正・検証**。事実、出典、論理展開、数式と会話の整合性を確認する | 校正／ファクトチェック／出典／数式チェック |
 | `yaruo-count` | 教材の文字数、行数、数式量、推定読了時間を統一ルールで正確に集計する | 正確な文字数／行数／読了時間 |
+| `textbook-figures` | 教材本文へ説明図を追加。Python生成SVGや出典明記の外部画像から適切な媒体を選び組み込む | 図を追加／図解／可視化／概念図 |
+| `yaruo-slide` | 教材から物語を除き学習内容だけを圧縮した marp スライド `slide.md` を作成・更新する | スライド／marp／要約スライド／発表資料 |
 | `discuss` | Codex と Claude がファイルを介して設計案やレビューを照合し、合意を残す | 議論して／Claude・Codex と相談／合意を取って |
 
 ## この執筆環境の使い方
