@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 430" role="img" aria-labelledby="title desc">
+<title id="title">図1　同じ境界 C なら、どの面を張っても同じ磁場</title>
+<desc id="desc">充電中のコンデンサ：導線では伝導電流 I、隙間では電束の変化が同じ役割を担う</desc>
+<defs><marker id="arw-eb6834" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#eb6834"/></marker><marker id="arw-1baf7a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1baf7a"/></marker><marker id="arw-52514e" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#52514e"/></marker></defs>
+<rect x="0.0" y="0.0" width="760.0" height="430.0" rx="10" fill="#fcfcfb" stroke="#e2e4e3" stroke-width="1"/>
+<text x="24.0" y="32.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="16" font-weight="700" fill="#0b0b0b" text-anchor="start">図1　同じ境界 C なら、どの面を張っても同じ磁場</text>
+<text x="24.0" y="54.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="400" fill="#52514e" text-anchor="start">充電中のコンデンサ：導線では伝導電流 I、隙間では電束の変化が同じ役割を担う</text>
+<rect x="24.0" y="82.0" width="336.0" height="266.0" rx="8" fill="#ffffff" stroke="#e2e4e3" stroke-width="1"/>
+<text x="40.0" y="107.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="13" font-weight="700" fill="#e34948" text-anchor="start">元のアンペールの法則</text>
+<line x1="192.0" y1="122.0" x2="192.0" y2="188.0" stroke="#0b0b0b" stroke-width="3" stroke-linecap="round"/>
+<line x1="192.0" y1="238.0" x2="192.0" y2="313.0" stroke="#0b0b0b" stroke-width="3" stroke-linecap="round"/>
+<rect x="122.0" y="188.0" width="140.0" height="7.0" rx="2" fill="#0b0b0b" stroke="none" stroke-width="1"/>
+<rect x="122.0" y="231.0" width="140.0" height="7.0" rx="2" fill="#0b0b0b" stroke="none" stroke-width="1"/>
+<line x1="192.0" y1="142.0" x2="192.0" y2="178.0" stroke="#eb6834" stroke-width="2.3" stroke-linecap="round" marker-end="url(#arw-eb6834)"/>
+<text x="204.0" y="158.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="13" font-weight="700" fill="#eb6834" text-anchor="start">I</text>
+<path d="M90,166 C90,142 294,142 294,166 C294,190 90,190 90,166" fill="none" stroke="#2a78d6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="80.0" y="151.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="13" font-weight="700" fill="#2a78d6" text-anchor="start">C</text>
+<path d="M91,166 C120,123 264,123 293,166" fill="none" stroke="#eb6834" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5 4"/>
+<text x="40.0" y="137.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11" font-weight="400" fill="#eb6834" text-anchor="start">面A：導線を横切る</text>
+<path d="M91,166 C110,278 274,278 293,166" fill="none" stroke="#1baf7a" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5 4"/>
+<text x="40.0" y="329.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11" font-weight="400" fill="#1baf7a" text-anchor="start">面B：隙間を横切る</text>
+<line x1="150.0" y1="202.0" x2="150.0" y2="225.0" stroke="#1baf7a" stroke-width="1.5" stroke-linecap="round" marker-end="url(#arw-1baf7a)" stroke-dasharray="3 3"/>
+<line x1="192.0" y1="202.0" x2="192.0" y2="225.0" stroke="#1baf7a" stroke-width="1.5" stroke-linecap="round" marker-end="url(#arw-1baf7a)" stroke-dasharray="3 3"/>
+<line x1="234.0" y1="202.0" x2="234.0" y2="225.0" stroke="#1baf7a" stroke-width="1.5" stroke-linecap="round" marker-end="url(#arw-1baf7a)" stroke-dasharray="3 3"/>
+<text x="270.0" y="218.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11" font-weight="700" fill="#1baf7a" text-anchor="start">∂E/∂t</text>
+<text x="192.0" y="370.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="14" font-weight="700" fill="#e34948" text-anchor="middle">面A：I　≠　面B：0</text>
+<text x="192.0" y="394.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12" font-weight="400" fill="#e34948" text-anchor="middle">同じ C なのに答えが割れる</text>
+<rect x="400.0" y="82.0" width="336.0" height="266.0" rx="8" fill="#ffffff" stroke="#e2e4e3" stroke-width="1"/>
+<text x="416.0" y="107.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="13" font-weight="700" fill="#1baf7a" text-anchor="start">修正後</text>
+<line x1="568.0" y1="122.0" x2="568.0" y2="188.0" stroke="#0b0b0b" stroke-width="3" stroke-linecap="round"/>
+<line x1="568.0" y1="238.0" x2="568.0" y2="313.0" stroke="#0b0b0b" stroke-width="3" stroke-linecap="round"/>
+<rect x="498.0" y="188.0" width="140.0" height="7.0" rx="2" fill="#0b0b0b" stroke="none" stroke-width="1"/>
+<rect x="498.0" y="231.0" width="140.0" height="7.0" rx="2" fill="#0b0b0b" stroke="none" stroke-width="1"/>
+<line x1="568.0" y1="142.0" x2="568.0" y2="178.0" stroke="#eb6834" stroke-width="2.3" stroke-linecap="round" marker-end="url(#arw-eb6834)"/>
+<text x="580.0" y="158.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="13" font-weight="700" fill="#eb6834" text-anchor="start">I</text>
+<path d="M466,166 C466,142 670,142 670,166 C670,190 466,190 466,166" fill="none" stroke="#2a78d6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="456.0" y="151.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="13" font-weight="700" fill="#2a78d6" text-anchor="start">C</text>
+<path d="M467,166 C496,123 640,123 669,166" fill="none" stroke="#eb6834" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5 4"/>
+<text x="416.0" y="137.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11" font-weight="400" fill="#eb6834" text-anchor="start">面A：導線を横切る</text>
+<path d="M467,166 C486,278 650,278 669,166" fill="none" stroke="#1baf7a" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5 4"/>
+<text x="416.0" y="329.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11" font-weight="400" fill="#1baf7a" text-anchor="start">面B：隙間を横切る</text>
+<line x1="526.0" y1="202.0" x2="526.0" y2="225.0" stroke="#1baf7a" stroke-width="1.5" stroke-linecap="round" marker-end="url(#arw-1baf7a)" stroke-dasharray="3 3"/>
+<line x1="568.0" y1="202.0" x2="568.0" y2="225.0" stroke="#1baf7a" stroke-width="1.5" stroke-linecap="round" marker-end="url(#arw-1baf7a)" stroke-dasharray="3 3"/>
+<line x1="610.0" y1="202.0" x2="610.0" y2="225.0" stroke="#1baf7a" stroke-width="1.5" stroke-linecap="round" marker-end="url(#arw-1baf7a)" stroke-dasharray="3 3"/>
+<text x="646.0" y="218.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11" font-weight="700" fill="#1baf7a" text-anchor="start">∂E/∂t</text>
+<text x="568.0" y="370.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="14" font-weight="700" fill="#1baf7a" text-anchor="middle">面A：I　＝　面B：Id</text>
+<text x="568.0" y="394.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12" font-weight="400" fill="#52514e" text-anchor="middle">どちらも磁場の一周分は同じ</text>
+<line x1="368.0" y1="211.0" x2="392.0" y2="211.0" stroke="#52514e" stroke-width="1.8" stroke-linecap="round" marker-end="url(#arw-52514e)"/>
+</svg>

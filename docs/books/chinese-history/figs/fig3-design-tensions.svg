@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 470" role="img" aria-labelledby="title desc">
+<title id="title">図3　歴代の『正解』は、同じつまみを逆向きに動かす</title>
+<desc id="desc">一方を強めれば必ず失敗するのではなく、別の問題と負担が増えるため、永久に固定できる位置はない</desc>
+
+<rect x="0.0" y="0.0" width="760.0" height="470.0" rx="10" fill="#fcfcfb" stroke="#e2e4e3" stroke-width="1"/>
+<text x="24.0" y="32.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="16" font-weight="700" fill="#0b0b0b" text-anchor="start">図3　歴代の『正解』は、同じつまみを逆向きに動かす</text>
+<text x="24.0" y="54.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="400" fill="#52514e" text-anchor="start">一方を強めれば必ず失敗するのではなく、別の問題と負担が増えるため、永久に固定できる位置はない</text>
+<text x="34.0" y="102.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="700" fill="#0b0b0b" text-anchor="start">中央の直接把握</text>
+<text x="726.0" y="102.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="700" fill="#0b0b0b" text-anchor="end">現地の裁量</text>
+<text x="34.0" y="122.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11" font-weight="400" fill="#52514e" text-anchor="start">統一・徴税</text>
+<text x="726.0" y="122.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11" font-weight="400" fill="#52514e" text-anchor="end">対応速度・地域適合</text>
+<line x1="176.0" y1="110.0" x2="584.0" y2="110.0" stroke="#dcdedd" stroke-width="6" stroke-linecap="round"/>
+<circle cx="176.0" cy="110.0" r="5.0" fill="#ffffff" stroke="#7b7a75" stroke-width="1.3"/>
+<circle cx="380.0" cy="110.0" r="5.0" fill="#ffffff" stroke="#7b7a75" stroke-width="1.3"/>
+<circle cx="584.0" cy="110.0" r="5.0" fill="#ffffff" stroke="#7b7a75" stroke-width="1.3"/>
+<circle cx="302.0" cy="110.0" r="11.0" fill="#2a78d6" stroke="#ffffff" stroke-width="3"/>
+<text x="380.0" y="155.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11" font-weight="700" fill="#2a78d6" text-anchor="middle">← 前提と負担に応じて動かす →</text>
+<text x="34.0" y="206.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="700" fill="#0b0b0b" text-anchor="start">軍の財源を分離</text>
+<text x="726.0" y="206.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="700" fill="#0b0b0b" text-anchor="end">国境軍へ権限</text>
+<text x="34.0" y="226.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11" font-weight="400" fill="#52514e" text-anchor="start">政変を抑える</text>
+<text x="726.0" y="226.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11" font-weight="400" fill="#52514e" text-anchor="end">即応・兵站</text>
+<line x1="176.0" y1="214.0" x2="584.0" y2="214.0" stroke="#dcdedd" stroke-width="6" stroke-linecap="round"/>
+<circle cx="176.0" cy="214.0" r="5.0" fill="#ffffff" stroke="#7b7a75" stroke-width="1.3"/>
+<circle cx="380.0" cy="214.0" r="5.0" fill="#ffffff" stroke="#7b7a75" stroke-width="1.3"/>
+<circle cx="584.0" cy="214.0" r="5.0" fill="#ffffff" stroke="#7b7a75" stroke-width="1.3"/>
+<circle cx="458.0" cy="214.0" r="11.0" fill="#eb6834" stroke="#ffffff" stroke-width="3"/>
+<text x="380.0" y="259.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11" font-weight="700" fill="#eb6834" text-anchor="middle">← 前提と負担に応じて動かす →</text>
+<text x="34.0" y="310.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="700" fill="#0b0b0b" text-anchor="start">一律の制度</text>
+<text x="726.0" y="310.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="700" fill="#0b0b0b" text-anchor="end">複数制度・仲介</text>
+<text x="34.0" y="330.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11" font-weight="400" fill="#52514e" text-anchor="start">一貫性</text>
+<text x="726.0" y="330.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11" font-weight="400" fill="#52514e" text-anchor="end">多言語・多生業を束ねる</text>
+<line x1="176.0" y1="318.0" x2="584.0" y2="318.0" stroke="#dcdedd" stroke-width="6" stroke-linecap="round"/>
+<circle cx="176.0" cy="318.0" r="5.0" fill="#ffffff" stroke="#7b7a75" stroke-width="1.3"/>
+<circle cx="380.0" cy="318.0" r="5.0" fill="#ffffff" stroke="#7b7a75" stroke-width="1.3"/>
+<circle cx="584.0" cy="318.0" r="5.0" fill="#ffffff" stroke="#7b7a75" stroke-width="1.3"/>
+<circle cx="356.0" cy="318.0" r="11.0" fill="#1baf7a" stroke="#ffffff" stroke-width="3"/>
+<text x="380.0" y="363.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11" font-weight="700" fill="#1baf7a" text-anchor="middle">← 前提と負担に応じて動かす →</text>
+<rect x="74.0" y="410.0" width="612.0" height="38.0" rx="8" fill="#ffffff" stroke="#e34948" stroke-width="1.5"/>
+<text x="380.0" y="434.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="14" font-weight="700" fill="#e34948" text-anchor="middle">九つの正解を全部『最大』にすることはできない</text>
+</svg>
