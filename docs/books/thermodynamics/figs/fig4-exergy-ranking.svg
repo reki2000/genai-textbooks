@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 420" role="img" aria-labelledby="title desc">
+<title id="title">図4　同じ1 MJでも、環境まで戻す間に取り出せる最大仕事は違う</title>
+<desc id="desc">環境温度 35℃。電池は約1.00 MJ、圧縮空気は条件付きで0.82 MJ、500℃の熱は0.60 MJ、40℃の熱は0.016 MJ</desc>
+
+<rect x="0.0" y="0.0" width="760.0" height="420.0" rx="10" fill="#fcfcfb" stroke="#e2e4e3" stroke-width="1"/>
+<text x="24.0" y="32.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="16" font-weight="700" fill="#0b0b0b" text-anchor="start">図4　同じ1 MJでも、環境まで戻す間に取り出せる最大仕事は違う</text>
+<text x="24.0" y="54.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="400" fill="#52514e" text-anchor="start">環境温度 35℃。電池は約1.00 MJ、圧縮空気は条件付きで0.82 MJ、500℃の熱は0.60 MJ、40℃の熱は0.016 MJ</text>
+<text x="168.0" y="120.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="700" fill="#0b0b0b" text-anchor="end">電池</text>
+<rect x="184.0" y="100.0" width="510.0" height="34.0" rx="5" fill="#ffffff" stroke="#e2e4e3" stroke-width="1"/>
+<rect x="184.0" y="100.0" width="510.0" height="34.0" rx="5" fill="#1baf7a" stroke="#1baf7a" stroke-width="1" opacity="0.22"/>
+<text x="690.0" y="122.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12" font-weight="700" fill="#1baf7a" text-anchor="end">≈ 1.00 MJ</text>
+<text x="168.0" y="188.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="700" fill="#0b0b0b" text-anchor="end">圧縮空気</text>
+<rect x="184.0" y="168.0" width="510.0" height="34.0" rx="5" fill="#ffffff" stroke="#e2e4e3" stroke-width="1"/>
+<rect x="184.0" y="168.0" width="418.2" height="34.0" rx="5" fill="#2a78d6" stroke="#2a78d6" stroke-width="1" opacity="0.22"/>
+<text x="612.2" y="190.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12" font-weight="700" fill="#2a78d6" text-anchor="end">0.82 MJ（今回の状態）</text>
+<text x="168.0" y="256.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="700" fill="#0b0b0b" text-anchor="end">500℃の熱</text>
+<rect x="184.0" y="236.0" width="510.0" height="34.0" rx="5" fill="#ffffff" stroke="#e2e4e3" stroke-width="1"/>
+<rect x="184.0" y="236.0" width="306.0" height="34.0" rx="5" fill="#eb6834" stroke="#eb6834" stroke-width="1" opacity="0.22"/>
+<text x="500.0" y="258.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12" font-weight="700" fill="#eb6834" text-anchor="start">0.60 MJ</text>
+<text x="168.0" y="324.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="700" fill="#0b0b0b" text-anchor="end">40℃の温水</text>
+<rect x="184.0" y="304.0" width="510.0" height="34.0" rx="5" fill="#ffffff" stroke="#e2e4e3" stroke-width="1"/>
+<rect x="184.0" y="304.0" width="8.2" height="34.0" rx="5" fill="#7b7a75" stroke="#7b7a75" stroke-width="1" opacity="0.22"/>
+<text x="202.2" y="326.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12" font-weight="700" fill="#7b7a75" text-anchor="start">0.016 MJ</text>
+<line x1="184.0" y1="82.0" x2="184.0" y2="360.0" stroke="#dcdedd" stroke-width="1" stroke-linecap="round" stroke-dasharray="3 4"/>
+<text x="184.0" y="378.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#7b7a75" text-anchor="middle">0.00</text>
+<line x1="311.5" y1="82.0" x2="311.5" y2="360.0" stroke="#dcdedd" stroke-width="1" stroke-linecap="round" stroke-dasharray="3 4"/>
+<text x="311.5" y="378.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#7b7a75" text-anchor="middle">0.25</text>
+<line x1="439.0" y1="82.0" x2="439.0" y2="360.0" stroke="#dcdedd" stroke-width="1" stroke-linecap="round" stroke-dasharray="3 4"/>
+<text x="439.0" y="378.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#7b7a75" text-anchor="middle">0.50</text>
+<line x1="566.5" y1="82.0" x2="566.5" y2="360.0" stroke="#dcdedd" stroke-width="1" stroke-linecap="round" stroke-dasharray="3 4"/>
+<text x="566.5" y="378.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#7b7a75" text-anchor="middle">0.75</text>
+<line x1="694.0" y1="82.0" x2="694.0" y2="360.0" stroke="#dcdedd" stroke-width="1" stroke-linecap="round" stroke-dasharray="3 4"/>
+<text x="694.0" y="378.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#7b7a75" text-anchor="middle">1.00</text>
+<text x="439.0" y="402.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12" font-weight="400" fill="#52514e" text-anchor="middle">理想的に取り出せる最大仕事（MJ）</text>
+</svg>
