@@ -42,6 +42,7 @@ from yaruo_markdown import (  # noqa: E402
     speaker_line_indices,
     speaker_names,
     split_eol,
+    strip_ruby,
 )
 
 LEVELS = ("error", "warning", "info")
@@ -202,8 +203,17 @@ def _is_space(char: str) -> bool:
     return char == "" or char.isspace()
 
 
+# ルビ区切り（｜《》）。generate_site.py は **｜台詞《せりふ》** のような並びが
+# CommonMark の flanking 規則で壊れないよう、ビルド時に <ruby> HTML へ変換し
+# つつ非約物のゼロ幅文字（U+200C）で挟んでから markdown-it に渡す。
+# lint 側もこの3文字を punct 扱いから除外し、実際のレンダリング結果に合わせる。
+RUBY_DELIMS = "｜《》"
+
+
 def _is_punct(char: str) -> bool:
     # CommonMark 0.30 の「Unicode punctuation」= P* および S* カテゴリ
+    if char in RUBY_DELIMS:
+        return False
     return char != "" and unicodedata.category(char)[0] in ("P", "S")
 
 
@@ -987,7 +997,7 @@ def parse_sections(
             if line_no - 1 in figures:
                 continue
             current.speech_lines[-1] += 1
-            current.speech_texts[-1] += body
+            current.speech_texts[-1] += strip_ruby(body)
     if current is not None:
         sections.append(current)
     return sections

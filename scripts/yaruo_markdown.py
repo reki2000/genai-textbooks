@@ -35,6 +35,15 @@ IMAGE_LINE = re.compile(
 # キャプションとみなすため、この正規表現だけでは判定しない（`figure_block_lines`）。
 CAPTION_LINE = re.compile(r"^図\d+(?:-\d+)?[：:]")
 DEFAULT_SPEAKERS = frozenset({"やる夫", "やらない夫"})
+# 青空文庫式ルビ `｜基底《よみ》`（記法と描画は AGENTS.md と site_template.html）。
+# 読みは注記であって読者が読み進める散文ではないため、字数の集計では基底だけを
+# 残す。区切りが全角なので表のセル区切りやTeXの波括弧とは衝突しない。
+RUBY = re.compile(r"｜([^｜《》\n]{1,40})《[^｜《》\n]{1,40}》")
+
+
+def strip_ruby(text: str) -> str:
+    """ルビ `｜基底《よみ》` を基底だけに畳む。字数・行数の集計の前処理。"""
+    return RUBY.sub(r"\1", text)
 
 
 def split_eol(line: str) -> tuple[str, str]:
