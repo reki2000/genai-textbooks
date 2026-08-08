@@ -798,7 +798,33 @@ UNIT_PATTERNS: tuple[tuple[re.Pattern[str], str], ...] = (
     # `プログラム`・`ヒストグラム`・`エングラム`・`ダイヤグラム` のように
     # グラムを含むが単位ではない語を、直前がカタカナのときに限り除外する。
     (re.compile(r"(?<![゠-ヿ])グラム(?!染色|陽性|陰性)"), "g"),
+    (re.compile("ミリリットル"), "mL"),
+    (re.compile("センチリットル"), "cL"),
+    (re.compile("デシリットル"), "dL"),
+    (re.compile("キロリットル"), "kL"),
+    (re.compile("リットル"), "L"),
 )
+
+# `トン`・`ニュートン` は `プラトン`・`バトン`・`ワシントン`・`ニュートン力学` の
+# 人名などと同じ綴りを含み、除外語を列挙する方式は語彙が増えるたびに漏れる。
+# 実際の用例を見ると、単位としての用法は必ず直前が数字（漢数字の位取り語や
+# `何`・`数` を含む）で、人名としての用法はそうならない。そこで直前が数字か
+# どうかで判定する（間に半角/全角スペースが1つ挟まる書き方も許容する）。
+CONTEXTUAL_UNIT_PATTERNS: tuple[tuple[re.Pattern[str], str], ...] = (
+    (re.compile(r"ニュートン"), "N"),
+    (re.compile(r"トン(?!ネル)"), "t"),
+)
+NUMERAL_PREFIX_CHARS = "〇一二三四五六七八九十百千万億兆何数"
+
+
+def _preceded_by_number(body: str, pos: int) -> bool:
+    i = pos - 1
+    if i >= 0 and body[i] in (" ", "　"):
+        i -= 1
+    if i < 0:
+        return False
+    ch = body[i]
+    return ch.isdigit() or ch in NUMERAL_PREFIX_CHARS
 
 
 def _masked_sub(
@@ -807,9 +833,15 @@ def _masked_sub(
     replacement: str,
     line_number: int,
     result: Result,
+    *,
+    require_number_before: bool = False,
 ) -> str:
     masked = INLINE_SKIP_RE.sub(lambda m: "\x00" * len(m.group()), body)
-    matches = list(pattern.finditer(masked))
+    matches = [
+        m
+        for m in pattern.finditer(masked)
+        if not require_number_before or _preceded_by_number(masked, m.start())
+    ]
     if not matches:
         return body
     parts: list[str] = []
@@ -829,7 +861,7 @@ def _masked_sub(
 
 
 def rule_unit_notation(lines: list[str], result: Result) -> list[str]:
-    """メートル・グラム系の単位のカタカナ表記を `m` `km` `g` `kg` 等へ揃える。
+    """メートル・グラム・リットル・トン系の単位のカタカナ表記を `m` `km` `g` `kg` `L` `t` 等へ揃える。
 
     コードブロック・行内コード・TeX数式内は対象外。
     """
@@ -843,6 +875,11 @@ def rule_unit_notation(lines: list[str], result: Result) -> list[str]:
         body, newline = split_eol(line)
         for pattern, replacement in UNIT_PATTERNS:
             body = _masked_sub(body, pattern, replacement, line_number, result)
+        for pattern, replacement in CONTEXTUAL_UNIT_PATTERNS:
+            body = _masked_sub(
+                body, pattern, replacement, line_number, result,
+                require_number_before=True,
+            )
         out.append(body + newline)
     return out
 
