@@ -4,23 +4,28 @@
 図は本文の「壁」に一対一で対応させ、教材を読まずに図だけ見ても
 何が問題で何が解決なのかが分かる説明図にする。
 
-    python3 scripts/figures/weather_forecasting_figs.py
+    python3 scripts/figs/weather-forecasting.py
+    python3 scripts/figs/weather-forecasting.py --check
 
 出力先の SVG はソース扱い（docs/ 配下）でコミットする。
 """
 
 from __future__ import annotations
 
+import argparse
 import math
+import sys
+import tempfile
 from functools import partial
 from pathlib import Path
 
 from svgkit import (  # noqa: F401  （教材ごとに使う色が違うためまとめて import する）
-    AQUA, BLUE, CARD_EDGE, GRID, INK, INK2, INK3, ORANGE, RED, SURFACE, VIOLET, Svg,
+    AQUA, BLUE, CARD_EDGE, GRID, INK, INK2, INK3, ORANGE, RED, SURFACE, VIOLET,
+    Svg as SvgDocument,
 )
 
 OUT_DIR = Path(__file__).resolve().parents[2] / "docs" / "books" / "weather-forecasting" / "figs"
-Svg = partial(Svg, out_dir=OUT_DIR)
+Svg = partial(SvgDocument, out_dir=OUT_DIR)
 
 
 # ---------------------------------------------------------------------------
@@ -511,16 +516,58 @@ def fig_pipeline():
     s.save("fig8-pipeline.svg")
 
 
-def main():
-    fig_predictability()
-    fig_richardson()
-    fig_cost()
-    fig_sphere()
-    fig_multimesh()
-    fig_mse_trap()
-    fig_rank_histogram()
-    fig_pipeline()
+FIGURE_FUNCTIONS = (
+    fig_predictability,
+    fig_richardson,
+    fig_cost,
+    fig_sphere,
+    fig_multimesh,
+    fig_mse_trap,
+    fig_rank_histogram,
+    fig_pipeline,
+)
+
+
+def render_all(out_dir: Path) -> None:
+    global Svg
+    Svg = partial(SvgDocument, out_dir=out_dir)
+    for render in FIGURE_FUNCTIONS:
+        render()
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help="fail if generated figures differ from files on disk",
+    )
+    args = parser.parse_args()
+
+    if not args.check:
+        render_all(OUT_DIR)
+        return 0
+
+    with tempfile.TemporaryDirectory(prefix="weather-forecasting-figs-") as tmp:
+        generated_dir = Path(tmp)
+        render_all(generated_dir)
+        generated = {path.name: path for path in generated_dir.glob("*.svg")}
+        existing = {path.name: path for path in OUT_DIR.glob("*.svg")}
+        stale = sorted(
+            name
+            for name in generated.keys() | existing.keys()
+            if name not in generated
+            or name not in existing
+            or generated[name].read_bytes() != existing[name].read_bytes()
+        )
+    if stale:
+        print("stale, missing, or unexpected figures:", file=sys.stderr)
+        for name in stale:
+            print(f"  {OUT_DIR / name}", file=sys.stderr)
+        return 1
+    print(f"OK: {len(generated)} figures are up to date")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

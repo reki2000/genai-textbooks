@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """教材図版（docs/books/{ID}/figs/*.svg）を組み立てる共通ヘルパ。
 
-教材ごとの図は `scripts/figures/{ID}_figs.py` に置き、このモジュールを import して
+教材ごとの図は `scripts/figs/{ID}.py` に置き、このモジュールを import して
 `Svg` に描く。配色・書体・カード面の作りをここへ集約し、教材をまたいで図の
-見た目を揃える。使い方は `.claude/skills/yaruo-figures/SKILL.md` が正本。
+見た目を揃える。使い方は `.claude/skills/textbook-figures/SKILL.md` が正本。
 
 図は docsify のライト／ダーク両テーマの上に置かれる。テーマ切り替えは OS の
 prefers-color-scheme と一致しないことがあるため、SVG 自身が明るいカード面を持ち、
@@ -47,6 +47,7 @@ class Svg:
         self.parts: list[str] = []
         self.defs: list[str] = []
         self.title = title
+        self.description = subtitle or title
         self.out_dir = out_dir
         self.rect(0, 0, width, height, fill=SURFACE, stroke=CARD_EDGE, rx=10)
         self.text(24, 32, title, size=16, weight="700")
@@ -145,8 +146,9 @@ class Svg:
         body = "\n".join(self.parts)
         svg = (
             f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {self.w:.0f} {self.h:.0f}" '
-            f'role="img" aria-label="{esc(self.title)}">\n'
-            f"<title>{esc(self.title)}</title>\n{defs}\n{body}\n</svg>\n"
+            f'role="img" aria-labelledby="title desc">\n'
+            f'<title id="title">{esc(self.title)}</title>\n'
+            f'<desc id="desc">{esc(self.description)}</desc>\n{defs}\n{body}\n</svg>\n'
         )
         target.mkdir(parents=True, exist_ok=True)
         (target / name).write_text(svg, encoding="utf-8")

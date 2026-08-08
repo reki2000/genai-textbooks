@@ -1,5 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 352" role="img" aria-label="図5　多重メッシュ ── 遠距離をホップ数で律速させない">
-<title>図5　多重メッシュ ── 遠距離をホップ数で律速させない</title>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 352" role="img" aria-labelledby="title desc">
+<title id="title">図5　多重メッシュ ── 遠距離をホップ数で律速させない</title>
+<desc id="desc">隣接間隔 200 km のメッシュだけでは 3000 km 先の影響を届けるのに 15 ホップ（＝深いネット）が要る</desc>
 <defs><marker id="arw-7b7a75" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#7b7a75"/></marker><marker id="arw-1baf7a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1baf7a"/></marker></defs>
 <rect x="0.0" y="0.0" width="760.0" height="352.0" rx="10" fill="#fcfcfb" stroke="#e2e4e3" stroke-width="1"/>
 <text x="24.0" y="32.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="16" font-weight="700" fill="#0b0b0b" text-anchor="start">図5　多重メッシュ ── 遠距離をホップ数で律速させない</text>

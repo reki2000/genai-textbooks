@@ -25,8 +25,12 @@ ROSTER_LINE = re.compile(r"^\*\*([^*\n]+)\*\*")
 # `yaruo_lint.py` の structure-delimiter が正規化する。
 SECTION_LINE = re.compile(r"^(?:---$|#{1,6}\s)")
 ROSTER_HEADING = re.compile(r"^##\s+登場人物\s*$")
-# 単独行の画像（図版）。本文ではなく図として扱い、句点や表記の検査対象から外す。
-IMAGE_LINE = re.compile(r"^!\[[^\]]*\]\([^)\s]+\)$")
+# 単独行の画像（図版）。原寸画像へリンクした形式も本文ではなく図として扱い、
+# 句点や表記の検査対象から外す。
+IMAGE_LINE = re.compile(
+    r"^(?:!\[[^\]]*\]\([^)\s]+\)|"
+    r"\[!\[[^\]]*\]\([^)\s]+\)\]\([^)\s]+\))$"
+)
 DEFAULT_SPEAKERS = frozenset({"やる夫", "やらない夫"})
 
 

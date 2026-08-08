@@ -1,5 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 420" role="img" aria-label="図7　ランクヒストグラム ── アンサンブルが較正されているかの判定装置">
-<title>図7　ランクヒストグラム ── アンサンブルが較正されているかの判定装置</title>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 420" role="img" aria-labelledby="title desc">
+<title id="title">図7　ランクヒストグラム ── アンサンブルが較正されているかの判定装置</title>
+<desc id="desc">観測値が「小さい順に並べたアンサンブル」の何位に落ちたかを多数事例で集計する。理想は平ら</desc>
 
 <rect x="0.0" y="0.0" width="760.0" height="420.0" rx="10" fill="#fcfcfb" stroke="#e2e4e3" stroke-width="1"/>
 <text x="24.0" y="32.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="16" font-weight="700" fill="#0b0b0b" text-anchor="start">図7　ランクヒストグラム ── アンサンブルが較正されているかの判定装置</text>

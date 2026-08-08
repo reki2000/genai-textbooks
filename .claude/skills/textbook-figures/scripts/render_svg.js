@@ -2,12 +2,16 @@
 /*
  * 教材図版の SVG を PNG 化して目視確認するためのスクリプト。
  *
- *   node .claude/skills/yaruo-figures/scripts/render_svg.js <svg-dir> [out-dir]
+ *   node .claude/skills/textbook-figures/scripts/render_svg.js <svg-dir> [out-dir]
  *
  * 事前に一度だけ:
  *   mkdir -p /tmp/svgshot && cd /tmp/svgshot && npm install @resvg/resvg-js
  *   # 日本語フォントが無い環境（fc-list :lang=ja が空）では文字が豆腐になる。
  *   # WSL なら: cp /mnt/c/Windows/Fonts/{YuGothR.ttc,YuGothB.ttc} ~/.local/share/fonts/ && fc-cache -f
+ *   # 一時フォントを直接渡す場合:
+ *   # SVG_FONT_FILES=/path/to/NotoSansJP.ttf node render_svg.js <svg-dir> [out-dir]
+ *   # 360 px 幅も確認する場合:
+ *   # SVG_RENDER_WIDTH=360 node render_svg.js <svg-dir> [out-dir]
  *
  * resvg を使うのは、rsvg-convert や headless chromium と違って
  * システム共有ライブラリ（sudo 必須）を要求しないため。
@@ -41,6 +45,12 @@ if (!svgDir) {
 }
 
 const { Resvg } = loadResvg();
+const fontFiles = (process.env.SVG_FONT_FILES || '').split(path.delimiter).filter(Boolean);
+const renderWidth = Number(process.env.SVG_RENDER_WIDTH || '1520');
+if (!Number.isFinite(renderWidth) || renderWidth <= 0) {
+  console.error('SVG_RENDER_WIDTH には正の数を指定する');
+  process.exit(1);
+}
 fs.mkdirSync(outDir, { recursive: true });
 
 const files = fs.readdirSync(svgDir).filter((f) => f.endsWith('.svg')).sort();
@@ -55,8 +65,12 @@ for (const f of files) {
     // 教材ページの地色と区別できるよう、カード外を中間グレーで塗る。
     // カードの縁と余白のはみ出しがこれで見える。
     background: '#8a8f94',
-    fitTo: { mode: 'width', value: 1520 },  // 実寸 760 の 2 倍。文字の重なりを判定できる解像度
-    font: { loadSystemFonts: true, defaultFontFamily: 'Yu Gothic' },
+    fitTo: { mode: 'width', value: renderWidth },
+    font: {
+      loadSystemFonts: true,
+      defaultFontFamily: fontFiles.length > 0 ? 'Noto Sans JP' : 'Yu Gothic',
+      fontFiles,
+    },
   });
   const out = path.join(outDir, f.replace(/\.svg$/, '.png'));
   fs.writeFileSync(out, resvg.render().asPng());

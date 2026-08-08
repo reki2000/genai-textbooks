@@ -1,5 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 430" role="img" aria-label="図4　舞台は球面 ── 緯度経度格子の歪みと、正20面体メッシュ">
-<title>図4　舞台は球面 ── 緯度経度格子の歪みと、正20面体メッシュ</title>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 430" role="img" aria-labelledby="title desc">
+<title id="title">図4　舞台は球面 ── 緯度経度格子の歪みと、正20面体メッシュ</title>
+<desc id="desc">同じ地球を 2 通りに区切る。左は極で升目が潰れ、経度に切れ目がある。右はどこでもほぼ同じ大きさの三角形</desc>
 
 <rect x="0.0" y="0.0" width="760.0" height="430.0" rx="10" fill="#fcfcfb" stroke="#e2e4e3" stroke-width="1"/>
 <text x="24.0" y="32.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="16" font-weight="700" fill="#0b0b0b" text-anchor="start">図4　舞台は球面 ── 緯度経度格子の歪みと、正20面体メッシュ</text>

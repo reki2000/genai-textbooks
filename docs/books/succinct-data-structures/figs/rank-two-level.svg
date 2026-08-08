@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" role="img" aria-labelledby="title desc">
+  <title id="title">二段階索引によるrank</title>
+  <desc id="desc">スーパーブロック累積3、ブロック内累積2、残り2ビットのpopcount 1を足し、rank 1 of 14 equals 6を得る。</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#24313a"/>
+    </marker>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif; fill: #24313a; dominant-baseline: middle; }
+      .title { font-size: 28px; font-weight: 700; }
+      .subtitle { font-size: 17px; fill: #60717d; }
+      .label { font-size: 18px; }
+      .small { font-size: 14px; fill: #60717d; }
+      .tiny { font-size: 12px; fill: #60717d; }
+      .mono { font-family: "SFMono-Regular", Consolas, "Liberation Mono", "Noto Sans JP", monospace; font-size: 18px; font-weight: 650; }
+      .number { font-family: "SFMono-Regular", Consolas, "Liberation Mono", "Noto Sans JP", monospace; font-size: 22px; font-weight: 700; }
+      .result { font-size: 22px; font-weight: 700; }
+    </style>
+  </defs>
+  <rect width="1200" height="600" fill="#fbfaf7"/>
+<text x="60" y="48" class="title" text-anchor="start">rank は三つの小さな答えを足す</text>
+<text x="60" y="82" class="subtitle" text-anchor="start">16ビットの縮小例：rank_1(14) は位置14より前にある1の個数</text>
+<text x="60" y="128" class="small" text-anchor="start">位置 i</text>
+<rect x="128" y="176" width="58" height="58" rx="3" fill="#dcecf7" stroke="#c9d2d8" stroke-width="1.5"/>
+<text x="157.0" y="206.0" class="number" text-anchor="middle">0</text>
+<text x="157.0" y="161" class="tiny" text-anchor="middle">0</text>
+<rect x="186" y="176" width="58" height="58" rx="3" fill="#dcecf7" stroke="#c9d2d8" stroke-width="1.5"/>
+<text x="215.0" y="206.0" class="number" text-anchor="middle">0</text>
+<text x="215.0" y="161" class="tiny" text-anchor="middle">1</text>
+<rect x="244" y="176" width="58" height="58" rx="3" fill="#dcecf7" stroke="#c9d2d8" stroke-width="1.5"/>
+<text x="273.0" y="206.0" class="number" text-anchor="middle">1</text>
+<text x="273.0" y="161" class="tiny" text-anchor="middle">2</text>
+<rect x="302" y="176" width="58" height="58" rx="3" fill="#dcecf7" stroke="#c9d2d8" stroke-width="1.5"/>
+<text x="331.0" y="206.0" class="number" text-anchor="middle">0</text>
+<text x="331.0" y="161" class="tiny" text-anchor="middle">3</text>
+<rect x="360" y="176" width="58" height="58" rx="3" fill="#dcecf7" stroke="#c9d2d8" stroke-width="1.5"/>
+<text x="389.0" y="206.0" class="number" text-anchor="middle">1</text>
+<text x="389.0" y="161" class="tiny" text-anchor="middle">4</text>
+<rect x="418" y="176" width="58" height="58" rx="3" fill="#dcecf7" stroke="#c9d2d8" stroke-width="1.5"/>
+<text x="447.0" y="206.0" class="number" text-anchor="middle">0</text>
+<text x="447.0" y="161" class="tiny" text-anchor="middle">5</text>
+<rect x="476" y="176" width="58" height="58" rx="3" fill="#dcecf7" stroke="#c9d2d8" stroke-width="1.5"/>
+<text x="505.0" y="206.0" class="number" text-anchor="middle">0</text>
+<text x="505.0" y="161" class="tiny" text-anchor="middle">6</text>
+<rect x="534" y="176" width="58" height="58" rx="3" fill="#dcecf7" stroke="#c9d2d8" stroke-width="1.5"/>
+<text x="563.0" y="206.0" class="number" text-anchor="middle">1</text>
+<text x="563.0" y="161" class="tiny" text-anchor="middle">7</text>
+<rect x="592" y="176" width="58" height="58" rx="3" fill="#dcefe9" stroke="#c9d2d8" stroke-width="1.5"/>
+<text x="621.0" y="206.0" class="number" text-anchor="middle">1</text>
+<text x="621.0" y="161" class="tiny" text-anchor="middle">8</text>
+<rect x="650" y="176" width="58" height="58" rx="3" fill="#dcefe9" stroke="#c9d2d8" stroke-width="1.5"/>
+<text x="679.0" y="206.0" class="number" text-anchor="middle">0</text>
+<text x="679.0" y="161" class="tiny" text-anchor="middle">9</text>
+<rect x="708" y="176" width="58" height="58" rx="3" fill="#dcefe9" stroke="#c9d2d8" stroke-width="1.5"/>
+<text x="737.0" y="206.0" class="number" text-anchor="middle">0</text>
+<text x="737.0" y="161" class="tiny" text-anchor="middle">10</text>
+<rect x="766" y="176" width="58" height="58" rx="3" fill="#dcefe9" stroke="#c9d2d8" stroke-width="1.5"/>
+<text x="795.0" y="206.0" class="number" text-anchor="middle">1</text>
+<text x="795.0" y="161" class="tiny" text-anchor="middle">11</text>
+<rect x="824" y="176" width="58" height="58" rx="3" fill="#fbe4d6" stroke="#c9d2d8" stroke-width="1.5"/>
+<text x="853.0" y="206.0" class="number" text-anchor="middle">0</text>
+<text x="853.0" y="161" class="tiny" text-anchor="middle">12</text>
+<rect x="882" y="176" width="58" height="58" rx="3" fill="#fbe4d6" stroke="#c9d2d8" stroke-width="1.5"/>
+<text x="911.0" y="206.0" class="number" text-anchor="middle">1</text>
+<text x="911.0" y="161" class="tiny" text-anchor="middle">13</text>
+<rect x="940" y="176" width="58" height="58" rx="3" fill="#f1f3f4" stroke="#c9d2d8" stroke-width="1.5"/>
+<text x="969.0" y="206.0" class="number" text-anchor="middle">0</text>
+<text x="969.0" y="161" class="tiny" text-anchor="middle">14</text>
+<rect x="998" y="176" width="58" height="58" rx="3" fill="#f1f3f4" stroke="#c9d2d8" stroke-width="1.5"/>
+<text x="1027.0" y="206.0" class="number" text-anchor="middle">0</text>
+<text x="1027.0" y="161" class="tiny" text-anchor="middle">15</text>
+<line x1="940" y1="136" x2="940" y2="292" stroke="#d8612c" stroke-width="4" stroke-dasharray="7 5"/>
+<text x="940" y="118" class="label" text-anchor="middle" fill="#d8612c">問い合わせ境界 i=14</text>
+<rect x="128" y="300" width="280" height="96" rx="12" fill="#dcecf7" stroke="#2463a6" stroke-width="2"/>
+<text x="148" y="326" class="small" text-anchor="start">① 大区画の累積</text>
+<text x="268" y="366" class="result" text-anchor="middle" fill="#2463a6">S = 3</text>
+<rect x="460" y="300" width="280" height="96" rx="12" fill="#dcefe9" stroke="#187c68" stroke-width="2"/>
+<text x="480" y="326" class="small" text-anchor="start">② 小区画の累積</text>
+<text x="600" y="366" class="result" text-anchor="middle" fill="#187c68">L = 2</text>
+<rect x="792" y="300" width="280" height="96" rx="12" fill="#fbe4d6" stroke="#d8612c" stroke-width="2"/>
+<text x="812" y="326" class="small" text-anchor="start">③ 残り2ビットを実測</text>
+<text x="932" y="366" class="result" text-anchor="middle" fill="#d8612c">popcount = 1</text>
+<line x1="408" y1="348" x2="454" y2="348" stroke="#24313a" stroke-width="2" marker-end="url(#arrow)"/>
+<line x1="740" y1="348" x2="786" y2="348" stroke="#24313a" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="250" y="462" width="700" height="76" rx="14" fill="#ffffff" stroke="#24313a" stroke-width="2.5"/>
+<text x="600" y="500" class="result" text-anchor="middle">rank_1(14) = 3 + 2 + 1 = 6</text>
+<text x="1120" y="573" class="small" text-anchor="end">大区画 + 小区画 + 短い実測</text>
+</svg>
