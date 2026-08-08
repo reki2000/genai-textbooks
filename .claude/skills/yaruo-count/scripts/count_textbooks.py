@@ -17,15 +17,20 @@ from yaruo_markdown import (  # noqa: E402
     FULLWIDTH_SPACE,
     is_speaker_line,
     speaker_names,
+    strip_ruby,
 )
 
 
 def countable_content_lines(source_path: Path) -> list[str]:
-    """Return countable lines after excluding recognized speaker labels."""
+    """Return countable lines after excluding speaker labels and ruby readings.
+
+    Ruby (`｜基底《よみ》`) is an annotation rather than prose the reader works
+    through, so only the base text is counted.
+    """
     lines = source_path.read_text(encoding="utf-8").splitlines()
     names = speaker_names(lines)
     return [
-        line
+        strip_ruby(line)
         for line in lines
         if not is_speaker_line(line.lstrip(FULLWIDTH_SPACE), names)
     ]

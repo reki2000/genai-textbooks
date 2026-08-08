@@ -190,6 +190,10 @@
       plugins: [],
     };
 
+    // Aozora-style ruby (｜基底《よみ》, see AGENTS.md) is converted to <ruby>
+    // HTML by scripts/generate_site.py before the page ever reaches the
+    // browser, so no docsify plugin is needed here.
+
     // Toggle button that swaps the article body for the marp slide deck
     // (books/<id>/slide.html) on book pages that have one, and back again.
     // Runs on every docsify route change since the shell markup is shared

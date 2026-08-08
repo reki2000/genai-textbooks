@@ -491,6 +491,54 @@ def write_file(path: Path, content: str) -> None:
     path.write_text(content, encoding="utf-8")
 
 
+# Aozora-style ruby (｜基底《よみ》, see AGENTS.md) is converted straight to
+# <ruby> HTML here at build time rather than by a docsify plugin in the
+# browser. ｜《》 (and the < of a raw <ruby> tag) are Unicode punctuation, so
+# **｜台詞《せりふ》** would fail CommonMark's emphasis-flanking rule once
+# docsify's markdown-it parses the page, silently dropping the bold -- the
+# same reason a literal ｜ next to ** breaks. A zero-width non-joiner
+# (U+200C, general category Cf: neither punctuation nor whitespace) around
+# each <ruby> span keeps ** flanking intact without changing anything
+# visible.
+RUBY_GUARD = "\u200c"
+
+_RUBY_PROTECTED_PATTERN = (
+    r"```[\s\S]*?(?:```|$)"
+    r"|~~~[\s\S]*?(?:~~~|$)"
+    r"|`[^`\n]*`"
+    r"|\$\$[\s\S]*?\$\$"
+    r"|\$[^$\n]*\$"
+)
+_RUBY_PATTERN = r"｜([^｜《》\n]{1,40})《([^｜《》\n]{1,40})》"
+_RUBY_TOKEN_RE = re.compile(f"(?:{_RUBY_PROTECTED_PATTERN})|(?:{_RUBY_PATTERN})")
+
+
+def convert_ruby_to_html(text: str) -> str:
+    def replace(match: re.Match[str]) -> str:
+        base = match.group(1)
+        if base is None:
+            return match.group(0)
+        reading = match.group(2)
+        ruby = f"<ruby>{base}<rp>（</rp><rt>{reading}</rt><rp>）</rp></ruby>"
+        return f"{RUBY_GUARD}{ruby}{RUBY_GUARD}"
+
+    return _RUBY_TOKEN_RE.sub(replace, text)
+
+
+def apply_ruby_conversion(out_docs: Path) -> None:
+    # slide.md (marp) doesn't render through docsify/markdown-it, so ruby
+    # notation isn't used there (see AGENTS.md).
+    for md_path in out_docs.rglob("*.md"):
+        if md_path.name == "slide.md":
+            continue
+        text = md_path.read_text(encoding="utf-8")
+        if "｜" not in text:
+            continue
+        converted = convert_ruby_to_html(text)
+        if converted != text:
+            md_path.write_text(converted, encoding="utf-8")
+
+
 def generate(categories: list[dict[str, Any]], documents: list[dict[str, Any]], out_docs: Path) -> None:
     # The generated HTML is only the docsify shell. The Markdown sources and
     # static assets must also be present in the deployed directory because
@@ -520,6 +568,8 @@ def generate(categories: list[dict[str, Any]], documents: list[dict[str, Any]], 
         write_file(out_docs / relative_path, page)
 
     render_slide_decks(documents, out_docs)
+
+    apply_ruby_conversion(out_docs)
 
     write_file(out_docs / "sitemap.xml", render_sitemap(documents))
 

@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 400" role="img" aria-labelledby="title desc">
+<title id="title">図6　いつを薬で、どの細胞を c-Fos で選ぶ</title>
+<desc id="desc">標識できる窓のあいだに活動した細胞にだけ ChR2 が入り、あとから光で呼び出せる</desc>
+<defs><marker id="arw-52514e" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#52514e"/></marker></defs>
+<rect x="0.0" y="0.0" width="760.0" height="400.0" rx="10" fill="#fcfcfb" stroke="#e2e4e3" stroke-width="1"/>
+<text x="24.0" y="32.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="16" font-weight="700" fill="#0b0b0b" text-anchor="start">図6　いつを薬で、どの細胞を c-Fos で選ぶ</text>
+<text x="24.0" y="54.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="400" fill="#52514e" text-anchor="start">標識できる窓のあいだに活動した細胞にだけ ChR2 が入り、あとから光で呼び出せる</text>
+<rect x="24.0" y="86.0" width="224.0" height="150.0" rx="8" fill="#ffffff" stroke="#e2e4e3" stroke-width="1"/>
+<text x="38.0" y="110.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12" font-weight="700" fill="#0b0b0b" text-anchor="start">1日目：薬を抜く</text>
+<rect x="38.0" y="120.0" width="62.0" height="20.0" rx="6" fill="#1baf7a" stroke="#1baf7a" stroke-width="1" opacity="0.2"/>
+<text x="69.0" y="134.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="700" fill="#1baf7a" text-anchor="middle">標識ON</text>
+<text x="38.0" y="166.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#0b0b0b" text-anchor="start">箱Aで足に電気ショック</text>
+<text x="38.0" y="185.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#0b0b0b" text-anchor="start">→ 活動した歯状回の細胞で</text>
+<text x="38.0" y="204.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#0b0b0b" text-anchor="start">　c-Fos のスイッチが入る</text>
+<text x="38.0" y="223.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#0b0b0b" text-anchor="start">→ その細胞に ChR2 が作られる</text>
+<rect x="268.0" y="86.0" width="224.0" height="150.0" rx="8" fill="#ffffff" stroke="#e2e4e3" stroke-width="1"/>
+<text x="282.0" y="110.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12" font-weight="700" fill="#0b0b0b" text-anchor="start">2日目：薬を戻す</text>
+<rect x="282.0" y="120.0" width="62.0" height="20.0" rx="6" fill="#7b7a75" stroke="#7b7a75" stroke-width="1" opacity="0.2"/>
+<text x="313.0" y="134.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="700" fill="#7b7a75" text-anchor="middle">標識OFF</text>
+<text x="282.0" y="166.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#0b0b0b" text-anchor="start">別の箱Bに入れる</text>
+<text x="282.0" y="185.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#0b0b0b" text-anchor="start">形も匂いも違う、怖くない箱</text>
+<text x="282.0" y="204.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#0b0b0b" text-anchor="start">→ マウスは普通に歩き回る</text>
+<text x="282.0" y="223.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#0b0b0b" text-anchor="start">→ 新しい標識は付かない</text>
+<rect x="512.0" y="86.0" width="224.0" height="150.0" rx="8" fill="#ffffff" stroke="#e2e4e3" stroke-width="1"/>
+<text x="526.0" y="110.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12" font-weight="700" fill="#0b0b0b" text-anchor="start">そこで青い光を当てる</text>
+<rect x="526.0" y="120.0" width="62.0" height="20.0" rx="6" fill="#2a78d6" stroke="#2a78d6" stroke-width="1" opacity="0.2"/>
+<text x="557.0" y="134.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="700" fill="#2a78d6" text-anchor="middle">呼び出し</text>
+<text x="526.0" y="166.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#0b0b0b" text-anchor="start">光が当たるのは、1日目に</text>
+<text x="526.0" y="185.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#0b0b0b" text-anchor="start">活動した細胞だけ</text>
+<text x="526.0" y="204.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#0b0b0b" text-anchor="start">→ その場でフリージング</text>
+<text x="526.0" y="223.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#0b0b0b" text-anchor="start">→ 目の前に怖いものは無い</text>
+<line x1="252.0" y1="161.0" x2="264.0" y2="161.0" stroke="#52514e" stroke-width="1.8" stroke-linecap="round" marker-end="url(#arw-52514e)"/>
+<line x1="496.0" y1="161.0" x2="508.0" y2="161.0" stroke="#52514e" stroke-width="1.8" stroke-linecap="round" marker-end="url(#arw-52514e)"/>
+<rect x="24.0" y="256.0" width="712.0" height="106.0" rx="8" fill="#ffffff" stroke="#e2e4e3" stroke-width="1"/>
+<text x="38.0" y="280.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#52514e" text-anchor="start">すくんだ時間の割合（本文の記述に対応する定性的な比較。実測値ではない）</text>
+<text x="216.0" y="304.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#0b0b0b" text-anchor="end">光なし</text>
+<rect x="228.0" y="295.0" width="466.0" height="11.0" rx="5" fill="#dcdedd" stroke="none" stroke-width="1" opacity="0.6"/>
+<rect x="228.0" y="295.0" width="83.9" height="11.0" rx="5" fill="#7b7a75" stroke="#7b7a75" stroke-width="1" opacity="0.85"/>
+<text x="216.0" y="324.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#0b0b0b" text-anchor="end">光あり</text>
+<rect x="228.0" y="315.0" width="466.0" height="11.0" rx="5" fill="#dcdedd" stroke="none" stroke-width="1" opacity="0.6"/>
+<rect x="228.0" y="315.0" width="363.5" height="11.0" rx="5" fill="#2a78d6" stroke="#2a78d6" stroke-width="1" opacity="0.85"/>
+<text x="216.0" y="344.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#0b0b0b" text-anchor="end">標識のとき学習させず＋光</text>
+<rect x="228.0" y="335.0" width="466.0" height="11.0" rx="5" fill="#dcdedd" stroke="none" stroke-width="1" opacity="0.6"/>
+<rect x="228.0" y="335.0" width="74.6" height="11.0" rx="5" fill="#7b7a75" stroke="#7b7a75" stroke-width="1" opacity="0.85"/>
+<text x="380.0" y="382.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12" font-weight="700" fill="#0b0b0b" text-anchor="middle">呼び出せるし、抑える道具を入れれば止められる。ただしマウスで、戻ったのは「恐怖」だ。</text>
+</svg>
