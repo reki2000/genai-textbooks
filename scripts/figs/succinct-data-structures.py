@@ -625,11 +625,91 @@ def wavelet_matrix_figure() -> str:
     )
 
 
+def fm_backward_search_figure() -> str:
+    steps = [
+        ("空文字列", "[0, 7)", "全7行", PANEL, INK),
+        ("a", "[1, 4)", "rank_a: 0 → 3", BLUE_LIGHT, BLUE),
+        ("na", "[5, 7)", "rank_n: 0 → 2", PURPLE_LIGHT, "#70539a"),
+        ("ana", "[2, 4)", "rank_a: 1 → 3", GREEN_LIGHT, GREEN),
+    ]
+    body = [
+        text(50, 46, "FM-index：検索語を右から足して区間を絞る", cls="title"),
+        text(50, 80, "T = banana$,  BWT L = annb$aa,  検索語 = ana", cls="subtitle"),
+        rect(50, 112, 1100, 112, fill=PANEL),
+        text(76, 142, "更新式", cls="small"),
+        text(76, 179, "[l', r') = [C[c] + rank_c(L,l),  C[c] + rank_c(L,r))", cls="mono"),
+    ]
+    xs = [65, 340, 615, 890]
+    for index, ((pattern, interval, ranks, fill, stroke), xpos) in enumerate(zip(steps, xs)):
+        body.append(rect(xpos, 300, 235, 154, fill=fill, stroke=stroke, sw=2.5))
+        body.append(text(xpos + 117.5, 327, pattern, cls="result", anchor="middle"))
+        body.append(text(xpos + 117.5, 371, interval, cls="number", anchor="middle"))
+        body.append(text(xpos + 117.5, 417, ranks, cls="small", anchor="middle"))
+        if index < 3:
+            body.append(line(xpos + 239, 377, xpos + 269, 377, stroke=INK, marker=True))
+            body.append(text(xpos + 254, 266, "a" if index in (0, 2) else "n", cls="result", anchor="middle", fill=ORANGE))
+    body.extend([
+        text(50, 265, "右から読む", cls="label", fill=ORANGE),
+        rect(250, 515, 700, 86, fill=GREEN_LIGHT, stroke=GREEN, sw=2.5),
+        text(600, 544, "最後の区間幅が一致件数", cls="label", anchor="middle"),
+        text(600, 578, "4 − 2 = 2件（ana$, anana$）", cls="result", anchor="middle", fill=GREEN),
+    ])
+    return svg_document(
+        1200,
+        650,
+        "FM-indexによるanaの後方検索",
+        "banana$のBWT上で検索語anaを右からa、n、aの順に追加し、区間を0から7、1から4、5から7、2から4へ絞る。最後の幅2が一致件数になる。",
+        "\n".join(body),
+    )
+
+
+def static_delta_figure() -> str:
+    body = [
+        text(50, 46, "更新を隔離し、静的な簡潔構造を守る", cls="title"),
+        text(50, 80, "問い合わせは基礎層と更新層を統合し、差分が育った時だけ再構築する", cls="subtitle"),
+        rect(55, 130, 430, 260, fill=BLUE_LIGHT, stroke=BLUE, sw=2.5),
+        text(270, 164, "大きな静的基礎層", cls="result", anchor="middle", fill=BLUE),
+        text(270, 205, "LOUDS / Elias–Fano", cls="label", anchor="middle"),
+        text(270, 239, "Wavelet Matrix / FM-index", cls="label", anchor="middle"),
+        text(270, 273, "圧縮ビットベクトル", cls="label", anchor="middle"),
+        text(270, 332, "小容量・高速検索", cls="small", anchor="middle"),
+        text(270, 361, "更新のたびには動かさない", cls="small", anchor="middle"),
+        rect(715, 130, 430, 260, fill=ORANGE_LIGHT, stroke=ORANGE, sw=2.5),
+        text(930, 164, "小さな更新差分層", cls="result", anchor="middle", fill=ORANGE),
+        text(930, 205, "ハッシュ表 / 平衡木", cls="label", anchor="middle"),
+        text(930, 239, "追加文書の小型索引", cls="label", anchor="middle"),
+        text(930, 273, "削除を示す墓石集合", cls="label", anchor="middle"),
+        text(930, 332, "更新しやすい", cls="small", anchor="middle"),
+        text(930, 361, "一定量まで一時保管", cls="small", anchor="middle"),
+        rect(510, 220, 180, 80, fill=PANEL, stroke=INK, sw=2.5),
+        text(600, 247, "問い合わせ", cls="small", anchor="middle"),
+        text(600, 276, "結果を統合", cls="label", anchor="middle"),
+        line(485, 260, 504, 260, stroke=INK, sw=3, marker=True),
+        line(715, 260, 696, 260, stroke=INK, sw=3, marker=True),
+        line(930, 408, 930, 494, stroke=ORANGE, sw=3, marker=True),
+        text(957, 451, "閾値到達", cls="small"),
+        rect(300, 500, 600, 88, fill=GREEN_LIGHT, stroke=GREEN, sw=2.5),
+        text(600, 529, "バックグラウンドで再構築", cls="result", anchor="middle", fill=GREEN),
+        text(600, 562, "完成後に新しい静的版へ切り替える", cls="label", anchor="middle"),
+        line(300, 544, 205, 544, stroke=GREEN, sw=3),
+        line(205, 544, 205, 397, stroke=GREEN, sw=3, marker=True),
+    ]
+    return svg_document(
+        1200,
+        640,
+        "静的基礎層と更新差分層のハイブリッド",
+        "大きな静的簡潔構造と小さな更新差分を並行して検索し、差分が閾値へ達したときだけ基礎層を再構築して切り替える。",
+        "\n".join(body),
+    )
+
+
 FIGURES = {
     "rank-two-level.svg": rank_figure,
     "elias-fano-transform.svg": elias_fano_figure,
     "louds-encoding.svg": louds_figure,
     "wavelet-matrix-range.svg": wavelet_matrix_figure,
+    "fm-backward-search.svg": fm_backward_search_figure,
+    "static-delta-hybrid.svg": static_delta_figure,
 }
 
 
