@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 430" role="img" aria-labelledby="title desc">
+<title id="title">図2　線を引き直すのではなく、接点の効きを変える</title>
+<desc id="desc">大人の脳では配線はもう引いてある。以降の幕で書き換わるのは、この接点1個の効きだけ</desc>
+<defs><marker id="arw-7b7a75" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#7b7a75"/></marker><marker id="arw-2a78d6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2a78d6"/></marker></defs>
+<rect x="0.0" y="0.0" width="760.0" height="430.0" rx="10" fill="#fcfcfb" stroke="#e2e4e3" stroke-width="1"/>
+<text x="24.0" y="32.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="16" font-weight="700" fill="#0b0b0b" text-anchor="start">図2　線を引き直すのではなく、接点の効きを変える</text>
+<text x="24.0" y="54.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="400" fill="#52514e" text-anchor="start">大人の脳では配線はもう引いてある。以降の幕で書き換わるのは、この接点1個の効きだけ</text>
+<rect x="24.0" y="86.0" width="406.0" height="268.0" rx="8" fill="#ffffff" stroke="#e2e4e3" stroke-width="1"/>
+<text x="227.0" y="110.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="700" fill="#2a78d6" text-anchor="middle">① つながりは、もう引いてある</text>
+<path d="M84,162 L44,122 M60,138 L74,120" fill="none" stroke="#7b7a75" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M84,162 L78,108 M80,130 L94,112" fill="none" stroke="#7b7a75" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M84,162 L116,118 M103,136 L117,118" fill="none" stroke="#7b7a75" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="84.0" cy="162.0" r="23.0" fill="#ffffff" stroke="#7b7a75" stroke-width="2"/>
+<circle cx="84.0" cy="162.0" r="9.0" fill="#4a3aa7" stroke="none" stroke-width="1" opacity="0.25"/>
+<path d="M105,172 L178,194 L232,210" fill="none" stroke="#7b7a75" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="243.0" cy="214.0" r="11.0" fill="#ffffff" stroke="#7b7a75" stroke-width="2"/>
+<line x1="130.0" y1="126.0" x2="104.0" y2="116.0" stroke="#7b7a75" stroke-width="1" stroke-linecap="round"/>
+<text x="134.0" y="130.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10" font-weight="700" fill="#52514e" text-anchor="start">樹状突起（受け手）</text>
+<text x="84.0" y="200.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10" font-weight="700" fill="#52514e" text-anchor="middle">細胞体</text>
+<text x="160.0" y="186.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10" font-weight="700" fill="#52514e" text-anchor="middle">軸索（送り手）</text>
+<path d="M275,232 L322,258 M296,245 L306,229" fill="none" stroke="#7b7a75" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="348.0" cy="278.0" r="23.0" fill="#ffffff" stroke="#7b7a75" stroke-width="2"/>
+<circle cx="348.0" cy="278.0" r="9.0" fill="#4a3aa7" stroke="none" stroke-width="1" opacity="0.25"/>
+<line x1="370.0" y1="288.0" x2="408.0" y2="302.0" stroke="#7b7a75" stroke-width="2" stroke-linecap="round" marker-end="url(#arw-7b7a75)"/>
+<text x="416.0" y="254.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10" font-weight="700" fill="#52514e" text-anchor="end">次の細胞の</text>
+<text x="416.0" y="268.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10" font-weight="700" fill="#52514e" text-anchor="end">樹状突起</text>
+<text x="416.0" y="318.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="9.5" font-weight="400" fill="#7b7a75" text-anchor="end">さらに次へ</text>
+<circle cx="259.0" cy="223.0" r="24.0" fill="none" stroke="#2a78d6" stroke-width="2" stroke-dasharray="4 3"/>
+<text x="259.0" y="160.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11" font-weight="700" fill="#2a78d6" text-anchor="middle">シナプス</text>
+<line x1="259.0" y1="168.0" x2="259.0" y2="192.0" stroke="#2a78d6" stroke-width="1.6" stroke-linecap="round" marker-end="url(#arw-2a78d6)"/>
+<text x="38.0" y="322.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10" font-weight="400" fill="#52514e" text-anchor="start">大脳皮質の神経細胞：約160億個</text>
+<text x="38.0" y="338.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10" font-weight="400" fill="#52514e" text-anchor="start">1個が持つシナプス：平均で数千個</text>
+<rect x="456.0" y="86.0" width="280.0" height="268.0" rx="8" fill="#ffffff" stroke="#e2e4e3" stroke-width="1"/>
+<text x="596.0" y="110.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="700" fill="#eb6834" text-anchor="middle">② 変えられるのは、この効き</text>
+<line x1="281.0" y1="223.0" x2="456.0" y2="120.0" stroke="#2a78d6" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="4 4" opacity="0.7"/>
+<line x1="281.0" y1="223.0" x2="456.0" y2="320.0" stroke="#2a78d6" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="4 4" opacity="0.7"/>
+<rect x="506.0" y="132.0" width="180.0" height="60.0" rx="22" fill="#ffffff" stroke="#7b7a75" stroke-width="2"/>
+<text x="596.0" y="126.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10" font-weight="700" fill="#52514e" text-anchor="middle">シナプス前終末（送り手）</text>
+<circle cx="540.0" cy="156.0" r="8.0" fill="#eb6834" stroke="#eb6834" stroke-width="1.4" opacity="0.25"/>
+<circle cx="568.0" cy="150.0" r="8.0" fill="#eb6834" stroke="#eb6834" stroke-width="1.4" opacity="0.25"/>
+<circle cx="598.0" cy="158.0" r="8.0" fill="#eb6834" stroke="#eb6834" stroke-width="1.4" opacity="0.25"/>
+<circle cx="628.0" cy="150.0" r="8.0" fill="#eb6834" stroke="#eb6834" stroke-width="1.4" opacity="0.25"/>
+<text x="596.0" y="182.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="9.5" font-weight="400" fill="#7b7a75" text-anchor="middle">小胞に詰めて溜めてある</text>
+<circle cx="568.0" cy="212.0" r="4.5" fill="#eb6834" stroke="none" stroke-width="1"/>
+<circle cx="590.0" cy="212.0" r="4.5" fill="#eb6834" stroke="none" stroke-width="1"/>
+<circle cx="612.0" cy="212.0" r="4.5" fill="#eb6834" stroke="none" stroke-width="1"/>
+<text x="466.0" y="216.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="9.5" font-weight="400" fill="#7b7a75" text-anchor="start">シナプス間隙</text>
+<text x="700.0" y="216.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10" font-weight="700" fill="#eb6834" text-anchor="end">グルタミン酸</text>
+<rect x="496.0" y="234.0" width="200.0" height="22.0" rx="3" fill="#eef0ef" stroke="#e2e4e3" stroke-width="1"/>
+<rect x="520.0" y="228.0" width="26.0" height="34.0" rx="4" fill="#f0f6fe" stroke="#2a78d6" stroke-width="1.8"/>
+<rect x="564.0" y="228.0" width="26.0" height="34.0" rx="4" fill="#f0f6fe" stroke="#2a78d6" stroke-width="1.8"/>
+<rect x="608.0" y="228.0" width="26.0" height="34.0" rx="4" fill="#f0f6fe" stroke="#2a78d6" stroke-width="1.8"/>
+<rect x="652.0" y="228.0" width="26.0" height="34.0" rx="4" fill="#f0f6fe" stroke="#2a78d6" stroke-width="1.8"/>
+<text x="596.0" y="284.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="700" fill="#2a78d6" text-anchor="middle">受け手に並ぶ受容体</text>
+<text x="596.0" y="308.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="700" fill="#2a78d6" text-anchor="middle">この数と効きが「重み」</text>
+<text x="596.0" y="330.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#52514e" text-anchor="middle">増やせば増強、減らせば抑圧</text>
+<text x="380.0" y="382.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12" font-weight="700" fill="#0b0b0b" text-anchor="middle">大人の脳で配線を新設していたら、映画をその日のうちに覚えて帰ることはできない。</text>
+<text x="380.0" y="406.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11.5" font-weight="400" fill="#52514e" text-anchor="middle">速いのは工事ではなく、既にある接点の効きを変えること。これをシナプス可塑性という。</text>
+</svg>

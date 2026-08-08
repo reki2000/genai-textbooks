@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 430" role="img" aria-labelledby="title desc">
+<title id="title">図3　NMDA受容体は、二つの鍵が同時に回ったときだけ開く</title>
+<desc id="desc">グルタミン酸だけでも脱分極だけでも Ca²⁺ は入らない。両方そろった入力だけが選ばれる</desc>
+<defs><marker id="arw-2a78d6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2a78d6"/></marker><marker id="arw-1baf7a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1baf7a"/></marker></defs>
+<rect x="0.0" y="0.0" width="760.0" height="430.0" rx="10" fill="#fcfcfb" stroke="#e2e4e3" stroke-width="1"/>
+<text x="24.0" y="32.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="16" font-weight="700" fill="#0b0b0b" text-anchor="start">図3　NMDA受容体は、二つの鍵が同時に回ったときだけ開く</text>
+<text x="24.0" y="54.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="400" fill="#52514e" text-anchor="start">グルタミン酸だけでも脱分極だけでも Ca²⁺ は入らない。両方そろった入力だけが選ばれる</text>
+<rect x="24.0" y="86.0" width="224.0" height="268.0" rx="8" fill="#ffffff" stroke="#e2e4e3" stroke-width="1"/>
+<text x="136.0" y="110.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="700" fill="#2a78d6" text-anchor="middle">① グルタミン酸だけ</text>
+<rect x="38.0" y="196.0" width="196.0" height="26.0" rx="3" fill="#eef0ef" stroke="#e2e4e3" stroke-width="1"/>
+<text x="40.0" y="138.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="9.5" font-weight="400" fill="#7b7a75" text-anchor="start">細胞外</text>
+<text x="40.0" y="254.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="9.5" font-weight="400" fill="#7b7a75" text-anchor="start">細胞内</text>
+<rect x="68.0" y="188.0" width="42.0" height="42.0" rx="5" fill="#ffffff" stroke="#7b7a75" stroke-width="1.5"/>
+<text x="89.0" y="288.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="700" fill="#52514e" text-anchor="middle">AMPA</text>
+<rect x="162.0" y="188.0" width="42.0" height="42.0" rx="5" fill="#ffffff" stroke="#7b7a75" stroke-width="1.5"/>
+<text x="183.0" y="288.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="700" fill="#52514e" text-anchor="middle">NMDA</text>
+<circle cx="78.0" cy="178.0" r="4.5" fill="#eb6834" stroke="none" stroke-width="1"/>
+<circle cx="99.0" cy="178.0" r="4.5" fill="#eb6834" stroke="none" stroke-width="1"/>
+<circle cx="172.0" cy="178.0" r="4.5" fill="#eb6834" stroke="none" stroke-width="1"/>
+<circle cx="193.0" cy="178.0" r="4.5" fill="#eb6834" stroke="none" stroke-width="1"/>
+<text x="38.0" y="160.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="700" fill="#eb6834" text-anchor="start">グルタミン酸あり</text>
+<line x1="89.0" y1="186.0" x2="89.0" y2="244.0" stroke="#2a78d6" stroke-width="1.6" stroke-linecap="round" marker-end="url(#arw-2a78d6)"/>
+<text x="89.0" y="262.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10" font-weight="700" fill="#2a78d6" text-anchor="middle">Na⁺</text>
+<text x="136.0" y="320.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="700" fill="#52514e" text-anchor="middle">内側は −70 mV のまま</text>
+<circle cx="183.0" cy="209.0" r="7.0" fill="#4a3aa7" stroke="none" stroke-width="1"/>
+<text x="183.0" y="254.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10" font-weight="700" fill="#4a3aa7" text-anchor="middle">Mg²⁺ が栓</text>
+<text x="136.0" y="340.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="13" font-weight="700" fill="#e34948" text-anchor="middle">Ca²⁺ 流入 ×</text>
+<rect x="268.0" y="86.0" width="224.0" height="268.0" rx="8" fill="#ffffff" stroke="#e2e4e3" stroke-width="1"/>
+<text x="380.0" y="110.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="700" fill="#2a78d6" text-anchor="middle">② 脱分極だけ</text>
+<rect x="282.0" y="196.0" width="196.0" height="26.0" rx="3" fill="#eef0ef" stroke="#e2e4e3" stroke-width="1"/>
+<text x="284.0" y="138.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="9.5" font-weight="400" fill="#7b7a75" text-anchor="start">細胞外</text>
+<text x="284.0" y="254.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="9.5" font-weight="400" fill="#7b7a75" text-anchor="start">細胞内</text>
+<rect x="312.0" y="188.0" width="42.0" height="42.0" rx="5" fill="#ffffff" stroke="#7b7a75" stroke-width="1.5"/>
+<text x="333.0" y="288.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="700" fill="#52514e" text-anchor="middle">AMPA</text>
+<rect x="406.0" y="188.0" width="42.0" height="42.0" rx="5" fill="#ffffff" stroke="#7b7a75" stroke-width="1.5"/>
+<text x="427.0" y="288.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="700" fill="#52514e" text-anchor="middle">NMDA</text>
+<text x="282.0" y="160.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="700" fill="#7b7a75" text-anchor="start">グルタミン酸なし</text>
+<line x1="320.0" y1="178.0" x2="346.0" y2="178.0" stroke="#7b7a75" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="4 3"/>
+<text x="380.0" y="320.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="700" fill="#4a3aa7" text-anchor="middle">内側は脱分極（マイナスが弱い）</text>
+<circle cx="464.0" cy="176.0" r="7.0" fill="#4a3aa7" stroke="none" stroke-width="1" opacity="0.55"/>
+<text x="478.0" y="158.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10" font-weight="700" fill="#4a3aa7" text-anchor="end">Mg²⁺ 外れる</text>
+<text x="380.0" y="340.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="13" font-weight="700" fill="#e34948" text-anchor="middle">Ca²⁺ 流入 ×</text>
+<rect x="512.0" y="86.0" width="224.0" height="268.0" rx="8" fill="#ffffff" stroke="#e2e4e3" stroke-width="1"/>
+<text x="624.0" y="110.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="700" fill="#1baf7a" text-anchor="middle">③ 両方そろう</text>
+<rect x="526.0" y="196.0" width="196.0" height="26.0" rx="3" fill="#eef0ef" stroke="#e2e4e3" stroke-width="1"/>
+<text x="528.0" y="138.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="9.5" font-weight="400" fill="#7b7a75" text-anchor="start">細胞外</text>
+<text x="528.0" y="254.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="9.5" font-weight="400" fill="#7b7a75" text-anchor="start">細胞内</text>
+<rect x="556.0" y="188.0" width="42.0" height="42.0" rx="5" fill="#ffffff" stroke="#7b7a75" stroke-width="1.5"/>
+<text x="577.0" y="288.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="700" fill="#52514e" text-anchor="middle">AMPA</text>
+<rect x="650.0" y="188.0" width="42.0" height="42.0" rx="5" fill="#ffffff" stroke="#7b7a75" stroke-width="1.5"/>
+<text x="671.0" y="288.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="700" fill="#52514e" text-anchor="middle">NMDA</text>
+<circle cx="566.0" cy="178.0" r="4.5" fill="#eb6834" stroke="none" stroke-width="1"/>
+<circle cx="587.0" cy="178.0" r="4.5" fill="#eb6834" stroke="none" stroke-width="1"/>
+<circle cx="660.0" cy="178.0" r="4.5" fill="#eb6834" stroke="none" stroke-width="1"/>
+<circle cx="681.0" cy="178.0" r="4.5" fill="#eb6834" stroke="none" stroke-width="1"/>
+<text x="526.0" y="160.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="700" fill="#eb6834" text-anchor="start">グルタミン酸あり</text>
+<line x1="577.0" y1="186.0" x2="577.0" y2="244.0" stroke="#2a78d6" stroke-width="1.6" stroke-linecap="round" marker-end="url(#arw-2a78d6)"/>
+<text x="577.0" y="262.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10" font-weight="700" fill="#2a78d6" text-anchor="middle">Na⁺</text>
+<text x="624.0" y="320.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="700" fill="#4a3aa7" text-anchor="middle">内側は脱分極（マイナスが弱い）</text>
+<circle cx="708.0" cy="176.0" r="7.0" fill="#4a3aa7" stroke="none" stroke-width="1" opacity="0.55"/>
+<text x="722.0" y="158.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10" font-weight="700" fill="#4a3aa7" text-anchor="end">Mg²⁺ 外れる</text>
+<line x1="671.0" y1="186.0" x2="671.0" y2="248.0" stroke="#1baf7a" stroke-width="2.4" stroke-linecap="round" marker-end="url(#arw-1baf7a)"/>
+<text x="671.0" y="268.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11.5" font-weight="700" fill="#1baf7a" text-anchor="middle">Ca²⁺</text>
+<text x="624.0" y="340.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="13" font-weight="700" fill="#1baf7a" text-anchor="middle">Ca²⁺ 流入 ○</text>
+<text x="380.0" y="372.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12" font-weight="700" fill="#0b0b0b" text-anchor="middle">グルタミン酸＝送り手が撃った、脱分極＝受け手が強く興奮した。ヘッブの二条件が、そのまま栓の外れ方になっている。</text>
+<text x="380.0" y="398.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11.5" font-weight="400" fill="#52514e" text-anchor="middle">細胞内の Ca²⁺ 濃度は外の約1万分の1。少し入るだけで跳ね上がり、電気の話が化学の話に切り替わる。</text>
+</svg>

@@ -37,10 +37,12 @@ from yaruo_markdown import (  # noqa: E402
     FULLWIDTH_SPACE,
     SECTION_LINE,
     SPEAKER_LINE,
+    figure_block_lines,
     non_prose_lines,
     speaker_line_indices,
     speaker_names,
     split_eol,
+    strip_ruby,
 )
 
 LEVELS = ("error", "warning", "info")
@@ -201,8 +203,17 @@ def _is_space(char: str) -> bool:
     return char == "" or char.isspace()
 
 
+# ルビ区切り（｜《》）。generate_site.py は **｜台詞《せりふ》** のような並びが
+# CommonMark の flanking 規則で壊れないよう、ビルド時に <ruby> HTML へ変換し
+# つつ非約物のゼロ幅文字（U+200C）で挟んでから markdown-it に渡す。
+# lint 側もこの3文字を punct 扱いから除外し、実際のレンダリング結果に合わせる。
+RUBY_DELIMS = "｜《》"
+
+
 def _is_punct(char: str) -> bool:
     # CommonMark 0.30 の「Unicode punctuation」= P* および S* カテゴリ
+    if char in RUBY_DELIMS:
+        return False
     return char != "" and unicodedata.category(char)[0] in ("P", "S")
 
 
@@ -941,9 +952,14 @@ def parse_sections(
     「長大な発言」が実在しない件数だけ発火していた（57冊で1801件中177件）。
     `yaruo_markdown` の方針どおり、解析器は全話者を返し、「主役2名だけを
     数える」は `Section.turns` と `report_stats` のフィルタで表現する。
+
+    **図版ブロックは発言へ数えない。** 発言の直後に置いた画像行とキャプションは
+    話者の言葉ではないので、字数・行数へ加算すると「長大な発言」が実在しない
+    件数だけ発火する（画像行だけで100字を超える）。
     """
     if names is None:
         names = speaker_names(lines)
+    figures = figure_block_lines(lines)
     sections: list[Section] = []
     current: Section | None = None
     in_speech = False
@@ -978,8 +994,10 @@ def parse_sections(
             if body == "---":
                 in_speech = False
                 continue
+            if line_no - 1 in figures:
+                continue
             current.speech_lines[-1] += 1
-            current.speech_texts[-1] += body
+            current.speech_texts[-1] += strip_ruby(body)
     if current is not None:
         sections.append(current)
     return sections
@@ -1650,7 +1668,7 @@ def report_stats(path: Path, lines: list[str]) -> None:
 
     print(
         f"  [幕別の話者バランス] 主役2名 {'／'.join(LEAD_SPEAKERS)} のみ。"
-        "比は脇役を含む幕の総字数に対する割合。発言字数は話者行・空行を除く本文のみ"
+        "比は脇役を含む幕の総字数に対する割合。発言字数は話者行・空行・図版を除く本文のみ"
     )
     for title, members in _act_buckets(sections):
         totals = _speaker_totals(members)

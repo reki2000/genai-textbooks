@@ -43,7 +43,13 @@ documents:
 
 ## 図版
 
-説明図は `/textbook-figures` で追加する。図は手書きせず `scripts/figs/{ID}.py` が生成し、`docs/books/{ID}/figs/*.svg` へ出力してコミットする。再利用できる描画ヘルパと配色は `scripts/figs/` 配下へ置く（既存のSVGヘルパは `scripts/figs/svgkit.py`）。本文へは単独行の画像を置き、細部を含む図は `[![…](figs/….svg)](figs/….svg)` として原寸表示へのリンクを付ける。単独行の画像は `yaruo_markdown.py` が非散文領域として扱う。
+説明図は `/textbook-figures` で追加する。図は手書きせず `scripts/figs/{ID}.py` が生成し、`docs/books/{ID}/figs/*.svg` へ出力してコミットする。再利用できる描画ヘルパと配色は `scripts/figs/` 配下へ置く（既存のSVGヘルパは `scripts/figs/svgkit.py`）。本文へは単独行の画像を置き、細部を含む図は `[![…](figs/….svg)](figs/….svg)` として原寸表示へのリンクを付ける。単独行の画像は `yaruo_markdown.py` が非散文領域として扱う。画像の直後に置く `図N：…` のキャプションは、表記の検査は受けるが、発言長の集計からは図版ブロックとして除外する（`figure_block_lines`）。
+
+## ルビ
+
+ルビは青空文庫式 `｜基底《よみ》` で書く（区切りは全角の `｜` `《` `》`、`｜` は省略しない）。表のセル区切り `|` やTeXの `{}` と衝突せず、変換されない場所でもそのまま読める。`scripts/generate_site.py` がビルド時に `<ruby>` HTML へ変換し、コードスパン・フェンス・`$…$` / `$$…$$` の中は素通しする。`｜《》` は Unicode の約物なので `**｜台詞《せりふ》**` のように隣接すると CommonMark の flanking 規則で太字が壊れるため、変換後の `<ruby>` はゼロ幅文字（U+200C）で挟む。marp スライドはこの変換を通らないので `slide.md` では使わない。
+
+読みは注記であって散文ではないので、字数の集計では基底だけを数える（`yaruo_markdown.strip_ruby` を `yaruo_lint.py` の発言長と `count_textbooks.py` の文字数・読了時間が共有する）。バイト数だけはファイル実寸なのでルビを含む。
 
 ## 検査・整形スクリプト
 
