@@ -11,3 +11,6 @@ __pycache__/
 
 # local discussion logs
 /discussion/
+
+# OS files
+.DS_Store
