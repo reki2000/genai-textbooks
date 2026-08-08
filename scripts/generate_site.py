@@ -416,6 +416,8 @@ def render_slide_deck(document: dict[str, Any], out_docs: Path) -> None:
         return
     dest = out_docs / "books" / document["id"] / "slide.html"
     dest.parent.mkdir(parents=True, exist_ok=True)
+    if dest.is_file() and dest.stat().st_mtime_ns >= source.stat().st_mtime_ns:
+        return
     try:
         subprocess.run(
             [
@@ -539,6 +541,65 @@ def apply_ruby_conversion(out_docs: Path) -> None:
             md_path.write_text(converted, encoding="utf-8")
 
 
+# docsify-footnote (see site_template.html) parses footnote definitions in
+# document order: for each `[^N]:` block it deletes the block's own raw text
+# out of the page source once it has located and replaced every `[^N]`
+# reference elsewhere. If a *later* footnote's definition text itself cites
+# an *earlier* footnote (e.g. `[^30]: ... [^29] と同じ...`), that citation is
+# still raw, undeleted text when footnote 29 is processed, so 29's reference
+# scan matches it too and rewrites it in place -- after which footnote 30's
+# own definition block no longer matches the string the plugin captured at
+# the start, so the deletion silently fails and the whole `[^30]: ...` line
+# leaks into the page as plain body text instead of becoming a footnote.
+# Reference: docsify-footnote@1.0.8 dist/docsify-footnote.min.js.
+#
+# Fixed by pre-rewriting, at build time only, any `[^M]` that appears inside
+# another footnote's own definition body into a plain link pointing at that
+# footnote's entry (`#ftref-M`, the id docsify-footnote assigns to its list
+# item). Two things about the replacement matter:
+#
+# - It must not itself contain the literal substring `[^M]` -- the plugin's
+#   `\[\^M\]` regex would still find and mangle it inside the replacement,
+#   reproducing the exact same bug one level in (tried and confirmed broken:
+#   the plugin renumbered the still-live `[^M]` text to a suffixed label
+#   like "29-1" and the surrounding block deletion failed again). Dropping
+#   the caret (`[M]` instead of `[^M]`) makes it inert to that regex.
+# - It must be Markdown link syntax, not a raw HTML `<a href="#...">` tag.
+#   docsify's history-mode router only rewrites in-page hash links that go
+#   through its own Markdown-link compiler; a passthrough HTML anchor
+#   bypasses that and gets mis-resolved into a `?id=...`-suffixed URL that
+#   doesn't scroll anywhere (tried and confirmed broken). Mirroring the
+#   `[\[N\]](#ftref-N)` form docsify-footnote itself emits for its back-links
+#   keeps it on the path that already works.
+_FOOTNOTE_DEF_RE = re.compile(r"^\[\^(\d+)\]:(.*)$", re.MULTILINE)
+_FOOTNOTE_REF_RE = re.compile(r"\[\^(\d+)\](?!:)")
+
+
+def convert_footnote_backrefs(text: str) -> str:
+    def guard_refs(body: str) -> str:
+        return _FOOTNOTE_REF_RE.sub(
+            lambda m: f'[\\[{m.group(1)}\\]](#ftref-{m.group(1)})', body
+        )
+
+    def replace(match: re.Match[str]) -> str:
+        number, body = match.group(1), match.group(2)
+        return f"[^{number}]:{guard_refs(body)}"
+
+    return _FOOTNOTE_DEF_RE.sub(replace, text)
+
+
+def apply_footnote_backref_guard(out_docs: Path) -> None:
+    for md_path in out_docs.rglob("*.md"):
+        if md_path.name == "slide.md":
+            continue
+        text = md_path.read_text(encoding="utf-8")
+        if "[^" not in text:
+            continue
+        converted = convert_footnote_backrefs(text)
+        if converted != text:
+            md_path.write_text(converted, encoding="utf-8")
+
+
 def generate(categories: list[dict[str, Any]], documents: list[dict[str, Any]], out_docs: Path) -> None:
     # The generated HTML is only the docsify shell. The Markdown sources and
     # static assets must also be present in the deployed directory because
@@ -570,6 +631,7 @@ def generate(categories: list[dict[str, Any]], documents: list[dict[str, Any]], 
     render_slide_decks(documents, out_docs)
 
     apply_ruby_conversion(out_docs)
+    apply_footnote_backref_guard(out_docs)
 
     write_file(out_docs / "sitemap.xml", render_sitemap(documents))
 
