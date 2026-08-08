@@ -31,6 +31,9 @@ IMAGE_LINE = re.compile(
     r"^(?:!\[[^\]]*\]\([^)\s]+\)|"
     r"\[!\[[^\]]*\]\([^)\s]+\)\]\([^)\s]+\))$"
 )
+# 図版のキャプション（`図3：…` `図5-1：…`）。画像の直後に置かれたものだけを
+# キャプションとみなすため、この正規表現だけでは判定しない（`figure_block_lines`）。
+CAPTION_LINE = re.compile(r"^図\d+(?:-\d+)?[：:]")
 DEFAULT_SPEAKERS = frozenset({"やる夫", "やらない夫"})
 
 
@@ -125,3 +128,34 @@ def non_prose_lines(lines: list[str]) -> set[int]:
         elif IMAGE_LINE.match(stripped.rstrip()):
             protected.add(index)
     return protected
+
+
+def figure_block_lines(lines: list[str]) -> set[int]:
+    """図版ブロック（単独行の画像と、その直後のキャプション）の 0-indexed 行番号。
+
+    `non_prose_lines` と違い、キャプションを含む。キャプションは読者が読む散文
+    なので表記の検査（単位・丸囲み数字・英語併記）は受けさせたい。一方、直前の
+    発言の一部として字数や行数へ数えられると発言長の診断が狂う。両者を分けるため、
+    この集合は会話の解析側（`yaruo_lint.parse_sections`）だけが使う。
+
+    キャプションは画像の直後の段落に限る。画像と離れた `図3：…` は本文とみなす。
+    """
+    figure: set[int] = set()
+    after_image = False
+    in_fence = False
+    for index, line in enumerate(lines):
+        body = split_eol(line)[0].strip()
+        if body.startswith("```"):
+            in_fence = not in_fence
+            after_image = False
+            continue
+        if in_fence or not body:
+            continue
+        if IMAGE_LINE.match(body):
+            figure.add(index)
+            after_image = True
+            continue
+        if after_image and CAPTION_LINE.match(body):
+            figure.add(index)
+        after_image = False
+    return figure

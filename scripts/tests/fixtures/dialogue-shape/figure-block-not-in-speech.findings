@@ -1,0 +1,4 @@
+figure-block-not-in-speech.md:13: info: [dialogue-shape] 1-1　図版ブロックが発言長へ加算されないこと (2実効往復、4発言、発言字数 6〜32〜81、瞬発3／短い推論0／展開1／錨0、計151字)
+figure-block-not-in-speech.md:13: warning: [dialogue-shape] 4実効往復未満: 1-1　図版ブロックが発言長へ加算されないこと（核心概念なら不足、2実効往復、4発言、発言字数 6〜32〜81、瞬発3／短い推論0／展開1／錨0、計151字）
+figure-block-not-in-speech.md:13: info: [dialogue-shape] 会話量が少ない: 1-1　図版ブロックが発言長へ加算されないこと (151字 < 1200字)
+figure-block-not-in-speech.md: error 0件、warning 1件、info 2件

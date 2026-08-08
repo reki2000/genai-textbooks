@@ -37,6 +37,7 @@ from yaruo_markdown import (  # noqa: E402
     FULLWIDTH_SPACE,
     SECTION_LINE,
     SPEAKER_LINE,
+    figure_block_lines,
     non_prose_lines,
     speaker_line_indices,
     speaker_names,
@@ -941,9 +942,14 @@ def parse_sections(
     「長大な発言」が実在しない件数だけ発火していた（57冊で1801件中177件）。
     `yaruo_markdown` の方針どおり、解析器は全話者を返し、「主役2名だけを
     数える」は `Section.turns` と `report_stats` のフィルタで表現する。
+
+    **図版ブロックは発言へ数えない。** 発言の直後に置いた画像行とキャプションは
+    話者の言葉ではないので、字数・行数へ加算すると「長大な発言」が実在しない
+    件数だけ発火する（画像行だけで100字を超える）。
     """
     if names is None:
         names = speaker_names(lines)
+    figures = figure_block_lines(lines)
     sections: list[Section] = []
     current: Section | None = None
     in_speech = False
@@ -977,6 +983,8 @@ def parse_sections(
                 continue
             if body == "---":
                 in_speech = False
+                continue
+            if line_no - 1 in figures:
                 continue
             current.speech_lines[-1] += 1
             current.speech_texts[-1] += body
@@ -1650,7 +1658,7 @@ def report_stats(path: Path, lines: list[str]) -> None:
 
     print(
         f"  [幕別の話者バランス] 主役2名 {'／'.join(LEAD_SPEAKERS)} のみ。"
-        "比は脇役を含む幕の総字数に対する割合。発言字数は話者行・空行を除く本文のみ"
+        "比は脇役を含む幕の総字数に対する割合。発言字数は話者行・空行・図版を除く本文のみ"
     )
     for title, members in _act_buckets(sections):
         totals = _speaker_totals(members)

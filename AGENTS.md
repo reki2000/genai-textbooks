@@ -43,7 +43,7 @@ documents:
 
 ## 図版
 
-説明図は `/textbook-figures` で追加する。図は手書きせず `scripts/figs/{ID}.py` が生成し、`docs/books/{ID}/figs/*.svg` へ出力してコミットする。再利用できる描画ヘルパと配色は `scripts/figs/` 配下へ置く（既存のSVGヘルパは `scripts/figs/svgkit.py`）。本文へは単独行の画像を置き、細部を含む図は `[![…](figs/….svg)](figs/….svg)` として原寸表示へのリンクを付ける。単独行の画像は `yaruo_markdown.py` が非散文領域として扱う。
+説明図は `/textbook-figures` で追加する。図は手書きせず `scripts/figs/{ID}.py` が生成し、`docs/books/{ID}/figs/*.svg` へ出力してコミットする。再利用できる描画ヘルパと配色は `scripts/figs/` 配下へ置く（既存のSVGヘルパは `scripts/figs/svgkit.py`）。本文へは単独行の画像を置き、細部を含む図は `[![…](figs/….svg)](figs/….svg)` として原寸表示へのリンクを付ける。単独行の画像は `yaruo_markdown.py` が非散文領域として扱う。画像の直後に置く `図N：…` のキャプションは、表記の検査は受けるが、発言長の集計からは図版ブロックとして除外する（`figure_block_lines`）。
 
 ## 検査・整形スクリプト
 
