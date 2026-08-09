@@ -12,5 +12,9 @@ __pycache__/
 # local discussion logs
 /discussion/
 
+# プレビューから投稿されたコメント（作業用。docs/ の外に置くのは、docs/ を
+# 丸ごと build/ へコピーするとサイトに公開されてしまうため）
+/comments/
+
 # OS files
 .DS_Store
