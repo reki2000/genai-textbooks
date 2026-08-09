@@ -1546,12 +1546,172 @@ DRAMリフレッシュ。
 半導体は次世代でまた小さくできるからだお。[^12]
 
 ---
+### 5-5　最初の買い手はPCではなかった
+
+**やる夫**：
+Intel 1103が1970年。
+
+これでPCへDRAMを載せて大勝利だお。
+
+**やらない夫**：
+1970年に、今の意味でのPC市場があったのか。
+
+**やる夫**：
+……ないお。
+
+では誰が、こんな高価な初期半導体メモリを必要としたんだお？
+
+**やらない夫**：
+PCより先に、大型計算機を見ろ。
+
+1964年のIBM System/360は、互換性のあるメインフレーム群として登場した。
+
+同じ命令体系の中で、中央記憶は8,000文字級から524,000文字級まで、機種と構成で大きく違った。主記憶の中心はまだ磁気コアだ。[^36]
+
+**やる夫**：
+一台の標準容量があったわけじゃない。
+
+業務規模と予算に合わせ、同じ系列で容量も性能も選んだのかお。
+
+でも磁気コアならCPU待ちは起きない？
+
+**やらない夫**：
+1968年のSystem/360 Model 85を見ろ。
+
+大きい主記憶は約1μs級、小さなバッファ記憶は80ns級だった。
+
+頻繁に参照する64byte単位の内容を、16KBまたは32KBの高速バッファへ入れた。[^37]
+
+**やる夫**：
+主記憶を全部80nsにするんじゃない。
+
+よく使う一部だけを小さな高速メモリへ置く。
+
+……これ、後のキャッシュと同じ発想じゃないかお。
+
+**やらない夫**：
+当時はbuffer storageなどとも呼ばれた。
+
+PCが生まれる前から、速い処理装置と大きい主記憶の差は階層で埋めていた。
+
+**やる夫**：
+では1970年のSystem/370 Model 145は？
+
+**やらない夫**：
+主記憶の全要素を単一のシリコンチップ上へ作ったIBM初の機種だ。
+
+IBMはここを、磁気コアからシリコン主記憶への転換点としている。[^38]
+
+**やる夫**：
+1970年には、Intel 1103が磁気コアと値段で並び、IBMのメインフレームも主記憶をシリコンへ移した。
+
+DRAM初期史はPCの前座じゃない。
+
+**メインフレームが、速度差、記憶階層、半導体主記憶を先に実用問題として踏んでいた**んだお。
+
+---
 ## 第6幕　CPUが速くなるほど、DRAMは待たせる
 
 ---
-### 6-1　CPUを2倍速くしたのに仕事が終わらない
+### 6-1　1MHzと1GHzの間に何が起きた
 
 **やる夫**：
+1970年の次に「最新CPU」では、いくら何でもワープしすぎだお。
+
+ここはやる夫の守備範囲だお。
+
+CPUと主記憶が、いつ、どれくらい増えたのか、代表機を並べる。
+
+ただしCPUの「8bit／16bit」という売り文句ではなく、メモリとの外部データ幅を別の列にする。
+
+8088みたいに、内部は16bit系でも外へは8bitずつ運ぶCPUがいるからだお。
+
+**やらない夫**：
+最初から罠を一つ避けたな。
+
+年、CPUクロック、CPUとメモリの外部データバス幅、代表機の搭載RAMだ。
+
+**やる夫**：
+よし、カタログ暗記大会なら負けないお。
+
+| 年 | 代表機 | CPUクロック | 外部データ幅 | 出荷時・最小構成などのRAM |
+|---:|---|---:|---:|---:|
+| 1977 | Apple II | 約1MHz | 8bit | 4KBから、基板上は最大48KB級 |
+| 1981 | IBM PC 5150 | 4.77MHz | 8bit | 16KBから |
+| 1990 | Macintosh IIfx | 40MHz | 32bit | 4MBから、最大128MB |
+| 1994 | IBM PC Server 500 | Pentium 90MHz | 64bit | 32MB ECC |
+| 2000 | Pentium 4初期プラットフォーム | 1.4／1.5GHz | 64bit系システムバス | 128MB RDRAMのキット例 |
+
+Apple IIは4KB DRAMを1列ずつ増設し、基板上に48KBぶんのRAMアドレスを用意した。[^40]
+
+IBM PCは約5MHzの8088と16KB RAMから出発した。[^39][^42]
+
+Macintosh IIfxは40MHzの68030と最低4MB、IBMの1994年サーバー例はPentium 90MHzと32MB ECCだった。[^41][^43]
+
+2000年のPentium 4は1.4／1.5GHzで登場し、Intelは128MB RDRAM付きの構成部品も出荷した。[^44]
+
+**やらない夫**：
+その表のRAM容量は「時代の標準規格」か。
+
+**やる夫**：
+違うお。
+
+最低構成、対応範囲、特定サーバーの搭載量、販売キットが混ざっている。
+
+機種、用途、価格で幅があるから、**代表的な実装例として比べる表**だお。
+
+そしてアドレス可能上限とも違う。
+
+8088は1MBのアドレス空間を持っても、最初のIBM PCが1MB RAM搭載だったわけじゃない。
+
+**やらない夫**：
+何が一番大きく変わった。
+
+**やる夫**：
+23年でCPUクロックは約1MHzから1.5GHz、約1,500倍。
+
+代表機の主記憶もKBからMBへ増えた。
+
+外部データ幅も8bitから32bit、64bitへ広がった。
+
+でもDRAMセルの一回のREADが1,500倍速くなったとは書いてない。
+
+……次に起きる事故が見えてきたお。
+
+---
+### 6-2　CPUを2倍速くしたのに仕事が終わらない
+
+**やる夫**：
+PC史だけで答えるなら、1989年の486で8KBキャッシュがCPUへ入った辺りを目印にしたくなるお。
+
+386は16〜33MHz級まであるのに内蔵キャッシュなし、486は8KB、初代Pentiumは命令8KBとデータ8KB。
+
+自作PCの系譜では、マザーボード上の外部キャッシュからCPU内蔵キャッシュへ重心が移った時代だお。[^39][^45]
+
+**やらない夫**：
+では1989年より前は、CPUが主記憶を一度も待たなかったのか。
+
+**やる夫**：
+そんなわけはないお。
+
+必要な時間内にメモリが応答できなければ、古いCPUでもウェイトステートを入れる。
+
+1968年のSystem/360 Model 85が高速バッファを使った時点で、階層化するほどの速度差はすでにあった。
+
+**やらない夫**：
+つまり486は待ちが始まった年ではない。
+
+**やる夫**：
+始まった一点ではなく、
+
+メインフレームでは1960年代末に先行し、
+
+PCでは1980年代末から1990年代に、CPU内蔵キャッシュなしでは苦しくなったのが見える。
+
+そして1994年、CPU性能の伸びと主記憶速度の差が「メモリウォール」と明示的に論じられた。[^28]
+
+では1990年代のつもりで、CPUだけ2倍にする実験だお。
+
 最新CPUを買ってきたお！
 
 クロック2倍。
@@ -1604,7 +1764,7 @@ CPUだけ速くすると、同じDRAMの待ち時間がCPU周期では何倍に�
 速い頭脳を買ったのに、机まで資料が届かないお。
 
 ---
-### 6-2　全部をCPUの中へ置けばいい
+### 6-3　全部をCPUの中へ置けばいい
 
 **やる夫**：
 待つなら、使うデータを全部SRAMへ移すお。
@@ -1654,7 +1814,7 @@ Bも2回目は残っている。
 でも一度開いた場所から、まとめて運ぶ工夫はできそうだお。
 
 ---
-### 6-3　開いた行をすぐ閉じるな
+### 6-4　開いた行をすぐ閉じるな
 
 **やる夫**：
 DRAMのREADを分解する。
@@ -1679,14 +1839,23 @@ DRAMのREADを分解する。
 これがページモードだ。
 Fast Page Mode DRAMでは、行を開いたまま列アドレスだけを切り替えて連続アクセスを速くした。
 
+1980年代後半から1990年代前半のPCでFPM DRAMが広く使われた。
+
 **やる夫**：
-EDOメモリは何を延ばしたんだお？
+FPMの次ならEDOだお。
+
+1990年代半ばのPC売り場で、72ピンSIMMの「EDO」「60ns」という札を見た世代もいる。
+
+Extended Data Outだから、前のデータを出力端子へ長く残す方式だお。
 
 **やらない夫**：
-Extended Data Outの名どおり、次の列アクセスを始めても前のデータを出力端子へ少し長く保持する。
-出力と次の内部動作を重ね、非同期DRAMの待ちを減らした。1990年代半ばにFast Page Modeを置き換えたが、その後はSDRAMへ移った。[^27]
+カタログ名は正解だ。では何と何を重ねた。
 
 **やる夫**：
+次の列アクセスを始めても前のデータを出力端子へ少し長く保持する。
+
+出力と次の内部動作を重ね、非同期DRAMの待ちを減らした。EDOは1990年代半ばにFast Page Modeを置き換えたが、1990年代後半にはSDRAMへ移った。[^27]
+
 FPMは行を開く手間を使い回した。
 
 EDOは前の出力を残したまま次の仕事を始めた。
@@ -1694,27 +1863,122 @@ EDOは前の出力を残したまま次の仕事を始めた。
 セルを速くできないから、**仕事を重ねて空白時間を減らした**んだお。
 
 ---
-### 6-4　CPUと同じ拍子で運べ
+### 6-5　何bit CPUなら、何bitずつ運べるのか
 
 **やる夫**：
-でもCPU側は、いつデータが来るか毎回様子を見ている。
+表では外部データ幅が8bit、32bit、64bitと増えた。
 
-ならメモリ側も共通のクロックへ合わせる。
+でも「何bit CPUなら同じbit幅ずつDRAMを読む」は、PCオタクなら8088の時点で踏む罠だお。
 
-クロックに同期させてコマンドを出す。
-
-バースト転送する。
-
-バンクを複数作って別バンクの待ち時間を重ねる。
+内部のレジスタや演算幅、アドレス幅、外部データバス幅は別物。
 
 **やらない夫**：
-同期DRAM（synchronous dynamic random-access memory, SDRAM）だ。
+具体例で証明しろ。
 
-PC66、PC100、PC133という名前を店頭で見た者もいるだろう。
+**やる夫**：
+8088は内部では16bit系でも、外へは8bitずつ。
+
+8086と80286は外部16bit。
+
+386DXと486は外部32bit。
+
+初代Pentiumは内部の基本レジスタが32bitのまま、メモリとの外部データバスを64bitへ広げた。[^39][^45]
+
+同じ「32bit CPU」という言葉でも、何を32bitと呼んでいるか確かめないといけないお。
+
+**やらない夫**：
+DRAMチップ1個の幅は。
+
+**やる夫**：
+初期にはx1、つまり1bit出力のチップが多かった。
+
+CPUへ8bit同時に渡すなら、x1チップを8個並べる。
+
+後にはx4、x8、x16のDRAMチップも使う。
+
+64bitのメモリチャネルなら、x8チップを8個で64bit。
+
+ECC用にさらに8bit加えたモジュールなら72bitぶん載る構成もある。
+
+**やらない夫**：
+ではバスを毎世代2倍にしろ。
+
+128bit、256bit、次は512bitだ。
+
+**やる夫**：
+CPUのピン、基板配線、同時に切り替える電力、信号の到着時刻合わせまで増える。
+
+1本を足せば無料で1bit増えるわけじゃない。
+
+……外部バスは8→16→32→64bitと広がったけど、64bitの次は一本を無限に太くするより、転送回数やチャネル数を増やす方向へ移るんだお。
+
+---
+### 6-6　CPUと同じ拍子で運べ
+
+**やる夫**：
+次はPC66、PC100、PC133のSDRAMだお。
+
+メモリ側も共通のクロックへ合わせ、クロックに同期してコマンドを出し、バースト転送する。
+
+バンクを複数作れば、別バンクの待ち時間も重ねられる。
+
+**やらない夫**：
+PCオタクの箱書き知識だけで、DDR5-6400を説明してみろ。
+
+**やる夫**：
+簡単だお。6400MHzのメモリ！
+
+**やらない夫**：
+いきなり単位を間違えたな。
+
+**やる夫**：
+……店頭ではMHzと書かれることも多いけど、DDR5-6400の6400は1pin当たり毎秒6400M回の転送、6400MT/sだお。
+
+PC趣味の会話で「ベースクロック」と呼ばれがちな外部CKクロックは、その半分の3200MHz。
+
+FPMやEDOは共通CKへ同期しないため、この表には入らない。あの世代は60nsや70nsのようなアクセス時間で語られた。
+
+同期DRAM（synchronous dynamic random-access memory, SDRAM）から順に分けると、こうなる。
+
+| 規格世代 | PCでの登場目安 | 外部CKクロックの代表範囲 | 1pin当たり実効転送レート | プリフェッチ |
+|---|---:|---:|---:|---:|
+| SDR SDRAM | 1990年代半ば | 66〜133MHz | 66〜133MT/s | 1n |
+| DDR | 2000年前後 | 100〜200MHz | 200〜400MT/s | 2n |
+| DDR2 | 2000年代半ば | 200〜533MHz | 400〜1066MT/s | 4n |
+| DDR3 | 2000年代後半 | 400〜1066MHz | 800〜2133MT/s | 8n |
+| DDR4 | 2010年代半ば | 800〜1600MHz | 1600〜3200MT/s | 8n |
+| DDR5 | 2020年代前半 | 1600〜3200MHz | 3200〜6400MT/s | 16n |
+
+この範囲は各世代の代表的な標準速度を丸めたものだ。同じ世代にも拡張速度、オーバークロック品、用途別規格がある。[^47]
+
+**やらない夫**：
+プリフェッチが増えると、何がうれしい。
+
+**やる夫**：
+DRAMセル配列を外部I/Oと同じ速さで一個ずつ走らせず、一度に複数bitを内部で取り出して外へ直列に吐ける。
+
+例えばDDR4-3200は8nだから、単純化すれば内部配列側は1pin当たり
+
+$$3200\div8=400\text{ M組/s}$$
+
+DDR5-6400は16nだから、
+
+$$6400\div16=400\text{ M組/s}$$
+
+外の転送レートは2倍でも、内部配列が一組を取り出す頻度まで2倍とは限らない。
+
+**内部を同じ倍率で無理に走らせず、まとめ取りとI/Oで外側を速くする**んだお。
+
+**やらない夫**：
+ではPC100を計算しろ。
+
+**やる夫**：
+SDRAMは1990年代半ばからPCへ広がった。
+
+PC66、PC100、PC133という1990年代後半の名前を店頭で見た者もいるだろう。
 
 末尾の数字は、当時のSDRAMモジュールが同期するクロックの目安だった。
 
-**やる夫**：
 100MHzなら1秒に1億回。
 
 64bit幅、つまり8byteを1回ずつ運ぶなら、
@@ -1726,12 +1990,14 @@ $$100\times10^6\times8=800\times10^6\text{ byte/s}$$
 だからPC100のモジュールがPC800とは呼ばれなかったのは、クロックと帯域で見ている数字が違うからかお。
 
 **やらない夫**：
-次はクロックの立ち上がりと立ち下がりの両方を使え。
+同じCKクロックのまま、転送回数を2倍にするには。
 
 **やる夫**：
-1周期に2回転送。
+DDRならクロックの立ち上がりと立ち下がりの両方を使い、1周期に2回転送する。
 
 倍データレート（double data rate, DDR）だお。
+
+PC主記憶では2000年前後からSDR SDRAMとの交代が始まった。
 
 例えば200MHz相当の入出力で両エッジを使い、毎秒400M回転送するDDR-400なら、64bit幅で、
 
@@ -1740,6 +2006,34 @@ $$400\times10^6\times8=3.2\times10^9\text{ byte/s}$$
 約3.2GB/s。
 
 だからPC3200という帯域名にもなる。
+
+**やらない夫**：
+ではDDR番号が増えれば、製造プロセスも一段ずつ小さくなるのか。
+
+**やる夫**：
+そこは一対一じゃないお。
+
+DDRはインターフェース規格、nmは特定メーカーの特定世代の製造技術だ。同じDDR規格が何回も微細化され、隣のDDR世代とも重なる。
+
+代表的な量産発表だけ並べてもこうなる。
+
+| 年 | 製品例 | 公表されたDRAMプロセス |
+|---:|---|---:|
+| 2001 | 256Mbit SDRAM | 0.15μm |
+| 2007 | 1Gbit DDR2 | 68nm |
+| 2007 | 1Gbit DDR3 | 78nm |
+| 2014 | DDR3／DDR4 | 20nm |
+| 2021 | DDR5 | 14nm、EUV使用 |
+
+同じDDR3だけでも78nmの製品例から20nmの量産例まである。表は業界全体の唯一の対応表ではなく、メーカー発表から拾った代表点だ。[^48][^49]
+
+**やらない夫**：
+何のために小さくした。
+
+**やる夫**：
+1枚のウェハから多くのbitを取り、容量と消費電力と原価を改善するため。
+
+ただしDRAMはコンデンサの電荷量を残さなければならない。CPUロジックと同じ縮小則、同じ工場設備で進むわけではない。この物理と工場の違いは第8幕で解剖するお。
 
 **やらない夫**：
 DDR2、DDR3、DDR4、DDR5と世代が続くにつれ、プリフェッチ、バンク構成、信号方式、電圧、モジュール側の仕組みも変わる。
@@ -1752,10 +2046,10 @@ DDR2、DDR3、DDR4、DDR5と世代が続くにつれ、プリフェッチ、バ�
 DDRは主に**セル配列とCPUの間で、どう大量に運ぶかという境界の進化**なんだお。
 
 ---
-### 6-5　一番MHzの大きいメモリを買う
+### 6-7　一番MHzの大きいメモリを買う
 
 **やる夫**：
-勝ち方が分かったお。
+では1999年のPC雑誌と店頭広告だけを信じる買い手を演じるお。
 
 商品箱で一番MHzが大きい物を採用すればいい。
 
@@ -1827,7 +2121,76 @@ Rambus案は高い転送レートという本物の長所を持っていた。
 今度は電気方式でなく、利用者が手に持つモジュールとしてだ。
 
 ---
-### 6-6　帯域を増やしても、最初の1byteは早く来ない
+### 6-8　規格は完成品へ貼る名前ではない
+
+**やる夫**：
+待つお。
+
+SDRAM、DDR、RDRAMと名前を並べたけど、方式を発明しただけでは他社のCPUやマザーボードにつながらない。
+
+PCオタクがメモリを買えたのは、ピン、電圧、コマンド、タイミング、モジュール形状の約束が先にあったからだお。
+
+**やらない夫**：
+では「規格化」はいつ始まった。
+
+**やる夫**：
+一つの年、一つの団体から始まったわけじゃない。
+
+互換性を作る範囲と、約束を決める主体が変わってきた。
+
+| 時期 | 例 | 互換性を作った方法 | 互換性の範囲 |
+|---:|---|---|---|
+| 1964年 | IBM System/360 | IBMが同一系列の命令体系と周辺機器を計画 | 一社の製品ファミリー |
+| 1981年 | IBM PC | 技術資料を公開し、他社製拡張カードや互換機が増える | デファクトなPC生態系 |
+| 1990年代以降 | SDRAM／DDR | JEDECで参加企業が電気・論理・モジュールの境界を標準化 | 複数のCPU、DRAM、モジュール企業 |
+| 1990年代末 | Direct RDRAM | Rambusのライセンスと対応企業群でチャネルを統一 | 契約で参加する製品生態系 |
+
+System/360は互換性の歴史では大事件だけど、公開された汎用DRAM規格ではない。IBM製品系列の中を揃えた。[^36]
+
+IBM PCは回路図やインターフェースを含む技術資料が公開され、第三者がメモリ拡張カードや互換機を作る余地を広げた。[^42]
+
+さらに部品メーカーが増えると、一社の完成機仕様だけでは足りない。
+
+JEDECはDDR SDRAM、HBM、メモリモジュール構成などのオープンな業界標準を策定している。[^46]
+
+**やらない夫**：
+ではPC66、PC100、PC133も、DDRも、全部まったく同じ種類の規格か。
+
+**やる夫**：
+違うお。
+
+DRAMチップの電気的・論理的な約束、DIMMの配線と形、SPDの内容、CPUやチップセットが要求する動作条件、メーカーの適合試験、店頭の速度表示が重なっている。
+
+PC100という商品名が読めても、それだけで任意の100MHz対応チップを任意の基板へ挿せるわけじゃない。
+
+**やらない夫**：
+Rambusは独自方式だから、規格化の反対か。
+
+**やる夫**：
+それも違う。
+
+RDRAM、RIMM、コントローラ、コネクタを複数企業で揃えなければ製品にならない点では、Rambusも規格化をした。
+
+ただし業界団体で合意する標準と、技術企業が知的財産をライセンスして統率する方式では、参加条件と利益配分が違う。[^32][^33]
+
+**やらない夫**：
+規格書は、最高のDRAMが完成してから書けばいいな。
+
+**やる夫**：
+それでは遅いお。
+
+CPUとチップセット、DRAM、モジュール、マザーボードを各社が同時に設計し、試作品を持ち寄り、起動条件と余裕を詰める。
+
+標準化は発明の後に名前を貼る事務作業じゃない。
+
+**別々の会社が、完成前から同じ境界へ向けて設計するための工学**なんだお。
+
+この幕では、規格化が必要になった理由と決め方までにする。
+
+次の幕でSIMM、DIMM、RIMM、ECC、Registered、SPDという、PCやUNIXサーバーの保守現場で実際に触る名前を解剖するお。
+
+---
+### 6-9　帯域を増やしても、最初の1byteは早く来ない
 
 **やる夫**：
 DDRなら安心だお。
@@ -5155,8 +5518,6 @@ $$32\times 8\times 2^{30}\approx2.75\times10^{11}\text{ bit}$$
 
 [^25]: [米国通商代表部『1996 National Trade Estimate - Japan』](https://ustr.gov/archive/Document_Library/Reports_Publications/1996/1996_National_Trade_Estimate/1996_National_Trade_Estimate-Japan.html), 2026年8月9日参照. 1986年の日米半導体協定が日本市場へのアクセスとダンピング問題を扱い、1991年の協定へ引き継がれた経緯を記録している。
 
-[^26]: [NESdev Wiki『Sample RAM map』](https://www.nesdev.org/wiki/Sample_RAM_map)および[NESdev Wiki『PPU memory map』](https://www.nesdev.org/wiki/PPU_memory_map), 2026年8月9日参照. NES/ファミコン系ハードウェアのCPU用2KB RAM、PPU用2KB RAM、カートリッジ上のCHR-ROM/CHR-RAMという分離構成を説明している。
-
 [^27]: [Computer History Museum所蔵Dataquest資料『PC semiconductors and applications, 1995』](https://archive.computerhistory.org/resources/access/text/2013/04/102723312-05-01-acc.pdf), 2026年8月9日参照. 専用VRAMのシリアル・ラインバッファと通常ポートの役割、EDO DRAMが非同期方式で出力保持を延ばし、1990年代後半にSDRAMへ置き換えられていく見通しを解説している。
 
 [^28]: Wm. A. Wulf and Sally A. McKee, [University of Virginia『Hitting the Memory Wall: Implications of the Obvious』](https://libraopen.lib.virginia.edu/downloads/4b29b598d), 2026年8月9日参照. CPU速度の向上がメモリ速度の向上を上回り、待ち時間がシステム性能を制約する問題を論じた1994年の報告。
@@ -5174,6 +5535,34 @@ $$32\times 8\times 2^{30}\approx2.75\times10^{11}\text{ bit}$$
 [^34]: Intel, [『Pat Gelsinger Keynote -- IDF Fall 1999』](https://www.intel.com/pressroom/archive/speeches/dp083199b.htm), 2026年8月10日参照. Intel 820チップセット、RDRAM、Pentium IIIを組み合わせたPCプラットフォームと、グラフィックスを含むシステム帯域の強化を紹介している。
 
 [^35]: Intel, [『Intel To Replace Motherboards With Defective Memory Translator Hub Component』](https://www.intel.com/pressroom/archive/releases/2000/cn051000.htm), 2026年8月10日参照. Intel 820でSDRAM信号を変換するMemory Translator Hubのノイズ問題と対象マザーボードの交換を発表し、RDRAMシステムは同部品を使わないため対象外としている。
+
+[^36]: [IBM『The IBM System/360』](https://www.ibm.com/history/system-360), 2026年8月10日参照. System/360は1964年に発表された互換メインフレーム群で、中央記憶容量は8,000〜524,000文字と機種・構成によって大きな幅があった。
+
+[^37]: C. Gordon Bellほか, [Computer History Museum『The IBM System/360 — a series of planned machines which span a wide performance range』](https://tcm.computerhistory.org/ComputerTimeline/Chap43-44_ibm360_CS1_40-41CS2.pdf), 2026年8月10日参照. 1968年発表のModel 85が、約1μsの磁気コア主記憶と80nsの16／32KBバッファ記憶を組み合わせ、64byte単位で内容を移した構造を説明している。
+
+[^38]: [IBM『The IBM System/370』](https://www.ibm.com/history/system-370), 2026年8月10日参照. 1970年のSystem/370 Model 145を、主記憶の全要素を単一シリコンチップ上へ作ったIBM初のコンピュータとして位置づけ、磁気コアからシリコン主記憶への転換を説明している。
+
+[^39]: [Intel『Intel Microprocessor Quick Reference Guide — Product Family』](https://www.intel.com/pressroom/kits/quickreffam.htm), 2026年8月10日参照. 8080からPentiumまでの登場年、クロック、キャッシュ、アドレス可能容量、バス速度を一覧化しており、Intel386 DXには内蔵キャッシュがなく、1989年のIntel486 DXには8KBが搭載されたことを示す。
+
+[^40]: Apple Computer, [『Apple II Reference Manual』](https://www.apple2.pl/books/redbook.pdf), 2026年8月10日参照. 4KB DRAMを行単位で実装する構成と、Apple II基板上でRAMへ割り当て可能な48KBのアドレス領域を説明している。
+
+[^41]: [Apple『Macintosh IIfx: Technical Specifications』](https://support.apple.com/en-us/112196), 2026年8月10日参照. 1990年登場、68030 40MHz、32bitデータパス、最小4MB・最大128MBという仕様を示す。
+
+[^42]: [IBM『The IBM PC』](https://www.ibm.com/history/personal-computer), 2026年8月10日参照. 1981年のIBM PC 5150が約5MHzのIntel 8088を採用し、1,565ドルの最小構成では16KB RAMだったこと、約10年でIBM PC系列のシステムメモリが16MB級へ伸びたことを記録している。
+
+[^43]: [IBM『Technical specifications — PC Server 500 (8641-0YR)』](https://www.ibm.com/support/pages/technical-specifications-pc-server-500-8641-0yr), 2026年8月10日参照. 1994年10月発表モデルのPentium 90MHzと32MB ECCメモリという構成を示す。
+
+[^44]: [Intel『Intel Introduces The Pentium 4 Processor』](https://www.intel.com/pressroom/archive/releases/2000/dp112000.htm), 2026年8月10日参照. 2000年11月に1.4／1.5GHzのPentium 4、Intel 850のデュアルRDRAM、128MB RDRAM付き構成部品を同時に投入したことを記録している。
+
+[^45]: [Intel『Single-chip Cloud Computer: An experimental many-core processor from Intel Labs』](https://www.intel.com/content/dam/www/public/us/en/documents/technology-briefs/intel-labs-single-chip-cloud-article.pdf), 2026年8月10日参照. 初代Pentiumが内部32bitに対して外部64bitデータバスを持ち、命令8KB・データ8KBのL1キャッシュを備え、1993年に60MHzで登場したことを整理している。
+
+[^46]: [JEDEC『Home』](https://www.jedec.org/), 2026年8月10日参照. JEDECは50年以上にわたりマイクロエレクトロニクスのオープン標準を策定し、現在の対象としてDDR SDRAM／HBM、メモリモジュール設計、メモリ構成などを挙げている。
+
+[^47]: Micron Technology, [『Introducing Micron DDR5 SDRAM: More Than a Generational Update』](https://assets.micron.com/adobe/assets/urn%3Aaaid%3Aaem%3Af1706cdb-4b55-4568-84bc-b7ee42f46236/original/as/ddr5-more-than-a-generational-update-wp.pdf)および[『FAQs』](https://www.micron.com/sales-support/sales/faqs), 2026年8月10日参照. DDR4の1600〜3200MT/s・8nとDDR5の3200〜6400MT/s・16n、DDR3／DDR4の8nプリフェッチ、DDRデータレートとCKクロックを区別する必要を示す。本文の世代表は各世代の代表的な標準速度を丸めた概観で、全拡張規格を列挙したものではない。
+
+[^48]: Samsung Electronics, [『History of Samsung (16): establishment of design centers and R&D Center: 2001』](https://news.samsung.com/global/history-of-samsung-16-establishment-of-design-centers-and-rd-center-2001)、[『Samsung Electronics Starts Mass Production of Industry’s First 8-Gigabit DDR4 Based on 20 Nanometer Process Technology』](https://news.samsung.com/global/samsung-electronics-starts-mass-production-of-industrys-first-8-gigabit-ddr4-based-on-20-nanometer-process-technology)、[『Samsung Starts Mass Production of Most Advanced 14nm EUV DDR5 DRAM』](https://news.samsung.com/us/samsung-14nm-euv-ddr5-dram-mass-production-most-advanced/), 2026年8月10日参照. 2001年の0.15μm・256Mbit SDRAM、2014年の20nm DDR3／DDR4、2021年の14nm EUV DDR5という量産例を示す。
+
+[^49]: Micron Technology, [『Micron Shrinks DRAM Process Technology, Achieving the World's Smallest 1 Gigabit DDR2 Memory Chip』](https://investors.micron.com/news-releases/news-release-details/micron-shrinks-dram-process-technology-achieving-worlds-smallest)および[『Micron Technology's DDR3 Memory for High-End Computing is Validated with INTEL Platforms』](https://investors.micron.com/news-releases/news-release-details/micron-technologys-ddr3-memory-high-end-computing-validated), 2026年8月10日参照. 2007年の68nm・1Gbit DDR2と78nm・1Gbit DDR3の製品例を示す。DDR3例は400〜533MHzのCKに対して800〜1066MT/sであることも明記している。
 
 [1]: https://www.computerhistory.org/timeline/computers/ "Timeline of Computer History"
 [2]: https://www.bell-labs.com/about/awards/1956-nobel-prize-physics/ "1956 Nobel Prize in Physics"
