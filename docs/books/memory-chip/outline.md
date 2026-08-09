@@ -1,7 +1,7 @@
 ---
 type: outline
 book: memory-chip
-readme_updated: '2026-08-09T15:25:24+00:00'
+readme_updated: '2026-08-09T15:33:52+00:00'
 ---
 
 # やるおがメモリを自作するそうです ― 0と1を信用できるまでの150年 の骨格
