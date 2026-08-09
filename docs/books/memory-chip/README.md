@@ -3662,6 +3662,744 @@ smartphoneはOS、app、写真、動画、通信cacheを一日中読み書きす
 次は、その境界を作り直す。
 
 ---
+## 第11幕　スマホがDRAMとNANDを再会させる
+
+---
+### 11-1　PC用DDRを小さく載せればよい
+
+**やる夫**：
+2007年のiPhoneは4GBまたは8GBのstorageで登場した。[^76]
+
+中身はPCの小型版だお。
+
+SO-DIMMを短く切り、DDR2を載せればよい。
+
+**やらない夫**：
+切るな。
+
+まず電池で動かせ。
+
+**やる夫**：
+PCなら壁のsocketがある。
+
+smartphoneは画面を消した待機中にも、着信、時計、networkを生かす。
+
+DRAMが速くても、I/Oと終端へ電流を流し続けたら電池が先に尽きるお。
+
+**やらない夫**：
+基板も見ろ。
+
+SIM card、radio、camera、電源回路、application processor、電池の間にDIMM socketを置く場所があるか。
+
+**やる夫**：
+ない。
+
+交換用socket、長い配線、終端抵抗まで、mobileでは面積と電力の負債になる。
+
+PC用DDRを低いclockで使うだけでは、待機電力と実装面積を解けないお。
+
+**やらない夫**：
+そこで低消費電力DDR（Low-Power Double Data Rate, LPDDR）は、電圧を下げ、細かな電力状態を持ち、短いpoint-to-point配線でSoCへつなぐ方向へ進んだ。
+
+代表的な製品の節目を並べろ。
+
+**やる夫**：
+規格公開年と、その規格を使った代表製品の発表年を混ぜずに書くお。
+
+| 年 | 世代・出来事 | 代表的な1pin当たり転送レート | ここで増えたもの |
+|---:|---|---:|---|
+| 2009年 | Mobile DDR製品例 | 400Mbit/s | 携帯向けの小容量・低電力化 |
+| 2011年 | LPDDR2製品例 | 1066Mbit/s | 高速化と低電圧化 |
+| 2012年 | LPDDR3製品例 | 1600Mbit/s | camera・動画処理向け帯域 |
+| 2014年 | LPDDR4規格・製品世代 | 3200Mbit/s級 | channel分割と省電力 |
+| 2016年 | LPDDR4X製品世代 | 4266Mbit/s級 | I/O電圧をさらに低下 |
+| 2018〜2019年 | LPDDR5開発・量産製品 | 6400Mbit/s級 | deep sleepと帯域効率 |
+| 2021〜2022年 | LPDDR5X開発・検証製品 | 8500Mbit/s級 | mobile AI向け帯域 |
+| 2025年 | LPDDR6規格公開 | 規格で次世代化 | dual sub-channel、効率・信頼性 |
+
+Samsungの代表製品史とMicronの資料では、LPDDR4／4Xは4266Mbit/s級、LPDDR5は6400Mbit/s級へ進み、LPDDR4XはLPDDR4の1.1V I/Oに対して0.6V I/Oを使う。2025年7月にはJEDECがLPDDR6規格を公開した。[^77]
+
+**やらない夫**：
+表のMbit/sを、そのままDRAM cell arrayのbase clockだと思うな。
+
+**やる夫**：
+DDR5-6400の店頭表示を分解した第6幕と同じだお。
+
+これは主にpin当たりの実効転送レートで、内部配列の動作速度そのものではない。
+
+LPDDRは世代ごとにclockingやprefetch、channel構成も変わるから、単純に2で割って全世代共通のbase clockにはできないお。
+
+**やらない夫**：
+電圧低下の効果だけなら、簡単な模型で見られる。
+
+I/Oのswitching energyを$E\propto CV^2$とし、同じ容量を1.1Vから0.6Vへ振るなら。
+
+**やる夫**：
+$$\left(\frac{0.6}{1.1}\right)^2\approx0.30$$
+
+約3割だお。
+
+ただし実機の総電力が7割減るという意味ではない。
+
+別の電源rail、周波数、終端、配線容量、controllerの動作もある。
+
+**やらない夫**：
+その留保まで含めて正解だ。
+
+**やる夫**：
+mobile memoryは、PC用DRAMを遅くしたものではない。
+
+**眠っている時間を安くしながら、起きた瞬間の帯域を増やすDRAM**へ設計の重心を変えたんだお。
+
+---
+### 11-2　microSDだけを本体storageにする
+
+**やる夫**：
+NANDは第10幕でcardになった。
+
+smartphoneにもmicroSD slotを付け、OSもappも写真も全部そこへ置けばよい。
+
+容量不足なら差し替えられる最強設計だお。
+
+**やらない夫**：
+地図appがdatabaseを書換えている最中に、利用者がcardを抜いた。
+
+**やる夫**：
+file systemと更新中のdataが壊れる。
+
+では「抜かないでください」と背面へ赤字で……。
+
+**やらない夫**：
+利用者をねじで固定するな。
+
+同じmicroSDという表示でも、random access、controller、NAND世代、摩耗状態が違う。
+
+OSの起動時間をcard売場の選び方へ委ねるのか。
+
+**やる夫**：
+cameraの交換媒体なら、撮影して後で抜く設計でもよかった。
+
+OSの内部storageは、常時接続、予測可能な機能、電源管理、firmware更新を本体側で管理したい。
+
+交換可能性と引換えに、基板へ直接はんだ付けする理由が出たお。
+
+**やらない夫**：
+MMCのinterfaceと管理機能を、組込み用packageへ閉じ込めたのがeMMC、embedded MultiMediaCardだ。
+
+中にはNANDとcontrollerがあり、外には標準化されたblock deviceとして見える。[^78]
+
+**やる夫**：
+raw NANDならSoC側がpage size、ECC、bad blockを知る。
+
+eMMCならpackage内のcontrollerがそれを隠し、hostはlogical blockを読む。
+
+第10幕のcard controllerを、抜けないchipへしたようなものだお。
+
+**やらない夫**：
+年代を置け。
+
+**やる夫**：
+eMMCは2000年代後半から携帯機器で普及し、2013年のeMMC 5.0、2015年2月公開のeMMC 5.1へ進んだ。
+
+5.1ではcommand queueも導入されたが、基本は8bitのparallel busを共有する。[^78]
+
+**やらない夫**：
+本体へ固定したため、失ったものは。
+
+**やる夫**：
+利用者が容量を増設できない。
+
+NANDだけ故障してもpackage交換、場合によっては基板修理になる。
+
+だが小さく、接触不良がなく、hostとmemoryの組合せをmakerが検証できる。
+
+**交換可能性を捨てた代わりに、実装面積と制御可能性を買った**んだお。
+
+---
+### 11-3　eMMCの一本道へ仕事が詰まる
+
+**やる夫**：
+eMMC 5.1にcommand queueがあるなら完成だお。
+
+cameraで4K動画を書きながら、写真を読み、appを更新してもcontrollerが並べ替える。
+
+**やらない夫**：
+荷物を予約できても、橋が一車線ならどうなる。
+
+**やる夫**：
+eMMCはparallelのdata線をreadとwriteで共有する。
+
+書いている間は読めず、向きを切り替える待ちもある。
+
+SoCが速くなり、cameraとappが同時に要求を出すと、一本の会話が詰まるお。
+
+**やらない夫**：
+では線を128本にするか。
+
+**やる夫**：
+第6幕でbus幅を増やし続けられないとやった。
+
+pin、配線、電力、package面積が増える。
+
+mobileで欲しいのは、少ない線で速く、複数の仕事を待たせないinterfaceだお。
+
+**やらない夫**：
+Universal Flash Storage、UFSは差動serial linkを使い、送信側と受信側の経路を分け、command queueで複数要求を扱う。
+
+eMMCとUFSの違いは、NAND cellの種類ではなく、hostとの会話の設計にもある。[^79]
+
+**やる夫**：
+節目を並べるお。
+
+| 年 | 規格または製品の節目 | 読み方 |
+|---:|---|---|
+| 2011年 | UFS 1.0規格 | mobile向けserial storageの土台 |
+| 2013年 | UFS 2.0規格 | 高速化とqueue処理 |
+| 2015年 | 128GB UFS 2.0量産製品、Galaxy S6採用 | 規格がflagship smartphoneへ入る |
+| 2018〜2020年 | UFS 3.0から3.1 | link高速化とwrite性能管理 |
+| 2022年 | UFS 4.0規格・対応製品 | 2 laneで世代更新 |
+| 2025年 | UFS 4.1規格 | 4.0互換を保ち機能改善 |
+| 2026年 | UFS 5.0規格 | 2 laneで約10.8GB/s級のinterfaceへ |
+
+**やらない夫**：
+2015年の実物を一台置け。
+
+**やる夫**：
+Galaxy S6は3GB LPDDR4と、32／64／128GBのUFS 2.0 storageを採用した。[^80]
+
+Samsungの同社製品例では、eMMC 5.1のsequential read 250MB/sに対し、2019年のUFS 3.0は2100MB/s、2020年のUFS 3.1もread 2100MB/s級とされた。[^79]
+
+これは各規格の保証上限ではなく、特定世代の製品値だお。
+
+**やらない夫**：
+2025年と2026年の行も、店に並んだ台数を表すのではない。
+
+**やる夫**：
+規格が公開された年だお。
+
+2025年1月のUFS 4.1、2026年2月のUFS 5.0は、対応controller、SoC、検証済み製品が普及する時期とは分けて読む。[^81]
+
+**やらない夫**：
+では、この高速化でTLCがSLCへ戻ったのか。
+
+**やる夫**：
+戻っていない。
+
+**NAND cellを変えなくても、serial link、queue、同時read／write、controller schedulingで外から見える性能を上げられる**。
+
+第10幕のSD Expressと同じく、媒体とinterfaceは別の改良軸だお。
+
+---
+### 11-4　DRAMとNANDを一つの黒い箱へ押し込む
+
+**やる夫**：
+LPDDR packageとUFS packageを基板へ並べれば完成だお。
+
+小さなchipを二つ置くくらい、誤差だお。
+
+**やらない夫**：
+その誤差を150mm²取り戻せたら、makerは何を置く。
+
+**やる夫**：
+大きな電池、camera、antenna。
+
+smartphoneでは1mm²が商品機能へ変わる。
+
+DRAMとstorageを近づけるpackageの工夫が要るお。
+
+**やらない夫**：
+似た略語を分けろ。
+
+**やる夫**：
+
+- PoP、Package on Package――application processorの上へ主にDRAM packageを積む
+- eMCP、embedded Multi-Chip Package――DRAMとeMMC系NANDを一つのpackageへ収める
+- ePoP、embedded Package on Package――DRAMとeMMCをまとめ、さらにprocessor上へ積める形にする
+- uMCP、UFS-based Multi-Chip Package――LPDDRとUFSを一つのpackageへ収める
+
+名前が似ていても、processorまで同じpackage構造へ含むか、DRAMとstorageだけを束ねるかが違うお。[^82]
+
+**やらない夫**：
+2015年のePoP例を測れ。
+
+**やる夫**：
+Samsungの3GB LPDDR3＋32GB eMMC ePoPは、別package構成の374.5mm²から225mm²へ実装面積を縮めた。
+
+$$374.5-225=149.5\text{ mm}^2$$
+
+約40%の削減だお。[^82]
+
+**やらない夫**：
+一つにしたら、DRAMとNANDも同じmemoryになったか。
+
+**やる夫**：
+ならない。
+
+LPDDRはCPUの作業中のdataをns級で繰り返し読む揮発性memory。
+
+UFSは電源を切っても残すstorageで、内部ではcontrollerがNANDを管理する。
+
+黒いpackageを共有しても、address空間、protocol、latency、寿命は別だお。
+
+**やらない夫**：
+統合の代償は。
+
+**やる夫**：
+片方だけを増設できない。
+
+故障時の交換単位が大きくなり、熱、package歩留まり、調達の組合せも厳しくなる。
+
+**短い配線と小さな面積を得るほど、修理と構成変更の自由をpackageへ渡す**んだお。
+
+---
+### 11-5　同じGBなら、RAM不足をstorageで埋められる
+
+**やる夫**：
+いまや1TB smartphoneがある。
+
+ならRAMは2GBで十分だお。
+
+足りない作業dataを1TB側へ置けば、合計1002GB memoryだお。
+
+**やらない夫**：
+PCオタクがその足し算をするな。
+
+写真を撮るapp、画像編集app、browserを同時に開け。
+
+**やる夫**：
+2GB RAMが埋まる。
+
+OSが背景appを終了させ、戻るたびUFSからcodeとdataを読み直す。
+
+写真は残るが、編集中の展開画像や実行状態を同じ速度では保持できないお。
+
+**やらない夫**：
+三つの節目を比較しろ。
+
+**やる夫**：
+
+| 年・製品 | 主記憶 | 内蔵storage | 注記 |
+|---|---:|---:|---|
+| 2007年 初代iPhone | 公式発表では容量記載なし | 4／8GB | smartphone市場の出発点 |
+| 2015年 Galaxy S6 | 3GB LPDDR4 | 32／64／128GB UFS 2.0 | LPDDR4とUFSが同居 |
+| 2024年 Galaxy S24 Ultra | 12GB | 256／512GB／1TB | mobile AI世代の一例 |
+
+AppleとSamsungの公式発表で確認できる値だけを置いた。[^76][^80][^83]
+
+初代iPhoneのRAM容量は別資料で推定せず、公式発表にないと明記したお。
+
+**やらない夫**：
+仮想memoryやswapなら、storageをRAMに見せられるだろう。
+
+**やる夫**：
+見かけのaddress空間は広げられる。
+
+でもUFS accessはDRAMより桁違いに遅く、NANDには書換寿命とerase単位がある。
+
+OSが圧縮、page退避、app再起動を使っても、12GB LPDDRを2GB LPDDR＋10GB UFSへ等価交換したことにはならないお。
+
+**やらない夫**：
+では、同じGBは何を数えている。
+
+**やる夫**：
+保存できるbyte数だけだお。
+
+**主記憶のGBは「いま何を同時に働かせられるか」、storageのGBは「電源を切って何を持ち帰れるか」を主に買っている**。
+
+smartphoneはLPDDRとNANDを同じ基板、時には同じpackageへ再会させた。
+
+それでも二つの役割は溶けなかったお。
+
+---
+## 第12幕　SSDは小さなコンピュータだった
+
+---
+### 12-1　住所100番は、物理block 100番に置く
+
+**やる夫**：
+memory cardを大きくしてPCへ挿せばSSDだお。
+
+hostがLBA 100へ書いたdataは、NANDの物理block 100へ置く。
+
+住所が同じならcontrollerも要らない。
+
+**やらない夫**：
+同じlog fileを1000回更新しろ。
+
+**やる夫**：
+block 100だけ1000回eraseされ、ほかの99 blockは新品のまま。
+
+100 blockへ順番に逃がせば、単純化した模型では各block 10回で済む。
+
+$$\frac{1000\text{ 回}}{100\text{ blocks}}=10\text{ 回/block}$$
+
+住所を固定すると、利用者の書込みの偏りが物理寿命の偏りになるお。
+
+**やらない夫**：
+しかもNANDはpageをその場で自由に上書きできない。
+
+新しい場所へ書き、古いpageを無効にし、後で有効pageを集めてblockを消す。
+
+**やる夫**：
+ならhostの論理block address、LBAと、NANDの物理page addressを対応表で分ける。
+
+これがFlash Translation Layer、FTLだお。
+
+**やらない夫**：
+FTLが引き受ける仕事を並べろ。
+
+**やる夫**：
+
+- 論理／物理address変換――LBAを空いている物理pageへ割り当てる
+- out-of-place update――更新dataを別pageへ書き、旧pageを無効化する
+- wear leveling――erase回数が偏らないよう配置を動かす
+- bad-block管理――出荷時・運用中の不良blockを避ける
+- garbage collection、GC――有効pageを移し、無効pageの多いblockを消して再利用する
+- TRIM――OSが不要になったLBAをSSDへ知らせ、移動すべき有効dataを減らす
+
+実装方式は製品ごとに違うが、論理住所と物理場所を分けてNANDの制約を隠す点は共通する。[^84]
+
+**やらない夫**：
+電話交換のSELECTは、行と列の交点を選んだ。
+
+DRAMはrowとcolumnでcellを選んだ。
+
+FTLでは何を選ぶ。
+
+**やる夫**：
+LBA 100という名前から、controllerがその時点の物理pageを選ぶ。
+
+更新のたびに場所が変わってよい。
+
+**SELECTの到達点は、指定された住所にbitが物理的に存在する必要すらないこと**だお。
+
+---
+### 12-2　dataを書けば、停電しても書込み完了だ
+
+**やる夫**：
+FTL表はDRAMへ置けば速い。
+
+`LBA 100 → page 7`を`page 91`へ更新し、data Bを書けばよい。
+
+NANDは不揮発だから停電にも強いお。
+
+**やらない夫**：
+順番を試せ。
+
+現在はpage 7にAがある。
+
+まずpage 91へBを書き、対応表を変える前に電源を切る。
+
+**やる夫**：
+再起動後の表はpage 7を指す。
+
+BはNANDに残っているのに、最新dataとして見つけられない。
+
+では先に表をpage 91へ変えるお。
+
+**やらない夫**：
+表を変えた直後、Bのprogram途中で切る。
+
+**やる夫**：
+今度は表が未完成pageを指す。
+
+順番を逆にしただけでは、どちらかの窓で壊れるお。
+
+**やらない夫**：
+何を「書込み完了」と呼ぶかが足りない。
+
+**やる夫**：
+data pageだけでなく、再起動後に最新の対応を選べるmetadataまで、矛盾なく残った状態だお。
+
+世代番号とchecksumを付けた記録、更新journal、古い対応を残したcopy-on-write、起動時scanなどを組み合わせる。
+
+controller固有の方式は違っても、途中状態から最後の整合した世代を選べる必要がある。
+
+**やらない夫**：
+企業向けSSDで、capacitorを載せる理由は。
+
+**やる夫**：
+突然外部電源が消えても、power-loss protection、PLPが短時間controllerとNANDを動かし、volatile bufferやmetadataの処理を完了させるためだお。
+
+すべてのconsumer SSDが同じPLPを持つわけではない。[^85]
+
+**やらない夫**：
+第1幕では、WRITEはswitchをONにすることだと思っていた。
+
+**やる夫**：
+SSDではもっと長い。
+
+**WRITEとは、再起動後にも論理dataを再構成できる状態まで契約を守ること**だお。
+
+不揮発なcellがあるだけでは、不揮発なsystemにはならない。
+
+---
+### 12-3　NANDを8個並べれば8倍になる
+
+**やる夫**：
+SSDを高速化するのは簡単だお。
+
+NAND channelを8本にし、同時に8 page読めば8倍だお。
+
+**やらない夫**：
+やる夫SSDの模型を測った。
+
+1 channelを100とすると、8 channelで340だった。
+
+**やる夫**：
+3.4倍。
+
+詐欺benchmarkだお。
+
+**やらない夫**：
+お前のfirmwareだ。
+
+同じchannelのbusyなdieへ順番にcommandを投げ、program完了を待ってから次へ進んでいる。
+
+裏ではGCも同じchannelを塞いでいる。
+
+**やる夫**：
+空いているchannelとdieへreadを先に出す。
+
+一方がprogram pulseとverifyを繰り返す間に、別dieのpageを転送する。
+
+host要求、GC、metadata更新を依存関係の許す範囲で並べ替えるお。
+
+**やらない夫**：
+再測定は690だ。
+
+**やる夫**：
+6.9倍。
+
+この100→340→690はscheduling効果を見る架空の模型で、市販SSDの測定値ではない。
+
+理想の800へ届かないのは、channel競合、controller処理、NANDのread／program／erase時間、GCが残るからだお。
+
+**やらない夫**：
+controller makerがNANDを替えるたび、pinとcommandを全部作り直すのか。
+
+**やる夫**：
+それを避ける境界がOpen NAND Flash Interface、ONFIだ。
+
+2006年12月のONFI 1.0は共通の電気interface、command、parameter pageを定め、最大50MB/s級から始まった。
+
+2026年のONFI 6.0は4800MT/sを標準化した。[^86]
+
+**やらない夫**：
+50MB/sと4800MT/sを同じ単位のように割るな。
+
+**やる夫**：
+前者はbyte転送率、後者はinterfaceのtransfer回数で、世代間にsignal方式もある。
+
+ここで見るのは倍率ではなく、NANDとcontrollerの境界が2006年から2026年まで更新されたことだお。
+
+**やらない夫**：
+ONFIはPCとSSDの規格か。
+
+**やる夫**：
+違う。
+
+host――SSD間がSATAやNVMe。
+
+SSD controller――NAND間がONFIの担当だお。
+
+**cellを変える高速化と、command順・channel・die並列性で速くする高速化を分離できた**お。
+
+---
+### 12-4　SATAへつなげばHDDより速い
+
+**やる夫**：
+SSDはPCへつなぐのだからSATAでよい。
+
+HDDと同じconnectorならOSもBIOSもそのまま使える。
+
+互換性こそ正義だお。
+
+**やらない夫**：
+正義だが、無料ではない。
+
+SATA 6Gbit/s系は実効上限が約600MB/s級で、AHCIのNative Command Queuingは1 device当たり最大32 commandだ。[^87]
+
+8 coreが大量の小さなI/Oを出すとどうなる。
+
+**やる夫**：
+一つの短い列へ集まり、driverとcontrollerがlockを奪い合う。
+
+NAND側に8 channelあっても、host側の受付がHDD時代の狭い窓だお。
+
+**やらない夫**：
+そこでPCI Express上の不揮発memory向けに、NVM Express、NVMeが作られた。
+
+NVMe 1.0は2011年3月に公開された。[^88]
+
+**やる夫**：
+submission queue、SQへhostがcommandを書く。
+
+queueのtailが進んだとdoorbell registerでcontrollerへ知らせる。
+
+controllerはdirect memory access、DMAでcommandとdataを運び、完了をcompletion queue、CQへ書く。
+
+interruptをcoreへ振り分ければ、多数のqueueを並行に扱えるお。
+
+**やらない夫**：
+数の桁は。
+
+**やる夫**：
+NVMe architectureは最大64K級のI/O queueと、各queue最大64K級のcommandを扱える設計だ。
+
+実製品が常に上限まで実装する意味ではないが、AHCIの1 device当たり32 commandとは発想の桁が違う。[^88]
+
+**やらない夫**：
+NAND cellのthreshold分布は変わったか。
+
+**やる夫**：
+変わらない。
+
+**memoryの進歩が、cell、controller、busを越え、OSとCPU coreが仕事を渡す入口まで来た**んだお。
+
+互換性のためSATAを使うSSDと、並列性を生かすNVMe SSDが、同じNANDを別の性格の商品にする。
+
+---
+### 12-5　箱の最高速度で100GBをcopyする
+
+**やる夫**：
+箱にsequential write 2000MB/sとある。
+
+100GB fileなら50秒だお。
+
+**やらない夫**：
+最初の20GBは2000MB/s、その後は400MB/sだった。
+
+計算し直せ。
+
+**やる夫**：
+最初は、TLCやQLCの一部を1bit/cellのように使うSLC write cacheへ入る。
+
+20GBを2000MB/sなら約10秒。
+
+cacheが埋まった後の80GBは、
+
+$$\frac{80\text{ GB}}{0.4\text{ GB/s}}=200\text{ s}$$
+
+合計210秒、平均は、
+
+$$\frac{100\text{ GB}}{210\text{ s}}\approx476\text{ MB/s}$$
+
+箱の数字から4倍以上ずれたお。
+
+**やらない夫**：
+この20GBと速度は仕組みを見る架空の例だ。
+
+実際のcache容量や速度は製品、空き容量、firmware、温度で変わる。
+
+**やる夫**：
+短いbenchmarkの間はSLC bufferがburstを受ける。
+
+長いwriteではmulti-bit cellへ移す速度が表へ出る。
+
+さらにGCが有効pageを移し、空きblockを作る仕事も競合するお。
+
+**やらない夫**：
+連続負荷でcontrollerとNANDが熱くなった。
+
+**やる夫**：
+温度上限へ近づけば、dynamic thermal throttlingが性能を段階的に下げてdata reliabilityを守る。
+
+Samsungのconsumer SSD説明にも、SLC buffering、数百GB級の転送時の性能抑制、thermal制御が明記されている。[^89]
+
+**やらない夫**：
+故障か。
+
+**やる夫**：
+必ずしも故障ではない。
+
+cache、GC、温度という内部状態で、同じdriveの速度が時間とともに変わる。
+
+SD cardで最大readとV30の最低持続writeを分けたのと同じだお。
+
+**peak bandwidthだけでなく、burst性能とsustained性能を別々に問わないと、実際の仕事時間は読めない**お。
+
+---
+### 12-6　1TBより多いNANDを隠している
+
+**やる夫**：
+1TB SSDを分解したら、利用者に見えない容量がある。
+
+買ったNANDを隠す容量詐欺だお。
+
+**やらない夫**：
+まず単位を揃えろ。
+
+架空の「やる夫SSD」は、物理側に1TiB、利用者へ10進の1TBを見せるとする。
+
+**やる夫**：
+$$2^{40}=1{,}099{,}511{,}627{,}776\text{ byte}$$
+
+利用者の$10^{12}$byteとの差は、
+
+$$1{,}099{,}511{,}627{,}776-1{,}000{,}000{,}000{,}000=99{,}511{,}627{,}776\text{ byte}$$
+
+user容量を分母にしたover-provisioning率は約9.95%。
+
+raw容量を分母にすれば約9.05%だお。
+
+**やらない夫**：
+その領域で何をする。
+
+**やる夫**：
+bad blockの代替、GC中の逃し場所、wear leveling、controller metadata、製品設計によってはECC用領域を支える。
+
+空き場所がなければ、1 page更新するたび有効dataを何度も移し、性能と寿命が悪化する。
+
+**隠した容量は、見える1TBを長く同じLBAとして見せる作業場**なんだお。
+
+**やらない夫**：
+ただし市販の「1TB」という表示だけから、必ず1TiBのNANDが載るとは断定できない。
+
+**やる夫**：
+die容量、factory bad block、ECCの置き方、可変SLC cache、firmware予約領域は製品ごとに違う。
+
+さっきの1TiB→1TBはover-provisioningを計算する模型で、全製品の部品表ではないお。
+
+**やらない夫**：
+値札ボードを更新しろ。
+
+**やる夫**：
+2008年9月のIntel X25-Mは80GBのMLC SATA SSDで、1000個購入時の公表価格が595ドルだった。
+
+$$\frac{80\times10^9\times8}{595}\approx1.08\times10^9\text{ bit/ドル}$$
+
+約10.8億bit/ドルだお。[^90]
+
+同じ年のPC用driveとしては高価だが、250MB/s級read、10 channel、wear levelingを含むcontrollerとfirmwareまで商品だった。
+
+**やらない夫**：
+2019年の1TB microSDは約178億bit/ドルだったな。
+
+**やる夫**：
+単純なbit単価なら約16倍だが、11年の差があり、cardとSSDではinterface、parallelism、耐久設計、性能保証が違う。
+
+容量だけで価格を裁けないお。
+
+**やらない夫**：
+SSDの中に何が入った。
+
+**やる夫**：
+複数channelのNAND、controller core、SRAMやDRAM、ECC、FTL、scheduler、GC、wear leveling、PLP、SATAまたはNVMe interface、firmware。
+
+**SSDはNANDを箱へ入れただけではない。NANDの不都合を隠し、LBAという約束を守る専用コンピュータだった**お。
+
+**やらない夫**：
+その小さなコンピュータでも、平面のcellを縮め続ければ容量は増やせるか。
+
+**やる夫**：
+第9幕のQLCはthreshold窓を16分割した。
+
+横へ縮めればcell間干渉と漏れが増え、判定余裕がさらに狭くなる。
+
+土地が足りないなら――次は上へ積むしかないお。
+
+---
 ## 第6幕　電源を切っても残せ、ただし壊れることは認めろ
 
 ---
@@ -7021,6 +7759,36 @@ $$32\times 8\times 2^{30}\approx2.75\times10^{11}\text{ bit}$$
 [^74]: [SD Association『SD Express Cards with PCIe and NVMe Interfaces White Paper』](https://www.sdcard.org/wp-content/uploads/2020/11/SD_Express_Cards_with_PCIe_and_NVMe_Interfaces_White_Paper.pdf), 2026年8月10日参照. SD Expressが一列目のlegacy SD interfaceと二列目のPCIe／NVMe interfaceを使い分け、従来hostとの互換性を維持する一方、UHS-II modeには対応しない構成を説明している。
 
 [^75]: [Western Digital『Western Digital Unveils World’s Fastest 1TB UHS-I microSD Card』](https://www.westerndigital.com/en-se/company/newsroom/press-releases/2019/2019-02-25-western-digital-unveils-worlds-fastest-1tb-uhs-i-microsd-card), 2019年2月25日. SanDisk Extreme 1TB microSDXCを希望小売価格449.99ドルで発表した。初期microSDの32／64／128MBについては[SD Associationの20周年史](https://www.sdcard.org/press/thoughtleadership/celebrating-20-years-of-microsd/)も参照した。
+
+[^76]: [Apple『Apple Reinvents the Phone with iPhone』](https://www.apple.com/jp/newsroom/2007/01/09Apple-Reinvents-the-Phone-with-iPhone/), 2007年1月9日. 初代iPhoneを4GB・499ドル、8GB・599ドルで発表した。本文では公式発表に記載されたstorage容量のみを用い、RAM容量は推定値を置いていない。
+
+[^77]: Micron Technology, [『LPDRAM Mobile and Embedded Memory』](https://www.micron.com/content/dam/micron/global/public/products/product-flyer/flyer-lpdram-mobile-embedded.pdf)および[『FAQs』](https://www.micron.com/sales-support/sales/faqs); Samsung Electronics, [『Samsung Launches Highest-Capacity Mobile DRAM』](https://news.samsung.com/us/samsung-launches-highest-capacity-mobile-dram-accommodate-next-generation-smartphones/)、[『Samsung Develops Industry’s First LPDDR5X DRAM』](https://news.samsung.com/us/samsung-develops-industrys-first-lpddr5x-dram/); JEDEC, [『JEDEC Releases New LPDDR6 Standard』](https://www.businesswire.com/news/home/20250709315796/en/JEDEC-Releases-New-LPDDR6-Standard-to-Enhance-Mobile-and-AI-Memory-Performance), 2026年8月10日参照. 本文の表はSamsungの代表製品発表年とJEDEC規格公開年を区別した概観である。LPDDR4Xの0.6VはI/O電源VDDQの値で、DRAM全体の全電源が0.6Vという意味ではない。
+
+[^78]: [Micron Technology『Managed NAND』](https://www.micron.com/products/storage/managed-nand)および[KIOXIA『Understanding Wear Leveling in NAND Flash Memory』](https://www.kioxia.com/content/dam/kioxia/shared/business/memory/mlc-nand/asset/productbrief/KIOXIA_Understanding_Wear_Leveling_Tech_Brief.pdf), 2026年8月10日参照. managed NANDがraw NANDとcontrollerを一packageへ統合すること、eMMC 5.1が2015年2月に公開されたJEDEC規格であることを示す。command queueについては[Samsung Semiconductor『Introducing eMMC 5.1』](https://semiconductor.samsung.com/news-events/tech-blog/introducing-emmc-5.1-the-next-step-in-relentless-flash-innovation/)も参照した。
+
+[^79]: [Samsung Semiconductor『Semiconductor Glossary: UFS』](https://semiconductor.samsung.com/support/tools-resources/dictionary/semiconductor-glossary-ufs/)、[『Samsung Begins Mass Production of the Fastest Storage for Flagship Smartphones』](https://semiconductor.samsung.com/us/news-events/news/samsung-begins-mass-production-of-the-fastest-storage-for-flagship-smartphones/)および[『UFS Takes Memory Card Technology to the Next Level』](https://semiconductor.samsung.com/news-events/tech-blog/samsung-electronics-ufs-takes-memory-card-technology-to-the-next-level/), 2026年8月10日参照. eMMCの共有parallel busに対するUFSの差動serial link、専用read／write経路、command queueを説明する。速度値はSamsung製品の比較値であり、規格がすべての製品へ保証する値ではない。
+
+[^80]: [Samsung Electronics『Samsung Galaxy S6 and S6 edge Launched in India』](https://news.samsung.com/in/samsung-galaxy-s6-and-s6-edge-launched-in-india), 2015年3月23日. Galaxy S6／S6 edgeの3GB LPDDR4 RAMと32／64／128GB UFS 2.0 storageを記載する。
+
+[^81]: JEDEC, [『Updates to Universal Flash Storage UFS and Memory Interface Standards』](https://www.businesswire.com/news/home/20250108099318/en/JEDEC-Announces-Updates-to-Universal-Flash-Storage-UFS-and-Memory-Interface-Standards), 2025年1月8日; [同2026年発表](https://www.businesswire.com/news/home/20260226710161/en/JEDEC-Announces-Updates-to-Universal-Flash-Storage-UFS-and-Memory-Interface-Standards), 2026年2月26日. UFS 4.1の4.0 hardware互換と約4.2GB/s級interface、UFS 5.0のM-PHY 6／UniPro 3採用と2 laneで約10.8GB/s級の有効帯域を発表した。規格公開と市販端末への普及は同じ年とは限らない。
+
+[^82]: Samsung Electronics, [『Mass Producing High-Density ePoP Memory for Smartphones』](https://news.samsung.com/global/samsung-electronics-mass-producing-high-density-epop-memory-for-smartphones)および[『Packaging With a Punch』](https://news.samsung.com/global/packaging-with-a-punch-editorial); [Micron Technology『UFS-based MCP』](https://www.micron.com/products/multichip-packages/ufs-based-mcp), 2026年8月10日参照. PoP／eMCP／ePoP／uMCPの構成と、2015年ePoP例の実装面積374.5mm²から225mm²への縮小を示す。package統合後もDRAMとUFSは論理的に別のinterfaceである。
+
+[^83]: [Samsung Electronics『Enter the New Era of Mobile AI With Samsung Galaxy S24 Series』](https://news.samsung.com/global/enter-the-new-era-of-mobile-ai-with-samsung-galaxy-s24-series), 2024年1月18日. Galaxy S24 Ultraの12GB memoryと256／512GB／1TB storage構成を示す。
+
+[^84]: [Samsung Semiconductor『Samsung Solid State Drive White Paper』](https://semiconductor.samsung.com/resources/white-paper/Samsung_SSD_White_Paper.pdf)および[KIOXIA『Understanding Wear Leveling in NAND Flash Memory』](https://www.kioxia.com/content/dam/kioxia/shared/business/memory/mlc-nand/asset/productbrief/KIOXIA_Understanding_Wear_Leveling_Tech_Brief.pdf), 2026年8月10日参照. wear leveling、reserved block、ECC、TRIM、garbage collectionをcontroller／firmwareが担うことを説明する。FTLのmappingや更新手順は製品固有で、本文のpage番号は原理を示す模型である。
+
+[^85]: [Samsung『Power Loss Protection: How SSDs Are Protecting Data Integrity』](https://insights.samsung.com/2016/03/22/power-loss-protection-how-ssds-are-protecting-data-integrity-white-paper/), 2016年3月22日および[Samsung Semiconductor『PM863 White Paper』](https://semiconductor.samsung.com/resources/others/PM863_White_Paper.pdf), 2026年8月10日参照. 電源断時にvolatile cache内のdataが媒体へ到達しない危険と、企業向けSSDのpower-loss protection例を説明する。すべてのSSDが同じ回路や復旧方式を持つことを意味しない。
+
+[^86]: ONFI Workgroup, [『Open NAND Flash Interface Specification Revision 1.0』](https://onfi.org/files/onfi_1_0_gold.pdf), 2006年12月28日および[『ONFI Specification Revision 6.0』](https://onfi.org/files/ONFI_6_0_Final.pdf), 2026年. ONFI 1.0は共通command、parameter page、最大50MB/s級interfaceを定め、ONFI 6.0は4800MT/sを標準化した。MB/sとMT/sは異なる物理量なので、本文では単純な倍率比較をしていない。
+
+[^87]: [SATA-IO『Frequently Asked Questions About SATA 6Gb/s』](https://sata-io.org/sites/default/files/documents/SATA-Revision-3.0-FAQ-FINAL.pdf)および[Intel『Serial ATA AHCI: Specification, Rev. 1.3.1』](https://www.intel.com/content/www/us/en/io/serial-ata/serial-ata-ahci-spec-rev1-3-1.html), 2026年8月10日参照. SATA Revision 3.0の6Gbit/s・600MB/sと、AHCIのNative Command Queuingがdeviceごとに最大32 entriesを扱うことを示す。
+
+[^88]: [NVM Express『SSD Drives Promise』](https://nvmexpress.org/ssd-drives-promise/), 2011年3月1日および[NVM Express『NVM Express Base Specification 2.0a』](https://nvmexpress.org/wp-content/uploads/NVMe-NVM-Express-2.0a-2021.07.26-Ratified.pdf), 2026年8月10日参照. NVMe 1.0の公開時期、最大64K級のI/O queueと各queue 64K級commandというarchitecture、submission／completion queue、doorbell、DMA、interruptの関係を定義する。実製品の実装上限はcontrollerにより異なる。
+
+[^89]: [Samsung Semiconductor『Internal SSD Product Information』](https://org-ap-publish.semiconductor.samsung.com/us/consumer-storage/support/faqs/internalssd-product-information/)および[『Samsung SSD 950 PRO White Paper』](https://download.semiconductor.samsung.com/resources/white-paper/Samsung_SSD_950_PRO_White_paper.pdf), 2026年8月10日参照. multi-bit cellへ移すSLC buffering、長時間負荷とDynamic Thermal Throttlingによる性能変化を説明する。本文の20GB／2000MB/s／400MB/sは計算用の架空例である。
+
+[^90]: [Intel『Intel Solid-State Drives Deliver Industry-Leading Performance』](https://www.intel.com/pressroom/archive/releases/2008/20080908comp.htm), 2008年9月8日. X25-M 80GB MLC SATA SSDについて、最大250MB/s read、70MB/s write、10-channel architecture、wear levelingを含むcontroller／firmware、1000個購入時595ドルという公表値を示す。
 
 [1]: https://www.computerhistory.org/timeline/computers/ "Timeline of Computer History"
 [2]: https://www.bell-labs.com/about/awards/1956-nobel-prize-physics/ "1956 Nobel Prize in Physics"
