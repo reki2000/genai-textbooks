@@ -23,9 +23,13 @@ Markdown を `comments/{book}/{id}.md` へ1件1ファイルで置く。`docs/` �
 from __future__ import annotations
 
 import argparse
+import fcntl
+import hashlib
 import json
+import os
 import re
 import sys
+import tempfile
 import time
 import unicodedata
 from dataclasses import dataclass, field
@@ -58,11 +62,19 @@ WORDING_CONTEXT_LINES = 6
 SECTION_WINDOW_LIMIT = 400
 MAX_BODY_CHARS = 4000
 MAX_QUOTE_CHARS = 400
+COMMENT_SCHEMA = "comment/v1"
+LEGACY_COMMENT_SCHEMA = "comment/v0-legacy"
+EDIT_ANCHOR_MAX_LINES = 12
+EDIT_ANCHOR_MAX_CHARS = 1200
 
 
 
 class CommentError(ValueError):
     """入力が不正でコメントを作れない。HTTP 層は 400 として返す。"""
+
+
+class CommentConflict(CommentError):
+    """読み込み後に別の更新が入り、安全に保存できない。HTTP 層は 409 にする。"""
 
 
 class WaiterBusy(RuntimeError):
@@ -260,14 +272,21 @@ class Comment:
     answer: str = ""
     answered: str = ""
     history: list[ThreadMessage] = field(default_factory=list)
+    schema: str = COMMENT_SCHEMA
+    revision: int = 0
+    _source_hash: str | None = field(default=None, repr=False, compare=False)
 
     @property
     def path(self) -> Path:
         return COMMENTS_DIR / self.book / f"{self.id}.md"
 
-    def to_frontmatter(self) -> dict[str, Any]:
+    def to_frontmatter(
+        self, *, schema: str | None = None, revision: int | None = None
+    ) -> dict[str, Any]:
         data: dict[str, Any] = {
             "type": "comment",  # OKF v0.1 の唯一の必須フィールド
+            "schema": schema if schema is not None else self.schema,
+            "revision": revision if revision is not None else self.revision,
             "id": self.id,
             "book": self.book,
             "part": self.part,
@@ -281,9 +300,12 @@ class Comment:
             data["answered"] = self.answered
         return data
 
-    def render(self) -> str:
+    def render(self, *, schema: str | None = None, revision: int | None = None) -> str:
         front = yaml.safe_dump(
-            self.to_frontmatter(), allow_unicode=True, sort_keys=False, default_flow_style=False
+            self.to_frontmatter(schema=schema, revision=revision),
+            allow_unicode=True,
+            sort_keys=False,
+            default_flow_style=False,
         )
         parts = ["---\n", front, "---\n\n"]
         user_count = 0
@@ -322,6 +344,23 @@ def parse_comment(text: str) -> Comment:
     if not match:
         raise CommentError("frontmatter が無い")
     front = yaml.safe_load(match.group("front")) or {}
+    if not isinstance(front, dict) or front.get("type") != "comment":
+        raise CommentError("type: comment ではない")
+    raw_schema = front.get("schema")
+    if raw_schema is None:
+        schema = LEGACY_COMMENT_SCHEMA
+        revision = 0
+    elif raw_schema == COMMENT_SCHEMA:
+        raw_revision = front.get("revision")
+        if isinstance(raw_revision, bool) or not isinstance(raw_revision, int) or raw_revision < 1:
+            raise CommentError(f"{COMMENT_SCHEMA} の revision が不正")
+        schema = COMMENT_SCHEMA
+        revision = raw_revision
+    else:
+        raise CommentError(f"未対応の comment schema: {raw_schema!r}")
+    anchor_data = front.get("anchor", {}) or {}
+    if not isinstance(anchor_data, dict):
+        raise CommentError("anchor が mapping ではない")
     body_text = match.group("body")
 
     answer = ""
@@ -353,20 +392,29 @@ def parse_comment(text: str) -> Comment:
         if answer:
             history.append(ThreadMessage("assistant", str(front.get("answered", "")), answer))
 
-    return Comment(
+    try:
+        part = int(front.get("part", 1) or 1)
+    except (TypeError, ValueError) as exc:
+        raise CommentError("part が不正") from exc
+    comment = Comment(
         id=str(front.get("id", "")),
         book=str(front.get("book", "")),
-        part=int(front.get("part", 1) or 1),
+        part=part,
         kind=str(front.get("kind", "wording")),
         unit=str(front.get("unit", "sentence")),
         status=str(front.get("status", "open")),
         created=str(front.get("created", "")),
-        anchor=Anchor.from_dict(front.get("anchor", {}) or {}),
+        anchor=Anchor.from_dict(anchor_data),
         body=body,
         answer=answer,
         answered=str(front.get("answered", "")),
         history=history,
+        schema=schema,
+        revision=revision,
+        _source_hash=_text_hash(text),
     )
+    _validate_comment(comment)
+    return comment
 
 
 # --------------------------------------------------------------------------
@@ -422,10 +470,83 @@ def find_comment(book: str, comment_id: str) -> Comment:
     return parse_comment(path.read_text(encoding="utf-8"))
 
 
+def _text_hash(text: str) -> str:
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def _validate_comment(comment: Comment) -> None:
+    if not COMMENT_ID_RE.match(comment.id):
+        raise CommentError(f"comment id が不正: {comment.id!r}")
+    check_book_id(comment.book)
+    if comment.part < 1:
+        raise CommentError(f"part が不正: {comment.part}")
+    if comment.kind not in KINDS:
+        raise CommentError(f"kind が不正: {comment.kind!r}")
+    if comment.unit not in UNITS:
+        raise CommentError(f"unit が不正: {comment.unit!r}")
+    if comment.status not in STATUSES:
+        raise CommentError(f"status が不正: {comment.status!r}")
+
+
+def _atomic_replace_text(path: Path, text: str) -> None:
+    """同じディレクトリの一時ファイルを同期してから原子的に置き換える。"""
+    temporary: Path | None = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="w", encoding="utf-8", dir=path.parent, prefix=f".{path.name}.", delete=False
+        ) as handle:
+            temporary = Path(handle.name)
+            handle.write(text)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, path)
+        temporary = None
+        directory_fd = os.open(path.parent, os.O_RDONLY)
+        try:
+            os.fsync(directory_fd)
+        finally:
+            os.close(directory_fd)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
+
+
 def write_comment(comment: Comment) -> Path:
+    """hash/revision を検査し、競合が無い場合だけ1 revision進めて保存する。"""
+    _validate_comment(comment)
     path = comment.path
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(comment.render(), encoding="utf-8")
+    lock_path = path.parent / ".comments-write.lock"
+    with lock_path.open("a+b") as lock:
+        fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
+        try:
+            if path.exists():
+                current_text = path.read_text(encoding="utf-8")
+                current_hash = _text_hash(current_text)
+                if comment._source_hash is None:
+                    raise CommentConflict(f"コメントが既に存在するため作成できない: {path.name}")
+                if current_hash != comment._source_hash:
+                    raise CommentConflict(
+                        f"コメント {comment.book}/{comment.id} は読み込み後に更新された。再読してやり直すこと"
+                    )
+                current = parse_comment(current_text)
+                if current.schema != comment.schema or current.revision != comment.revision:
+                    raise CommentConflict(
+                        f"コメント {comment.book}/{comment.id} の revision が変わった。再読してやり直すこと"
+                    )
+            elif comment._source_hash is not None or comment.revision != 0:
+                raise CommentConflict(
+                    f"コメント {comment.book}/{comment.id} が読み込み後に削除された。再読してやり直すこと"
+                )
+
+            next_revision = comment.revision + 1
+            rendered = comment.render(schema=COMMENT_SCHEMA, revision=next_revision)
+            _atomic_replace_text(path, rendered)
+            comment.schema = COMMENT_SCHEMA
+            comment.revision = next_revision
+            comment._source_hash = _text_hash(rendered)
+        finally:
+            fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
     return path
 
 
@@ -575,19 +696,28 @@ def window_for(
     return window_start, window_end
 
 
-def edit_anchor(lines: list[str], span: tuple[int, int]) -> tuple[str, bool]:
+def edit_anchor(
+    lines: list[str], span: tuple[int, int], *, unit: str = "sentence"
+) -> tuple[str, bool]:
     """編集ツールの old_string 候補と、その一意性。
 
     一意でなければ前の行を足して伸ばす。ここで一意性まで確かめておくと、
     エージェント側が本文を検索し直す必要が無くなる。
     """
+    if unit == "section":
+        return "", False
     source = "".join(lines)
     start, end = span
     for top in range(start, max(start - 6, -1), -1):
         candidate = "".join(lines[top : end + 1])
+        if end - top + 1 > EDIT_ANCHOR_MAX_LINES or len(candidate) > EDIT_ANCHOR_MAX_CHARS:
+            return "", False
         if candidate and source.count(candidate) == 1:
             return candidate, True
-    return "".join(lines[start : end + 1]), False
+    candidate = "".join(lines[start : end + 1])
+    if end - start + 1 > EDIT_ANCHOR_MAX_LINES or len(candidate) > EDIT_ANCHOR_MAX_CHARS:
+        return "", False
+    return candidate, False
 
 
 # --------------------------------------------------------------------------
@@ -842,9 +972,15 @@ def render_payload(comment: Comment, *, group: list[Comment] | None = None, scop
     out.append("")
 
     if len(resolved) == 1:
-        candidate, unique = edit_anchor(lines, spans[resolved[0].id])  # type: ignore[arg-type]
+        resolved_comment = resolved[0]
+        candidate, unique = edit_anchor(
+            lines, spans[resolved_comment.id], unit=resolved_comment.unit  # type: ignore[arg-type]
+        )
         out.append("--- edit anchor ---")
-        out.append("一意性: " + ("OK（この文字列で置換できる）" if unique else "NG（窓から広げて特定すること）"))
+        if not candidate:
+            out.append("一意性: 該当なし（選択範囲が広すぎる。窓から修正箇所を選ぶこと）")
+        else:
+            out.append("一意性: " + ("OK（この文字列で置換できる）" if unique else "NG（窓から広げて特定すること）"))
         out.append(repr(candidate))
         out.append("")
 
@@ -1031,6 +1167,9 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
         return args.func(args)
+    except CommentConflict as exc:
+        print(f"conflict: {exc}", file=sys.stderr)
+        return 2
     except CommentError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1

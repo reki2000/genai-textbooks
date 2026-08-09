@@ -31,6 +31,7 @@
   var STATUS_ORDER = ['open', 'answered', 'stale', 'resolved']
 
   var AGENT_LABEL = {
+    loading: '確認中',
     waiting: '待機中',
     initializing: '初期化中',
     working: '対応中',
@@ -38,7 +39,9 @@
   }
 
   var state = {
-    agent: { state: 'disconnected' },
+    // 初回の一覧 API が返すサーバ側の在席情報を正本にする。応答前に未接続と
+    // 決めつけると、画面リロードのたびに担当が消えたように見えてしまう。
+    agent: { state: 'loading' },
     book: null,
     part: 1,
     vm: null,
@@ -367,7 +370,7 @@
       .join(',')
   }
 
-  function reloadComments() {
+  function reloadComments(forceRender) {
     if (!state.book) return Promise.resolve()
     return api('?book=' + encodeURIComponent(state.book))
       .then(function (data) {
@@ -376,8 +379,9 @@
         // 1秒ごとに取りに行くので、中身が変わっていないなら描き直さない
         // （入力欄のフォーカスと履歴のスクロール位置を壊さないため）。
         var same = signature(comments) === signature(state.comments) &&
-          agent.state === state.agent.state && agent.model === state.agent.model
-        if (same) return
+          agent.state === state.agent.state && agent.model === state.agent.model &&
+          agent.effort === state.agent.effort && agent.session === state.agent.session
+        if (same && !forceRender) return
         state.agent = agent
         state.comments = comments
         state.markers = null
@@ -511,13 +515,14 @@
           return '<div class="dev-comment-message is-' + message.role + '"><b>' + label + '</b>' +
             timestamp + '<div>' + escapeHtml(message.body) + '</div></div>'
         }).join('') + '</div>'
-      if (comment.status === 'answered' || comment.status === 'stale') {
+      if (comment.status === 'stale') {
         detail += '<button type="button" data-resolve="' + comment.id + '">確認して閉じる</button>'
       }
       if (comment.status === 'answered') {
         detail += '<form class="dev-comment-followup" data-followup="' + comment.id + '">' +
           '<textarea rows="3" placeholder="対応結果に追加コメント"></textarea>' +
           '<span class="dev-comment-followup-error"></span>' +
+          '<button type="button" data-resolve="' + comment.id + '">確認して閉じる</button>' +
           '<button type="submit">追加送信</button></form>'
       }
       detail += '</div>'
@@ -792,11 +797,21 @@
   // -------------------------------------------------------------- クリック
 
   // 選択は本文をなぞって作る。パネル内の操作で選択が消えるのを避けたいので、
-  // 本文の中で指を離したときだけ拾う。空の選択（ただのクリック）では捨てない。
+  // 本文の中で指を離したときだけ拾う。本文のシングルクリックで空の選択に
+  // なった場合は、直前のコメント対象を外す。
   document.addEventListener('mouseup', function (event) {
     if (!state.book) return
     if (event.target.closest && event.target.closest('#dev-comment-panel')) return
-    window.setTimeout(captureSelection, 0)
+    var article = event.target.closest && event.target.closest('.markdown-section')
+    window.setTimeout(function () {
+      var selection = window.getSelection()
+      if (article && event.detail === 1 && (!selection || selection.isCollapsed)) {
+        clearSelection()
+        renderPanel()
+        return
+      }
+      captureSelection()
+    }, 0)
   })
 
   document.addEventListener('keyup', function (event) {
@@ -845,10 +860,10 @@
       state.markdown = ''
       fetchMarkdown().then(function (text) { state.markdown = text }).catch(function () {})
     }
-    // パネルは部ごとに中身が変わる。コメント一覧そのものが同じでも描き直す。
-    renderPanel()
     repaint()
-    reloadComments()
+    // 初回描画もサーバが保持する担当情報の取得後に行う。クライアントの仮状態を
+    // 「未接続」として一瞬表示しない。
+    reloadComments(true)
   }
 
   function currentMarkdownPath() {
@@ -940,16 +955,12 @@
 
   // docsify は取得済みの Markdown をキャッシュするので、_fetch() を呼び直しても
   // 古い本文が描き直されるだけ。自前で取り直し、その中身を描画系へ直接渡す。
-  function softReload(changed) {
-    var target = currentMarkdownPath()
-    var onlyThisPage = target && changed.length > 0 && changed.every(function (path) { return path === target })
-    if (!onlyThisPage || !state.vm || typeof state.vm._renderMain !== 'function') {
-      window.location.reload()
-      return
-    }
+  function softReload() {
+    if (!currentMarkdownPath() || !state.vm || typeof state.vm._renderMain !== 'function') return
     var scroll = window.scrollY
     fetchMarkdown()
       .then(function (text) {
+        if (text === state.markdown) return
         var region = changedRegion(state.markdown, text)
         state.markdown = text
         state.vm._renderMain(text)
@@ -960,9 +971,8 @@
           reloadComments()
         }, 60)
       })
-      .catch(function () {
-        window.location.reload()
-      })
+      // 最後に描画できた本文を維持する。次の revision か手動更新で再試行される。
+      .catch(function () {})
   }
 
   function pollRevision() {
@@ -975,7 +985,7 @@
         }
         if (status.revision !== state.revision) {
           state.revision = status.revision
-          softReload(status.changed || [])
+          softReload()
         }
       })
       .catch(function () {})
@@ -1003,6 +1013,10 @@
     'animation:dev-comment-fade 1.6s ease-out forwards}',
     '@keyframes dev-comment-fade{0%{opacity:1}70%{opacity:.9}100%{opacity:0}}',
     'body.dev-comment-mode .content{padding-right:340px}',
+    // 本文表示中の要約ボタンは、コメントペインではなく本文ペインの右上に置く。
+    // 要約へ切り替えた後はスライドに全幅を渡し、コメントペインも隠す。
+    'body.dev-comment-mode:not(.slide-mode) #slide-summary-toggle{right:356px}',
+    'body.dev-comment-mode.slide-mode #dev-comment-panel{display:none!important}',
 
     '#dev-comment-panel{display:none;position:fixed;top:0;right:0;bottom:0;width:320px;z-index:28;',
     'flex-direction:column;background:var(--background,#fff);color:var(--textColor,#34495e);',
@@ -1028,7 +1042,10 @@
     '#dev-comment-log li.dev-comment-empty{border:none;background:none;opacity:.6;padding:8px}',
     '.dev-comment-line{display:flex;gap:6px;align-items:baseline;padding:6px 8px;cursor:pointer}',
     '.dev-comment-status{flex:none;width:1.3em;text-align:center;font-size:12px;line-height:1.4}',
-    '.status-open .dev-comment-status{color:#e6a23c}',
+    '.status-open .dev-comment-status{display:inline-block;color:#e6a23c;',
+    'animation:dev-comment-hourglass 1.6s ease-in-out infinite;transform-origin:center}',
+    '@keyframes dev-comment-hourglass{0%,35%{transform:rotate(0)}50%,85%{transform:rotate(180deg)}',
+    '100%{transform:rotate(360deg)}}',
     '.status-answered .dev-comment-status{color:var(--accent,#42b983)}',
     '.status-stale .dev-comment-status{color:var(--highlightColor,#d22778)}',
     '.status-resolved .dev-comment-status{opacity:.5}',
@@ -1058,8 +1075,12 @@
     '.dev-comment-message.is-user{border-left:3px solid #e6a23c}',
     '.dev-comment-message small{display:block;font-size:9px;opacity:.55}',
     '.dev-comment-followup{display:grid;grid-template-columns:1fr auto;gap:5px;margin-top:7px}',
-    '.dev-comment-followup textarea{grid-column:1/-1;resize:vertical;font:inherit;padding:5px}',
-    '.dev-comment-followup-error{font-size:10px;color:var(--highlightColor,#d22778)}',
+    '.dev-comment-followup textarea{grid-column:1/-1;box-sizing:border-box;resize:vertical;',
+    'font:inherit;padding:5px;border-radius:4px;background:var(--codeBackgroundColor,#fff);',
+    'color:inherit;border:1px solid var(--borderColor,rgba(0,0,0,.2))}',
+    '.dev-comment-followup-error{grid-column:1/-1;font-size:10px;',
+    'color:var(--highlightColor,#d22778)}',
+    '.dev-comment-followup button[type=submit]{justify-self:end}',
     '.dev-comment-answer{margin-top:6px;padding:6px 8px;border-radius:4px;white-space:pre-wrap;',
     'background:var(--background,#fff);border:1px solid var(--borderColor,rgba(0,0,0,.12))}',
     '.dev-comment-detail button{margin-top:6px;padding:3px 10px;border-radius:4px;cursor:pointer;',
@@ -1085,7 +1106,9 @@
 
     '.dev-comment-flash{animation:dev-comment-flash 1s ease-out}',
     '@keyframes dev-comment-flash{from{background:rgba(66,185,131,.14)}to{background:transparent}}',
+    '@media (prefers-reduced-motion:reduce){.status-open .dev-comment-status{animation:none}}',
     '@media (max-width:768px){body.dev-comment-mode .content{padding-right:0}',
+    'body.dev-comment-mode:not(.slide-mode) #slide-summary-toggle{right:16px}',
     '#dev-comment-panel{width:100%;top:auto;height:60vh}}',
   ].join('')
 
