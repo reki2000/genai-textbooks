@@ -486,8 +486,10 @@
     // 未接続のときは、状態表示のすぐ下で起動方法を出す。
     return (
       '<div class="dev-comment-agent-detail is-warning">コメントを拾う担当が居ません。別のセッションで：' +
-      '<br>claude: <code>/comment-eater</code>' +
-      '<br>codex: <code>$comment-eater</code></div>'
+      '<br>claude: <button type="button" class="dev-comment-agent-command" data-copy-command="/comment-eater"' +
+      ' title="クリックしてコピー"><code>/comment-eater</code></button>' +
+      '<br>codex: <button type="button" class="dev-comment-agent-command" data-copy-command="$comment-eater"' +
+      ' title="クリックしてコピー"><code>$comment-eater</code></button></div>'
     )
   }
 
@@ -564,6 +566,21 @@
   }
 
   function bindPanel(panel) {
+    Array.prototype.forEach.call(panel.querySelectorAll('[data-copy-command]'), function (button) {
+      button.addEventListener('click', function () {
+        copyText(button.getAttribute('data-copy-command')).then(function () {
+          button.classList.add('is-copied')
+          button.title = 'コピーしました'
+          window.setTimeout(function () {
+            button.classList.remove('is-copied')
+            button.title = 'クリックしてコピー'
+          }, 1200)
+        }).catch(function () {
+          button.title = 'コピーできませんでした'
+        })
+      })
+    })
+
     Array.prototype.forEach.call(panel.querySelectorAll('[data-filter]'), function (button) {
       button.addEventListener('click', function () {
         var status = button.getAttribute('data-filter')
@@ -639,6 +656,25 @@
     form.addEventListener('submit', function (event) {
       event.preventDefault()
       submit()
+    })
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text)
+    }
+    return new Promise(function (resolve, reject) {
+      var input = document.createElement('textarea')
+      input.value = text
+      input.setAttribute('readonly', '')
+      input.style.position = 'fixed'
+      input.style.opacity = '0'
+      document.body.appendChild(input)
+      input.select()
+      var copied = document.execCommand && document.execCommand('copy')
+      document.body.removeChild(input)
+      if (copied) resolve()
+      else reject(new Error('copy failed'))
     })
   }
 
@@ -1057,6 +1093,11 @@
     '.dev-comment-agent-detail.is-warning{opacity:1;white-space:normal;line-height:1.6;',
     'background:var(--codeBackgroundColor,#f8f8f8)}',
     '.dev-comment-agent-detail code{font-family:var(--codeFontFamily,monospace)}',
+    '.dev-comment-agent-command{padding:1px 4px;border:1px solid transparent;border-radius:3px;',
+    'background:none;color:inherit;font:inherit;cursor:pointer}',
+    '.dev-comment-agent-command:hover,.dev-comment-agent-command:focus-visible{',
+    'border-color:var(--accent,#42b983);background:var(--background,#fff);outline:none}',
+    '.dev-comment-agent-command.is-copied{color:var(--accent,#42b983)}',
     '.dev-comment-counts{display:inline-flex;gap:2px}',
     '.dev-comment-count{display:inline-flex;align-items:center;gap:2px;padding:2px 6px;border-radius:9px;',
     'border:1px solid transparent;background:none;color:inherit;font:inherit;font-size:11px;',
