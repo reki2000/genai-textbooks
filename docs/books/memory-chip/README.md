@@ -4400,6 +4400,730 @@ SSDの中に何が入った。
 土地が足りないなら――次は上へ積むしかないお。
 
 ---
+## 第13幕　平面を諦め、上へ積む
+
+---
+### 13-1　平面のセルを、もう半分に縮める
+
+**やる夫**：
+SSDの次世代機は簡単だお。
+
+平面NANDの縦横を0.7倍にすれば、cell面積は約0.49倍。
+
+同じ面積へ約2倍置ける。
+
+これを毎世代繰り返せばよい。
+
+**やらない夫**：
+第9幕の0〜4V模型へ、QLCの16状態を置き直せ。
+
+隣り合う代表値の間隔を単純化して0.25Vとする。
+
+**やる夫**：
+cellが十分大きいとき、製造ばらつき、書換え劣化、保持中の電荷移動をまとめた分布幅が、代表値から左右0.08Vだったとする。
+
+隣との空きは、
+
+$$0.25-0.08\times2=0.09\text{ V}$$
+
+まだ判定境界を置けるお。
+
+**やらない夫**：
+縮小して電荷量が減り、隣接cellとの干渉が強くなり、幅が左右0.15Vになった。
+
+**やる夫**：
+$$0.25-0.15\times2=-0.05\text{ V}$$
+
+分布が0.05V重なる。
+
+この数値は実製品のthreshold仕様ではなく、marginが消える構造を見る模型だお。
+
+**やらない夫**：
+面積だけなら約2倍だ。
+
+だが読めるbit数も約2倍になったか。
+
+**やる夫**：
+program-verifyを細かくし、soft decisionとLDPCを強くすれば救える。
+
+でもread回数、latency、controllerの仕事が増える。
+
+**平面を縮めて得た面積を、狭くなった電圧marginの補修費が食べ始める**お。
+
+**やらない夫**：
+土地の区画を細くする以外に、同じ土地へ部屋を増やす方法は。
+
+**やる夫**：
+……上へ建てる。
+
+平屋を顕微鏡で縮め続けるのではなく、高層住宅へするお。
+
+NAND cellをvertical方向へ並べれば、平面寸法を同じ率で縮めなくてもbitを増やせる。
+
+これが3D NANDの出発点だお。
+
+---
+### 13-2　24階から300階を超える
+
+**やる夫**：
+平面NANDを完成させ、その上へもう一枚、その上へもう一枚貼る。
+
+完成chipを321枚接着すれば321層だお。
+
+**やらない夫**：
+高さだけで冷蔵庫になるぞ。
+
+完成dieを重ねるHBMとは作り方が違う。
+
+3D NANDでは、まず多数の薄膜をwafer上へ交互に積み、まとめて深い穴を開ける。
+
+**やる夫**：
+穴の中央へvertical channelを通す。
+
+穴の側壁と各word lineが交わる高さごとに、電荷を蓄えるcellを作る。
+
+一本のchannel stringへ、縦方向に何十、何百cellも並ぶのかお。
+
+**やらない夫**：
+Samsungが2013年に量産開始を発表した最初のV-NANDは、24層、128Gbitだった。[^91]
+
+2024年にはSK hynixが321層、1Tbit TLC NANDの量産開始を発表し、2025年には321層、2Tbit QLC品の量産開始を発表した。[^92]
+
+**やる夫**：
+層数だけなら、
+
+$$\frac{321}{24}=13.375$$
+
+約13.4倍だお。
+
+では同じdie面積なら容量も必ず13.4倍。
+
+**やらない夫**：
+周辺回路、層間接続、dummy layer、横方向のcell密度、TLC／QLC、plane数は同じか。
+
+**やる夫**：
+違う。
+
+24層と321層の比は高さの目安で、製品bit密度の倍率ではないお。
+
+積層数が増えても、穴を分割して接続する境界や、使えない端部、peripheryの面積が増える。
+
+**やらない夫**：
+2026年のKIOXIAの技術説明は、400層超へ増やす案と比べ、332層を選ぶほうがwafer cost、電力、cell信頼性の均衡で有利だという自社推定を示した。[^92]
+
+**やる夫**：
+「最大積層数」がそのまま「最小bit原価」ではないのか。
+
+高い建物ほど家賃が下がるなら、東京は無料住宅だお。
+
+**やらない夫**：
+そんなわけねぇだろ、常考。
+
+**やる夫**：
+3D NANDは一人が一つの構造を発明して終わった話でもない。
+
+charge-trap型、peripheryをcell arrayの下へ置く方式、別waferで作って接合する方式、複数回に分けて穴をつなぐ方式を、各社が異なる名前と工程で競っている。
+
+**上へ増やす自由を得た代わりに、何層をどう作ると最も安く歩留まりよくなるかが新しい設計問題になった**お。
+
+---
+### 13-3　300階を一本の穴で貫く
+
+**やる夫**：
+321層分の膜を積み、上からdrillで一発。
+
+真っすぐな穴を開ければ量産完成だお。
+
+**やらない夫**：
+上の直径を1とし、下へ行くほど0.2%ずつ細くなる架空のetchを、300段続けろ。
+
+**やる夫**：
+単純な掛け算なら、
+
+$$0.998^{300}\approx0.549$$
+
+底は上の約55%しかない。
+
+cellごとのchannel形状が高さで変わり、read電流とthresholdも揃わないお。
+
+**やらない夫**：
+実際の欠陥は単純な指数形だけではない。
+
+上広がり、bowing、途中の曲がり、穴ごとの傾き、mask消耗、底へ反応種が届かない問題が重なる。
+
+**やる夫**：
+第8幕でDRAM capacitorの深い側壁を原子層堆積、ALDで覆った。
+
+3D NANDでも、深い穴へ均一な膜を作る成膜と、高aspect ratioの深掘りetchが主役になる。
+
+最先端とは、細線を描く競争だけではなかったお。
+
+**やらない夫**：
+Lam Researchは2024年、10μmまでのmemory channelを上下の寸法偏差0.1%未満で加工する将来向けcryogenic etchを発表し、400層以降を対象に挙げた。[^93]
+
+では、300層を一度に掘ることだけが解か。
+
+**やる夫**：
+複数の短いdeckに分けて穴を掘り、位置を合わせて電気的につなぐstring stackingがある。
+
+SK hynixの321層品は三回のplug工程を接続し、低応力材料とalignment補正を使う。[^92]
+
+ただし接続回数を増やすと、今度はdeck同士のずれと接続抵抗が増えるお。
+
+**やらない夫**：
+cell arrayとCMOS周辺回路を同じwaferへ順番に作る必要もあるか。
+
+**やる夫**：
+別々のwaferで最適条件を使って作り、最後に接合するwafer bondingもある。
+
+KIOXIAのCBAは、CMOS回路waferとmemory cell array waferを別工程で作ってbondingする構成だ。[^94]
+
+**やらない夫**：
+膜を何百層も積めば、各膜のstressは。
+
+**やる夫**：
+wafer全体で足し合わさって反る。
+
+焦点と重ね合わせがずれ、次の穴と配線が合わなくなる。
+
+裏面へ補償膜を付けてbowを抑える仕事まで必要になる。[^93]
+
+**高さを増やすこと自体が、穴形状、接続ずれ、膜stress、wafer反りという次の製造誤差を増やす**。
+
+上へ逃げても、量産の壁は上まで追いかけてきたお。
+
+---
+### 13-4　1本を100Gbit/sにすればHBMはいらない
+
+**やる夫**：
+NANDは容量のために上へ積んだ。
+
+DRAMも同じだお。
+
+GPU用DRAMは積まず、基板上のdata pinを1本100Gbit/sにすればよい。
+
+**やらない夫**：
+長い基板配線を高速に振るほど、反射、crosstalk、timing skew、I/O energyはどうなる。
+
+**やる夫**：
+厳しくなる。
+
+第6幕でbus幅を増やし続けられず、第11幕でmobileの配線を短くした。
+
+なら今度はmemoryをGPUのすぐ隣へ置き、一本を魔法の速度にせず、短い線を大量に並べるお。
+
+**やらない夫**：
+DRAM dieを薄くし、siliconを縦に貫くシリコン貫通電極（through-silicon via, TSV）で積み、base dieを介して1024bit級の広いinterfaceを外へ出す。
+
+GPUやacceleratorとはsilicon interposerなどの微細配線で結ぶ。
+
+これが高帯域幅memory（High Bandwidth Memory, HBM）だ。
+
+**やる夫**：
+2019年発表、2020年量産のHBM2E例を計算するお。
+
+1pin当たり3.6Gbit/s、1024 I/Oなら、
+
+$$\frac{3.6\times1024}{8}=460.8\text{ GB/s}$$
+
+公表値の460GB/s超と一致する。[^95]
+
+**やらない夫**：
+2024年のHBM3E 12H例は、1024 I/O、10Gbit/s級だ。
+
+**やる夫**：
+$$\frac{10\times1024}{8}=1280\text{ GB/s}$$
+
+1 stackで1.28TB/s、容量36GBだお。[^96]
+
+**やらない夫**：
+2025年に公開されたHBM4規格は、interfaceを2048bitへ倍増し、規格上8Gbit/sまでとした。
+
+**やる夫**：
+$$\frac{8\times2048}{8}=2048\text{ GB/s}$$
+
+2TB/s級だお。
+
+規格公開年と、特定makerの量産・顧客採用年は別に読む。[^97]
+
+**やらない夫**：
+3D NANDとHBMは、どちらも縦に積む。
+
+同じ発明か。
+
+**やる夫**：
+違う。
+
+3D NANDは、一つのwafer内にvertical cell stringを作り、主にbit密度と容量を増やす。
+
+HBMは、別々に作ったDRAM dieをpackage工程で積み、主に短く極端に広いinterfaceで帯域を増やす。
+
+**NANDは容量のため、HBMは帯域のために上へ積む**。
+
+積むという外見が同じでも、作る場所と解くbottleneckが違うお。
+
+---
+### 13-5　良品率95%を8枚積めば760%だ
+
+**やる夫**：
+良品率95%のDRAM dieを8枚積む。
+
+95%が8枚だから、景気よく760%の超良品HBMだお！！
+
+**やらない夫**：
+確率を足すな。
+
+無作為に取った8枚が全部良品である確率を掛けろ。
+
+**やる夫**：
+$$0.95^8\approx0.6634$$
+
+約66.3%しかない。
+
+1枚なら95%売れたdieを、検査せず積むと3 stackに1 stack近くがdie不良を含む模型になるお。
+
+**やらない夫**：
+実際のHBM yieldを66.3%と断定してよいか。
+
+**やる夫**：
+駄目だお。
+
+95%は架空の独立確率で、実際には不良の相関、repair、base die、assembly yield、検査精度がある。
+
+だから積層前にtestし、良品と判定したKnown Good Die、KGDを選ぶ。
+
+**やらない夫**：
+KGDを選べば100%か。
+
+**やる夫**：
+testで見逃す潜在不良がある。
+
+die thinningで割れ、TSVやmicro-bumpがopen／shortになり、接合にvoidが入り、stack全体が反り、熱が抜けにくくなる。
+
+積層後にもtestとrepairが要るお。
+
+**やらない夫**：
+2024年のSamsung HBM3E 12Hは、24Gbit dieを12枚積んで36GBとし、8-highと同じpackage高さへ収めるためdie間を7μmまで縮め、反りと放熱を接合材料とbump配置で扱った。[^96]
+
+**やる夫**：
+cell arrayを作ったら完成ではない。
+
+wafer test、良品選別、薄化、TSV、接合、underfill、熱設計、積層後testまで続く。
+
+**HBMには、DRAM cell工場の後ろにもう一個の工場がある**お。
+
+3D NANDでもcell工程が立体化し、HBMでは後工程が立体化する。
+
+立体化は、面積を節約する魔法ではなく、製造工程を別の方向へ増やす選択だったお。
+
+---
+### 13-6　値札のないHBMを1bit単価にする
+
+**やる夫**：
+値札ボードへHBMを追加するお。
+
+通販で80GB HBMを一個買って、価格を容量で割る。
+
+……商品pageがない。
+
+**やらない夫**：
+HBMは一般DIMMのように単体小売される部品ではなく、accelerator makerとのpackage設計と顧客契約へ組み込まれる。
+
+正確な取引価格がないなら、どうする。
+
+**やる夫**：
+でっち上げる。
+
+**やらない夫**：
+帰れ。
+
+**やる夫**：
+……仮定を明記し、答えを一点でなく範囲にするお。
+
+架空のAI acceleratorを3万ドル、搭載HBMを合計80GBとする。
+
+製品価格のうちHBMへ割り当てる仮定を、6分の1から3分の1まで振る。
+
+**やらない夫**：
+計算しろ。
+
+**やる夫**：
+HBMへ割り当てる額は5000〜1万ドル。
+
+80GBを10進表記とすれば、
+
+$$\frac{80\times10^9\times8}{10{,}000}=64{,}000{,}000\text{ bit/ドル}$$
+
+$$\frac{80\times10^9\times8}{5{,}000}=128{,}000{,}000\text{ bit/ドル}$$
+
+中間の4分の1、7500ドルなら約8533万bit/ドルだお。
+
+**やらない夫**：
+これはHBMの市場価格か。
+
+**やる夫**：
+違う。
+
+accelerator価格もHBM原価比も架空の感度分析だお。
+
+値札ボードには、
+
+`HBM世代：推定6400万〜1億2800万bit/ドル（仮定幅2倍）`
+
+と括弧つきで書く。
+
+**やらない夫**：
+第12幕のIntel SSD価格とは何が違う。
+
+**やる夫**：
+X25-Mは公表された製品価格から計算した。
+
+HBMは公開小売価格がないため、製品全体から仮に配賦した。
+
+**正確な値が出ないとき、仮定を隠して精密な数字を作るのではなく、仮定を振って結論の桁が変わるかを見る**。
+
+bit単価の安さでは負けても、HBMはbitを演算器へ1秒で何回届けられるかを買うmemoryだお。
+
+---
+## 第14幕　CPUの隣だけでは容量が足りない
+
+---
+### 14-1　AI acceleratorにはHBMだけ載せる
+
+**やる夫**：
+HBMは1 stackで1.28TB/s級。
+
+もうDDR5は全部捨てて、serverのmemoryをHBMだけにするお。
+
+速いものだけ残すのがPC自作の基本だお。
+
+**やらない夫**：
+架空のacceleratorへ、36GB HBM3Eを8 stack載せる。
+
+容量と理論帯域を出せ。
+
+**やる夫**：
+$$36\text{ GB}\times8=288\text{ GB}$$
+
+$$1.28\text{ TB/s}\times8=10.24\text{ TB/s}$$
+
+実効帯域はcontrollerやaccess patternで下がるが、看板値は圧倒的だお。
+
+**やらない夫**：
+500GBのmodel weightと、200GBのKV cacheを同時に置け。
+
+**やる夫**：
+合計700GB。
+
+288GBへ入らない。
+
+HBMを20 stackに増やせば720GBだお。
+
+**やらない夫**：
+accelerator dieの周囲へ20 stackを置く面積、interposer配線、package歩留まり、消費電力、熱は。
+
+**やる夫**：
+計算器よりmemory packageが外周を占領する。
+
+HBMは速いが、容量を無限に増やす最安の置き場ではないお。
+
+**やらない夫**：
+一方、128GB DDR5 RDIMMを24枚載せる架空のhostなら。
+
+**やる夫**：
+$$128\text{ GB}\times24=3072\text{ GB}$$
+
+3TB級だお。
+
+Micronは32Gbit dieを使う128GB DDR5 RDIMMを製品化しており、server platformにはさらに大容量の3DS RDIMM構成もある。[^98]
+
+**やらない夫**：
+ではDDR5だけに戻るか。
+
+**やる夫**：
+それでは大量の演算器がmemoryを待つ。
+
+頻繁に使うweightと中間dataをHBMへ置き、大きいが相対的に冷たいdataをhost DDR5へ置く。
+
+必要に応じて階層間を運ぶお。
+
+**HBMは大帯域、DDR5 RDIMMは大容量を主に担当し、二つで記憶階層を作る**。
+
+最高のmemory一種類へ統一するより、異なる高価さを適材適所へ置くほうがsystem全体を成立させるお。
+
+---
+### 14-2　DIMMの形は永遠に変わらない
+
+**やる夫**：
+PC memoryの形は決着したお。
+
+desktopはUDIMM、serverはRDIMM、notebookはSO-DIMM。
+
+DDR5になってもchipだけ速くし、基板はDDR4を色違いで使えばよい。
+
+**やらない夫**：
+DDR5 moduleをDDR4 slotへ挿してみろ。
+
+**やる夫**：
+切欠きもpin配置も違う。
+
+破壊動画の撮影は中止するお。
+
+**やらない夫**：
+形だけでなく、module境界で何が変わった。
+
+**やる夫**：
+DDR4の64bit data channel一つから、DDR5ではmoduleを二つの独立32bit subchannelへ分けた。
+
+ECC RDIMMなら各subchannelに追加8bitが付き、40bitずつになる。
+
+電圧regulatorの仕事もmotherboard側から、module上の電源管理IC、PMICへ寄せた。[^99]
+
+**やらない夫**：
+on-die ECCが入ったから、server用ECC DIMMは不要か。
+
+**やる夫**：
+on-die ECCはDRAM chip内部の128bitに8bitのparityを持ち、内部のsingle-bit errorをread時に訂正する。
+
+だがchipからCPUまでのdata線、connector、別chip故障は保護範囲外だ。
+
+**製造微細化を支えるon-die ECCと、system全体を守るECC DIMMは同じ名前でも階層が違う**お。[^99]
+
+**やらない夫**：
+SO-DIMMも永遠か。
+
+**やる夫**：
+薄型notebookではsocketの高さと配線長が邪魔になる。
+
+LPDDRをはんだ付けすれば薄く低電力だが、交換不能になる。
+
+そこで基板へ水平に圧着し、低背と交換性を両立するCAMM2が出るお。
+
+**やらない夫**：
+年代と状態を分けろ。
+
+**やる夫**：
+
+| 年 | 名称 | 主な狙い | 2026年時点での読み方 |
+|---:|---|---|---|
+| 2020年 | DDR5規格公開 | 2 subchannel、PMIC、on-die ECC | PC／serverで量産普及 |
+| 2023年 | CAMM2規格公開 | DDR5またはLPDDR5/5Xを低背・交換可能に | connector共通でも両者のpinoutは別 |
+| 2024年 | LPCAMM2量産製品 | LPDDR5Xを16〜64GBの交換moduleに | notebook向け製品が登場 |
+| 2024〜2026年 | MRDIMM製品・標準化作業 | rankをmultiplexしserver帯域を増やす | 製品名とJEDEC標準の進行を区別 |
+
+JEDECは2023年にJESD318 CAMM2を公開し、Micronは2024年にLPDDR5X LPCAMM2を16〜64GBで製品化した。[^100]
+
+**やらない夫**：
+MRDIMMの行が曖昧だな。
+
+**やる夫**：
+2024年には8800MT/s級の製品がMRDIMM名で出た一方、cross-vendorのJEDEC MRDIMM標準はまだ策定中だった。
+
+2026年4月にJEDECはdata buffer標準を公開し、Gen2 module標準は完成へ向けて進行中、12,800MT/sを目標と説明した。[^101]
+
+同じ略語でも、特定platformで動く製品と、業界標準として相互運用できる段階を混ぜてはいけないお。
+
+**やらない夫**：
+DIMMの歴史は終わったか。
+
+**やる夫**：
+終わらない。
+
+**moduleは単なるDRAM chipの台ではなく、電源、信号buffer、管理情報、冷却、交換性の境界**だお。
+
+CPU、筐体、用途が変われば、最適な形もまた変わる。
+
+---
+### 14-3　slotが足りなければmotherboardを広げる
+
+**やる夫**：
+12 channelに128GB RDIMMを一枚ずつ挿せば1.5TB。
+
+2TB必要なら、slotを外側へ延長し、巨大motherboardを作るお。
+
+**やらない夫**：
+CPUから最遠slotまで50cmになった。
+
+DDR5の多数の並列線を、その距離で同じtiming marginに揃えられるか。
+
+**やる夫**：
+signal integrityが崩れ、board層数、connector、pin数も増える。
+
+CPU packageが持つmemory channel数も固定だ。
+
+DIMMを置く面積だけ増やしても、CPU側の入口が増えないお。
+
+**やらない夫**：
+第12幕でPCIeへNVMeをつないだ。
+
+同じ物理層の系譜を使いながら、block I/Oでなくload／storeに近いmemory semanticsを運べないか。
+
+**やる夫**：
+CPUが`load address X`を出し、遠いDRAMをsystem memoryの一部として読む。
+
+PCIe slotの先をSSDとしてfile I/Oするのではない。
+
+memory controllerの外へ、cache coherentなmemory protocolを伸ばすお。
+
+**やらない夫**：
+それがCompute Express Link、CXLだ。
+
+CXL.ioはdevice発見と管理、CXL.memはhostからdevice memoryへのload／store、CXL.cacheは対応acceleratorがhost memoryをcacheする用途を担う。
+
+DRAMを載せるType 3 deviceは主にCXL.ioとCXL.memを使う。[^102]
+
+**やる夫**：
+CXLの規格年表を、製品普及年と分けるお。
+
+| 公開年 | 規格 | 主な追加 |
+|---:|---|---|
+| 2019年3月 | CXL 1.0 | CPUとdeviceのdirect-attached coherent link |
+| 2020年11月 | CXL 2.0 | switch、memory pooling、hot-plug |
+| 2022年8月 | CXL 3.0 | fabric、multi-level switching、memory sharing |
+| 2023年11月 | CXL 3.1 | fabric管理、sharing／pooling、memory機能を拡張 |
+| 2024年12月 | CXL 3.2 | securityと相互運用性を更新 |
+| 2025年11月 | CXL 4.0 | 128GT/s、bundled port、RAS強化 |
+
+CXL Consortiumの公開timelineはこの順序を示す。4.0は2026年に突然現れた製品名ではなく、2025年11月公開の規格だ。[^103]
+
+**やらない夫**：
+CXL memoryはlocal DDR5と同じ速さか。
+
+**やる夫**：
+違う。
+
+link、controller、場合によってはswitchを通る分、latencyとbandwidthに費用がある。
+
+CPU cacheから最短で届くlocal DRAMを全部置換するのではなく、local slotを越える容量や、共有したい領域へ使う。
+
+**メモリはCPU専用slotへ直結するもの、という物理的な前提を外したのであって、距離の費用を消したわけではない**お。
+
+---
+### 14-4　4台分なら4TB買えば安全だ
+
+**やる夫**：
+server A、B、C、Dが、それぞれ最大1TB使う。
+
+なら各1TB、合計4TBを固定搭載すれば絶対安全だお。
+
+**やらない夫**：
+一日の同時使用量を測った。
+
+| 時刻 | A | B | C | D | 合計 |
+|---:|---:|---:|---:|---:|---:|
+| 9時 | 1.0TB | 0.2TB | 0.2TB | 0.2TB | 1.6TB |
+| 13時 | 0.2TB | 1.0TB | 0.2TB | 0.2TB | 1.6TB |
+| 18時 | 0.2TB | 0.2TB | 1.0TB | 0.2TB | 1.6TB |
+| 2時 | 0.2TB | 0.2TB | 0.2TB | 1.0TB | 1.6TB |
+
+**やる夫**：
+peakの時刻がずれている。
+
+個別最大を足すと4TBだが、同時最大は1.6TB。
+
+2TBの共通memory poolから、忙しいhostへ1TB、残りへ0.2TBずつ割り当てれば0.4TBの余裕もあるお。
+
+**やらない夫**：
+これがCXL 2.0以降のmemory poolingの基本的な狙いだ。
+
+switchとfabric managerがdevice memoryを区画し、必要なhostへ割り当て直す。[^104]
+
+**やる夫**：
+ではAとBが同じregionへ同時に書けば、自動でdatabase共有完成。
+
+**やらない夫**：
+poolingとsharingを混ぜるな。
+
+poolingでは、ある時点のregionを一つのhostへ排他的に割り当てる設計が基本になる。
+
+**やる夫**：
+memory sharingは、同じdevice memoryへ複数hostから到達できる構成。
+
+CXL 3.0以降のfabricはその用途を広げるが、cache coherence、同期、権限、故障分離、softwareのdata構造まで勝手に解決するわけではないお。[^104]
+
+**やらない夫**：
+電話交換のSELECTを思い出せ。
+
+一人一本の線を引かず、交換機が相手を選んだ。
+
+FTLでは論理LBAと物理pageを分けた。
+
+**やる夫**：
+CXL poolでは、host physical addressのregionを、fabricの先のmemory deviceとその領域へ対応付ける。
+
+さらに割当てを変えれば、昨日Aが使った物理DRAMを今日はBが使える。
+
+**住所だけでなく、その容量を誰が所有して使うかまで、はんだ付けされたDRAMから離れる**お。
+
+ただし遠いmemoryのlatency、fabric障害、securityという新しい代価を背負う。
+
+論理／物理分離は、便利さと管理責任を同時に増やすお。
+
+---
+### 14-5　完成してから規格へ持ち込む
+
+**やる夫**：
+やる夫式HBM4＋CXL memoryが完成したお！！
+
+明日GPU makerへ持っていき、採用してもらう。
+
+pinoutとprotocolは、量産後にJEDECとCXL Consortiumへ登録するお。
+
+**やらない夫**：
+GPUのpackage設計は2年前に固定済みだ。
+
+HBM PHY、interposer配線、電源rail、thermal model、memory controller、firmware、test patternのどれを今から変える。
+
+**やる夫**：
+全部。
+
+……採用会議が葬式になったお。
+
+**やらない夫**：
+CXL側も同じだ。
+
+CPU root port、switch、Type 3 controller、DRAM module、BIOS、ACPI、OS、management software、security、compliance testが同じ版の契約を理解しなければならない。
+
+**やる夫**：
+memory chipだけ規格通りでも起動しない。
+
+hostだけ新しくてもdeviceがない。
+
+hardwareが揃ってもOSとfirmwareがenumerateできなければ使えない。
+
+一社が完成品を持ち込む直列開発では遅すぎるお。
+
+**やらない夫**：
+実際、SK hynixは最初のTSV HBMをAMDと共同開発したと説明している。[^95]
+
+2020年公開のDDR5規格には150社以上が参加し、memory makerは公開前からCPU makerやtest企業とecosystem検証を進めた。[^99]
+
+CXLも2019年からCPU、accelerator、device、software企業が共通仕様を作り、現在はcompliance eventとintegrator listで組合せを検証している。[^105]
+
+**やる夫**：
+発明して、製造して、最後に規格書を書くのではない。
+
+要求を合わせ、試作PHYを作り、signalとprotocolをsimulateし、互いのtest chipで動かし、規格を固め、製品とsoftwareを並行して仕上げる。
+
+**企業間調整そのものが、pinやtransistorと同じくらい製品を成立させる工学**なんだお。
+
+**やらない夫**：
+それでも一社で全部作りたいか。
+
+**やる夫**：
+もう規格会議だけで老後を迎えそうだお……。
+
+だったらDRAM、NAND、HBM、CXLを全部置換する、速くて安くて消えない新材料を一個だけ見つけるお！！
+
+**やらない夫**：
+立ち直りだけは速いな。
+
+**やる夫**：
+次こそ階層も規格会議も消してやるお。
+
+……たぶん、その「全部」が次の罠なんだお。
+
+---
 ## 第6幕　電源を切っても残せ、ただし壊れることは認めろ
 
 ---
@@ -7789,6 +8513,36 @@ $$32\times 8\times 2^{30}\approx2.75\times10^{11}\text{ bit}$$
 [^89]: [Samsung Semiconductor『Internal SSD Product Information』](https://org-ap-publish.semiconductor.samsung.com/us/consumer-storage/support/faqs/internalssd-product-information/)および[『Samsung SSD 950 PRO White Paper』](https://download.semiconductor.samsung.com/resources/white-paper/Samsung_SSD_950_PRO_White_paper.pdf), 2026年8月10日参照. multi-bit cellへ移すSLC buffering、長時間負荷とDynamic Thermal Throttlingによる性能変化を説明する。本文の20GB／2000MB/s／400MB/sは計算用の架空例である。
 
 [^90]: [Intel『Intel Solid-State Drives Deliver Industry-Leading Performance』](https://www.intel.com/pressroom/archive/releases/2008/20080908comp.htm), 2008年9月8日. X25-M 80GB MLC SATA SSDについて、最大250MB/s read、70MB/s write、10-channel architecture、wear levelingを含むcontroller／firmware、1000個購入時595ドルという公表値を示す。
+
+[^91]: [Samsung Electronics『Samsung Starts Mass Producing Industry’s First 3D Vertical NAND Flash』](https://news.samsung.com/global/samsung-starts-mass-producing-industrys-first-3d-vertical-nand-flash), 2013年8月6日. 24層、128Gbitのcharge-trap型V-NANDを量産開始し、積層膜を上下に貫くvertical channelでcellを接続したことを説明している。
+
+[^92]: SK hynix, [『SK hynix Starts Mass Production of World’s First 321-High NAND』](https://news.skhynix.com/sk-hynix-starts-mass-production-of-world-first-321-high-nand/), 2024年11月21日および[『SK hynix Begins Mass Production of 321-Layer QLC NAND Flash』](https://news.skhynix.com/sk-hynix-begins-mass-production-of-321-layer-qlc-nand-flash/), 2025年8月24日; [KIOXIA Holdings『Investor Day 2026』](https://www.kioxia-holdings.com/content/dam/kioxia-hd/en-jp/ir/library/event/asset/Kioxia_Investor_Day_2026_en_script.pdf), 2026年8月10日参照. 321層TLC／QLC製品と三分割plug工程、KIOXIAが自社推定で332層と400層超のcost・電力・信頼性を比較していることを示す。積層数は製品bit密度や原価へ一対一に対応しない。
+
+[^93]: [Lam Research『Cryogenic Etching』](https://www.lamresearch.com/products/our-solutions/cryogenic-etching/)および[『Lam Research Introduces Lam Cryo 3.0』](https://newsroom.lamresearch.com/2024-07-31-Lam-Research-Introduces-Lam-Cryo-TM-3-0-Cryogenic-Etch-Technology-to-Accelerate-Scaling-of-3D-NAND-for-the-AI-Era), 2026年8月10日参照. 2024年発表の将来向け3D NAND etchで、深さ10μm、上下critical dimension偏差0.1%未満という公表値と、400層以降、wafer bow補償を対象に挙げている。特定装置の公表値であり、すべての量産NANDの寸法を表すものではない。
+
+[^94]: [KIOXIA Holdings『Integrated Report 2025』](https://www.kioxia-holdings.com/content/dam/kioxia-hd/en-jp/ir/library/integrated-report/2025/asset/Integrated-Report-2025-all-print-en.pdf), 2026年8月10日参照. CBAでCMOS回路waferとmemory cell array waferを各々に適した工程・温度で製造し、後からbondingする構成を説明している。
+
+[^95]: SK hynix, [『Continuing to Make HBM History: The Story of SK hynix’s HBM Development』](https://news.skhynix.com/the-story-of-sk-hynixs-hbm-development/)および[『SK hynix Develops World’s Fastest High Bandwidth Memory, HBM2E』](https://news.skhynix.com/sk-hynix-develops-worlds-fastest-high-bandwidth-memory-hbm2e/), 2026年8月10日参照. AMDとのTSV HBM共同開発、HBM2Eの1024 I/O、3.6Gbit/s per pin、460GB/s超、8枚積み16GBという製品例を示す。
+
+[^96]: [Samsung Electronics『Samsung Develops Industry-First 36GB HBM3E 12H DRAM』](https://news.samsung.com/global/samsung-develops-industry-first-36gb-hbm3e-12h-dram), 2024年2月27日. 24Gbit DRAM dieをTSVで12枚積み、36GB、最大1280GB/sとした製品例で、7μmのdie間隔、反りと放熱を考慮した接合構造も説明している。
+
+[^97]: JEDEC, [『JEDEC and Industry Leaders Collaborate to Release JESD270-4 HBM4 Standard』](https://www.businesswire.com/news/home/20250416843598/en/JEDEC-and-Industry-Leaders-Collaborate-to-Release-JESD270-4-HBM4-Standard-Advancing-Bandwidth-Efficiency-and-Capacity-for-AI-and-HPC), 2025年4月16日. HBM4規格を2048bit interface、最大8Gbit/s、最大2TB/sとして公開した。規格上限と個別makerの製品値、規格公開と量産採用の時期は分けて読む必要がある。
+
+[^98]: [Micron Technology『DDR5 DRAM』](https://www.micron.com/products/memory/dram-components/ddr5-sdram)および[AMD『EPYC 9004 Series Memory Population Recommendations』](https://docs.amd.com/api/khub/documents/zynTogiENLgLxWEd4075vQ/content), 2026年8月10日参照. 32Gbit monolithic dieを使う128GB RDIMM製品と、12-channel serverで128GB〜512GB級3DS RDIMMを使う構成例を示す。本文の24枚構成は容量差を見る架空のhostである。
+
+[^99]: JEDEC, [『JEDEC Publishes New DDR5 Standard』](https://www.businesswire.com/news/home/20200714005727/en/JEDEC-Publishes-New-DDR5-Standard-for-Advancing-Next-Generation-High-Performance-Computing-Systems), 2020年7月14日; [Micron Technology『DDR5: Client Module Features』](https://www.micron.com/content/dam/micron/global/public/products/white-paper/ddr5-key-module-features-wp-client.pdf), 2026年8月10日参照. DDR5 moduleの二つの独立subchannel、module上のPMIC、on-die ECC、150社超が標準策定へ参加したことを説明する。on-die ECCはDRAM内部を対象とし、system-level ECCの保護範囲と同一ではない。
+
+[^100]: JEDEC, [『JEDEC Publishes New CAMM2 Memory Module Standard』](https://markets.financialcontent.com/bpas/article/bizwire-2023-12-5-jedec-publishes-new-camm2-memory-module-standard), 2023年12月5日; [Micron Technology『Micron First to Market With LPDDR5X-based LPCAMM2 Memory』](https://investors.micron.com/news-releases/news-release-details/micron-first-market-lpddr5x-based-lpcamm2-memory-transforming), 2024年1月9日. JESD318がDDR5とLPDDR5/5XのCAMM2を共通mechanical規格の下で定義しつつpinoutを分けること、LPCAMM2製品が16〜64GBで登場したことを示す。
+
+[^101]: JEDEC, [『Plans for DDR5 MRDIMM and LPDDR6 CAMM Standards』](https://www.businesswire.com/news/home/20240722188979/en/JEDEC-Unveils-Plans-for-DDR5-MRDIMM-and-LPDDR6-CAMM-Standards-to-Propel-High-Performance-Computing-and-AI), 2024年7月22日および[『JEDEC Advances DDR5 MRDIMM Ecosystem』](https://www.businesswire.com/news/home/20260430759074/en/JEDEC-Advances-DDR5-MRDIMM-Ecosystem-with-New-Memory-Interface-Logic-and-Expanded-MRDIMM-Roadmap), 2026年4月30日; [Micron Technology『Micron MRDIMM Innovations』](https://investors.micron.com/news-releases/news-release-details/micron-mrdimm-innovations-deliver-highest-performance-and-lowest)および[AMD『Server Memory』](https://www.amd.com/en/products/processors/server/epyc/memory.html), 2026年8月10日参照. 8800MT/s級の特定platform向け製品と、cross-vendor JEDEC Gen2 module標準・12,800MT/s roadmapが進行中であることを区別する。
+
+[^102]: [Compute Express Link Consortium『CXL 3.0 Specification』](https://computeexpresslink.org/wp-content/uploads/2024/02/CXL-3.0-Specification.pdf)および[『Memory Challenges and CXL Solutions』](https://computeexpresslink.org/blog/join-us-compute-express-link-cxl-memory-challenges-and-cxl-solutions-webinar-2353/), 2026年8月10日参照. Type 3 deviceが主にCXL.ioとCXL.memを使うhost memory expanderであり、NVMeのblock I/Oとは異なるload／store memory semanticsを提供することを定義している。
+
+[^103]: [Compute Express Link Consortium『CXL 4.0 Webinar Presentation』](https://computeexpresslink.org/wp-content/uploads/2025/12/CXL_4.0-Webinar_December-2025_FINAL.pdf)および[『Introducing the CXL 4.0 Specification』](https://computeexpresslink.org/event/introducing-the-cxl-4-0-specification/), 2026年8月10日参照. CXL 1.0から4.0までの公開timelineと、4.0が128GT/s、bundled port、RAS強化を加えたことを示す。
+
+[^104]: Compute Express Link Consortium, [『DRAM Resource Scalability Enabled by CXL』](https://computeexpresslink.org/blog/dram-resource-scalability-enabled-by-cxl-1071/)および[『CXL 3.1 Specification』](https://computeexpresslink.org/wp-content/uploads/2024/02/CXL-3.1-Specification.pdf), 2026年8月10日参照. CXL 2.0 switchによるmemory resourceの再割当て、CXL 3.xでのmulti-headed／fabric-attached memoryによるpoolingとsharingを説明する。本文の4台・2TBは利用率差を示す架空の模型である。
+
+[^105]: [Compute Express Link Consortium『Integrators List』](https://computeexpresslink.org/integrators-list/), 2026年8月10日参照. host、switch、controller、memory expanderなどをcompliance eventで組み合わせて検証する公開一覧で、規格策定後にもecosystem全体の相互運用試験が必要なことを示す。
 
 [1]: https://www.computerhistory.org/timeline/computers/ "Timeline of Computer History"
 [2]: https://www.bell-labs.com/about/awards/1956-nobel-prize-physics/ "1956 Nobel Prize in Physics"
