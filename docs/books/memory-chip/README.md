@@ -5124,6 +5124,711 @@ CXLも2019年からCPU、accelerator、device、software企業が共通仕様を
 ……たぶん、その「全部」が次の罠なんだお。
 
 ---
+## 第15幕　もっと優れた材料なら階層を消せるのか
+
+---
+### 15-1　物性表の一位を、そのまま採用する
+
+**やる夫**：
+新材料選手権を始めるお！！
+
+不揮発、DRAM並みに速い、NAND並みに安い、書換え回数は無限。
+
+この四項目をcatalogで比較し、丸が一番多い材料へ全財産を投資するお。
+
+**やらない夫**：
+第1幕から置いてある6問ボードは、何のためだった。
+
+**やる夫**：
+STATE、WRITE、READ・REGENERATE、SELECT、MASS-PRODUCTION、PRODUCT・STANDARD。
+
+……物性表は最初の三問しか見ていないお。
+
+**やらない夫**：
+では「不揮発で速い」を、製品要求へ展開してみろ。
+
+**やる夫**：
+
+| 問い | 新材料へ要求すること | 一つでも落とすと起きること |
+|---|---|---|
+| STATE | 温度と時間が変わっても二状態を区別できる | 保持中にbitが反転する |
+| WRITE | 小さなenergyで速く、狙ったcellだけ変える | 発熱、隣接cell disturb、短寿命 |
+| READ・REGENERATE | 十分なmarginで読み、必要なら復元する | 読出し誤り、破壊読出し |
+| SELECT | 大配列から一つだけ選ぶ | 回り込み電流と誤書込み |
+| MASS-PRODUCTION | CMOS工程へ入り、高歩留まりで揃う | 試作一個から先へ進めない |
+| PRODUCT・STANDARD | controller、package、interface、testが揃う | 良いcellのまま売れない |
+
+**やらない夫**：
+さらに容量、latency、bandwidth、保持年数、書換え回数、待機電力、書込みenergy、温度範囲、bit単価がある。
+
+全部を一つの点数へ足せるか。
+
+**やる夫**：
+serverの主記憶ならlatencyと容量を重く見る。
+
+sensorの設定保存なら容量より、低電力と電源断保持が重要だお。
+
+SSDのwrite cacheなら耐久性と電源断保持が効く。
+
+用途ごとに重みが違うから、**材料単体に用途を超えた総合一位は定義できない**お。
+
+**やらない夫**：
+なら選考方法は。
+
+**やる夫**：
+最初に用途と合格線を決める。
+
+候補を同じ6問へ通し、落ちた場所を回路、工程、softwareで補えるかを見る。
+
+丸の数ではなく、**その用途で致命傷になる×があるか**を調べるお。
+
+いきなり優勝者を選べなくなったけど、詐欺catalogには少し強くなったお。
+
+---
+### 15-2　消えないなら、DRAMとSRAMを追放できる
+
+**やる夫**：
+最初の候補は強誘電体RAM（ferroelectric RAM, FRAM）だお。
+
+強誘電体の分極を右向きと左向きへ切り替え、電界を外した後も向きを残す。
+
+電荷を浮遊gateへ押し込むNANDより低energyで速く書け、高い書換え耐久性を狙える。[^106]
+
+これをDRAMの1T1Cへ入れれば、refresh不要DRAMの完成だお！！
+
+**やらない夫**：
+従来型1T1C FRAMを読め。
+
+既知の電圧を加えて分極が反転したか、流れた電荷差で判定する。
+
+保存状態と逆向きの電圧を加えたcellはどうなる。
+
+**やる夫**：
+読むために分極を反転させた。
+
+……また破壊読出しだお。
+
+読んだ値をsense amplifierで判定し、書き戻す必要がある。[^106]
+
+磁気coreとDRAMで見た構造が、材料を替えて帰ってきたお。
+
+**やらない夫**：
+容量は。
+
+**やる夫**：
+強誘電体capacitor、選択transistor、sense回路が要る。
+
+同時代のNANDと同じbit単価を、速さと耐久性だけからは導けない。
+
+FRAMはSTATEとWRITEで強くても、READ方式、cell面積、工程統合まで無条件に勝つわけではないお。
+
+**やる夫**：
+なら磁気抵抗RAM（magnetoresistive RAM, MRAM）だお。
+
+固定層と自由層を絶縁膜で挟むMTJ（magnetic tunnel junction）を作る。
+
+日本語では磁気トンネル接合だお。
+
+磁化が平行なら低抵抗、反平行なら高抵抗。
+
+読んでも磁化を反転させなければ非破壊だお。
+
+**やらない夫**：
+自由層の磁化を、熱揺らぎに対してどれだけ安定させる。
+
+**やる夫**：
+energy barrierを$E_b$、絶対温度を$T$とすれば、熱安定性の目安は
+
+$$\Delta=\frac{E_b}{k_B T}$$
+
+だお。
+
+$\Delta$を40から60へ上げた模型なら、熱で障壁を越える頻度は$e^{20}$、約4億8500万分の1へ下がる。
+
+保持には圧倒的に有利だお。
+
+**やらない夫**：
+その障壁を、書込み時にはどうする。
+
+**やる夫**：
+spinの揃った電流で自由層へ角運動量を渡す、スピン移行トルク（spin-transfer torque, STT）を使う。
+
+だが保持のため障壁を高くすると、短時間で確実に反転させる電流とenergyも厳しくなる。[^107]
+
+**消えにくくした同じ壁を、WRITEだけは越えなければならない**お。
+
+**やらない夫**：
+DRAMとSRAMを追放するか。
+
+**やる夫**：
+用途の容量、write頻度、latency、温度、原価を入れてから判定する。
+
+FRAMもMRAMも“不揮発で速い”は本当だが、その一文はSELECTと工場と価格を免除する合格証ではないお。
+
+---
+### 15-3　抵抗を二つ作るだけなら、cellは一素子でよい
+
+**やる夫**：
+capacitorも磁石も面倒だお。
+
+材料の抵抗を高低二状態にすれば、交差する二本の線の間へ一素子を置くだけでよい。
+
+まず相変化RAM（phase-change memory, PCM）。
+
+結晶状態を低抵抗、急冷して作るamorphous状態を高抵抗にする。
+
+Joule加熱のpulseでSETとRESETを切り替えるお。[^108]
+
+**やらない夫**：
+高抵抗値は十年同じ場所に止まるか。
+
+**やる夫**：
+amorphous状態の抵抗は時間とともにdriftする。
+
+二値なら余裕を取れても、多値化して判定窓を詰めれば隣へ近づく。
+
+QLC NANDで見た、**状態は二つ以上作れても境界marginが商品寿命を決める**問題だお。[^108]
+
+しかも書込みは局所加熱だから、電流、熱拡散、隣接cell、耐久性も見る必要がある。
+
+**やる夫**：
+次は抵抗変化RAM（resistive RAM, ReRAM）だお。
+
+絶縁膜の中に導電filamentを作れば低抵抗、切れば高抵抗。
+
+縦横配線の交点へ置くcross-point arrayなら高密度だお。
+
+**やらない夫**：
+選んだcellを10kΩ、1Vで読む模型にしよう。
+
+選択電流は。
+
+**やる夫**：
+
+$$I_{selected}=\frac{1\ \mathrm{V}}{10\ \mathrm{k\Omega}}=100\ \mathrm{\mu A}$$
+
+余裕だお。
+
+**やらない夫**：
+選ばないcellを通る二素子直列の経路が63本あり、各経路を20kΩとする単純模型なら。
+
+**やる夫**：
+一本50μA。
+
+63本で
+
+$$I_{sneak}=63\times50\ \mathrm{\mu A}=3.15\ \mathrm{mA}$$
+
+選択cellの31.5倍が脇道を流れるお！！
+
+読みたい100μAが埋もれる。
+
+これは実array全体をそのまま表す回路ではないが、arrayを増やすほど回り込み電流（sneak current）の候補も増える構造は分かるお。
+
+**やらない夫**：
+修正案は。
+
+**やる夫**：
+各抵抗素子へ非線形なselectorを直列に置き、半選択電圧では流れず、選択電圧でだけ大電流を通す。
+
+一素子で済むはずのcellが1S1Rになった。
+
+selectorにもdrive電流、漏れ、耐久性、速度、CMOS工程との互換性が要る。[^109]
+
+**やらない夫**：
+何が失敗原因だった。
+
+**やる夫**：
+単体cellの断面だけを見て、array中の電流経路を消していた。
+
+**cellを簡単にしても、SELECTの複雑さは消えず、別の場所へ移るだけ**だお。
+
+---
+### 15-4　全置換できなければ失敗なのか
+
+**やる夫**：
+FRAM、MRAM、PCM、ReRAM。
+
+誰もDRAM＋NAND＋SRAMを全部追放できなかった。
+
+新材料研究、全敗だお……。
+
+**やらない夫**：
+全置換だけを成功と定義したのは誰だ。
+
+実際の製品を6問ボードへ戻せ。
+
+**やる夫**：
+
+| 時期 | 技術と製品例 | 獲得した役割 | 全置換しない理由 |
+|---:|---|---|---|
+| 2010年代〜 | TI MSP430系の組込みFRAM | 低電力MCUのcode・data、電源断前後の状態保存 | 容量はKB〜数百KB級が中心 |
+| 2018〜2019年 | Everspin 1Gbit STT-MRAM | SSDやnetwork機器のpersistent buffer | DRAM／NANDの大容量bit単価とは用途が違う |
+| 2020年 | GF 22FDX組込みMRAM量産 | MCU、IoT、自動車向けの4〜48Mbit macro | logic chip内の組込み不揮発memory |
+| 2025年 | GF 22FDX+ RRAM試作提供 | MCUのcode、edge AIのweight保存 | 量産一般memoryでなくplatform機能 |
+
+**やらない夫**：
+四例は、同じ市場を奪ったのか。
+
+**やる夫**：
+違う。
+
+FRAM搭載MCUは、低energyの頻繁な書込みと電源断保持を使う。[^106]
+
+1Gbit STT-MRAMはpersistent bufferとして売られ、GFの組込みMRAMは2020年に22nm platformで量産へ入り、10万回耐久・10年保持のmacroを用途へ合わせた。[^107]
+
+2025年のGF RRAMも、まず22FDX+上の組込みcode・AI weight用途として試作提供された。[^110]
+
+**やらない夫**：
+敗北か。
+
+**やる夫**：
+違う。
+
+DRAMとNANDの最大市場へ正面衝突せず、既存階層の間やlogic chipの中で、消費電力、保持、耐久性という固有の問題を解いた。
+
+**万能memoryにならなくても、記憶階層の一段を獲得すれば製品として成功**だお。
+
+**やらない夫**：
+では新材料を標準CMOS工場へ一種類追加しろ。
+
+**やる夫**：
+材料を買って、空いているtankへ入れれば……。
+
+……やらない夫の顔が、もう事故報告書の顔だお。
+
+材料性能表に、工場の列を足していなかったお。
+
+---
+## 第16幕　やる夫半導体工場株式会社――それでもメモリが高い
+
+---
+### 16-1　ウェハへ回路を印刷すれば完成する
+
+**やる夫**：
+やる夫半導体工場株式会社、設立だお！！
+
+300mm silicon waferを買い、回路図を巨大printerへ送り、DRAMとNANDを刷る。
+
+午後には初出荷だお。
+
+**やらない夫**：
+「刷る」を一層だけ分解してみろ。
+
+**やる夫**：
+洗浄する。
+
+膜を成長または堆積する。
+
+photoresistを塗り、bakeし、maskを通して露光し、現像する。
+
+patternをetchで下の膜へ移し、resistを落とす。
+
+必要ならion implantation、熱処理、CMP、計測、欠陥検査。
+
+……一層で午後が終わったお。
+
+**やらない夫**：
+transistor、capacitor、絶縁膜、contact、金属配線を積むには。
+
+**やる夫**：
+材料とmaskを替え、同じ種類のcycleを何度も回す。
+
+Micronは現代DRAMの製造を1000超のstepと説明し、Intelもfab前工程の後にassemblyとtestでさらに多数の工程が続くと説明している。[^111]
+
+回路図は工程の入口でしかないお。
+
+**やらない夫**：
+工場の規模は。
+
+**やる夫**：
+Intelが示す典型例では、fab一棟に約1200台の製造tool、1500台のutility設備、建設費約100億ドル、完成まで3〜5年。
+
+cleanroomの下にはpump、transformer、gas、薬液、水、排気、chillerの階がある。[^111]
+
+**やらない夫**：
+高価な露光機を一台買えば工場完成か。
+
+**やる夫**：
+そんなわけないお。
+
+High-NA EUVは2023年に最初のEXE:5000 modulesが出荷され、NAを0.33から0.55へ上げる露光方式だが、**一工場全部ではなく、数百〜千超の工程中に置く一種類のpattern形成tool**だお。[^112]
+
+全層がHigh-NAを使うわけでもなく、成膜、etch、洗浄、implant、CMP、計測、検査、搬送、後工程は別に要る。
+
+**やらない夫**：
+午後の初出荷は。
+
+**やる夫**：
+工場の建設だけで小学生が中学生になるお。
+
+しかも建物完成は量産完成じゃない。
+
+toolを据え付け、recipeを合わせ、test waferを流し、故障原因を潰し、歩留まりを上げて初めて商品が出るお。
+
+---
+### 16-2　最先端CPU工場のrecipeだけ替える
+
+**やる夫**：
+100億ドルの工場を三つも建てられない。
+
+最先端CPUを作れるなら、recipe fileを`CPU`から`DRAM`へ変更。
+
+夜は`NAND`へ切り替えて三毛作だお。
+
+**やらない夫**：
+三つが最優先する構造を並べろ。
+
+**やる夫**：
+
+| 製品 | cell／deviceの中心 | 工程で最優先するもの | 特に重い設備能力 |
+|---|---|---|---|
+| CPU／logic | 高性能transistorと多層配線 | switch速度、配線抵抗、電力、複雑なlogic pattern | 微細露光、overlay、多層配線、先端transistor形成 |
+| DRAM | 1T1Cと巨大反復array | 容量、保持時間、sense margin、低cost/bit | 高アスペクト比capacitor、均一な薄膜、cell修復・検査 |
+| 3D NAND | 垂直stringと多層cell膜 | 積層数、深穴形状、film stress、charge保持 | 厚い反復成膜、10μm級深掘りetch、string接続・bonding |
+
+**やらない夫**：
+表の違いを、実際の構造へ戻してみろ。
+
+**やる夫**：
+
+CPU／logicの例では、gateがchannelを囲むgate-all-around transistorと、裏面から電源を送るbackside power deliveryが微細化の重点になる。Intel 18AのRibbonFETとPowerViaがその一例だ。[^113]
+
+DRAMは第8幕で見たように、cellを縮めても30〜40fF級の容量を守るため立体capacitorと均一な薄膜が要る。[^53][^54]
+
+3D NANDは第13幕の積層膜、10μm級channel etch、wafer bow、複数plug接続が重点だ。[^92][^93]
+
+**やらない夫**：
+どれも露光、成膜、etchを使う。
+
+同じtoolを回せない理由は。
+
+**やる夫**：
+「etch装置」という名が同じでも、CPUの微細patternを浅く正確に削る能力と、3D NANDを深く垂直に掘る能力は同じじゃない。
+
+成膜も、DRAM capacitorの原子層級均一性と、NANDの数百層を低stressで積む条件は違う。
+
+材料、chamber、温度履歴、汚染管理、工程順、検査recipe、throughputが違うお。
+
+**やらない夫**：
+新材料を空きtankへ入れる案は。
+
+**やる夫**：
+磁性材料、強誘電体、chalcogenide、金属酸化物を入れれば、既存CMOSへの汚染、後続工程の熱で状態が変わらないか、膜厚ばらつき、etch残渣、test方法を再認定する。
+
+**材料一個の追加は、材料一行ではなく工程列全体への変更**だお。
+
+recipe切替ではなく、専用tool、process integration、歩留まり学習まで必要になる。
+
+**やらない夫**：
+同じ「nm」の工場なら互換か。
+
+**やる夫**：
+node名はmakerと製品群の世代名でもあり、CPU gate寸法、DRAM half-pitch、NAND積層数を一つの物差しにできない。
+
+**CPUとmemoryは同じ縮小競争に見えて、残そうとしている物理量も工場の重点も違う**お。
+
+三毛作の看板は、cleanroomへ入る前に撤去するお。
+
+---
+### 16-3　粒子を一個も発生させない
+
+**やる夫**：
+工場差は分かった。
+
+今度は全工場を完全密閉し、人間も装置も一切動かさない。
+
+粒子が出なければ欠陥ゼロだお。
+
+**やらない夫**：
+動かさない工場は何を生産する。
+
+**やる夫**：
+静寂を高歩留まりで量産するお……。
+
+装置の可動部、wafer搬送、薬液、服、人間から粒子は出る。
+
+発生を完全にゼロにはできないお。
+
+**やらない夫**：
+1960年ごろのcleanroomも、密閉と掃除だけでは粒子が滞留した。
+
+Willis Whitfieldらは何を変えた。
+
+**やる夫**：
+高性能filterを通した空気を一定方向へ流し続け、発生した粒子を作業領域から床側へ掃き出す。
+
+一方向気流（unidirectional airflow）だお。
+
+1961年の試作は1立方foot当たり平均750粒で、当時の良い部屋の100万粒超に対して粒子数を1000分の1未満にした。[^114]
+
+**やらない夫**：
+ゼロか。
+
+**やる夫**：
+ゼロではない。
+
+粒子が生まれる速度より、filterと気流で排出する速度を上げた。
+
+……これまでのmemoryと同じだお。
+
+DRAMは漏れをゼロにせず、漏れ切る前にrefreshする。
+
+NANDは誤りをゼロにせず、ECCで訂正し、悪いblockを避ける。
+
+cleanroomは粒子発生をゼロにせず、付着する前に運び出す。
+
+**やらない夫**：
+共通する設計原理は。
+
+**やる夫**：
+**完璧を作るのではなく、乱れが増える速度より補正する速度を上げる**ことだお。
+
+物理世界で0と1を信用するには、静止した完全さではなく、測定して直し続ける仕組みが要る。
+
+cleanroomまでrefreshしていたとは思わなかったお。
+
+---
+### 16-4　1000個描いたから、1000個売れる
+
+**やる夫**：
+一枚のwaferへ1000 dieを描いた。
+
+工程費を1000で割れば一個原価が出るお。
+
+**やらない夫**：
+電気試験の結果は620個だけ合格だ。
+
+**やる夫**：
+残り380個の原価が消えてないお！！
+
+良品620個が全工程費を負担する。
+
+描けた数ではなく売れる数で割る必要があるお。
+
+**やらない夫**：
+簡単なPoisson模型を使う。
+
+単位面積当たり欠陥密度を$D$、die面積を$A$とすると、欠陥を踏まない割合は。
+
+**やる夫**：
+
+$$Y\approx e^{-DA}$$
+
+良品率$Y=0.62$、$A=1\ \mathrm{cm^2}$なら、
+
+$$D=-\frac{\ln 0.62}{1\ \mathrm{cm^2}}\approx0.478\ \mathrm{defects/cm^2}$$
+
+という模型になるお。
+
+実際の欠陥はclusterし、全欠陥が即死でもないから、これは面積効果を見る概念式だお。
+
+**やらない夫**：
+別の架空fabで$D=0.20\ \mathrm{cm^{-2}}$としよう。
+
+同じ有効wafer面積400cm²へ、4cm² logic dieを100個、1cm² memory dieを400個描く。
+
+予備回路を使う前の期待良品数は。
+
+**やる夫**：
+logicは
+
+$$Y_{logic}=e^{-0.20\times4}\approx0.449$$
+
+だから約45個。
+
+memoryは
+
+$$Y_{memory}=e^{-0.20\times1}\approx0.819$$
+
+だから約328個だお。
+
+同じwafer面積でも、大きいdieは一個が欠陥を踏む確率が高い。
+
+**やらない夫**：
+DRAMの不良列一本を見つけたら全廃棄か。
+
+**やる夫**：
+第8幕のspare row／columnとfuseで置換できる場合がある。[^56]
+
+反復arrayは局所欠陥を予備へ逃がしやすい。
+
+logicもcache、core、周波数のbinningで部分救済できる製品はあるが、複雑な任意配線を全部同じ方法では直せない。
+
+**やらない夫**：
+試作一個が動いたら量産完成か。
+
+**やる夫**：
+違う。
+
+wafer内、lot間、tool間、工場間、時間変化を測り、原因工程を絞り、recipe、清浄度、検査、修復設計を更新する。
+
+**研究室の一個と月100万個の間には、歩留まりを再現可能にする量産工学が丸ごとある**お。
+
+---
+### 16-5　来月からHBMを2倍作る
+
+**やる夫**：
+AI向けHBMが高い。
+
+やる夫社長命令、来月から出荷を2倍にするお！！
+
+DRAM前工程を120 stack相当から240へ増やした。
+
+**やらない夫**：
+架空工場の月間能力表だ。
+
+| 工程 | stack換算能力／月 |
+|---|---:|
+| HBM用DRAM die前工程 | 240 |
+| Known Good Die選別 | 95 |
+| TSV・薄化 | 80 |
+| 積層・接合 | 70 |
+| interposer・package | 85 |
+| 最終test | 75 |
+
+完成数は。
+
+**やる夫**：
+全部を通るから最小の70 stack。
+
+前工程を120から240へ倍増しても、完成数は70のままだお。
+
+余分な仕掛品と投資だけ増えた！！
+
+**やらない夫**：
+第13幕の$0.95^8$と何が同じだ。
+
+**やる夫**：
+積層では全dieが通る確率を掛けた。
+
+供給網では全工程を通れる数量の最小値が上限になる。
+
+**局所の最大化ではなく、系全体の一番細い場所が出荷を決める**お。
+
+**やらない夫**：
+積層・接合を70から140へ増強しろ。
+
+**やる夫**：
+専用toolを発注し、space、utility、材料、作業者を用意し、recipeと歩留まりを立ち上げる。
+
+明日には増えない。
+
+Micronの公表例でもmemory fab投資は150億ドルを十年末までに行う規模で、New York計画は20年以上で最大1000億ドル、出力は需要に合わせて後半から段階的に増やす。[^115]
+
+**やらない夫**：
+今あるDRAM能力の配分なら変えられる。
+
+**やる夫**：
+同じ前工程、人材、検査toolを、PC用DDR5、server DRAM、HBM向けdieのどこへ優先するかは動かせる。
+
+HBMの契約を優先すれば、短期のHBM出荷は増やせても、PC用DDR5へ回る能力が減り得る。
+
+……あ。
+
+**やらない夫**：
+冒頭で32GBが高いと怒っていたのは誰だ。
+
+**やる夫**：
+やる夫だお。
+
+いまPC向けを減らす判断をしたのも、やる夫だお。
+
+悪い転売屋が砂へ利益を載せたと思っていた。
+
+でも実際は、**限られた工場能力をどの製品へ配るかという経営判断が、別市場の価格へ届く**お。
+
+やる夫社長、自分のPCのupgrade費用を自分で上げたお……。
+
+---
+### 16-6　高い今こそ、全社で工場を建てる
+
+**やる夫**：
+memoryが高いなら儲かる。
+
+競合各社も100億ドルfabを同時に建てる。
+
+完成後は全員大金持ちだお！！
+
+**やらない夫**：
+三年後。
+
+全社の新能力が同時に立ち上がり、需要の伸びが予想を下回った。
+
+何が起きる。
+
+**やる夫**：
+供給過剰で平均販売価格が下がる。
+
+高い売価を前提にした投資の減価償却だけ残る。
+
+稼働率を落とせば、固定費を少ない良品で負担して一個原価が上がるお。
+
+**やらない夫**：
+投資を止めると。
+
+**やる夫**：
+数年後に需要が戻っても、新fabはすぐ生えない。
+
+不足して価格が上がり、高値を見てまた全社が投資する。
+
+**需要は短く変わり、供給能力は長く遅れて動く**から、判断時と完成時の市場がずれるお。
+
+Micron自身も2025年の年次報告で、投資が世界供給を増やし、需要が同じだけ伸びなければ平均販売価格が下がること、長い部品lead timeが過剰在庫と販売機会損失の両方を生むことをriskとして挙げている。[^115]
+
+**できる夫**：
+最後の値札更新です！！
+
+**やる夫**：
+最後ではないお。
+
+2026年8月の一時点として、既存の値札ボードを並べるお。
+
+| 時代 | 製品単位 | 1ドルで買えるbit数 |
+|---|---|---:|
+| 電球模型 | 1bit装置、部品代500円 | 約0.3bit |
+| 磁気core、1960年代末 | 計算機内蔵 | 約100bit |
+| Intel 1103、1970年 | 1Kbit、約10ドル | 約100bit |
+| 初期NAND camera模型、1990年前後 | 4Mbit×8、約2万ドル | 約1700bit |
+| 1GB DDR2 DIMM、2005年 | 119ドル | 約7200万bit |
+| 80GB SSD、2008年 | 595ドル | 約11.5億bit |
+| HBM、現代 | accelerator価格からの仮定 | 約6400万〜1億2800万bit |
+| 32GB DDR5 kit、2025年秋の報道例 | 100〜200ドル | 約13.7億〜27.5億bit |
+| 32GB DDR5 kit、2026年の市場例 | 約5.5万円、150円／ドル換算 | 約7.5億bit |
+
+電球模型の0.3bitからDDR5の約7.5億bitまで、約25億倍だお。[^12][^13][^14]
+
+ただしHBMは小売価格でなく第13幕の仮定幅、DDR5は地域、在庫、時点で動く市場例だお。[^21]
+
+最後の二行では、一年で1ドルが買うbitが増えず、報道例の範囲より減っている。
+
+**やらない夫**：
+技術が進めば、価格は毎年必ず下がるか。
+
+**やる夫**：
+長期には微細化、立体化、歩留まり、標準化で1ドルのbitは増えた。
+
+短期には設備能力、製品配分、在庫、需要、建設と立上げの遅れで逆走できる。
+
+だから“砂なのになぜ高い”では原因が見えない。
+
+**どの工程、材料、歩留まり、package、規格、供給能力が今のbottleneckなのか**と問うべきだお。
+
+**やらない夫**：
+では、最高のmemoryを自作する話は終わりか。
+
+**やる夫**：
+まだ一問残っているお。
+
+150年かけて材料も回路も工場も規格も変えたのに、なぜ人類はDRAM、NAND、SRAM、HBM、CXLを一つへ統一しなかったのか。
+
+やる夫が欲しかった“速く、安く、大容量で、消えず、無限に書けるmemory”は、技術不足で未完成なのか。
+
+それとも要求そのものが喧嘩しているのか。
+
+値札ボードの前で、最後にそこを決着させるお。
+
+---
 ## 第6幕　電源を切っても残せ、ただし壊れることは認めろ
 
 ---
@@ -8543,6 +9248,26 @@ $$32\times 8\times 2^{30}\approx2.75\times10^{11}\text{ bit}$$
 [^104]: Compute Express Link Consortium, [『DRAM Resource Scalability Enabled by CXL』](https://computeexpresslink.org/blog/dram-resource-scalability-enabled-by-cxl-1071/)および[『CXL 3.1 Specification』](https://computeexpresslink.org/wp-content/uploads/2024/02/CXL-3.1-Specification.pdf), 2026年8月10日参照. CXL 2.0 switchによるmemory resourceの再割当て、CXL 3.xでのmulti-headed／fabric-attached memoryによるpoolingとsharingを説明する。本文の4台・2TBは利用率差を示す架空の模型である。
 
 [^105]: [Compute Express Link Consortium『Integrators List』](https://computeexpresslink.org/integrators-list/), 2026年8月10日参照. host、switch、controller、memory expanderなどをcompliance eventで組み合わせて検証する公開一覧で、規格策定後にもecosystem全体の相互運用試験が必要なことを示す。
+
+[^106]: Texas Instruments, [『Low-Power FRAM Microcontrollers and Their Applications』](https://www.ti.com/jp/lit/pdf/slaa502)および[『MSP-FRAM-UTILITIES』](https://www.ti.com/tool/MSP-FRAM-UTILITIES), 2026年8月10日参照. 強誘電体capacitorの分極を使うFRAM cellと、従来型1T1C FRAMがread後にrestoreを要すること、MSP430製品群が3.75KB〜256KB級FRAMを組込み、低電力状態保存へ利用する例を示す。
+
+[^107]: [GlobalFoundries『Production-ready eMRAM on 22FDX Platform』](https://investors.gf.com/news-releases/news-release-details/globalfoundries-delivers-industrys-first-production-ready-emram), 2020年2月27日; Everspin Technologies, [『Everspin Ships the World’s First Pre-Production 28 nm 1 Gb STT-MRAM Customer Samples』](https://www.everspin.com/sites/default/files/pressdocs/Press%20Release%201Gb%20CS%20Availability%20Final.pdf), 2019年1月8日および[『EMD4E001G - 1Gb Spin-transfer Torque MRAM』](https://www.everspin.com/products/series/emd4e001g), 2026年8月10日参照; J. Chatterjeeほか, [『High-temperature thermal stability driven by magnetization dilution in CoFeB free layers for spin-transfer-torque magnetic random access memory』](https://pmc.ncbi.nlm.nih.gov/articles/PMC6158269/), *Scientific Reports*, 2018. MTJの熱安定性因子$\Delta=E_b/(k_BT)$とswitching currentの交換条件、22FDX eMRAMの4〜48Mbit macro・10万回耐久・10年保持、2018年末からsample出荷された1Gbit STT-MRAMのpersistent buffer用途を示す。製品値は各用途の仕様であり、MRAM一般の上限ではない。
+
+[^108]: [IBM Research Zurich『Phase-change memory』](https://www.zurich.ibm.com/pcm/), 2026年8月10日参照. PCMがamorphous／crystalline状態の抵抗差を用い、Joule加熱で切り替えること、amorphous状態の抵抗driftが多値記録の狭いread marginを損なう主要課題であることを説明している。
+
+[^109]: [imec『The promise of OTS-only memories for next-gen compute system architectures』](https://www.imec-int.com/en/articles/promise-ots-only-memories-next-gen-compute-system-architectures-0), 2026年8月10日参照. PCMやReRAMなどのcross-point arrayでは未選択cellを通るsneak currentが読出しを妨げ、各memory elementへselectorを直列接続して抑える必要があることを説明する。本文の63経路模型は増加構造だけを見る架空回路である。
+
+[^110]: [GlobalFoundries『Availability of 22FDX+ RRAM Technology for Wireless Connectivity and AI Applications』](https://gf.com/news-and-events/news/globalfoundries-announces-availability-of-22fdx-rram-technology-for-wireless-connectivity-and-ai-applications/), 2025年8月28日. OxRAMを22FDX+へ組み込み、wireless MCUのcodeとedge AIのweight保存向けに試作提供したことを示す。一般DRAM／NANDを置換する量産汎用memoryの発表とは区別する。
+
+[^111]: Intel, [『How a Semiconductor Factory Works』](https://newsroom.intel.com/tech101/how-a-semiconductor-factory-works), 2023年6月9日および[『How Silicon Die Become Chip Packages』](https://newsroom.intel.com/tech101/how-silicon-die-become-chip-packages), 2025年2月19日; [Micron Technology『Inside 1-Alpha DRAM』](https://www.micron.com/about/blog/memory/dram/inside-1a-the-worlds-most-advanced-dram-process-technology), 2026年8月10日参照. Intelの典型fab例は約1200製造tool、1500 utility設備、約100億ドル、建設3〜5年であり、Micronは現代DRAMが1000超の工程を通ると説明する。前工程後にもassemblyとtestが続き、個別工場の実費・工程数は世代と製品で異なる。
+
+[^112]: [ASML『2023 Annual Report』](https://www.asml.com/en/investors/annual-report/2023), 2026年8月10日参照. 2023年に最初のHigh-NA EUV EXE:5000 modulesを出荷し、numerical apertureを0.33から0.55へ上げたことを記載する。本文では露光機をfab全体の価格や、全層で使う万能toolとして扱っていない。
+
+[^113]: [Intel Foundry『Intel 18A』](https://www.intel.com/content/www/us/en/foundry/process/18a.html), 2026年8月10日参照. gate-all-around構造のRibbonFETと、電源配線をwafer裏面へ移すPowerViaを先端logic工程の重点例として示す。DRAM／NANDのnode名と直接比較するための線幅値ではない。
+
+[^114]: [Sandia National Laboratories『Willis Whitfield: A simple man with a simple solution that changed the world』](https://www.sandia.gov/labnews/2024/04/04/willis-whitfield-a-simple-man-with-a-simple-solution-that-changed-the-world/), 2024年4月4日. 1961年の一方向気流型cleanroom試作が平均750 particles/ft³で、当時の良好なcleanroomの100万超に対して1000倍以上清浄だったこと、粒子をfilterと連続気流で排出する原理を記録している。
+
+[^115]: Micron Technology, [『2025 Form 10-K』](https://investors.micron.com/static-files/7a1f8c6f-1ce9-4efe-bc6e-722b6b9c4550), 2025年10月3日; [『Micron to Invest $15 Billion in New Idaho Fab』](https://investors.micron.com/news-releases/news-release-details/micron-invest-15-billion-new-idaho-fab-bringing-leading-edge), 2022年9月1日; [『Micron Announces Historic Investment of up to $100 Billion to Build Megafab in Central New York』](https://investors.micron.com/news-releases/news-release-details/micron-announces-historic-investment-100-billion-build-megafab), 2022年10月4日. 投資による世界供給増が需要を上回れば平均販売価格が下がるrisk、長いlead time、150億ドル級fabと20年以上・最大1000億ドルの段階投資例を示す。将来計画は発表時点の計画であり、完成済み能力ではない。
 
 [1]: https://www.computerhistory.org/timeline/computers/ "Timeline of Computer History"
 [2]: https://www.bell-labs.com/about/awards/1956-nobel-prize-physics/ "1956 Nobel Prize in Physics"
