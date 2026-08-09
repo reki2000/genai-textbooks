@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -53,6 +54,7 @@ INDEX_PATH = ROOT / "docs" / "index.html"
 NOT_FOUND_PATH = ROOT / "docs" / "404.html"
 SITEMAP_PATH = ROOT / "docs" / "sitemap.xml"
 BOOKS_DIR = ROOT / "docs" / "books"
+MARP_CLI = ("npx", "--yes", "@marp-team/marp-cli@4")
 START_MARKER = "<!-- BEGIN GENERATED CATALOG -->"
 END_MARKER = "<!-- END GENERATED CATALOG -->"
 
@@ -408,20 +410,26 @@ def has_slide(document: dict[str, Any]) -> bool:
     return (BOOKS_DIR / document["id"] / "slide.md").is_file()
 
 
+def slide_needs_render(document: dict[str, Any], out_docs: Path) -> bool:
+    source = BOOKS_DIR / document["id"] / "slide.md"
+    if not source.is_file():
+        return False
+    dest = out_docs / "books" / document["id"] / "slide.html"
+    return not (
+        dest.is_file() and dest.stat().st_mtime_ns >= source.stat().st_mtime_ns
+    )
+
+
 def render_slide_deck(document: dict[str, Any], out_docs: Path) -> None:
     """Render docs/books/{id}/slide.md to build/books/{id}/slide.html via
     marp-cli, if a slide.md is present for the document."""
     source = BOOKS_DIR / document["id"] / "slide.md"
-    if not source.is_file():
-        return
     dest = out_docs / "books" / document["id"] / "slide.html"
     dest.parent.mkdir(parents=True, exist_ok=True)
-    if dest.is_file() and dest.stat().st_mtime_ns >= source.stat().st_mtime_ns:
-        return
     try:
         subprocess.run(
             [
-                "npx", "--yes", "@marp-team/marp-cli@4",
+                *MARP_CLI,
                 str(source), "-o", str(dest), "--html", "--allow-local-files",
                 "--template", "bare",
             ],
@@ -432,14 +440,40 @@ def render_slide_deck(document: dict[str, Any], out_docs: Path) -> None:
         fail(f"document {document['id']} slide.md failed to render via marp-cli: {exc}")
 
 
+def warm_marp_cli() -> None:
+    """Populate the npx cache for marp-cli with a single throwaway run.
+
+    Every `npx --yes @marp-team/marp-cli@4` resolves to the same cache
+    directory under ~/.npm/_npx, so starting several of them at once on a
+    cold cache lets one process read a half-installed node_modules that
+    another is still writing (`Cannot find module 'cssfilter'`). Installing
+    once, serially, leaves the concurrent renders with nothing to race over."""
+    try:
+        subprocess.run(
+            [*MARP_CLI, "--version"],
+            check=True,
+            cwd=ROOT,
+            stdout=subprocess.DEVNULL,
+        )
+    except (subprocess.CalledProcessError, FileNotFoundError) as exc:
+        fail(f"marp-cli is unavailable: {exc}")
+
+
 def render_slide_decks(documents: list[dict[str, Any]], out_docs: Path) -> None:
     """Render all slide.md decks concurrently, since each invokes marp-cli as
     a separate subprocess and spends most of its time waiting on that
     process rather than on the Python interpreter."""
-    targets = [document for document in documents if has_slide(document)]
+    targets = [
+        document for document in documents
+        if slide_needs_render(document, out_docs)
+    ]
     if not targets:
         return
-    with ThreadPoolExecutor(max_workers=len(targets)) as executor:
+    warm_marp_cli()
+    # marp-cli is heavier than a plain I/O wait, so keep the fan-out near the
+    # core count instead of starting one process per deck.
+    workers = min(len(targets), max(os.cpu_count() or 1, 2))
+    with ThreadPoolExecutor(max_workers=workers) as executor:
         futures = {
             executor.submit(render_slide_deck, document, out_docs): document
             for document in targets
