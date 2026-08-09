@@ -60,7 +60,7 @@ END_MARKER = "<!-- END GENERATED CATALOG -->"
 
 # Multi-part documents split their body across docs/books/{id}/README.md
 # (part 1), README.2.md (part 2), README.3.md (part 3), ... Numbering must
-# start at 1 and be contiguous; see docs/BUILD.md.
+# start at 1 and be contiguous; see BUILD.md.
 PART_FILE_PATTERN = re.compile(r"^README(?:\.(?P<n>[1-9][0-9]*))?\.md$")
 DOCUMENT_ID_PATTERN = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 
