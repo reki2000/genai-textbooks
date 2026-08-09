@@ -797,11 +797,21 @@
   // -------------------------------------------------------------- クリック
 
   // 選択は本文をなぞって作る。パネル内の操作で選択が消えるのを避けたいので、
-  // 本文の中で指を離したときだけ拾う。空の選択（ただのクリック）では捨てない。
+  // 本文の中で指を離したときだけ拾う。本文のシングルクリックで空の選択に
+  // なった場合は、直前のコメント対象を外す。
   document.addEventListener('mouseup', function (event) {
     if (!state.book) return
     if (event.target.closest && event.target.closest('#dev-comment-panel')) return
-    window.setTimeout(captureSelection, 0)
+    var article = event.target.closest && event.target.closest('.markdown-section')
+    window.setTimeout(function () {
+      var selection = window.getSelection()
+      if (article && event.detail === 1 && (!selection || selection.isCollapsed)) {
+        clearSelection()
+        renderPanel()
+        return
+      }
+      captureSelection()
+    }, 0)
   })
 
   document.addEventListener('keyup', function (event) {
@@ -1003,6 +1013,10 @@
     'animation:dev-comment-fade 1.6s ease-out forwards}',
     '@keyframes dev-comment-fade{0%{opacity:1}70%{opacity:.9}100%{opacity:0}}',
     'body.dev-comment-mode .content{padding-right:340px}',
+    // 本文表示中の要約ボタンは、コメントペインではなく本文ペインの右上に置く。
+    // 要約へ切り替えた後はスライドに全幅を渡し、コメントペインも隠す。
+    'body.dev-comment-mode:not(.slide-mode) #slide-summary-toggle{right:356px}',
+    'body.dev-comment-mode.slide-mode #dev-comment-panel{display:none!important}',
 
     '#dev-comment-panel{display:none;position:fixed;top:0;right:0;bottom:0;width:320px;z-index:28;',
     'flex-direction:column;background:var(--background,#fff);color:var(--textColor,#34495e);',
@@ -1094,6 +1108,7 @@
     '@keyframes dev-comment-flash{from{background:rgba(66,185,131,.14)}to{background:transparent}}',
     '@media (prefers-reduced-motion:reduce){.status-open .dev-comment-status{animation:none}}',
     '@media (max-width:768px){body.dev-comment-mode .content{padding-right:0}',
+    'body.dev-comment-mode:not(.slide-mode) #slide-summary-toggle{right:16px}',
     '#dev-comment-panel{width:100%;top:auto;height:60vh}}',
   ].join('')
 
