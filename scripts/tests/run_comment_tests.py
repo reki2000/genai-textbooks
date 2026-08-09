@@ -195,6 +195,140 @@ def test_edit_anchor(root: Path) -> None:
     duplicated = C.edit_anchor(lines, (8, 8))
     check("edit_anchor: 重複は広げて一意化", (duplicated[1], duplicated[0].count("\n")), (True, 2))
 
+    section = C.edit_anchor(lines, (4, 12), unit="section")
+    check("edit_anchor: section は候補を出さない", section, ("", False))
+
+    thirteen_lines = [f"一意な行 {index}\n" for index in range(C.EDIT_ANCHOR_MAX_LINES + 1)]
+    over_lines = C.edit_anchor(thirteen_lines, (0, len(thirteen_lines) - 1))
+    check("edit_anchor: 行数上限を超えたら候補なし", over_lines, ("", False))
+
+    long_line = ["長" * (C.EDIT_ANCHOR_MAX_CHARS + 1) + "\n"]
+    over_chars = C.edit_anchor(long_line, (0, 0))
+    check("edit_anchor: 文字数上限を超えたら候補なし", over_chars, ("", False))
+
+    block = [f"共通行 {index}\n" for index in range(C.EDIT_ANCHOR_MAX_LINES)]
+    needs_over_limit_extension = ["一つ目の前置き\n", *block, "区切り\n", "二つ目の前置き\n", *block]
+    extended = C.edit_anchor(needs_over_limit_extension, (1, C.EDIT_ANCHOR_MAX_LINES))
+    check("edit_anchor: 一意化後に上限超過なら候補なし", extended, ("", False))
+
+
+def test_schema_revision_and_legacy_upgrade(root: Path) -> None:
+    comment = C.create_comment(
+        book="sample",
+        part=1,
+        kind="wording",
+        unit="sentence",
+        body="schema の検査",
+        heading="1-1　最初の問い",
+        heading_level=3,
+        heading_path=[],
+        quote="転移は治療の障害ではないのかお。",
+        quote_tail="ないのかお。",
+        occurrence=1,
+    )
+    check("schema: 新規は現行版", (comment.schema, comment.revision), (C.COMMENT_SCHEMA, 1))
+    first_text = comment.path.read_text(encoding="utf-8")
+    check("schema: frontmatter に版と revision", ("schema: comment/v1" in first_text, "revision: 1" in first_text), (True, True))
+
+    legacy_text = first_text.replace("schema: comment/v1\nrevision: 1\n", "", 1)
+    comment.path.write_text(legacy_text, encoding="utf-8")
+    legacy = C.find_comment("sample", comment.id)
+    check("schema: 欠落は legacy として読む", (legacy.schema, legacy.revision), (C.LEGACY_COMMENT_SCHEMA, 0))
+    C.set_status(legacy, "stale")
+    upgraded = C.find_comment("sample", comment.id)
+    check("schema: 更新と同じ保存で現行版へ移行", (upgraded.schema, upgraded.revision), (C.COMMENT_SCHEMA, 1))
+
+    unknown = upgraded.path.read_text(encoding="utf-8").replace("schema: comment/v1", "schema: comment/v999", 1)
+    try:
+        C.parse_comment(unknown)
+    except C.CommentError:
+        print("ok   schema: 未知の明示版を拒否")
+    else:
+        print("FAIL schema: 未知の明示版が通った")
+        FAILURES.append("schema: unknown version")
+
+
+def test_atomic_write_and_conflicts(root: Path) -> None:
+    comment = C.create_comment(
+        book="sample",
+        part=1,
+        kind="wording",
+        unit="sentence",
+        body="競合の検査",
+        heading="1-1　最初の問い",
+        heading_level=3,
+        heading_path=[],
+        quote="転移は治療の障害ではないのかお。",
+        quote_tail="ないのかお。",
+        occurrence=1,
+    )
+    C.set_status(comment, "answered", answer="最初の対応")
+    before_followup = C.find_comment("sample", comment.id)
+    stale_agent_copy = C.find_comment("sample", comment.id)
+    C.add_followup(before_followup, "追加指摘を消さないで")
+    try:
+        C.set_status(stale_agent_copy, "answered", answer="古い版への対応")
+    except C.CommentConflict:
+        print("ok   conflict: stale な回答を拒否")
+    else:
+        print("FAIL conflict: stale な回答が上書きした")
+        FAILURES.append("conflict: stale answer")
+    preserved = C.find_comment("sample", comment.id)
+    check(
+        "conflict: 追加指摘と open 状態を保持",
+        (preserved.status, preserved.body, [message.role for message in preserved.messages()]),
+        ("open", "追加指摘を消さないで", ["user", "assistant", "user"]),
+    )
+
+    for target in ("resolved", "stale", "open"):
+        first = C.find_comment("sample", comment.id)
+        second = C.find_comment("sample", comment.id)
+        C.set_status(first, target)
+        try:
+            C.set_status(second, target)
+        except C.CommentConflict:
+            print(f"ok   conflict: {target} の競合を拒否")
+        else:
+            print(f"FAIL conflict: {target} の競合が通った")
+            FAILURES.append(f"conflict: {target}")
+
+    fresh = C.find_comment("sample", comment.id)
+    original = fresh.path.read_text(encoding="utf-8")
+    with mock.patch("comments.os.replace", side_effect=OSError("置換失敗")):
+        try:
+            C.set_status(fresh, "stale")
+        except OSError:
+            print("ok   atomic: 置換失敗を呼び出し側へ返す")
+        else:
+            print("FAIL atomic: 置換失敗を握りつぶした")
+            FAILURES.append("atomic: replace failure")
+    check("atomic: 置換失敗時は元ファイルを保持", fresh.path.read_text(encoding="utf-8"), original)
+    check(
+        "atomic: 置換失敗時に一時ファイルを残さない",
+        list(fresh.path.parent.glob(f".{fresh.path.name}.*")),
+        [],
+    )
+
+
+def test_conflict_http_status() -> None:
+    import dev_server
+
+    handler = dev_server.PreviewHandler.__new__(dev_server.PreviewHandler)
+    handler.path = f"{dev_server.COMMENT_API_PATH}/sample/0001/reopen"
+    handler._check_origin = mock.Mock(return_value=True)
+    handler._set_status = mock.Mock(side_effect=C.CommentConflict("競合"))
+    handler._send_bytes = mock.Mock()
+    handler.send_error = mock.Mock()
+    handler.do_POST()
+    check("conflict: HTTP は 409", handler._send_bytes.call_args.kwargs.get("status"), 409)
+
+    with (
+        mock.patch("comments.find_comment", return_value=anchor_comment(anchor=C.Anchor())),
+        mock.patch("comments.set_status", side_effect=C.CommentConflict("競合")),
+    ):
+        exit_code = C.main(["reopen", "--book", "sample", "--id", "0001"])
+    check("conflict: CLI は終了コード 2", exit_code, 2)
+
 
 def test_create_and_status(root: Path) -> None:
     comment = C.create_comment(
@@ -224,6 +358,7 @@ def test_create_and_status(root: Path) -> None:
     C.set_status(reloaded, "answered", answer="やる夫の台詞に理由を1文足した")
     again = C.find_comment("sample", "0001")
     check("answer: 状態", again.status, "answered")
+    check("answer: revision を進める", again.revision, 2)
     check("answer: 対応の説明", again.answer, "やる夫の台詞に理由を1文足した")
     check("answer: 指摘は残る", again.body, "唐突に感じる")
 
@@ -234,9 +369,11 @@ def test_create_and_status(root: Path) -> None:
     check("follow-up: 再び処理対象へ戻す", followed.status, "open")
     check("follow-up: 往復の履歴を残す", [m.role for m in followed.messages()], ["user", "assistant", "user"])
     check("follow-up: 最新の指摘を本文にする", followed.body, "理由ではなく、具体例も必要です")
+    check("follow-up: revision を進める", followed.revision, 3)
 
     C.set_status(followed, "answered", answer="具体例を一つ追加した")
     threaded = C.find_comment("sample", "0001")
+    check("follow-up: 二度目の対応でも revision を進める", threaded.revision, 4)
     check(
         "follow-up: 二度目の対応も同じ履歴へ追加",
         [(m.role, m.body) for m in threaded.messages()],
@@ -446,6 +583,8 @@ def main() -> int:
         test_outline_metadata(root)
         test_edit_anchor(root)
         test_create_and_status(root)
+        test_schema_revision_and_legacy_upgrade(root)
+        test_atomic_write_and_conflicts(root)
         test_create_rejects_unresolvable(root)
         test_browser_quote_parity(root)
         test_group_same_section(root)
@@ -453,6 +592,7 @@ def main() -> int:
         test_wait_connection_failure()
         test_wait_parser_needs_no_book()
         test_client_disconnect_during_response()
+        test_conflict_http_status()
         test_book_id_guard(root)
 
     if FAILURES:
