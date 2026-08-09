@@ -2029,9 +2029,13 @@ $$\left(\alpha|0\rangle+\beta|1\rangle\right)|A_{\mathrm{ready}}\rangle
 **やる夫**：
 時間集合を、
 
-$$T=(-\infty,0]\cup([0,\infty)\times{L,R})$$
+$$
+T=\left((-\infty,0]\times\{P\}\;\sqcup\;[0,\infty)\times\{L,R\}\right)\Big/\!\sim,
+\qquad (0,P)\sim(0,L)\sim(0,R)
+$$
 
-みたいに作って、$0$ から左未来と右未来へ分けるお。
+みたいに、過去枝 $P$ と2本の未来枝 $L,R$ の3つの原点を同じ一点とみなして、
+$0$ から左未来と右未来へ分けるお。
 
 **やらない夫**：
 分岐点（branch point）の近傍を見ろ。
