@@ -75,7 +75,7 @@ python3 scripts/dev_server.py
 python3 scripts/dev_server.py --host 0.0.0.0 --port 8000
 ```
 
-本文 Markdown（`docs/books/*/README*.md`）だけが変わったときは、全体ビルドを回さずにそのファイルだけをルビ変換して差し替える。ブラウザ側もページ全体を捨てず、docsify に本文を取り直させてスクロール位置を保ったまま更新する（`/__dev/revision` が返す `changed` を見て判断する）。それ以外の変更は従来どおり全体ビルドと再読み込み。
+本文 Markdown（`docs/books/*/README*.md`）だけが変わったときは、全体ビルドを回さずにそのファイルだけをルビ変換して差し替える。ブラウザ側は更新種別にかかわらずページ全体を再読み込みせず、現在開いている Markdown を取り直す。内容が変わっていれば docsify の本文だけを描画し直し、スクロール位置を保ったまま更新する（`/__dev/revision` を更新通知として使う）。
 
 ### プレビュー上のコメント
 

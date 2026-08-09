@@ -24,8 +24,9 @@ python3 scripts/comments.py answer --book {ID} --id 0007 --message '…'
 
 ## ファイルと責務
 
-- コメントは `comments/{ID}/{連番}.md`（OKF v0.1：YAML frontmatter 付き Markdown、`type: comment`）。`docs/` の外に置くのは、`generate_site.py` が `docs/` を丸ごと `build/` へコピーするため。`.gitignore` 済みでサイトには公開されない。
+- コメントは `comments/{ID}/{連番}.md`（OKF v0.1：YAML frontmatter 付き Markdown、`type: comment`）。現行形式は `schema: comment/v1` と単調増加する `revision` を持つ。schema の無い既存ファイルは legacy として読み、次の更新と同じトランザクションで現行形式へ移す。未知の明示 schema は推測して読まない。`docs/` の外に置くのは、`generate_site.py` が `docs/` を丸ごと `build/` へコピーするため。`.gitignore` 済みでサイトには公開されない。
 - 永続化・アンカー解決・窓の切り出しは `scripts/comments.py` が唯一の入口。`dev_server.py` は HTTP 層だけを持つ。
+- 保存は同一ディレクトリ内の一時ファイルを `fsync` してから原子的に置換する。更新時は短時間のファイルロック内で、読み込み時の hash・schema・revision と現在値を照合する。競合した更新は上書きせず、HTTP は 409、CLI は終了コード 2 で再読を求める。
 
 ## アンカー
 
@@ -36,6 +37,7 @@ python3 scripts/comments.py answer --book {ID} --id 0007 --message '…'
 
 - 状態は `open`（処理中）→ `answered`（AI が対応）→ `resolved`（人が確認）。対応結果へ人が追加コメントすると、同じファイルへ履歴を追記して `open` に戻る。**`resolved` にできるのは人だけ**で、パネルの「確認して閉じる」を押す。
 - 選択範囲はコメントの**対象**を示すもので、修正範囲ではない。どこまで直すかは対応する側がコメントの内容で判断し、必要なら `comments.py show --scope section|part` で窓を引き直す。
+- `edit_anchor` の `old_string` 候補は、節単位の選択では出さない。文・段落でも、一意化のために前へ伸ばした最終候補が12行または1,200文字を超える場合は出さず、対応側が窓から実際の修正箇所を選ぶ。
 - 対応する側の作法は `/comment-eater`（または `$comment-eater`）。全文を読み直さず、`comments.py wait` が渡す窓だけで直す。`python3 scripts/comments.py wait --session … --model … --effort …` で全教材を待ち受け、GET の応答で対象教材を受け取る。待機の GET でモデルと effort を名乗り、その接続を掴んでいる間が「待機中」。担当は1教材に1つで、二人目は終了コード 2（判定は dev_server がメモリで持つ）。
 
 ## テスト

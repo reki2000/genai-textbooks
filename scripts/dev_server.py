@@ -283,6 +283,9 @@ class PreviewHandler(BaseHTTPRequestHandler):
             if len(parts) == 3 and parts[2] in comments_module.STATUS_ACTIONS:
                 self._set_status(parts[0], parts[1], parts[2])
                 return
+        except comments_module.CommentConflict as exc:
+            self._send_bytes(str(exc).encode("utf-8"), "text/plain; charset=utf-8", True, status=409)
+            return
         except comments_module.CommentError as exc:
             self._send_bytes(str(exc).encode("utf-8"), "text/plain; charset=utf-8", True, status=400)
             return
