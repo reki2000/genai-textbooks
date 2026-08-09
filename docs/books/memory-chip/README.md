@@ -2880,6 +2880,788 @@ $$\frac{8\times2^{30}}{119}\approx72{,}000{,}000\text{ bit/ドル}$$
 **発明を、何億個も同じ品質で安く出すところまで運んだ企業が、各世代の主役になる**んだお。
 
 ---
+## 第9幕　電源を切っても残せ、ただし壊れることは認めろ
+
+---
+### 9-1　ROMなら消えない。だから完成だ
+
+**やる夫**：
+DRAMは電源を切ると消える。
+
+次は配線そのものを0と1にすればいいお。
+
+つながっている配線を1、切れている配線を0にする。
+
+電荷を置かないからrefreshもいらない。これで完成だお。
+
+**やらない夫**：
+その0を1へ書き換えるには。
+
+**やる夫**：
+工場へ戻して、配線を作り直す。
+
+……完成してないお。
+
+**やらない夫**：
+二つの能力を一緒にするな。
+
+- 電源を切っても残ること――**不揮発性（non-volatility）**
+- 利用者が後から内容を変えられること――**書換可能性（rewritability）**
+
+mask ROMは前者だけを持つ。
+
+**やる夫**：
+なら利用者がヒューズを焼くPROMだお。
+
+1970年には、金属ヒューズを切って一度だけ書けるPROMが製品化された。[^58]
+
+**やらない夫**：
+書き間違えたら。
+
+**やる夫**：
+新しいチップを買う。
+
+一度だけ書けるOTPだお。
+
+**やらない夫**：
+1971年のEPROMなら、石英窓から紫外線を当てて消せる。
+
+電気で書き、光で全体を消し、また書ける。
+
+**やる夫**：
+PCオタクの箱に、窓へシールを貼ったBIOS ROMがあるお。
+
+あれがEPROMか。
+
+でもマザーボードから抜いて消去器へ入れる必要がある。
+
+**やらない夫**：
+次は1970年代後半のEEPROMだ。
+
+電気だけで消去と書込みができる。
+
+**やる夫**：
+なら今度こそ完成だお。
+
+**やらない夫**：
+EEPROMは細かく書き換えられる代わりに、セルや周辺回路が大きく、まとめて安く保存するには不利だった。
+
+欲しい能力を並べ直せ。
+
+**やる夫**：
+電源を切っても残る。
+
+何度も書き換えられる。
+
+しかもDRAMのように小さく、磁気ディスクへ近づけるほど安い。
+
+三つを同時に要求した瞬間、別の妥協が要るお。
+
+---
+### 9-2　絶縁体へ閉じ込めれば、電子は永遠に逃げない
+
+**やる夫**：
+DRAMはキャパシタの電荷が漏れた。
+
+なら導線につながっていない小さな金属へ電子を閉じ込めるお。
+
+絶縁体で囲めば逃げ道はない。
+
+**やらない夫**：
+その島を浮遊ゲート（floating gate）と呼ぶ。
+
+だが、完全に触れない島の電子をどう書き、どう読む。
+
+**やる夫**：
+矛盾したお。
+
+閉じ込められるなら入れられない。
+
+入れられるなら漏れる。
+
+**やらない夫**：
+読む方から考えろ。
+
+MOSFETはgate電圧がある値を超えるとchannelが導通する。その境目がしきい値電圧（threshold voltage, $V_\mathrm{th}$）だ。
+
+浮遊ゲートへ電子があると電界が変わり、導通に必要なcontrol gate電圧も変わる。
+
+**やる夫**：
+たとえば電子が少ないセルは2VでON、電子が多いセルは5VでON。
+
+3Vをかけて電流が流れれば前者、流れなければ後者。
+
+電子を直接数えず、トランジスタがONになる境目を読むのか。
+
+**やらない夫**：
+そうだ。
+
+書込みと消去では薄い酸化膜へ強い電界をかけ、電子を障壁の向こうへ通す。代表的な仕組みが**Fowler–Nordheim tunneling**だ。セル方式によってはhot-electron injectionも使う。[^29]
+
+**やる夫**：
+量子力学のtunnelなら、絶縁体を壊さず電子だけ通せる。
+
+これなら永久だお。
+
+**やらない夫**：
+強い電界を何度もかけた酸化膜は、何も起きなかった新品へは戻らない。
+
+電荷を捕まえる欠陥が増え、しきい値が揺れ、保持した電子も少しずつ逃げる。
+
+**やる夫**：
+「不揮発」は「永久保存」ではないのか。
+
+**やらない夫**：
+電源を切った瞬間に消えない、という分類だ。
+
+実用品には別に、保持期間、書換回数、温度、誤り率という仕様がある。
+
+**やる夫**：
+DRAMは弱い電荷を頻繁にrefreshした。
+
+flashは強い操作で閉じ込める代わりに、書換えのたびに入口が摩耗する。
+
+どちらも「電子を完全に支配した」のではなく、漏れ方と直し方が違うだけだお。
+
+---
+### 9-3　1byteずつ消すのを諦めたら、flashになった
+
+**やる夫**：
+EEPROMをそのまま小さく並べれば大容量になるお。
+
+全bitを個別に読み、個別に書き、個別に消す。
+
+最高に自由だお。
+
+**やらない夫**：
+各セルへ個別消去の配線と選択回路を付ける面積は誰が払う。
+
+**やる夫**：
+また住所札が住人より大きくなる問題だお。
+
+なら消去単位を大きくする。
+
+64KiBを一群にして、全員まとめて消すお。
+
+**やらない夫**：
+その「一瞬にまとめて消す」発想からflashという名が付いた。
+
+東芝は1984年にNOR型flashを発表し、1987年にNAND型flashの動作原理を発表した。1991年には4Mbit NANDを製品化した。[^59]
+
+**やる夫**：
+NORとNANDは論理回路の名前と同じだお。
+
+何が違う。
+
+**やらない夫**：
+8セルの模型を作れ。
+
+NOR型では各セルがbit lineへ並列に近い形でつながる。狙ったセルを直接選びやすい。
+
+NAND型では複数セルを直列の**string**へ並べ、選ばないセルを通過状態にして目的セルを読む。
+
+**やる夫**：
+配線の共有が増えるから、NANDは1bit当たりを小さくできる。
+
+でも直列の途中1個だけを読むには、周りも制御しないといけない。
+
+**やらない夫**：
+そこで用途が分かれた。
+
+| 構造 | 得意なアクセス | 主な用途 | 妥協 |
+|---|---|---|---|
+| NOR flash | byte／word単位のrandom read | firmware、組込みcode | 面積とbit単価 |
+| NAND flash | page単位のread／program、block単位のerase | 写真、音楽、SSDなど大量data | 細粒度の上書きと管理 |
+
+**やる夫**：
+PCのBIOS用NORと、SSD用NANDが別なのは偶然じゃない。
+
+CPUがその場で命令を読むならrandom read。
+
+大きなfileを安く持つなら密度。
+
+**やらない夫**：
+「全部を細かく自由に書き換える」を捨てたから、大容量の不揮発memoryへ進めた。
+
+ただしblock eraseを選んだ借金は、後でcontrollerが返す。
+
+---
+### 9-4　0と1を保存するのをやめた
+
+**やる夫**：
+1セルへ1bitなら、1兆bitには1兆セルが要る。
+
+同じ浮遊ゲートへ電子を二倍詰めれば、2bitにならないか。
+
+電子なしを00、少しを01、もっとを10、満杯を11。
+
+**やらない夫**：
+今度は正しい。
+
+保存しているのは電子数そのものより、結果として生じる複数のしきい値範囲だ。
+
+**やる夫**：
+0〜4Vの読取り窓を均等に割る模型なら、こうなるお。
+
+| 呼称 | 1セルのbit数 | 状態数 | 1状態の理想幅 |
+|---|---:|---:|---:|
+| SLC | 1 | 2 | 2V |
+| MLC | 2 | 4 | 1V |
+| TLC | 3 | 8 | 0.5V |
+| QLC | 4 | 16 | 0.25V |
+
+状態数は$2^b$。
+
+同じセル数ならQLCはSLCの4倍のbitを売れるお。
+
+**やらない夫**：
+その表の電圧は説明用で、実製品の値ではない。
+
+さらに実物のしきい値は一本の線でなく分布になる。製造ばらつき、隣接セルの干渉、保持中の電荷漏れ、program／eraseの摩耗で山が広がり、動く。
+
+**やる夫**：
+QLCは16本の細い箱に16個の山を収める。
+
+隣の山と重なれば、0110を0111と読む。
+
+容量を増やした代金を、速度、耐久性、誤り率で払うのか。
+
+なら読取り境界を理想どおり0.25V刻みへ固定すればいいお。
+
+**やらない夫**：
+製造直後と、書換えを重ねた後と、高温で長く保持した後で、山の位置が同じならな。
+
+実際のcontrollerは状態に応じてread thresholdを変え、失敗すれば別の境界でread retryする。
+
+**やる夫**：
+1セルのbit数だけを4倍にしたのではない。
+
+書込みの精密さ、読取り回数、ECC、管理回路まで増やして4bitを成立させるお。
+
+**やらない夫**：
+Samsungが示す製品世代の一例では、2006年の1bit SLC、2010年の2bit MLC、2012年の3bit TLC、2018年の4bit QLCへ進んでいる。これは各方式の発明年ではなく、高密度製品が市場へ広がった時期の目安だ。[^60]
+
+**やる夫**：
+PCのSSD売場で「TLCだから駄目」「QLCだから全部遅い」と型名だけで断言するのも雑だお。
+
+世代、controller、並列数、cache、用途まで見ないと製品性能は決まらない。
+
+でも物理の出発点として、状態を増やすほど判定余白が狭いのは消えないお。
+
+---
+### 9-5　曖昧な電圧から、正しいbit列を再生しろ
+
+**やる夫**：
+しきい値の山が狭いなら、一発で狙った電圧まで電子を注入する。
+
+QLCの13番目へぴたりと止めるお。
+
+**やらない夫**：
+ばらつくセルへ大きなpulseを一回かけたら、行き過ぎた電子を一セルだけ簡単に戻せない。
+
+**やる夫**：
+では小さなpulseをかけ、読む。
+
+まだ目標より低ければ、もう一度pulseをかけ、また読む。
+
+**program–verify**を繰り返すお。
+
+**やらない夫**：
+それでもraw dataの誤りはゼロにならない。
+
+8bitのdataへ1bitのparityを足すだけでは、奇数個の誤りを検出できても、どのbitを直すか分からない。
+
+**やる夫**：
+検査bitを複数置き、重なる組合せから故障位置を逆算する。
+
+1950年のHamming codeなら、適切な冗長bitで1bit誤りを訂正できる。[^61]
+
+複数bitが壊れるなら、1959〜1960年に成立したBCH codeのような強い符号へ進む。
+
+**やらない夫**：
+さらに高密度NANDでは、1962〜1963年にGallagerが示した**LDPC（Low-Density Parity-Check）code**が、半世紀後のcontrollerで重要になった。
+
+理論が古くても、反復復号を高速に回せる回路と、必要とする媒体が揃う時期は別だ。
+
+**やる夫**：
+Hamming、BCH、LDPCを年代順の製品規格だと思ってはいけない。
+
+数学の誕生年と、NANDで主役になる年が違うお。
+
+**やらない夫**：
+LDPCにはもう一つ武器がある。
+
+read電圧3Vで0か1かだけを返すのが**hard decision**。
+
+2.8V、3.0V、3.2Vと何度か読み、「0寄りだが境界に近い」という確信度まで渡すのが**soft decision**だ。
+
+**やる夫**：
+三つのセルを、単なる`1 0 1`でなく、
+
+`1に99% / 0に51% / 1に98%`
+
+としてdecoderへ渡す。
+
+parityが合わなければ、51%の真ん中を疑えるお。
+
+**やらない夫**：
+複数のread thresholdからsoft情報を得てLDPC復号へ使う研究は、hard decisionより強い訂正と、追加readによる遅延・energyの交換条件を示している。[^62]
+
+**やる夫**：
+第1幕の電信と同じだお。
+
+弱った波形をそのまま保存するのではない。
+
+「本当はどの記号だったか」を冗長な規則から再生する。
+
+NANDは石の箱ではなく、noiseのある通信路を内側に抱えたmemoryなんだお。
+
+---
+### 9-6　不良blockがある製品を出荷してよい
+
+**やる夫**：
+ECCで直せるとしても、工場で不良blockが見つかったchipは捨てるべきだお。
+
+新品に不良があるなんて商品じゃない。
+
+**やらない夫**：
+1024 blockの試作品で、20 blockまで使えない可能性があるとdatasheetに書いてあったら。
+
+**やる夫**：
+良品は最低1004 block。
+
+悪いblockへ書かず、1004以上を保証容量として売ればよい。
+
+……不良があることと、製品仕様を満たさないことは同じではないお。
+
+**やらない夫**：
+KIOXIAのraw NAND datasheetにも、使用不能blockが含まれる場合があり、system側で検出して使わないよう管理すること、ECCとwear levelingを組み込むことが明記されている。[^63]
+
+**やる夫**：
+出荷時のbad blockを印で知らせる。
+
+運用中にprogram／eraseへ失敗したblockも退役させる。
+
+予備blockへ論理住所を付け替える。
+
+使える容量、訂正できる誤り率、書換寿命を測ってgradeを分ける。
+
+**やらない夫**：
+DRAMの予備行・列と似ているが、境界が違う。
+
+DRAMではchip内の修復を外から見えないようにすることが多い。
+
+raw NANDではbad-block管理やECCをhost／controllerへ要求する製品もある。
+
+**やる夫**：
+完全な石を選ぶのではない。
+
+欠陥の場所と増え方を測り、予備と符号で吸収し、外から見える契約を守る。
+
+**やらない夫**：
+では、そのraw NANDを1990年代のdigital cameraへ直結してみろ。
+
+**やる夫**：
+写真を保存するだけなら簡単だお。
+
+……いや、camera側がpage、block、bad-block表、ECC、論理住所、file systemを全部知ることになる。
+
+memory chipを交換しただけでfirmwareを書き直す羽目だお。
+
+**やらない夫**：
+次の発明は、セルではない。
+
+その複雑さを、どちら側へ置くかという境界線だ。
+
+---
+## 第10幕　NANDを「カード」という商品に閉じ込める
+
+---
+### 10-1　NANDをcameraへ直結すれば最安だ
+
+**やる夫**：
+1991年に4Mbit NANDが製品になった。
+
+8個並べれば、
+
+$$4\text{ Mbit}\times8=32\text{ Mbit}=4\text{ MiB}$$
+
+digital cameraへ直接はんだ付けするお。
+
+controllerを省けば安い。
+
+**やらない夫**：
+写真1枚を上書きするとき、NANDのblock全体をどう扱う。
+
+**やる夫**：
+同じblockの残したいpageをRAMへ読む。
+
+blockを消す。
+
+新しい写真と残すpageを書き戻す。
+
+途中で電池が切れたら……管理表ごと消えるお。
+
+**やらない夫**：
+ほかにも必要だ。
+
+- 出荷時と運用中のbad blockを避ける
+- pageごとにECCを付け、read時に訂正する
+- 同じblockだけが摩耗しないよう書込みを分散する
+- cameraのfile名やdirectoryを、NANDの物理pageへ対応付ける
+- NAND世代が変わってもcamera側のsoftwareを壊さない
+
+**やる夫**：
+cameraのfirmwareがNAND controllerになった。
+
+新しいchipへ交換するたびpage sizeやcommandや必要ECCが変わるなら、camera makerが全部追従することになるお。
+
+**やらない夫**：
+そこでcardの中へNANDと小さなcontrollerを入れ、外には安定したblock interfaceを見せる。
+
+hostは「sector 12345を書け」と頼む。card内部は、そのsectorをどの物理pageへ置くか決める。
+
+**やる夫**：
+NANDの欠陥を消したのではなく、cardの内側へ隠した。
+
+hostと媒体の境界を決めたのか。
+
+**やらない夫**：
+ただし全cardが同じ境界を選んだわけではない。
+
+controllerをcard側へ置けば交換互換性を得やすいが、cardは高く厚くなる。
+
+host側へ置けばcardは薄く安くできるが、hostが媒体差を背負う。
+
+1990年代のmemory card競争は、形の競争であると同時に、**誰がNANDの面倒を見るか**の競争だった。
+
+**やる夫**：
+つまりcontrollerを置く場所まで含めてcard architectureだお。
+
+単にNANDへplasticの殻をかぶせただけではない。
+
+---
+### 10-2　財布に七種類の「標準」を入れる
+
+**やる夫**：
+PCオタクの発掘箱から出てきたお。
+
+PC Card、CompactFlash、SmartMedia、MMC、Memory Stick、SD、xD-Picture Card。
+
+全部「標準」なのに、全部形が違うお。
+
+**やらない夫**：
+市場が一つの正解へ瞬時に収束すると思うな。
+
+年代と設計思想を並べろ。
+
+| 登場時期 | 形式 | 外から見せるもの／管理の置き場所 | 狙った市場 |
+|---:|---|---|---|
+| 1990年代前半 | PC Card ATA Flash | PC Card／ATA。controllerはcard側 | notebook PC、業務機器 |
+| 1995〜1996年 | CompactFlash | 小型化したPC Card／PATA。controllerはcard側 | digital camera、PDA |
+| 1995年ごろ | SmartMedia | 薄いcontrollerless card。flash管理はhost側 | 薄型camera、音楽機器 |
+| 1997年 | MMC | 少pinのserial interfaceとcard内管理 | 携帯機器 |
+| 1998年 | Memory Stick | SonyのAV／PC ecosystem | camera、音楽、PC |
+| 2000年 | SD | MMCに近い小型serial cardを業界規格化 | cameraから携帯機器全般 |
+| 2002年 | xD-Picture Card | 小型camera向けの専用色が強い形式 | Olympus／Fujifilm camera |
+
+**やる夫**：
+PC Card ATAとCompactFlashは、PCから見ると小さなIDE driveに近い。
+
+CF内部のcontrollerがNAND、ECC、defectを処理し、外へATA commandを見せる。[^64]
+
+SmartMediaは逆にcontrollerを省き、cameraやreaderがflashを管理する。
+
+薄く安くできるが、大容量世代へhostを追従させる負担が残るお。
+
+**やらない夫**：
+Memory Stickは1998年、4MBが3300円、8MBが4400円で発売された。PC Card kitまで用意し、AV機器とPCで画像・音・dataを交換する構想だった。[^65]
+
+xD-Picture Cardは2002年、16／32／64／128MBから始まり、cameraの小型化と大容量化を掲げた。[^66]
+
+**やる夫**：
+どれも当時の要求には理由がある。
+
+大きいがPC互換性の高いCF。
+
+薄いSmartMedia。
+
+自社AV製品をつなぐMemory Stick。
+
+cameraをさらに小さくするxD。
+
+後から勝者だけ見て「最初からSDでよかった」と言うのは歴史を逆再生しているお。
+
+なら万能card readerを一台作り、変換adapterで全部SD相当に見せれば統一できるお。
+
+**やらない夫**：
+接点の形を変えるだけで、ATAとserial commandとhost管理型raw flashを同じ会話にできるか。
+
+変換器自身が複数protocolと媒体管理を実装するなら、それは単なるadapterでなくcontrollerだ。
+
+**やる夫**：
+形の変換だけで規格差は消えない。
+
+互換性とは、物理形状、電気信号、command、容量表現、管理責任をどこまで共通化したかだお。
+
+**やらない夫**：
+では主流になった線を追え。
+
+1997年のMMCは小型のserial cardを示した。その延長上でPanasonic、SanDisk、東芝が2000年1月にSD Associationを設立し、競合各社が使えるSD規格を整備した。[^67]
+
+**やる夫**：
+規格化はpin数とcommandを紙に書くだけじゃない。
+
+card maker、camera maker、PC reader、OS、file system、logo、適合試験が同じ境界を守る必要がある。
+
+1社の良いcardより、複数社のcardと複数社のhostが入れ替わるecosystemの方が強いお。
+
+---
+### 10-3　同じ形なら、古いreaderでも読める
+
+**やる夫**：
+SD cardの外形はほとんど同じだ。
+
+2GBの古いcardが読めるreaderなら、2TBも読めるはずだお。
+
+住所が増えるだけだお。
+
+**やらない夫**：
+住所の表し方とfile systemが変わらなければな。
+
+**やる夫**：
+また「形」と「protocol」と「容量」が別の層だったお。
+
+**やらない夫**：
+SD Associationが定める容量区分を並べろ。[^68]
+
+| 規格 | 規格上の容量範囲 | 標準file system | 登場の節目 |
+|---|---:|---|---:|
+| SD | 2GB以下 | FAT12／FAT16 | 2000年 |
+| SDHC | 2GB超〜32GB | FAT32 | 2006年 |
+| SDXC | 32GB超〜2TB | exFAT | 2009〜2010年 |
+| SDUC | 2TB超〜128TB | exFAT | 2018年 |
+
+**やる夫**：
+`SDXC`は単に「容量の大きいSD」という商品名ではない。
+
+addressingとfile systemを含むhostとの契約だお。
+
+FAT16しか知らない2001年のcameraへ64GB SDXCを挿しても、同じ接点だから読めるとは限らない。
+
+**やらない夫**：
+互換性には向きがある。
+
+新しいSDXC hostは通常、SDXCだけでなくSDHCとSDも扱う。
+
+古いSD hostは、後から定義されたSDHCやSDXCを理解しない。[^69]
+
+**やる夫**：
+backward compatibilityは「新しい側が古い約束も話す」ことだお。
+
+古い側へ未来の単語を理解させる魔法ではない。
+
+**やらない夫**：
+さらに、市販容量と規格上限も区別しろ。
+
+初期SD規格の上限は2GBだったが、2000年に市場へ出たcardは8MB級だった。[^70]
+
+規格が2GBの住所を用意しても、その日に2GB NANDを安く量産できるわけではない。
+
+**やる夫**：
+逆にNANDだけ大容量になっても、住所とfile systemとhostが追いつかなければ商品にならない。
+
+セルの大容量化と、外部規格の大容量化は別々に進み、製品で合流するお。
+
+---
+### 10-4　最大170MB/sなら、25MB/sの動画は必ず撮れる
+
+**やる夫**：
+cardの箱に最大170MB/sと書いてある。
+
+25MB/sで記録するvideoなら6倍以上余裕だお。
+
+**やらない夫**：
+その170MB/sはreadかwriteか。瞬間最大か最低保証か。専用readerが必要か。
+
+**やる夫**：
+小さい字は読まない主義だお。
+
+……録画停止の原因を自分で作る主義だったお。
+
+**やらない夫**：
+cameraに必要なのは、撮影中ずっと下回らない**最低連続write速度**だ。
+
+SDの速度classはそこを記号にした。[^71]
+
+| logo | 最低連続write速度 |
+|---|---:|
+| C2／C4／C6／C10 | 2／4／6／10MB/s |
+| U1／U3 | 10／30MB/s |
+| V6／V10／V30／V60／V90 | 6／10／30／60／90MB/s |
+
+**やる夫**：
+25MB/sのvideoなら、C10やU1の10MB/s保証では足りない。
+
+U3かV30なら30MB/s以上を保証するから条件を満たす。
+
+箱の「最大read 170MB/s」だけでは判定できないお。
+
+**やらない夫**：
+一方、smartphoneでappをcardへ置くと、小さなfileをばらばらに読む。
+
+連続videoと違い、random read／write回数が体感を左右する。
+
+**やる夫**：
+そこで2016年のA1、2017年のA2という**Application Performance Class**か。
+
+A1はrandom read 1500 IOPS、random write 500 IOPS、sequential 10MB/s以上。
+
+A2は4000／2000 IOPSと10MB/s以上。ただしA2 hostの支援が必要だお。[^72]
+
+**やらない夫**：
+一枚のcardに、容量規格、bus規格、最低連続速度、application性能が別々に印刷される理由が分かったか。
+
+**やる夫**：
+`SDXC UHS-I U3 V30 A2`は呪文ではない。
+
+- SDXC――容量とfile systemの世代
+- UHS-I――hostとのbus方式
+- U3／V30――最低連続write 30MB/s
+- A2――random accessの最低性能と対応host条件
+
+別の問いへの答えを一行へ重ねているお。
+
+---
+### 10-5　接点を増やさず、SSD並みに速くしろ
+
+**やる夫**：
+SDの9接点を高速clockにすれば、永遠に速くできるお。
+
+同じwireへ毎秒何兆回でもbitを流す。
+
+**やらない夫**：
+信号波形、電圧、noise、消費電力が許さない。
+
+SDのdefault speedは12.5MB/s、2004年のHigh Speedは25MB/sだった。
+
+2010年ごろのUHS-Iは1列目の接点を使いながら最大104MB/sへ上げた。[^73]
+
+**やる夫**：
+その先は二列目の接点を足す。
+
+2011年のUHS-IIが最大156または312MB/s。
+
+2017年のUHS-IIIが最大624MB/s。
+
+外形を保ちつつ、裏面の通信路を増設したお。
+
+**やらない夫**：
+では2018年のSD Expressで、また独自busを伸ばし続けたのか。
+
+**やる夫**：
+違う。
+
+PCのSSDで普及したPCI ExpressとNVMeをcardの二列目へ持ち込んだ。
+
+現行概要ではPCIe Gen4×2まで用い、理論上3940MB/s級へ進んでいる。[^73]
+
+**やらない夫**：
+古いhostへ挿したら。
+
+**やる夫**：
+一列目のlegacy SD interfaceへfallbackする。
+
+ただしSD Express cardはUHS-II modeを兼ねるわけではない。同じ二列目に見えても、そこで話すprotocolが違う。[^74]
+
+**やらない夫**：
+また形だけでは判断できないな。
+
+**やる夫**：
+しかも3940MB/sはbusの上限。
+
+NANDの並列数、controller、発熱、card容量、書込み状態が実効速度を決める。
+
+DDRでMT/sとlatencyを分けたのと同じで、interfaceの看板と媒体の実力を分ける必要があるお。
+
+**やらない夫**：
+ここで見ているのはNANDセルの改良ではない。
+
+外へ見せる標準interfaceが、serial SDからUHS、さらにPCIe／NVMeへ進んだ歴史だ。
+
+**やる夫**：
+大容量化にはセル、使いやすさにはcontroller、交換可能性には規格、高速化にはbus。
+
+一枚のcardでも、別々の発明が積み重なっているお。
+
+---
+### 10-6　4MiBで2万ドルから、爪先の1TBへ
+
+**やる夫**：
+値札ボードへ戻るお。
+
+Masuokaの証言にある初期camera試作は、4Mbit NANDを8個使った4MiB級で、system全体が約2万ドルだった。[^15]
+
+記憶部分だけの価格ではないけれど、cameraを成立させるsystem価格として割ると、
+
+$$\frac{4\times2^{20}\times8}{20{,}000}\approx1{,}678\text{ bit/ドル}$$
+
+1ドルで約1700bitだお。
+
+**やらない夫**：
+その値を現在のcard単価と同じものとして比較してよいか。
+
+**やる夫**：
+駄目だお。
+
+試作camera systemと量産memory cardでは、含むものも時期も違う。
+
+ここでは桁がどう動いたかを見る粗い物差しだお。
+
+**やらない夫**：
+市販品の節目も置け。
+
+**やる夫**：
+2000年の初期SDは8MB級。
+
+2002年のxDは16〜128MBで登場。
+
+2005年の初期microSDは32／64／128MB。
+
+2019年には1TB microSDXCが発表され、SanDisk Extreme 1TBの希望小売価格は449.99ドルだった。[^75]
+
+2019年の値札なら、10進表記の1TBを使って、
+
+$$\frac{8\times10^{12}}{449.99}\approx17{,}800{,}000{,}000\text{ bit/ドル}$$
+
+約178億bit/ドルだお。
+
+**やらない夫**：
+1990年代初頭の試作system比で1000万倍級か。
+
+**やる夫**：
+しかも爪ほどのcardの中に、NAND die、controller、ECC、bad-block管理、protocolが入る。
+
+安くなったのはセルだけのおかげじゃない。
+
+微細化と多値化でbitを増やし、工場の歩留まりを上げ、controllerが不完全なNANDを商品へ変え、標準化が大市場を作った。
+
+**やらない夫**：
+では、写真を持ち運ぶcardが、電話の中へ常駐したら何が変わる。
+
+**やる夫**：
+cameraなら撮影時に連続write、後でPCへcopyすればよかった。
+
+smartphoneはOS、app、写真、動画、通信cacheを一日中読み書きする。
+
+着脱cardだけでなく、基板へ直接載せるeMMCやUFSが欲しくなるお。
+
+**やらない夫**：
+2007年以後、NANDは「digital film」から、常時動くmobile computerの内蔵storageへ役割を広げる。
+
+次は、その境界を作り直す。
+
+---
 ## 第6幕　電源を切っても残せ、ただし壊れることは認めろ
 
 ---
@@ -6203,6 +6985,42 @@ $$32\times 8\times 2^{30}\approx2.75\times10^{11}\text{ bit}$$
 [^56]: [Micron Technology『Data Science in Semiconductor』](https://www.micron.com/content/dam/micron/educatorhub/artificial-intelligence-ai/data-science/micron-data-science-in-memory-manufacturing-presentation.pdf), 2026年8月10日参照. DRAMダイへ予備行・列をあらかじめ設け、ウェハ検査で不良位置を分類し、修復可能なダイは冗長要素へ置換して救済する製造フローを図示している。
 
 [^57]: [Computer History Museum『1978: Consortia pursue storage R&D projects』](https://www.computerhistory.org/storageengine/consortia-pursue-storage-r-d-projects/), 2026年8月10日参照. 日本のVLSI共同研究と、その後の5社による商用化が、1980年代の64Kbit以上のDRAMで日本勢が主導権を取る一因になったと整理している。
+
+[^58]: [Computer History Museum『1971: Reusable semiconductor ROM introduced』](https://www.computerhistory.org/storageengine/reusable-semiconductor-rom-introduced/), 2026年8月10日参照. 1970年のfuse PROM、1971年のEPROM、EEPROMからflashへ至る不揮発memoryの系譜を整理している。
+
+[^59]: [KIOXIA『技術開発ヒストリー』](https://www.kioxia.com/ja-jp/rd/technology/history.html), 2026年8月10日参照. 1984年に一括消去する不揮発memoryをFlash EEPROMと命名・発表し、1987年にNAND型flashを発明・発表、1991年に4Mbit NANDを製品化した経緯を示す。
+
+[^60]: [Samsung Semiconductor『Industry’s First 4-bit Consumer SSD』](https://semiconductor.samsung.com/emea/news-events/news/industrys-first-4-bit-consumer-ssd/), 2026年8月10日参照. 同社製品の世代例として、2006年の1bit SLC、2010年の2bit MLC、2012年の3bit TLC、2018年の4bit QLCを並べている。本文では発明年でなく市場展開の目安として用いた。
+
+[^61]: R. W. Hamming, [『Error Detecting and Error Correcting Codes』](https://doi.org/10.1002/j.1538-7305.1950.tb00463.x), *Bell System Technical Journal*, 1950; A. Hocquenghem, 1959およびR. C. Bose／D. K. Ray-Chaudhuri, 1960によるBCH code; R. G. Gallager, *Low-Density Parity-Check Codes*, MIT Press, 1963. 符号の理論成立年とNAND controllerへの実装時期は区別する必要がある。
+
+[^62]: Jiadong Wangほか, [『Reducing latency overhead caused by using LDPC codes in NAND flash memory』](https://link.springer.com/article/10.1186/1687-6180-2012-203), *EURASIP Journal on Advances in Signal Processing*, 2012. NANDのしきい値分布、incremental step pulse programming、hard／soft decisionによるLDPC復号の性能とlatencyの交換条件を扱う。
+
+[^63]: [KIOXIA『TC58NVG0S3HBAI6 Datasheet』](https://europe.kioxia.com/content/dam/kioxia/newidr/productinfo/datasheet/201910/DST_TC58NVG0S3HBAI6-TDE_EN_31434.pdf), 2026年8月10日参照. 使用不能blockをsystem側で検出・回避すること、1024 block中の有効block数を最低1004とする例を記載する。KIOXIAのraw NAND資料はECCとwear levelingをsystem designへ組み込むことも要求している。
+
+[^64]: [Analog Devices『Glue-less Hot-Swappable CompactFlash Storage-Card Interface』](https://www.analog.com/en/resources/analog-dialogue/articles/glue-less-hot-swappable-compact-flash-storage-card.html)および[CompactFlash Association『History of CFA』](https://compactflash.org/), 2026年8月10日参照. CompactFlashがPC Card／ATAを小型化したinterfaceを持ち、card内部のflash controllerがECC、defect管理、sector mappingを担う構成を説明している。
+
+[^65]: [Sony『Sony Announces “Memory Stick” Recordable IC Memory Card Products』](https://www.sony.com/en/SonyInfo/News/Press/199807/98-067/), 1998年7月30日. 4MB品を3300円、8MB品を4400円で同年9月に発売し、digital AV機器とPCの間でdataを交換する構想を発表した。
+
+[^66]: Olympus／Fujifilm, [『超小型のデジタルカメラ用記録メディア「xD-Picture Card」開発』](https://www.olympus.co.jp/jp/news/2002b/nr020730xdcardj.html), 2002年7月30日. 当初16／32／64／128MB、将来8GBまでを視野に入れ、小型cameraと大容量化を狙ったことを示す。
+
+[^67]: [SD Association『About the SD Association』](https://www.sdcard.org/about-sda/), 2026年8月10日参照. Panasonic、SanDisk、東芝が2000年1月に業界横断のSD規格団体を設立した経緯を示す。MMCについてはSanDiskとSiemensが1997年に小型serial cardとして展開し、1998年に普及団体が設立された同時代資料も参照した。
+
+[^68]: [SD Association『Capacity (SD/SDHC/SDXC/SDUC)』](https://www.sdcard.org/developers/sd-standard-overview/capacity-sd-sdhc-sdxc-sduc/), 2026年8月10日参照. SDは2GB以下・FAT12／16、SDHCは2GB超〜32GB・FAT32、SDXCは32GB超〜2TB・exFAT、SDUCは2TB超〜128TB・exFATと定義している。
+
+[^69]: [SD Association『SD, SDHC, SDXC and SDUC Card Capacity Choices』](https://www.sdcard.org/consumers/about-sd-memory-card-choices/sd-sdhc-sdxc-and-sduc-card-capacity-choices/), 2026年8月10日参照. 新しいcapacity type対応hostが従来cardを扱える一方、従来hostは後発capacity typeへ対応しないという互換性の向きを示す。
+
+[^70]: [SD Association『Anatomy of an SD Memory Card』](https://www.sdcard.org/press/thoughtleadership/anatomy-of-an-sd-memory-card-what-matters-most-for-photography-and-videography/), 2026年8月10日参照. 2000年の最初のSD仕様は上限2GB・最大12.5MB/sだったが、当初の市販容量は8MBだったと説明している。
+
+[^71]: [SD Association『Speed Class』](https://www.sdcard.org/developers/sd-standard-overview/speed-class/), 2026年8月10日参照. Speed Class C2〜C10、UHS Speed Class U1／U3、Video Speed Class V6〜V90が、それぞれ最低連続write速度を保証することを定義している。
+
+[^72]: [SD Association『Application Performance Class』](https://www.sdcard.org/developers/sd-standard-overview/application-performance-class/), 2026年8月10日参照. A1／A2のrandom read／write IOPSと最低sequential性能、およびA2性能にA2対応hostが必要であることを定義している。
+
+[^73]: [SD Association『Bus Speed』](https://www.sdcard.org/developers/sd-standard-overview/bus-speed-default-speed-high-speed-uhs-sd-express/)および[『20th Anniversary Timeline』](https://www.sdcard.org/pdf/SDA20thAnniversary_Infographic.pdf), 2026年8月10日参照. Default／High Speed、UHS-I／II／IIIの各最大bus速度と導入時期、PCIe／NVMeを使うSD Expressの速度世代を整理している。
+
+[^74]: [SD Association『SD Express Cards with PCIe and NVMe Interfaces White Paper』](https://www.sdcard.org/wp-content/uploads/2020/11/SD_Express_Cards_with_PCIe_and_NVMe_Interfaces_White_Paper.pdf), 2026年8月10日参照. SD Expressが一列目のlegacy SD interfaceと二列目のPCIe／NVMe interfaceを使い分け、従来hostとの互換性を維持する一方、UHS-II modeには対応しない構成を説明している。
+
+[^75]: [Western Digital『Western Digital Unveils World’s Fastest 1TB UHS-I microSD Card』](https://www.westerndigital.com/en-se/company/newsroom/press-releases/2019/2019-02-25-western-digital-unveils-worlds-fastest-1tb-uhs-i-microsd-card), 2019年2月25日. SanDisk Extreme 1TB microSDXCを希望小売価格449.99ドルで発表した。初期microSDの32／64／128MBについては[SD Associationの20周年史](https://www.sdcard.org/press/thoughtleadership/celebrating-20-years-of-microsd/)も参照した。
 
 [1]: https://www.computerhistory.org/timeline/computers/ "Timeline of Computer History"
 [2]: https://www.bell-labs.com/about/awards/1956-nobel-prize-physics/ "1956 Nobel Prize in Physics"
