@@ -1154,12 +1154,20 @@ MSBから規定ビット数ずつ切らないと読めないお。
 **やる夫**：
 MPEG-2だけ、Sequence Headerのすぐ後ろに
 `00 00 01 B5 14 8A...` があるお。
-`B5` はExtension Start Codeで、次の `14` の上位4ビット `0001` が
-**sequence_extension_id = 1**。
-続く8ビットはニブルをまたぎ、`0x48`でMain Profile / Main Levelを表す。
+`B5` がExtension Start Codeなのは表から分かるお。
+でも、その後ろの`14 8A`をどう区切ればMPEG-2だと断定できるのかは、
+規格のフィールド配置を知らないと読めないお。
 
-つまりMPEG-2は、MPEG-1と共通のSequence Headerを置いた直後に
-必須の **Sequence Extension** を足して、自分がMPEG-2だと宣言するんだお[^mpeg2-video]。
+**やらない夫**：
+そこは推測させる場所ではない。規格では、`B5`直後の上位4ビットを
+`extension_start_code_identifier`と定め、値1をSequence Extension、値8をPicture Coding Extensionに割り当てる。
+値1の直後8ビットは`profile_and_level_indication`で、この例ではニブルをまたいだ`0x48`だ。
+対応表ではMain Profile / Main Levelを表す[^mpeg2-video]。
+
+**やる夫**：
+なら、最初の`B5 14 8A...`は**sequence_extension_id = 1**を持つ必須のSequence Extensionだお。
+MPEG-2は、MPEG-1と共通のSequence Headerを置いた直後に
+拡張を足して、自分のProfileとLevelを宣言しているんだお。
 
 **やらない夫**：
 後ろの `00 00 01 B5 8F...` は、拡張IDの上位4ビットが `8`。
