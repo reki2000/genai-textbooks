@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 430" role="img" aria-labelledby="title desc">
+<title id="title">図4　増幅器を2個、出力と入力を交差してつなぐと、勝敗が固定される</title>
+<desc id="desc">Eccles-Jordan（1918）。片方が勝つほど相手を抑え、抑えられた相手は反撃できなくなる</desc>
+<defs><marker id="arw-e34948" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#e34948"/></marker><marker id="arw-7b7a75" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#7b7a75"/></marker></defs>
+<rect x="0.0" y="0.0" width="760.0" height="430.0" rx="10" fill="#fcfcfb" stroke="#e2e4e3" stroke-width="1"/>
+<text x="24.0" y="32.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="16" font-weight="700" fill="#0b0b0b" text-anchor="start">図4　増幅器を2個、出力と入力を交差してつなぐと、勝敗が固定される</text>
+<text x="24.0" y="54.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="400" fill="#52514e" text-anchor="start">Eccles-Jordan（1918）。片方が勝つほど相手を抑え、抑えられた相手は反撃できなくなる</text>
+<line x1="232.0" y1="132.0" x2="628.0" y2="132.0" stroke="#3f3e3b" stroke-width="2.2" stroke-linecap="round"/>
+<text x="224.0" y="136.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11.5" font-weight="700" fill="#0b0b0b" text-anchor="end">B+</text>
+<line x1="232.0" y1="356.0" x2="628.0" y2="356.0" stroke="#3f3e3b" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M 430 356 L 430 364" fill="none" stroke="#3f3e3b" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+<line x1="419.0" y1="364.0" x2="441.0" y2="364.0" stroke="#0b0b0b" stroke-width="2.2" stroke-linecap="round"/>
+<line x1="423.0" y1="369.0" x2="437.0" y2="369.0" stroke="#0b0b0b" stroke-width="2.2" stroke-linecap="round"/>
+<line x1="426.5" y1="374.0" x2="433.5" y2="374.0" stroke="#0b0b0b" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M 300 132 L 300 146" fill="none" stroke="#3f3e3b" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 300 172 L 300 186" fill="none" stroke="#3f3e3b" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 293 146 L 293 172 L 307 172 L 307 146 Z" fill="#ffffff" stroke="#0b0b0b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="278.0" y="162.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10" font-weight="400" fill="#52514e" text-anchor="end">陽極抵抗</text>
+<circle cx="300.0" cy="268.0" r="30.0" fill="#ffffff" stroke="#0b0b0b" stroke-width="1.8"/>
+<line x1="289.0" y1="256.0" x2="311.0" y2="256.0" stroke="#0b0b0b" stroke-width="2.6" stroke-linecap="round"/>
+<path d="M 300 256 L 300 238" fill="none" stroke="#3f3e3b" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+<line x1="287.0" y1="268.0" x2="313.0" y2="268.0" stroke="#0b0b0b" stroke-width="1.6" stroke-linecap="round" stroke-dasharray="4 4"/>
+<path d="M 313 268 L 330 268" fill="none" stroke="#3f3e3b" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 289 282 L 300 276 L 311 282" fill="none" stroke="#0b0b0b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 300 279 L 300 298" fill="none" stroke="#3f3e3b" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 300 186 L 300 238" fill="none" stroke="#3f3e3b" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 300 298 L 300 356" fill="none" stroke="#3f3e3b" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="300.0" cy="356.0" r="3.2" fill="#3f3e3b" stroke="#3f3e3b" stroke-width="1"/>
+<circle cx="300.0" cy="194.0" r="3.2" fill="#3f3e3b" stroke="#3f3e3b" stroke-width="1"/>
+<text x="256.0" y="254.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="15" font-weight="700" fill="#e34948" text-anchor="middle">A</text>
+<text x="300.0" y="330.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="700" fill="#e34948" text-anchor="middle">電流が流れている</text>
+<text x="262.0" y="198.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="700" fill="#e34948" text-anchor="end">陽極は低い</text>
+<path d="M 560 132 L 560 146" fill="none" stroke="#3f3e3b" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 560 172 L 560 186" fill="none" stroke="#3f3e3b" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 553 146 L 553 172 L 567 172 L 567 146 Z" fill="#ffffff" stroke="#0b0b0b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="538.0" y="162.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10" font-weight="400" fill="#52514e" text-anchor="end">陽極抵抗</text>
+<circle cx="560.0" cy="268.0" r="30.0" fill="#ffffff" stroke="#0b0b0b" stroke-width="1.8"/>
+<line x1="549.0" y1="256.0" x2="571.0" y2="256.0" stroke="#0b0b0b" stroke-width="2.6" stroke-linecap="round"/>
+<path d="M 560 256 L 560 238" fill="none" stroke="#3f3e3b" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+<line x1="547.0" y1="268.0" x2="573.0" y2="268.0" stroke="#0b0b0b" stroke-width="1.6" stroke-linecap="round" stroke-dasharray="4 4"/>
+<path d="M 547 268 L 530 268" fill="none" stroke="#3f3e3b" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 549 282 L 560 276 L 571 282" fill="none" stroke="#0b0b0b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 560 279 L 560 298" fill="none" stroke="#3f3e3b" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 560 186 L 560 238" fill="none" stroke="#3f3e3b" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 560 298 L 560 356" fill="none" stroke="#3f3e3b" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="560.0" cy="356.0" r="3.2" fill="#3f3e3b" stroke="#3f3e3b" stroke-width="1"/>
+<circle cx="560.0" cy="194.0" r="3.2" fill="#3f3e3b" stroke="#3f3e3b" stroke-width="1"/>
+<text x="604.0" y="254.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="15" font-weight="700" fill="#7b7a75" text-anchor="middle">B</text>
+<text x="560.0" y="330.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="700" fill="#7b7a75" text-anchor="middle">止まっている</text>
+<text x="598.0" y="198.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="700" fill="#7b7a75" text-anchor="start">陽極は高い</text>
+<path d="M 300 194 L 530 268" fill="none" stroke="#e34948" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 560 194 L 330 268" fill="none" stroke="#7b7a75" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="430.0" y="176.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11" font-weight="700" fill="#e34948" text-anchor="middle">Aの陽極 → Bの格子</text>
+<text x="430.0" y="252.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11" font-weight="400" fill="#7b7a75" text-anchor="middle">Bの陽極 → Aの格子</text>
+<rect x="24.0" y="108.0" width="186.0" height="148.0" rx="8" fill="#f4f5f4" stroke="#e2e4e3" stroke-width="1"/>
+<text x="117.0" y="130.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12" font-weight="700" fill="#e34948" text-anchor="middle">勝つほど勝つ理由</text>
+<text x="40.0" y="154.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#0b0b0b" text-anchor="start">Aに電流が流れる</text>
+<text x="40.0" y="170.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#0b0b0b" text-anchor="start">→ Aの陽極電圧が下がる</text>
+<text x="40.0" y="186.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#0b0b0b" text-anchor="start">→ Bの格子が下げられる</text>
+<text x="40.0" y="202.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#0b0b0b" text-anchor="start">→ Bがますます止まる</text>
+<text x="40.0" y="218.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#0b0b0b" text-anchor="start">→ Bの陽極は高いまま</text>
+<text x="40.0" y="234.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#0b0b0b" text-anchor="start">→ Aの格子を高く保つ</text>
+<line x1="356.0" y1="314.0" x2="334.0" y2="272.0" stroke="#e34948" stroke-width="1.8" stroke-linecap="round" marker-end="url(#arw-e34948)" stroke-dasharray="5 4"/>
+<text x="362.0" y="328.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="700" fill="#e34948" text-anchor="start">セット</text>
+<line x1="504.0" y1="314.0" x2="526.0" y2="272.0" stroke="#7b7a75" stroke-width="1.8" stroke-linecap="round" marker-end="url(#arw-7b7a75)" stroke-dasharray="5 4"/>
+<text x="498.0" y="328.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="700" fill="#7b7a75" text-anchor="end">リセット</text>
+<rect x="24.0" y="272.0" width="186.0" height="84.0" rx="8" fill="#f4f5f4" stroke="#e2e4e3" stroke-width="1"/>
+<text x="117.0" y="294.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12" font-weight="700" fill="#0b0b0b" text-anchor="middle">2つの安定状態</text>
+<text x="117.0" y="316.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#52514e" text-anchor="middle">A入 / B切　と　A切 / B入</text>
+<text x="117.0" y="332.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#52514e" text-anchor="middle">中間は不安定で、どちらかへ倒れる</text>
+<text x="380.0" y="400.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="700" fill="#0b0b0b" text-anchor="middle">セット側を一瞬押して勝敗をひっくり返せば、入力を戻しても状態が残る。これが1ビット。</text>
+<text x="380.0" y="420.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11.5" font-weight="400" fill="#52514e" text-anchor="middle">この交差帰還は、真空管からCMOS、6T SRAM、DRAMの検出増幅器まで生き残る。</text>
+</svg>

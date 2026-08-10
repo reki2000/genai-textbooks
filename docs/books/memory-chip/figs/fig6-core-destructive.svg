@@ -1,0 +1,169 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 462" role="img" aria-labelledby="title desc">
+<title id="title">図6　読出しは観察ではない。壊してから、同じ値を書き戻している</title>
+<desc id="desc">`10110010` を1語読むと、コアの実体はいったん `00000000` になる</desc>
+<defs><marker id="arw-7b7a75" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#7b7a75"/></marker></defs>
+<rect x="0.0" y="0.0" width="760.0" height="462.0" rx="10" fill="#fcfcfb" stroke="#e2e4e3" stroke-width="1"/>
+<text x="24.0" y="32.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="16" font-weight="700" fill="#0b0b0b" text-anchor="start">図6　読出しは観察ではない。壊してから、同じ値を書き戻している</text>
+<text x="24.0" y="54.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="400" fill="#52514e" text-anchor="start">`10110010` を1語読むと、コアの実体はいったん `00000000` になる</text>
+<rect x="24.0" y="80.0" width="168.0" height="288.0" rx="8" fill="#f4f5f4" stroke="#e2e4e3" stroke-width="1"/>
+<text x="108.0" y="104.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="700" fill="#eb6834" text-anchor="middle">1. 選択</text>
+<text x="108.0" y="124.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10" font-weight="400" fill="#52514e" text-anchor="middle">X線とY線へ I/2 ずつ</text>
+<circle cx="50.0" cy="192.0" r="9.2" fill="none" stroke="#ffffff" stroke-width="5.5"/>
+<circle cx="50.0" cy="192.0" r="9.2" fill="none" stroke="#0b0b0b" stroke-width="5.5" opacity="0.3"/>
+<circle cx="50.0" cy="192.0" r="12.0" fill="none" stroke="#0b0b0b" stroke-width="1.9"/>
+<circle cx="50.0" cy="192.0" r="6.5" fill="none" stroke="#0b0b0b" stroke-width="1.4"/>
+<circle cx="80.0" cy="192.0" r="9.2" fill="none" stroke="#ffffff" stroke-width="5.5"/>
+<circle cx="80.0" cy="192.0" r="12.0" fill="none" stroke="#0b0b0b" stroke-width="1.9"/>
+<circle cx="80.0" cy="192.0" r="6.5" fill="none" stroke="#0b0b0b" stroke-width="1.4"/>
+<circle cx="110.0" cy="192.0" r="9.2" fill="none" stroke="#ffffff" stroke-width="5.5"/>
+<circle cx="110.0" cy="192.0" r="9.2" fill="none" stroke="#0b0b0b" stroke-width="5.5" opacity="0.3"/>
+<circle cx="110.0" cy="192.0" r="12.0" fill="none" stroke="#0b0b0b" stroke-width="1.9"/>
+<circle cx="110.0" cy="192.0" r="6.5" fill="none" stroke="#0b0b0b" stroke-width="1.4"/>
+<circle cx="140.0" cy="192.0" r="9.2" fill="none" stroke="#ffffff" stroke-width="5.5"/>
+<circle cx="140.0" cy="192.0" r="9.2" fill="none" stroke="#0b0b0b" stroke-width="5.5" opacity="0.3"/>
+<circle cx="140.0" cy="192.0" r="12.0" fill="none" stroke="#0b0b0b" stroke-width="1.9"/>
+<circle cx="140.0" cy="192.0" r="6.5" fill="none" stroke="#0b0b0b" stroke-width="1.4"/>
+<circle cx="50.0" cy="232.0" r="9.2" fill="none" stroke="#ffffff" stroke-width="5.5"/>
+<circle cx="50.0" cy="232.0" r="12.0" fill="none" stroke="#0b0b0b" stroke-width="1.9"/>
+<circle cx="50.0" cy="232.0" r="6.5" fill="none" stroke="#0b0b0b" stroke-width="1.4"/>
+<circle cx="80.0" cy="232.0" r="9.2" fill="none" stroke="#ffffff" stroke-width="5.5"/>
+<circle cx="80.0" cy="232.0" r="12.0" fill="none" stroke="#0b0b0b" stroke-width="1.9"/>
+<circle cx="80.0" cy="232.0" r="6.5" fill="none" stroke="#0b0b0b" stroke-width="1.4"/>
+<circle cx="110.0" cy="232.0" r="9.2" fill="none" stroke="#ffffff" stroke-width="5.5"/>
+<circle cx="110.0" cy="232.0" r="9.2" fill="none" stroke="#0b0b0b" stroke-width="5.5" opacity="0.3"/>
+<circle cx="110.0" cy="232.0" r="12.0" fill="none" stroke="#0b0b0b" stroke-width="1.9"/>
+<circle cx="110.0" cy="232.0" r="6.5" fill="none" stroke="#0b0b0b" stroke-width="1.4"/>
+<circle cx="140.0" cy="232.0" r="9.2" fill="none" stroke="#ffffff" stroke-width="5.5"/>
+<circle cx="140.0" cy="232.0" r="12.0" fill="none" stroke="#0b0b0b" stroke-width="1.9"/>
+<circle cx="140.0" cy="232.0" r="6.5" fill="none" stroke="#0b0b0b" stroke-width="1.4"/>
+<text x="108.0" y="262.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="9.5" font-weight="400" fill="#7b7a75" text-anchor="middle">コアの実体</text>
+<rect x="38.0" y="270.0" width="140.0" height="26.0" rx="5" fill="#ffffff" stroke="#e2e4e3" stroke-width="1"/>
+<text x="108.0" y="288.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="13" font-weight="700" fill="#0b0b0b" text-anchor="middle">10110010</text>
+<text x="108.0" y="320.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="9.5" font-weight="400" fill="#7b7a75" text-anchor="middle">レジスタ</text>
+<rect x="38.0" y="328.0" width="140.0" height="26.0" rx="5" fill="#f4f5f4" stroke="#e2e4e3" stroke-width="1" stroke-dasharray="4 4"/>
+<text x="108.0" y="346.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11" font-weight="400" fill="#7b7a75" text-anchor="middle">（空）</text>
+<line x1="193.0" y1="214.0" x2="203.0" y2="214.0" stroke="#7b7a75" stroke-width="2" stroke-linecap="round" marker-end="url(#arw-7b7a75)"/>
+<rect x="204.0" y="80.0" width="168.0" height="288.0" rx="8" fill="#f4f5f4" stroke="#e2e4e3" stroke-width="1"/>
+<text x="288.0" y="104.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="700" fill="#e34948" text-anchor="middle">2. 0方向へ強制</text>
+<text x="288.0" y="124.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10" font-weight="400" fill="#52514e" text-anchor="middle">1だったコアだけ反転し</text>
+<text x="288.0" y="139.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10" font-weight="400" fill="#52514e" text-anchor="middle">センス線にパルスが出る</text>
+<circle cx="230.0" cy="192.0" r="9.2" fill="none" stroke="#ffffff" stroke-width="5.5"/>
+<circle cx="230.0" cy="192.0" r="12.0" fill="none" stroke="#e34948" stroke-width="2.4"/>
+<circle cx="230.0" cy="192.0" r="6.5" fill="none" stroke="#e34948" stroke-width="1.4"/>
+<circle cx="260.0" cy="192.0" r="9.2" fill="none" stroke="#ffffff" stroke-width="5.5"/>
+<circle cx="260.0" cy="192.0" r="12.0" fill="none" stroke="#0b0b0b" stroke-width="1.9"/>
+<circle cx="260.0" cy="192.0" r="6.5" fill="none" stroke="#0b0b0b" stroke-width="1.4"/>
+<circle cx="290.0" cy="192.0" r="9.2" fill="none" stroke="#ffffff" stroke-width="5.5"/>
+<circle cx="290.0" cy="192.0" r="12.0" fill="none" stroke="#e34948" stroke-width="2.4"/>
+<circle cx="290.0" cy="192.0" r="6.5" fill="none" stroke="#e34948" stroke-width="1.4"/>
+<circle cx="320.0" cy="192.0" r="9.2" fill="none" stroke="#ffffff" stroke-width="5.5"/>
+<circle cx="320.0" cy="192.0" r="12.0" fill="none" stroke="#e34948" stroke-width="2.4"/>
+<circle cx="320.0" cy="192.0" r="6.5" fill="none" stroke="#e34948" stroke-width="1.4"/>
+<circle cx="230.0" cy="232.0" r="9.2" fill="none" stroke="#ffffff" stroke-width="5.5"/>
+<circle cx="230.0" cy="232.0" r="12.0" fill="none" stroke="#0b0b0b" stroke-width="1.9"/>
+<circle cx="230.0" cy="232.0" r="6.5" fill="none" stroke="#0b0b0b" stroke-width="1.4"/>
+<circle cx="260.0" cy="232.0" r="9.2" fill="none" stroke="#ffffff" stroke-width="5.5"/>
+<circle cx="260.0" cy="232.0" r="12.0" fill="none" stroke="#0b0b0b" stroke-width="1.9"/>
+<circle cx="260.0" cy="232.0" r="6.5" fill="none" stroke="#0b0b0b" stroke-width="1.4"/>
+<circle cx="290.0" cy="232.0" r="9.2" fill="none" stroke="#ffffff" stroke-width="5.5"/>
+<circle cx="290.0" cy="232.0" r="12.0" fill="none" stroke="#e34948" stroke-width="2.4"/>
+<circle cx="290.0" cy="232.0" r="6.5" fill="none" stroke="#e34948" stroke-width="1.4"/>
+<circle cx="320.0" cy="232.0" r="9.2" fill="none" stroke="#ffffff" stroke-width="5.5"/>
+<circle cx="320.0" cy="232.0" r="12.0" fill="none" stroke="#0b0b0b" stroke-width="1.9"/>
+<circle cx="320.0" cy="232.0" r="6.5" fill="none" stroke="#0b0b0b" stroke-width="1.4"/>
+<text x="288.0" y="262.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="9.5" font-weight="400" fill="#7b7a75" text-anchor="middle">コアの実体</text>
+<rect x="218.0" y="270.0" width="140.0" height="26.0" rx="5" fill="#ffffff" stroke="#e2e4e3" stroke-width="1"/>
+<text x="288.0" y="288.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="13" font-weight="700" fill="#0b0b0b" text-anchor="middle">00000000</text>
+<text x="288.0" y="320.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="9.5" font-weight="400" fill="#7b7a75" text-anchor="middle">レジスタ</text>
+<rect x="218.0" y="328.0" width="140.0" height="26.0" rx="5" fill="#f4f5f4" stroke="#e2e4e3" stroke-width="1" stroke-dasharray="4 4"/>
+<text x="288.0" y="346.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11" font-weight="400" fill="#7b7a75" text-anchor="middle">（空）</text>
+<line x1="373.0" y1="214.0" x2="383.0" y2="214.0" stroke="#7b7a75" stroke-width="2" stroke-linecap="round" marker-end="url(#arw-7b7a75)"/>
+<rect x="384.0" y="80.0" width="168.0" height="288.0" rx="8" fill="#f4f5f4" stroke="#e2e4e3" stroke-width="1"/>
+<text x="468.0" y="104.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="700" fill="#2a78d6" text-anchor="middle">3. レジスタへ保存</text>
+<text x="468.0" y="124.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10" font-weight="400" fill="#52514e" text-anchor="middle">検出増幅器がパルスを</text>
+<text x="468.0" y="139.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10" font-weight="400" fill="#52514e" text-anchor="middle">判定して確かな1へ戻す</text>
+<circle cx="410.0" cy="192.0" r="9.2" fill="none" stroke="#ffffff" stroke-width="5.5"/>
+<circle cx="410.0" cy="192.0" r="12.0" fill="none" stroke="#0b0b0b" stroke-width="1.9"/>
+<circle cx="410.0" cy="192.0" r="6.5" fill="none" stroke="#0b0b0b" stroke-width="1.4"/>
+<circle cx="440.0" cy="192.0" r="9.2" fill="none" stroke="#ffffff" stroke-width="5.5"/>
+<circle cx="440.0" cy="192.0" r="12.0" fill="none" stroke="#0b0b0b" stroke-width="1.9"/>
+<circle cx="440.0" cy="192.0" r="6.5" fill="none" stroke="#0b0b0b" stroke-width="1.4"/>
+<circle cx="470.0" cy="192.0" r="9.2" fill="none" stroke="#ffffff" stroke-width="5.5"/>
+<circle cx="470.0" cy="192.0" r="12.0" fill="none" stroke="#0b0b0b" stroke-width="1.9"/>
+<circle cx="470.0" cy="192.0" r="6.5" fill="none" stroke="#0b0b0b" stroke-width="1.4"/>
+<circle cx="500.0" cy="192.0" r="9.2" fill="none" stroke="#ffffff" stroke-width="5.5"/>
+<circle cx="500.0" cy="192.0" r="12.0" fill="none" stroke="#0b0b0b" stroke-width="1.9"/>
+<circle cx="500.0" cy="192.0" r="6.5" fill="none" stroke="#0b0b0b" stroke-width="1.4"/>
+<circle cx="410.0" cy="232.0" r="9.2" fill="none" stroke="#ffffff" stroke-width="5.5"/>
+<circle cx="410.0" cy="232.0" r="12.0" fill="none" stroke="#0b0b0b" stroke-width="1.9"/>
+<circle cx="410.0" cy="232.0" r="6.5" fill="none" stroke="#0b0b0b" stroke-width="1.4"/>
+<circle cx="440.0" cy="232.0" r="9.2" fill="none" stroke="#ffffff" stroke-width="5.5"/>
+<circle cx="440.0" cy="232.0" r="12.0" fill="none" stroke="#0b0b0b" stroke-width="1.9"/>
+<circle cx="440.0" cy="232.0" r="6.5" fill="none" stroke="#0b0b0b" stroke-width="1.4"/>
+<circle cx="470.0" cy="232.0" r="9.2" fill="none" stroke="#ffffff" stroke-width="5.5"/>
+<circle cx="470.0" cy="232.0" r="12.0" fill="none" stroke="#0b0b0b" stroke-width="1.9"/>
+<circle cx="470.0" cy="232.0" r="6.5" fill="none" stroke="#0b0b0b" stroke-width="1.4"/>
+<circle cx="500.0" cy="232.0" r="9.2" fill="none" stroke="#ffffff" stroke-width="5.5"/>
+<circle cx="500.0" cy="232.0" r="12.0" fill="none" stroke="#0b0b0b" stroke-width="1.9"/>
+<circle cx="500.0" cy="232.0" r="6.5" fill="none" stroke="#0b0b0b" stroke-width="1.4"/>
+<text x="468.0" y="262.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="9.5" font-weight="400" fill="#7b7a75" text-anchor="middle">コアの実体</text>
+<rect x="398.0" y="270.0" width="140.0" height="26.0" rx="5" fill="#ffffff" stroke="#e2e4e3" stroke-width="1"/>
+<text x="468.0" y="288.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="13" font-weight="700" fill="#0b0b0b" text-anchor="middle">00000000</text>
+<text x="468.0" y="320.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="9.5" font-weight="400" fill="#7b7a75" text-anchor="middle">レジスタ</text>
+<rect x="398.0" y="328.0" width="140.0" height="26.0" rx="5" fill="#ffffff" stroke="#e2e4e3" stroke-width="1"/>
+<text x="468.0" y="346.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="13" font-weight="700" fill="#2a78d6" text-anchor="middle">10110010</text>
+<line x1="553.0" y1="214.0" x2="563.0" y2="214.0" stroke="#7b7a75" stroke-width="2" stroke-linecap="round" marker-end="url(#arw-7b7a75)"/>
+<rect x="564.0" y="80.0" width="168.0" height="288.0" rx="8" fill="#f4f5f4" stroke="#e2e4e3" stroke-width="1"/>
+<text x="648.0" y="104.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="700" fill="#1baf7a" text-anchor="middle">4. 書き戻し</text>
+<text x="648.0" y="124.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10" font-weight="400" fill="#52514e" text-anchor="middle">保存した値で</text>
+<text x="648.0" y="139.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10" font-weight="400" fill="#52514e" text-anchor="middle">元の磁化へ戻す</text>
+<circle cx="590.0" cy="192.0" r="9.2" fill="none" stroke="#ffffff" stroke-width="5.5"/>
+<circle cx="590.0" cy="192.0" r="9.2" fill="none" stroke="#0b0b0b" stroke-width="5.5" opacity="0.3"/>
+<circle cx="590.0" cy="192.0" r="12.0" fill="none" stroke="#0b0b0b" stroke-width="1.9"/>
+<circle cx="590.0" cy="192.0" r="6.5" fill="none" stroke="#0b0b0b" stroke-width="1.4"/>
+<circle cx="620.0" cy="192.0" r="9.2" fill="none" stroke="#ffffff" stroke-width="5.5"/>
+<circle cx="620.0" cy="192.0" r="12.0" fill="none" stroke="#0b0b0b" stroke-width="1.9"/>
+<circle cx="620.0" cy="192.0" r="6.5" fill="none" stroke="#0b0b0b" stroke-width="1.4"/>
+<circle cx="650.0" cy="192.0" r="9.2" fill="none" stroke="#ffffff" stroke-width="5.5"/>
+<circle cx="650.0" cy="192.0" r="9.2" fill="none" stroke="#0b0b0b" stroke-width="5.5" opacity="0.3"/>
+<circle cx="650.0" cy="192.0" r="12.0" fill="none" stroke="#0b0b0b" stroke-width="1.9"/>
+<circle cx="650.0" cy="192.0" r="6.5" fill="none" stroke="#0b0b0b" stroke-width="1.4"/>
+<circle cx="680.0" cy="192.0" r="9.2" fill="none" stroke="#ffffff" stroke-width="5.5"/>
+<circle cx="680.0" cy="192.0" r="9.2" fill="none" stroke="#0b0b0b" stroke-width="5.5" opacity="0.3"/>
+<circle cx="680.0" cy="192.0" r="12.0" fill="none" stroke="#0b0b0b" stroke-width="1.9"/>
+<circle cx="680.0" cy="192.0" r="6.5" fill="none" stroke="#0b0b0b" stroke-width="1.4"/>
+<circle cx="590.0" cy="232.0" r="9.2" fill="none" stroke="#ffffff" stroke-width="5.5"/>
+<circle cx="590.0" cy="232.0" r="12.0" fill="none" stroke="#0b0b0b" stroke-width="1.9"/>
+<circle cx="590.0" cy="232.0" r="6.5" fill="none" stroke="#0b0b0b" stroke-width="1.4"/>
+<circle cx="620.0" cy="232.0" r="9.2" fill="none" stroke="#ffffff" stroke-width="5.5"/>
+<circle cx="620.0" cy="232.0" r="12.0" fill="none" stroke="#0b0b0b" stroke-width="1.9"/>
+<circle cx="620.0" cy="232.0" r="6.5" fill="none" stroke="#0b0b0b" stroke-width="1.4"/>
+<circle cx="650.0" cy="232.0" r="9.2" fill="none" stroke="#ffffff" stroke-width="5.5"/>
+<circle cx="650.0" cy="232.0" r="9.2" fill="none" stroke="#0b0b0b" stroke-width="5.5" opacity="0.3"/>
+<circle cx="650.0" cy="232.0" r="12.0" fill="none" stroke="#0b0b0b" stroke-width="1.9"/>
+<circle cx="650.0" cy="232.0" r="6.5" fill="none" stroke="#0b0b0b" stroke-width="1.4"/>
+<circle cx="680.0" cy="232.0" r="9.2" fill="none" stroke="#ffffff" stroke-width="5.5"/>
+<circle cx="680.0" cy="232.0" r="12.0" fill="none" stroke="#0b0b0b" stroke-width="1.9"/>
+<circle cx="680.0" cy="232.0" r="6.5" fill="none" stroke="#0b0b0b" stroke-width="1.4"/>
+<text x="648.0" y="262.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="9.5" font-weight="400" fill="#7b7a75" text-anchor="middle">コアの実体</text>
+<rect x="578.0" y="270.0" width="140.0" height="26.0" rx="5" fill="#ffffff" stroke="#e2e4e3" stroke-width="1"/>
+<text x="648.0" y="288.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="13" font-weight="700" fill="#0b0b0b" text-anchor="middle">10110010</text>
+<text x="648.0" y="320.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="9.5" font-weight="400" fill="#7b7a75" text-anchor="middle">レジスタ</text>
+<rect x="578.0" y="328.0" width="140.0" height="26.0" rx="5" fill="#ffffff" stroke="#e2e4e3" stroke-width="1"/>
+<text x="648.0" y="346.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="13" font-weight="700" fill="#2a78d6" text-anchor="middle">10110010</text>
+<circle cx="210.0" cy="388.0" r="17.2" fill="none" stroke="#ffffff" stroke-width="5.5"/>
+<circle cx="210.0" cy="388.0" r="17.2" fill="none" stroke="#0b0b0b" stroke-width="5.5" opacity="0.3"/>
+<circle cx="210.0" cy="388.0" r="20.0" fill="none" stroke="#0b0b0b" stroke-width="1.9"/>
+<circle cx="210.0" cy="388.0" r="14.5" fill="none" stroke="#0b0b0b" stroke-width="1.4"/>
+<path d="M 194.056 381.416 A 17.25 17.25 0 0 1 226.204 382.085" fill="none" stroke="#0b0b0b" stroke-width="3.795" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 228.688 388.891 L 221.991 383.623 L 230.417 380.547 Z" fill="#0b0b0b" stroke="#0b0b0b" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="238.0" y="392.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#52514e" text-anchor="start">磁化が時計回り＝1（帯を塗った輪）</text>
+<circle cx="460.0" cy="388.0" r="17.2" fill="none" stroke="#ffffff" stroke-width="5.5"/>
+<circle cx="460.0" cy="388.0" r="20.0" fill="none" stroke="#0b0b0b" stroke-width="1.9"/>
+<circle cx="460.0" cy="388.0" r="14.5" fill="none" stroke="#0b0b0b" stroke-width="1.4"/>
+<path d="M 476.204 382.085 A 17.25 17.25 0 0 0 444.056 381.416" fill="none" stroke="#0b0b0b" stroke-width="3.795" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 441.291 388.113 L 439.91 379.705 L 448.201 383.128 Z" fill="#0b0b0b" stroke="#0b0b0b" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="488.0" y="392.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="10.5" font-weight="400" fill="#52514e" text-anchor="start">反時計回り＝0（白い輪）</text>
+<text x="380.0" y="430.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="700" fill="#0b0b0b" text-anchor="middle">外から見た1回の読出しの裏で、破壊と復元が必ず対になっている。</text>
+<text x="380.0" y="450.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11.5" font-weight="400" fill="#52514e" text-anchor="middle">DRAM もこの形をそのまま受け継ぐ。物理は違うのに、読出しの構造が同じになる。</text>
+</svg>
