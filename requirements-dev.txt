@@ -1,5 +1,17 @@
-PyYAML==6.0.2
+# バージョンは完全一致（==）で固定しない。
+# OS のパッケージ管理が入れた同名パッケージ（Debian/Ubuntu の python3-yaml など）は
+# dist-info に RECORD を持たないため pip が消せず、1つでも版が違うと install 全体が落ちる。
+#   ERROR: Cannot uninstall PyYAML 6.0.1, RECORD file not found.
+#          Hint: The package was installed by debian.
+# 範囲で書いておけば、OS 側の版が条件を満たす限り pip は触らずに済む。
+# 上限はメジャーバージョンで止める。下限は下記の安定APIが揃っていれば足りる。
+
+# サイト生成（scripts/generate_site.py, scripts/comments.py）
+# 使うのは yaml.safe_load / yaml.safe_dump のみ
+PyYAML>=6.0,<7
+
 # 図版の機械検査（.claude/skills/zuhan/scripts/check_figure.py）
-# fonttools: 豆腐（フォントに無い文字）の検出 / cairosvg: 目視用のPNG書き出し
-fonttools==4.63.0
-cairosvg==2.9.0
+# fonttools: 豆腐（フォントに無い文字）の検出。使うのは TTFont / TTCollection / cmap のみ
+# cairosvg: 目視用のPNG書き出し。使うのは svg2png のみ
+fonttools>=4.0,<5
+cairosvg>=2.5,<3

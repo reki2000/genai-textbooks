@@ -142,11 +142,13 @@ git diff --check
 uv run --with-requirements requirements-dev.txt python scripts/generate_site.py
 ```
 
-`check_figure.py` の豆腐検査と PNG 書き出しには `fonttools` と `cairosvg` が要る（`requirements-dev.txt` に入っている）。ただし `pip install -r requirements-dev.txt` は、OS が入れた PyYAML を消せずに失敗することがある。その場合は必要な2つだけ入れる。
+`check_figure.py` の豆腐検査と PNG 書き出しには `fonttools` と `cairosvg` が要る。
 
 ```bash
-pip install fonttools cairosvg     # requirements-dev.txt のバージョンに合わせる
+python3 -m pip install -r requirements-dev.txt
 ```
+
+`requirements-dev.txt` はバージョンを範囲で書いてある。完全一致で固定すると、OS のパッケージ管理が入れた同名パッケージ（`python3-yaml` など）を pip が消せず、install 全体が落ちるため。**新しい依存を足すときも `==` を使わない。**
 
 ## PNG の目視
 
