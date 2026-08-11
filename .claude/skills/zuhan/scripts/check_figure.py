@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """図版の機械検査。内省では捕まらない事故だけを見る。
 
-  python check_figure.py fig.svg [fig2.svg ...] [--png-dir DIR]
+  python check_figure.py fig.svg [fig2.svg ...] [--png-dir DIR] [--labels]
 
 検査項目
   1. 豆腐  … 指定フォントに存在しない文字（上付き・下付き・記号類）
@@ -10,6 +10,10 @@
   3. はみ出し … 要素が viewBox の外へ出ている
   4. 規模  … <text> の数・色数（1図1論点の目安を超えていないか）
 必ず PNG も書き出す。最後は人間（またはモデル）が画像を見て確かめること。
+
+ラベルの数え方は「2文字以上の <text> を、同一文字列は1個として数える」。
+上限に当たったときにどれを削るか判断できるよう、超過時は数えたラベルを全部並べる。
+設計中に見積もりたいときは `--labels` を付ければ、合格していても一覧が出る。
 """
 import sys, re, os, glob
 import xml.etree.ElementTree as ET
@@ -57,7 +61,7 @@ def seg_cross(a, b):
     return None
 
 
-def check(path, charset, png_dir=None):
+def check(path, charset, png_dir=None, show_labels=False):
     tree = ET.parse(path)
     root = tree.getroot()
     vb = [float(v) for v in (root.get("viewBox") or "0 0 0 0").split()]
@@ -141,10 +145,15 @@ def check(path, charset, png_dir=None):
         r_, g_, b_ = (int(m.group(1)[k:k + 2], 16) for k in (0, 2, 4))
         return (0.299 * r_ + 0.587 * g_ + 0.114 * b_) < 216   # 淡い地色は数えない
     cols = {c for c in cols if dark(c)}
+    label_list = " / ".join(sorted(labels))
     if len(labels) > 22:
-        issues.append(f"ラベル {len(labels)} 個。1図1論点を超えている。パネル分割を検討")
+        issues.append(f"ラベル {len(labels)} 個。1図1論点を超えている。パネル分割を検討\n"
+                      f"       数えたラベル: {label_list}")
+    elif show_labels:
+        notes.append(f"数えたラベル {len(labels)}/22: {label_list}")
     if len(cols) > 8:
-        issues.append(f"意味のありそうな色 {len(cols)} 種。3系統までに抑える")
+        issues.append(f"意味のありそうな色 {len(cols)} 種。3系統までに抑える\n"
+                      f"       数えた色: {' '.join(sorted(cols))}")
 
     png = None
     if png_dir:
@@ -173,11 +182,14 @@ def check(path, charset, png_dir=None):
 
 
 if __name__ == "__main__":
-    argv, args, png_dir = sys.argv[1:], [], None
+    argv, args, png_dir, show_labels = sys.argv[1:], [], None, False
     i = 0
     while i < len(argv):
         if argv[i] == "--png-dir" and i + 1 < len(argv):
             png_dir, i = argv[i + 1], i + 2
+            continue
+        if argv[i] == "--labels":
+            show_labels, i = True, i + 1
             continue
         if not argv[i].startswith("--"):
             args.append(argv[i])
@@ -188,6 +200,6 @@ if __name__ == "__main__":
     cs = font_charset()
     if cs is None:
         print("※ フォントを読めないので豆腐検査は簡易版（fontTools 未導入）")
-    n = sum(check(f, cs, png_dir) for f in files)
+    n = sum(check(f, cs, png_dir, show_labels) for f in files)
     print(f"\n{len(files)} 枚中 指摘 {n} 件")
     sys.exit(1 if n else 0)
