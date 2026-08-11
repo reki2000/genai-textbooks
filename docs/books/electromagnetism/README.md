@@ -1559,10 +1559,6 @@ $$\oint_C\mathbf B\cdot d\mathbf l
 隙間を横切る面では伝導電流は0だが、電束の変化が同じ値になる。
 どの面を選んでも答えが一致するお。
 
-[![同じ境界Cに張る面を変えても伝導電流と変位電流により同じ磁場が得られる図](figs/fig1-displacement-current.svg)](figs/fig1-displacement-current.svg)
-
-図5-1：元の法則では面Aの $I$ と面Bの0が矛盾する。変位電流 $I_d$ を加えると、どちらの面でも $\oint_C\mathbf B\cdot d\mathbf l=\mu_0I$ になる（タップ／クリックで原寸表示）。
-
 **やらない夫**：
 これも1点ごとに述べ直せる。
 磁束密度の式では閉曲面を縮めたが、今度は閉じた経路 $C$ を縮める。
@@ -1798,10 +1794,6 @@ $$E=cB$$
 
 電場と磁場は同じ位相で振動し、一方だけが先に生まれて他方が遅れて追いかけるわけではない。
 互いに整合した1つの波だお。
-
-[![電場と磁場が互いと進行方向に直交し同位相で進む図](figs/fig2-electromagnetic-wave.svg)](figs/fig2-electromagnetic-wave.svg)
-
-図6-1：$\mathbf E\perp\mathbf B\perp\mathbf S$ で、山の位置は一致する。$\mathbf E\times\mathbf B$ の向きへ1つの電磁波としてエネルギーを運ぶ（タップ／クリックで原寸表示）。
 
 **やらない夫**：
 周波数を変えると何が変わる。

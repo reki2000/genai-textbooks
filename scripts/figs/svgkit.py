@@ -1,155 +1,153 @@
-#!/usr/bin/env python3
-"""教材図版（docs/books/{ID}/figs/*.svg）を組み立てる共通ヘルパ。
+# -*- coding: utf-8 -*-
+"""最小限のSVG組み立てヘルパ。
 
-教材ごとの図は `scripts/figs/{ID}.py` に置き、このモジュールを import して
-`Svg` に描く。配色・書体・カード面の作りをここへ集約し、教材をまたいで図の
-見た目を揃える。使い方は `.claude/skills/textbook-figures/SKILL.md` が正本。
+教材ごとの図は `scripts/figs/{ID}.py` に置き、このモジュールを import して描き、
+`docs/books/{ID}/figs/*.svg` へ書き出す。使い方は `.claude/skills/zuhan/` が正本
+（配置と検査は `references/repo.md`、作図規約は `references/conventions.md`）。
 
-図は docsify のライト／ダーク両テーマの上に置かれる。テーマ切り替えは OS の
-prefers-color-scheme と一致しないことがあるため、SVG 自身が明るいカード面を持ち、
-どちらのテーマでも同じ配色で読めるようにしている。
+作図規約:
+  - 座標は先に決める（自動レイアウトを使わない）
+  - 色は3系統のみ: 電子=青 / 正孔=赤 / 固定イオン=灰
+  - 接続線は直線、または直角1回まで
+
+書き出しは docsify に合わせてある。`width` / `height` 属性を付けると閲覧側の
+`max-width:100%` と噛み合って縦横比が崩れるため、`viewBox` だけを持たせる。
+図はライト／ダーク両テーマの上に置かれるので、SVG 自身が明るい地色を持つ。
 """
-
-from __future__ import annotations
 
 from pathlib import Path
 
-# --- 配色（dataviz スキルの検証済みパレット。ライト面向けの値）-----------------
-SURFACE = "#fcfcfb"     # カード面
-CARD_EDGE = "#e2e4e3"   # カードの枠
-INK = "#0b0b0b"         # 主要テキスト
-INK2 = "#52514e"        # 副次テキスト・注記
-INK3 = "#7b7a75"        # 軸・目盛・弱い要素
-GRID = "#dcdedd"        # グリッド線
-BLUE = "#2a78d6"        # 系列1
-ORANGE = "#eb6834"      # 系列2
-AQUA = "#1baf7a"        # 系列3
-RED = "#e34948"         # 「これは駄目」を指す強調
-VIOLET = "#4a3aa7"      # 補助
+FONT = "Noto Sans CJK JP, Hiragino Sans, Noto Sans JP, Yu Gothic, sans-serif"
 
-FONT = "'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif"
-
-
-def esc(text: str) -> str:
-    return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+E_BLUE = "#1f6fd0"      # 電子
+H_RED = "#cf3b2d"       # 正孔
+FIX_GRAY = "#8d8d8d"    # 動けない固定電荷
+INK = "#1c1c1c"
+SUB = "#6b6b6b"
+N_TINT = "#e6eefb"
+P_TINT = "#fbeae8"
+DEP_TINT = "#f2f2f2"
+OX_TINT = "#f6e6b8"
+METAL = "#b9c0c7"
+ACCENT = "#e07b1f"      # 制御端子の強調
 
 
-class Svg:
-    """タイトル・副題つきのカード1枚。座標は左上原点、単位はユーザー単位（≒px）。
+def esc(s):
+    return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
-    幅は 760 を既定とする（docsify の本文幅にほぼ一致）。高さは中身に合わせる。
-    """
 
-    def __init__(self, width: float, height: float, title: str, subtitle: str = "",
-                 out_dir: Path | None = None):
-        self.w = width
-        self.h = height
-        self.parts: list[str] = []
-        self.defs: list[str] = []
+class SVG:
+    def __init__(self, w, h, title="", desc="", bg="#ffffff"):
+        """title / desc はスクリーンリーダ用。title は図が何を示すかを一文で書く。"""
+        self.w, self.h = w, h
+        self.parts = []
+        self.defs = []
         self.title = title
-        self.description = subtitle or title
-        self.out_dir = out_dir
-        self.rect(0, 0, width, height, fill=SURFACE, stroke=CARD_EDGE, rx=10)
-        self.text(24, 32, title, size=16, weight="700")
-        if subtitle:
-            self.text(24, 54, subtitle, size=12.5, fill=INK2)
-
-    # --- primitives -----------------------------------------------------
-    def rect(self, x, y, w, h, fill="none", stroke="none", rx=0, sw=1, opacity=None, dash=None):
-        extra = f' opacity="{opacity}"' if opacity is not None else ""
-        extra += f' stroke-dasharray="{dash}"' if dash else ""
+        self.desc = desc or title
+        self._arrowheads = set()
         self.parts.append(
-            f'<rect x="{x:.1f}" y="{y:.1f}" width="{w:.1f}" height="{h:.1f}" rx="{rx}" '
-            f'fill="{fill}" stroke="{stroke}" stroke-width="{sw}"{extra}/>'
-        )
+            f'<rect x="0" y="0" width="{w}" height="{h}" fill="{bg}"/>')
 
-    def line(self, x1, y1, x2, y2, stroke=GRID, sw=1, dash=None, cap="round", opacity=None):
-        extra = f' stroke-dasharray="{dash}"' if dash else ""
-        extra += f' opacity="{opacity}"' if opacity is not None else ""
+    # ---- primitives ----
+    def rect(self, x, y, w, h, fill="none", stroke=INK, sw=1.4, rx=0, dash=None, op=1):
+        d = f' stroke-dasharray="{dash}"' if dash else ""
         self.parts.append(
-            f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" '
-            f'stroke="{stroke}" stroke-width="{sw}" stroke-linecap="{cap}"{extra}/>'
-        )
+            f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="{rx}" '
+            f'fill="{fill}" stroke="{stroke}" stroke-width="{sw}" opacity="{op}"{d}/>')
 
-    def path(self, d, stroke="none", fill="none", sw=2, dash=None, opacity=None):
-        extra = f' stroke-dasharray="{dash}"' if dash else ""
-        extra += f' opacity="{opacity}"' if opacity is not None else ""
+    def line(self, x1, y1, x2, y2, stroke=INK, sw=1.4, dash=None, cap="round",
+             op=1, role=None):
+        """role="connector" を付けた線どうしの交差だけを check_figure.py が咎める。
+        領域の境界や×印など、交差して当然の線には role を付けない。"""
+        d = f' stroke-dasharray="{dash}"' if dash else ""
+        r = f' data-role="{role}"' if role else ""
+        self.parts.append(
+            f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="{stroke}" '
+            f'stroke-width="{sw}" stroke-linecap="{cap}" opacity="{op}"{d}{r}/>')
+
+    def path(self, d, stroke=INK, sw=1.4, fill="none", dash=None, op=1):
+        da = f' stroke-dasharray="{dash}"' if dash else ""
         self.parts.append(
             f'<path d="{d}" fill="{fill}" stroke="{stroke}" stroke-width="{sw}" '
-            f'stroke-linecap="round" stroke-linejoin="round"{extra}/>'
-        )
+            f'stroke-linecap="round" stroke-linejoin="round" opacity="{op}"{da}/>')
 
-    def circle(self, cx, cy, r, fill="none", stroke="none", sw=1, opacity=None, dash=None):
-        extra = f' opacity="{opacity}"' if opacity is not None else ""
-        extra += f' stroke-dasharray="{dash}"' if dash else ""
+    def circle(self, cx, cy, r, fill="none", stroke=INK, sw=1.2, dash=None, op=1):
+        d = f' stroke-dasharray="{dash}"' if dash else ""
         self.parts.append(
-            f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="{r:.1f}" fill="{fill}" '
-            f'stroke="{stroke}" stroke-width="{sw}"{extra}/>'
-        )
+            f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="{fill}" stroke="{stroke}" '
+            f'stroke-width="{sw}" opacity="{op}"{d}/>')
 
-    def text(self, x, y, s, size=12, fill=INK, weight="400", anchor="start", opacity=None):
-        extra = f' opacity="{opacity}"' if opacity is not None else ""
+    def text(self, x, y, s, size=13, fill=INK, anchor="start", weight="400", style=""):
+        st = f' font-style="{style}"' if style else ""
+        s = esc(s)
         self.parts.append(
-            f'<text x="{x:.1f}" y="{y:.1f}" font-family="{FONT}" font-size="{size}" '
-            f'font-weight="{weight}" fill="{fill}" text-anchor="{anchor}"{extra}>{esc(s)}</text>'
-        )
+            f'<text x="{x}" y="{y}" font-family="{FONT}" font-size="{size}" '
+            f'fill="{fill}" text-anchor="{anchor}" font-weight="{weight}"{st}>{s}</text>')
 
-    def lines_of_text(self, x, y, rows, size=12, fill=INK2, lh=16, anchor="start", weight="400"):
-        for i, row in enumerate(rows):
-            self.text(x, y + i * lh, row, size=size, fill=fill, anchor=anchor, weight=weight)
+    # ---- composites ----
+    def _arrowhead(self, color, sw):
+        # 頭の実寸を約 3.4*sw に固定し、太い矢印で頭が肥大するのを防ぐ
+        mw = round(max(2.4, min(20.0 / sw, 9.0)), 2)
+        key = color.replace("#", "") + str(mw).replace(".", "_")
+        if key not in self._arrowheads:
+            self._arrowheads.add(key)
+            self.defs.append(
+                f'<marker id="ah{key}" viewBox="0 0 10 10" refX="8.5" refY="5" '
+                f'markerWidth="{mw}" markerHeight="{mw}" orient="auto-start-reverse">'
+                f'<path d="M 0 0 L 10 5 L 0 10 z" fill="{color}"/></marker>')
+        return f"ah{key}"
 
-    def arrow_defs(self, name, color):
-        self.defs.append(
-            f'<marker id="{name}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" '
-            f'markerHeight="6" orient="auto-start-reverse">'
-            f'<path d="M0,0 L10,5 L0,10 z" fill="{color}"/></marker>'
-        )
-
-    def arrow(self, x1, y1, x2, y2, color=INK2, sw=1.6, marker=None, dash=None):
-        marker = marker or f"arw-{color.lstrip('#')}"
-        if not any(f'id="{marker}"' in d for d in self.defs):
-            self.arrow_defs(marker, color)
-        extra = f' stroke-dasharray="{dash}"' if dash else ""
+    def arrow(self, x1, y1, x2, y2, stroke=INK, sw=2.0, dash=None):
+        m = self._arrowhead(stroke, sw)
+        d = f' stroke-dasharray="{dash}"' if dash else ""
         self.parts.append(
-            f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" stroke="{color}" '
-            f'stroke-width="{sw}" stroke-linecap="round" marker-end="url(#{marker})"{extra}/>'
-        )
+            f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="{stroke}" '
+            f'stroke-width="{sw}" stroke-linecap="round" marker-end="url(#{m})"{d}/>')
 
-    def arrow_path(self, d, color=INK2, sw=1.6, dash=None):
-        marker = f"arw-{color.lstrip('#')}"
-        if not any(f'id="{marker}"' in dd for dd in self.defs):
-            self.arrow_defs(marker, color)
-        extra = f' stroke-dasharray="{dash}"' if dash else ""
+    def dim(self, x1, x2, y, label, color=SUB, size=11, up=False):
+        """水平方向の寸法線（両矢印）"""
+        m = self._arrowhead(color, 1)
         self.parts.append(
-            f'<path d="{d}" fill="none" stroke="{color}" stroke-width="{sw}" '
-            f'stroke-linecap="round" marker-end="url(#{marker})"{extra}/>'
-        )
+            f'<line x1="{x1}" y1="{y}" x2="{x2}" y2="{y}" stroke="{color}" '
+            f'stroke-width="1" marker-start="url(#{m})" marker-end="url(#{m})"/>')
+        self.line(x1, y - 5, x1, y + 5, stroke=color, sw=1)
+        self.line(x2, y - 5, x2, y + 5, stroke=color, sw=1)
+        ty = y - 7 if up else y + 15
+        self.text((x1 + x2) / 2, ty, label, size=size, fill=color, anchor="middle")
 
-    def box(self, x, y, w, h, label, sub="", color=BLUE, size=12.5, fill="#ffffff"):
-        """ラベル（＋小さい副題）つきの角丸ボックス。流れ図の節点に使う。"""
-        self.rect(x, y, w, h, fill=fill, stroke=color, rx=8, sw=1.6)
-        cy = y + h / 2 + (0 if not sub else -6)
-        self.text(x + w / 2, cy + 4, label, size=size, anchor="middle", weight="700", fill=INK)
-        if sub:
-            self.text(x + w / 2, cy + 21, sub, size=11, anchor="middle", fill=INK2)
+    def electron(self, cx, cy, r=5):
+        self.circle(cx, cy, r, fill=E_BLUE, stroke=E_BLUE, sw=0)
+        self.text(cx, cy + 3.2, "\u2212", size=r * 1.9, fill="#ffffff", anchor="middle", weight="700")
 
-    def save(self, name: str, out_dir: Path | None = None):
-        """viewBox だけを持つ SVG を書き出す。
+    def hole(self, cx, cy, r=5):
+        self.circle(cx, cy, r, fill="#ffffff", stroke=H_RED, sw=1.6)
+        self.text(cx, cy + 3.4, "+", size=r * 1.9, fill=H_RED, anchor="middle", weight="700")
 
-        width/height 属性は付けない。付けると docsify 側の `max-width:100%` で
-        縦横比が崩れる。viewBox だけなら閲覧幅にフィットする。
-        """
-        target = out_dir or self.out_dir
-        if target is None:
-            raise ValueError("out_dir を Svg() か save() で指定する")
-        defs = f"<defs>{''.join(self.defs)}</defs>" if self.defs else ""
-        body = "\n".join(self.parts)
-        svg = (
-            f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {self.w:.0f} {self.h:.0f}" '
-            f'role="img" aria-labelledby="title desc">\n'
-            f'<title id="title">{esc(self.title)}</title>\n'
-            f'<desc id="desc">{esc(self.description)}</desc>\n{defs}\n{body}\n</svg>\n'
-        )
-        target.mkdir(parents=True, exist_ok=True)
-        (target / name).write_text(svg, encoding="utf-8")
-        print(f"wrote {target / name}")
+    def fixed_ion(self, cx, cy, sign, r=7.5):
+        """動けない固定電荷: 灰の破線の輪。"""
+        self.circle(cx, cy, r, fill="#ffffff", stroke=FIX_GRAY, sw=1.3, dash="3 2")
+        col = FIX_GRAY
+        self.text(cx, cy + r * 0.55, sign, size=r * 1.75, fill=col, anchor="middle", weight="700")
+
+    def cross(self, cx, cy, r=5, stroke=H_RED, sw=2):
+        self.line(cx - r, cy - r, cx + r, cy + r, stroke=stroke, sw=sw, role="glyph")
+        self.line(cx + r, cy - r, cx - r, cy + r, stroke=stroke, sw=sw, role="glyph")
+
+    def save(self, path):
+        """viewBox だけを持つSVGを書き出す（width/height は付けない）。"""
+        path = Path(path)
+        defs = ("<defs>" + "".join(self.defs) + "</defs>") if self.defs else ""
+        head = ""
+        if self.title:
+            head = (f'<title id="title">{esc(self.title)}</title>'
+                    f'<desc id="desc">{esc(self.desc)}</desc>')
+            label = ' role="img" aria-labelledby="title desc"'
+        else:
+            label = ""
+        svg = (f'<svg xmlns="http://www.w3.org/2000/svg" '
+               f'viewBox="0 0 {self.w} {self.h}"{label}>'
+               + head + defs + "".join(self.parts) + "</svg>\n")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(svg, encoding="utf-8")
+        print(f"wrote {path}")
+        return path
