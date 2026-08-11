@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 384" role="img" aria-labelledby="title desc">
+<title id="title">図9　混ぜた瞬間に捨てた約11万段と、拾えた30段</title>
+<desc id="desc">80℃と20℃の水を1 kgずつ直接混合：S_gen ≒ 36 J/K、W_lost = 293 × 36 ≒ 10.6 kJ ＝ 約11万段</desc>
+
+<rect x="0.0" y="0.0" width="760.0" height="384.0" rx="10" fill="#fcfcfb" stroke="#e2e4e3" stroke-width="1"/>
+<text x="24.0" y="32.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="16" font-weight="700" fill="#0b0b0b" text-anchor="start">図9　混ぜた瞬間に捨てた約11万段と、拾えた30段</text>
+<text x="24.0" y="54.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="400" fill="#52514e" text-anchor="start">80℃と20℃の水を1 kgずつ直接混合：S_gen ≒ 36 J/K、W_lost = 293 × 36 ≒ 10.6 kJ ＝ 約11万段</text>
+<rect x="60.0" y="118.0" width="640.0" height="54.0" rx="6" fill="#eb6834" stroke="#eb6834" stroke-width="1.6" opacity="0.2"/>
+<text x="380.0" y="151.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="13.5" font-weight="700" fill="#0b0b0b" text-anchor="middle">直接混合で失った最大仕事　10.6 kJ ＝ 約11万段</text>
+<rect x="60.0" y="118.0" width="3.0" height="54.0" rx="0" fill="#e34948" stroke="none" stroke-width="1"/>
+<text x="70.0" y="110.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11" font-weight="400" fill="#e34948" text-anchor="start">30段はこの左端（線の太さは実寸ではない）</text>
+<line x1="60.0" y1="176.0" x2="60.0" y2="252.0" stroke="#7b7a75" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="5 4"/>
+<line x1="63.0" y1="176.0" x2="700.0" y2="252.0" stroke="#7b7a75" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="5 4"/>
+<text x="78.0" y="240.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="11.5" font-weight="400" fill="#7b7a75" text-anchor="start">左端の100段ぶんを拡大（全体の約0.09%）</text>
+<rect x="60.0" y="252.0" width="640.0" height="48.0" rx="6" fill="#ffffff" stroke="#e2e4e3" stroke-width="1"/>
+<rect x="60.0" y="252.0" width="192.0" height="48.0" rx="6" fill="#e34948" stroke="#e34948" stroke-width="1.6" opacity="0.22"/>
+<text x="156.0" y="282.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="14" font-weight="700" fill="#e34948" text-anchor="middle">30段</text>
+<text x="266.0" y="282.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="400" fill="#0b0b0b" text-anchor="start">＝ 最高記録（約2.9 J）。11万段のうち 0.03%</text>
+<text x="380.0" y="342.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12" font-weight="400" fill="#52514e" text-anchor="middle">エネルギーは1 Jも減っていない。減ったのは、そこから取り出せる仕事の上限だけ。</text>
+<text x="380.0" y="364.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12" font-weight="400" fill="#52514e" text-anchor="middle">しかも熱の大部分は容器壁と配管を通り、エンジンを通らずに均されていた。</text>
+</svg>
