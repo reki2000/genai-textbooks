@@ -1,0 +1,4 @@
+interface:
+  display_name: "教材図版の追加"
+  short_description: "図が要る箇所を選定し、作図規約と機械検査つきで教材へ図版を追加"
+  default_prompt: "Use $zuhan to add explanatory figures to this textbook."

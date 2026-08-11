@@ -1,4 +1,0 @@
-interface:
-  display_name: "教材図版の追加"
-  short_description: "文脈に合う説明図を選定し、再現可能なコードで教材へ追加"
-  default_prompt: "Use $textbook-figures to add context-aware explanatory figures to this textbook."

@@ -1,1 +1,5 @@
 PyYAML==6.0.2
+# 図版の機械検査（.claude/skills/zuhan/scripts/check_figure.py）
+# fonttools: 豆腐（フォントに無い文字）の検出 / cairosvg: 目視用のPNG書き出し
+fonttools==4.63.0
+cairosvg==2.9.0
