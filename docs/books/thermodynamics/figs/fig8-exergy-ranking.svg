@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 420" role="img" aria-labelledby="title desc">
-<title id="title">図4　同じ1 MJでも、環境まで戻す間に取り出せる最大仕事は違う</title>
+<title id="title">図8　同じ1 MJでも、環境まで戻す間に取り出せる最大仕事は違う</title>
 <desc id="desc">環境温度 35℃。電池は約1.00 MJ、圧縮空気は条件付きで0.82 MJ、500℃の熱は0.60 MJ、40℃の熱は0.016 MJ</desc>
 
 <rect x="0.0" y="0.0" width="760.0" height="420.0" rx="10" fill="#fcfcfb" stroke="#e2e4e3" stroke-width="1"/>
-<text x="24.0" y="32.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="16" font-weight="700" fill="#0b0b0b" text-anchor="start">図4　同じ1 MJでも、環境まで戻す間に取り出せる最大仕事は違う</text>
+<text x="24.0" y="32.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="16" font-weight="700" fill="#0b0b0b" text-anchor="start">図8　同じ1 MJでも、環境まで戻す間に取り出せる最大仕事は違う</text>
 <text x="24.0" y="54.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="400" fill="#52514e" text-anchor="start">環境温度 35℃。電池は約1.00 MJ、圧縮空気は条件付きで0.82 MJ、500℃の熱は0.60 MJ、40℃の熱は0.016 MJ</text>
 <text x="168.0" y="120.0" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',system-ui,sans-serif" font-size="12.5" font-weight="700" fill="#0b0b0b" text-anchor="end">電池</text>
 <rect x="184.0" y="100.0" width="510.0" height="34.0" rx="5" fill="#ffffff" stroke="#e2e4e3" stroke-width="1"/>
