@@ -85,16 +85,25 @@ class SVG:
             f'fill="{fill}" text-anchor="{anchor}" font-weight="{weight}"{st}>{s}</text>')
 
     # ---- composites ----
-    def _arrowhead(self, color, sw):
+    def _arrowhead(self, color, sw, back=False):
+        """矢印の頭を1つ定義して id を返す。
+
+        `orient="auto-start-reverse"` は SVG2 で、resvg のような検査用レンダラが
+        未対応だと頭が回らず、目視で矢印の向きを確かめられなくなる。SVG1.1 の
+        `orient="auto"` だけを使い、marker-start 用には向きを反転した図形を
+        別マーカーとして持つ（`back=True`）。
+        """
         # 頭の実寸を約 3.4*sw に固定し、太い矢印で頭が肥大するのを防ぐ
         mw = round(max(2.4, min(20.0 / sw, 9.0)), 2)
-        key = color.replace("#", "") + str(mw).replace(".", "_")
+        key = ("b" if back else "f") + color.replace("#", "") + str(mw).replace(".", "_")
         if key not in self._arrowheads:
             self._arrowheads.add(key)
+            d = "M 10 0 L 0 5 L 10 10 z" if back else "M 0 0 L 10 5 L 0 10 z"
+            refx = 1.5 if back else 8.5
             self.defs.append(
-                f'<marker id="ah{key}" viewBox="0 0 10 10" refX="8.5" refY="5" '
-                f'markerWidth="{mw}" markerHeight="{mw}" orient="auto-start-reverse">'
-                f'<path d="M 0 0 L 10 5 L 0 10 z" fill="{color}"/></marker>')
+                f'<marker id="ah{key}" viewBox="0 0 10 10" refX="{refx}" refY="5" '
+                f'markerWidth="{mw}" markerHeight="{mw}" orient="auto">'
+                f'<path d="{d}" fill="{color}"/></marker>')
         return f"ah{key}"
 
     def arrow(self, x1, y1, x2, y2, stroke=INK, sw=2.0, dash=None):
@@ -106,10 +115,11 @@ class SVG:
 
     def dim(self, x1, x2, y, label, color=SUB, size=11, up=False):
         """水平方向の寸法線（両矢印）"""
-        m = self._arrowhead(color, 1)
+        ms = self._arrowhead(color, 1, back=True)
+        me = self._arrowhead(color, 1)
         self.parts.append(
             f'<line x1="{x1}" y1="{y}" x2="{x2}" y2="{y}" stroke="{color}" '
-            f'stroke-width="1" marker-start="url(#{m})" marker-end="url(#{m})"/>')
+            f'stroke-width="1" marker-start="url(#{ms})" marker-end="url(#{me})"/>')
         self.line(x1, y - 5, x1, y + 5, stroke=color, sw=1)
         self.line(x2, y - 5, x2, y + 5, stroke=color, sw=1)
         ty = y - 7 if up else y + 15
