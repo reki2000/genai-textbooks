@@ -7,7 +7,7 @@
 
 作図規約:
   - 座標は先に決める（自動レイアウトを使わない）
-  - 色は3系統のみ: 電子=青 / 正孔=赤 / 固定イオン=灰
+  - 意味を持つ色は3系統まで。役割で選ぶ（MAIN / FOCUS / WARN、補助は MUTED）
   - 接続線は直線、または直角1回まで
 
 書き出しは docsify に合わせてある。`width` / `height` 属性を付けると閲覧側の
@@ -19,17 +19,22 @@ from pathlib import Path
 
 FONT = "Noto Sans CJK JP, Hiragino Sans, Noto Sans JP, Yu Gothic, sans-serif"
 
-E_BLUE = "#1f6fd0"      # 電子
-H_RED = "#cf3b2d"       # 正孔
-FIX_GRAY = "#8d8d8d"    # 動けない固定電荷
+# 意味は役割で決める。分野固有の対象（電子・正孔など）に固定しない。
+# その教材で各色が何を指すかは scripts/figs/{ID}.py の冒頭で宣言する。
+MAIN = "#1f6fd0"        # その教材が追いかける主役
+FOCUS = "#e07b1f"       # いま注目している箇所
+WARN = "#cf3b2d"        # 注意喚起・破綻
+MUTED = "#8d8d8d"       # 動かないもの・補助
 INK = "#1c1c1c"
 SUB = "#6b6b6b"
-N_TINT = "#e6eefb"
-P_TINT = "#fbeae8"
-DEP_TINT = "#f2f2f2"
-OX_TINT = "#f6e6b8"
-METAL = "#b9c0c7"
-ACCENT = "#e07b1f"      # 制御端子の強調
+TINT_MAIN = "#e6eefb"
+TINT_FOCUS = "#f6e6b8"
+TINT_WARN = "#fbeae8"
+TINT_MUTED = "#f2f2f2"
+
+# 旧名（半導体教材由来）。既存の図が参照しているので別名として残す。
+E_BLUE, ACCENT, H_RED, FIX_GRAY = MAIN, FOCUS, WARN, MUTED
+N_TINT, OX_TINT, P_TINT, DEP_TINT = TINT_MAIN, TINT_FOCUS, TINT_WARN, TINT_MUTED
 
 
 def esc(s):
@@ -125,21 +130,7 @@ class SVG:
         ty = y - 7 if up else y + 15
         self.text((x1 + x2) / 2, ty, label, size=size, fill=color, anchor="middle")
 
-    def electron(self, cx, cy, r=5):
-        self.circle(cx, cy, r, fill=E_BLUE, stroke=E_BLUE, sw=0)
-        self.text(cx, cy + 3.2, "\u2212", size=r * 1.9, fill="#ffffff", anchor="middle", weight="700")
-
-    def hole(self, cx, cy, r=5):
-        self.circle(cx, cy, r, fill="#ffffff", stroke=H_RED, sw=1.6)
-        self.text(cx, cy + 3.4, "+", size=r * 1.9, fill=H_RED, anchor="middle", weight="700")
-
-    def fixed_ion(self, cx, cy, sign, r=7.5):
-        """動けない固定電荷: 灰の破線の輪。"""
-        self.circle(cx, cy, r, fill="#ffffff", stroke=FIX_GRAY, sw=1.3, dash="3 2")
-        col = FIX_GRAY
-        self.text(cx, cy + r * 0.55, sign, size=r * 1.75, fill=col, anchor="middle", weight="700")
-
-    def cross(self, cx, cy, r=5, stroke=H_RED, sw=2):
+    def cross(self, cx, cy, r=5, stroke=WARN, sw=2):
         self.line(cx - r, cy - r, cx + r, cy + r, stroke=stroke, sw=sw, role="glyph")
         self.line(cx + r, cy - r, cx - r, cy + r, stroke=stroke, sw=sw, role="glyph")
 
