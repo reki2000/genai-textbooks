@@ -1,0 +1,5 @@
+schema: bench-case/v1
+task: D
+title: 初回通過効果（既知知識からの難所説明）
+evaluates: 説明の流暢さではなく、読んだ後に転移問題を解ける理解になっているか
+origin: docs/books/cold-medicine/checkpoints.yml の cp-14。採点は同 checkpoint の probe を使う

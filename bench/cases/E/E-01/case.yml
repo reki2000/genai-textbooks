@@ -1,0 +1,8 @@
+schema: bench-case/v1
+task: E
+title: 総合感冒薬・製造の幕（構成操作だけでの改善）
+evaluates: 本文を書き換えず、削除・移動・追加・統合だけで構成改善案を出せるか
+origin: docs/books/cold-medicine/README.md の第9幕（6つの壁が連続する、最も密度の高い幕）
+source: docs/books/cold-medicine/README.md
+section: 第9幕　一錠に固める ── 製造という別の戦場
+source_digest: 8fe72b03deb02e46
