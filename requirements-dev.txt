@@ -10,6 +10,10 @@
 # 使うのは yaml.safe_load / yaml.safe_dump のみ
 PyYAML>=6.0,<7
 
+# 公開用ラスタ図版の WebP 変換（scripts/generate_site.py）
+# Image.save(..., "WEBP") / ImageOps.exif_transpose / Resampling.LANCZOS を使用
+Pillow>=10.0,<13
+
 # 図版の機械検査（.claude/skills/zuhan/scripts/check_figure.py）
 # fonttools: 豆腐（フォントに無い文字）の検出。使うのは TTFont / TTCollection / cmap のみ
 # cairosvg: 目視用のPNG書き出し。使うのは svg2png のみ
