@@ -152,6 +152,16 @@ python3 scripts/generate_site.py --check
 python3 -m pip install -r requirements-dev.txt
 ```
 
+不足パッケージだけを理由に停止し、グローバル環境を汚したくないなら `uv` で検証する。
+
+```bash
+uv run --with-requirements requirements-dev.txt python scripts/generate_site.py
+```
+
+`requirements-dev.txt` はバージョンを範囲で書いてある。完全一致で固定すると、OS のパッケージ管理が入れた同名パッケージ（`python3-yaml` など）を pip が消せず、install 全体が落ちるため。**新しい依存を足すときも `==` を使わない。**
+
+図版の検査に使う `fonttools`（豆腐検査）と `cairosvg`（PNG 書き出し）も同じファイルに入っている。
+
 ### 教材ファイルが認識されない
 
 確認事項：
