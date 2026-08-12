@@ -89,6 +89,12 @@ def fast_rebuild(relative_paths: list[str]) -> bool:
             text = source.read_text(encoding="utf-8")
             text = generate_site.convert_ruby_to_html(text)
             text = generate_site.convert_footnote_backrefs(text)
+            text = generate_site.rewrite_public_png_references_in_text(
+                text,
+                target,
+                BUILD_DIR,
+                generate_site.public_image_conversions(BUILD_DIR),
+            )
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_text(text, encoding="utf-8")
     except OSError as exc:

@@ -12,7 +12,7 @@ docs/                  ← ソースのみ（git 追跡対象）
 └── books/*/
     ├── README.md      ← 各教材本文
     ├── catalog.yml    ← 各教材のカタログ定義
-    └── figs/*.svg     ← 説明図（`scripts/figs/{ID}.py` が生成。任意）
+    └── figs/*.{svg,png} ← 説明図の原本（描画コードまたは画像生成。任意）
 
 build/                 ← 生成ファイル（git 除外）
 ├── index.html         ← トップページHTML（自動生成）
@@ -23,13 +23,14 @@ build/                 ← 生成ファイル（git 除外）
 ├── assets/            ← docs/ からコピー
 ├── sitemap.xml        ← サイトマップ（自動生成）
 ├── books/*/README.md  ← docs/ からコピー
-├── books/*/figs/      ← docs/ からコピー
+├── books/*/figs/      ← SVGはコピー、PNG原本は公開用WebPへ変換
 └── books/*/index.html ← 各教材SEOページ（自動生成）
 ```
 
 ### 生成ルール
 
 - `docs/**/catalog.yml` を `scripts/generate_site.py` がビルド時に統合し、`docs/` のソースを `build/` にコピーして生成ファイルを追加・上書き
+- `docs/books/**` のPNG図版は原本として維持する。ビルド時に長辺1600px以下・200KiB以下のWebPへ変換し、公開Markdownの表示画像と原寸リンクをWebPへ差し替える。文字・細線を守るため圧縮を先に試し、必要な場合だけ縮小する。faviconなど `docs/books/` 外のPNGは対象外。開発時の継続ビルドでは、既存WebPがPNG原本と変換コードより新しく、容量上限内なら再圧縮せずに再利用する
 - カテゴリは `docs/catalog.yml`、教材情報は対応する `docs/books/{id}/catalog.yml` に置く
 - 教材のタイトルは `catalog.yml` には書かず、本文 `README.md` の先頭行にある `# ` 見出しから取得する
 - 教材の `created` には、旧 `docs/books/{id}.md` と現行パスを含む Git 履歴上の初出コミット日時をタイムゾーン付き ISO 8601 形式で記録し、カテゴリ内ではその昇順（同一日時は `id` の昇順）で表示する

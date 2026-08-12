@@ -7,6 +7,7 @@ nothing here is meant to be hand-edited or committed as generated output.
 from __future__ import annotations
 
 import argparse
+import io
 import json
 import os
 import re
@@ -25,6 +26,14 @@ try:
 except ImportError:
     sys.exit(
         "PyYAML is required. Install it with "
+        "`python3 -m pip install -r requirements-dev.txt`."
+    )
+
+try:
+    from PIL import Image, ImageOps
+except ImportError:
+    sys.exit(
+        "Pillow is required for public image optimization. Install it with "
         "`python3 -m pip install -r requirements-dev.txt`."
     )
 
@@ -57,6 +66,22 @@ BOOKS_DIR = ROOT / "docs" / "books"
 MARP_CLI = ("npx", "--yes", "@marp-team/marp-cli@4")
 START_MARKER = "<!-- BEGIN GENERATED CATALOG -->"
 END_MARKER = "<!-- END GENERATED CATALOG -->"
+
+# Generated-image PNGs stay under docs/ as source assets, while the public
+# build serves WebP derivatives. 1600 px covers the roughly 760 px article
+# column at 2x density; 200 KiB leaves room for labels and thin lines.
+PUBLIC_IMAGE_MAX_BYTES = 200 * 1024
+PUBLIC_IMAGE_MAX_DIMENSION = 1600
+PUBLIC_IMAGE_MIN_DIMENSION = 760
+PUBLIC_IMAGE_MIN_QUALITY = 75
+_PUBLIC_TEXT_SUFFIXES = {
+    ".css", ".html", ".js", ".json", ".md", ".xml", ".yaml", ".yml"
+}
+_PNG_REFERENCE_RE = re.compile(
+    r"(?P<path>(?:\.{0,2}/|/)?[A-Za-z0-9_./-]+\.png)"
+    r"(?P<suffix>[?#][A-Za-z0-9_.~!$&'()*+,;=:@/?%-]*)?",
+    re.IGNORECASE,
+)
 
 # Multi-part documents split their body across docs/books/{id}/README.md
 # (part 1), README.2.md (part 2), README.3.md (part 3), ... Numbering must
@@ -423,7 +448,9 @@ def slide_needs_render(document: dict[str, Any], out_docs: Path) -> bool:
 def render_slide_deck(document: dict[str, Any], out_docs: Path) -> None:
     """Render docs/books/{id}/slide.md to build/books/{id}/slide.html via
     marp-cli, if a slide.md is present for the document."""
-    source = BOOKS_DIR / document["id"] / "slide.md"
+    # Render the copied source: raster references there may have been changed
+    # from source PNGs to public WebP derivatives.
+    source = out_docs / "books" / document["id"] / "slide.md"
     dest = out_docs / "books" / document["id"] / "slide.html"
     dest.parent.mkdir(parents=True, exist_ok=True)
     try:
@@ -525,6 +552,172 @@ def render_sitemap(documents: list[dict[str, Any]]) -> str:
 def write_file(path: Path, content: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(content, encoding="utf-8")
+
+
+def _webp_bytes(image: Image.Image, quality: int) -> bytes:
+    output = io.BytesIO()
+    image.save(output, "WEBP", quality=quality, method=6)
+    return output.getvalue()
+
+
+def render_public_webp(source: Path) -> bytes:
+    """Render one source image within the public byte budget.
+
+    Prefer compression over downscaling because textbook figures contain
+    small labels and thin lines. If quality 75 cannot meet the budget, reduce
+    dimensions in 10% steps, but never below the article width.
+    """
+    with Image.open(source) as opened:
+        opened.load()
+        image = ImageOps.exif_transpose(opened)
+        if image.mode not in {"RGB", "RGBA"}:
+            image = image.convert(
+                "RGBA" if "transparency" in image.info else "RGB"
+            )
+
+    longest = max(image.size)
+    if longest > PUBLIC_IMAGE_MAX_DIMENSION:
+        scale = PUBLIC_IMAGE_MAX_DIMENSION / longest
+        image = image.resize(
+            (max(1, round(image.width * scale)), max(1, round(image.height * scale))),
+            Image.Resampling.LANCZOS,
+        )
+
+    while True:
+        for quality in range(100, PUBLIC_IMAGE_MIN_QUALITY - 1, -1):
+            payload = _webp_bytes(image, quality)
+            if len(payload) <= PUBLIC_IMAGE_MAX_BYTES:
+                return payload
+
+        longest = max(image.size)
+        if longest <= PUBLIC_IMAGE_MIN_DIMENSION:
+            raise ValueError(
+                f"cannot optimize {source.relative_to(ROOT)} below "
+                f"{PUBLIC_IMAGE_MAX_BYTES} bytes without making it narrower "
+                f"than {PUBLIC_IMAGE_MIN_DIMENSION}px"
+            )
+        next_longest = max(PUBLIC_IMAGE_MIN_DIMENSION, int(longest * 0.9))
+        scale = next_longest / longest
+        image = image.resize(
+            (max(1, round(image.width * scale)), max(1, round(image.height * scale))),
+            Image.Resampling.LANCZOS,
+        )
+
+
+def _reference_target(reference: str, referring_file: Path, out_docs: Path) -> Path:
+    if reference.startswith(SITE_BASE_PATH + "/"):
+        return (out_docs / reference.removeprefix(SITE_BASE_PATH + "/")).resolve()
+    if reference.startswith("/"):
+        return (out_docs / reference.lstrip("/")).resolve()
+    return (referring_file.parent / reference).resolve()
+
+
+def rewrite_public_png_references_in_text(
+    text: str,
+    referring_file: Path,
+    out_docs: Path,
+    conversions: dict[Path, Path],
+) -> str:
+    """Point one copied text file at its generated WebP delivery assets."""
+    def replace(match: re.Match[str]) -> str:
+        reference = match.group("path")
+        target = _reference_target(reference, referring_file, out_docs)
+        if target not in conversions:
+            return match.group(0)
+        return reference[:-4] + ".webp" + (match.group("suffix") or "")
+
+    return _PNG_REFERENCE_RE.sub(replace, text)
+
+
+def rewrite_public_png_references(
+    out_docs: Path, conversions: dict[Path, Path]
+) -> None:
+    """Point copied site text at generated WebP files, preserving URL style."""
+    for text_path in out_docs.rglob("*"):
+        if (
+            not text_path.is_file()
+            or text_path.suffix.lower() not in _PUBLIC_TEXT_SUFFIXES
+        ):
+            continue
+        text = text_path.read_text(encoding="utf-8")
+        rewritten = rewrite_public_png_references_in_text(
+            text, text_path, out_docs, conversions
+        )
+        if rewritten != text:
+            text_path.write_text(rewritten, encoding="utf-8")
+
+
+def public_image_conversions(out_docs: Path) -> dict[Path, Path]:
+    """Map copied PNG paths to their WebP delivery paths."""
+    source_books_dir = DOCS_DIR / "books"
+    books_dir = out_docs / "books"
+    return {
+        (books_dir / source.relative_to(source_books_dir)).resolve():
+        (books_dir / source.relative_to(source_books_dir)).with_suffix(".webp").resolve()
+        for source in source_books_dir.rglob("*.png")
+    }
+
+
+def public_image_needs_render(source: Path, destination: Path) -> bool:
+    """Return whether a public WebP is absent, stale, or over budget.
+
+    The generator source is itself an input: changing compression constants or
+    conversion code must invalidate every existing derivative. copytree uses
+    copy2, so copied PNG mtimes still match their originals.
+    """
+    if not destination.is_file() or destination.stat().st_size > PUBLIC_IMAGE_MAX_BYTES:
+        return True
+    newest_input = max(source.stat().st_mtime_ns, Path(__file__).stat().st_mtime_ns)
+    return destination.stat().st_mtime_ns < newest_input
+
+
+def optimize_public_images(out_docs: Path) -> list[tuple[Path, Path]]:
+    """Replace copied book PNGs with <=200 KiB WebP delivery assets.
+
+    The source PNGs in docs/ remain untouched. UI assets such as favicon.png
+    are outside books/ and deliberately keep their original format.
+    """
+    source_books_dir = DOCS_DIR / "books"
+    books_dir = out_docs / "books"
+    # Remove the cache file used by an earlier implementation. Derivative
+    # freshness is now carried by each WebP's own mtime, so this must not be
+    # deployed as a public asset from an existing local build directory.
+    (out_docs / ".public-image-cache.json").unlink(missing_ok=True)
+    source_pngs = {
+        source.relative_to(source_books_dir): source
+        for source in source_books_dir.rglob("*.png")
+    }
+    source_webps = {
+        source.relative_to(source_books_dir)
+        for source in source_books_dir.rglob("*.webp")
+    }
+
+    # copytree(..., dirs_exist_ok=True) intentionally preserves most build
+    # output for fast slide rebuilds. Remove only obsolete raster derivatives
+    # so a deleted source image cannot remain publicly reachable after the
+    # next local build.
+    for stale in books_dir.rglob("*.png"):
+        if stale.relative_to(books_dir) not in source_pngs:
+            stale.unlink()
+    for stale in books_dir.rglob("*.webp"):
+        relative = stale.relative_to(books_dir)
+        if relative not in source_webps and relative.with_suffix(".png") not in source_pngs:
+            stale.unlink()
+
+    conversions = public_image_conversions(out_docs)
+    for relative, original in sorted(source_pngs.items()):
+        copied_source = books_dir / relative
+        destination = copied_source.with_suffix(".webp")
+        if public_image_needs_render(original, destination):
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            temporary = destination.with_suffix(destination.suffix + ".tmp")
+            temporary.write_bytes(render_public_webp(original))
+            os.replace(temporary, destination)
+
+    rewrite_public_png_references(out_docs, conversions)
+    for source in conversions:
+        source.unlink(missing_ok=True)
+    return list(conversions.items())
 
 
 # Aozora-style ruby (｜基底《よみ》, see AGENTS.md) is converted straight to
@@ -639,6 +832,7 @@ def generate(categories: list[dict[str, Any]], documents: list[dict[str, Any]], 
     # static assets must also be present in the deployed directory because
     # docsify fetches them in the browser at runtime.
     shutil.copytree(ROOT / "docs", out_docs, dirs_exist_ok=True)
+    optimize_public_images(out_docs)
 
     sidebar = render_sidebar(categories, documents)
     current_top_page = (ROOT / "docs" / "README.md").read_text(encoding="utf-8")

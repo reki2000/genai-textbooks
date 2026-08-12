@@ -7,29 +7,79 @@ Phase 2 に入ったら読む。作図の判断は `conventions.md` と `recipes
 教材IDを `<id>` として固定する。
 
 ```text
-scripts/figs/<id>.py              # その教材の全図を生成する唯一のコード
+scripts/figs/<id>.py              # 決定的に描画する図の生成元
+scripts/figs/<id>.md              # 画像生成のプロンプト・生成手段・検査メモ
 scripts/figs/svgkit.py            # 共通の描画ヘルパ
 docs/books/<id>/figs/<name>.svg   # 本文が参照する生成物
+docs/books/<id>/figs/<name>.png   # 本文が参照する生成画像
 ```
 
-**骨格は `scripts/figs/database-design.py` を写す。** 決定的な出力、`--check`、出力先の解決、座標の丸めはそこに実装済みなので、図ごとの関数だけ足す。散文で骨格を持たないのは、実装とすぐ食い違うため。
+決定的な描画コードを作る場合は、**骨格を `scripts/figs/database-design.py` から写す。** 決定的な出力、`--check`、出力先の解決、座標の丸めはそこに実装済みなので、図ごとの関数だけ足す。
 
-守るべきはコードの形ではなく、次の約束。
+決定的な描画コードでは、コードの形そのものではなく次の約束を守る。
 
-- 1教材1ファイル。複数教材で再利用する部品だけ `scripts/figs/` 配下の共通モジュールへ切り出す。
+- 1教材につき、決定的な描画は1個の `.py`、画像生成の記録は1個の `.md` にまとめる。両方の手段を使う教材では両方あってよい。複数教材で再利用する部品だけ `scripts/figs/` 配下の共通モジュールへ切り出す。
 - `--check` が差分ゼロで通ること。生成物も一緒にコミットし、**手で編集しない。**
 - 冒頭の docstring で、その教材の色3系統が何を指すかを宣言する（`conventions.md`）。
 - 座標・曲線・尺度・数値は本文の式や入力値から計算する。目分量で結果らしい形を作らない。**本文の数値は `assert` で突き合わせてから描く。** 図と本文がずれたら、どちらが誤りかを検査が教えてくれる（本文側の誤りが見つかることもある）。
 - 各図の関数の docstring に、キャンバス寸法と要素の座標を先に書き出す。書いていない要素を描かない。
-- 外部引用画像は `docs/books/<id>/figs/` へコピーせず、生成対象にも含めない。
+
+外部引用画像は `docs/books/<id>/figs/` へコピーせず、生成対象にも含めない。
 
 ## 生成画像
 
 画像生成で作った図も置き場所は同じ `docs/books/<id>/figs/` で、ラスタ画像のままコミットする。`docs/` は丸ごとサイトへコピーされるので、ここに置けばそのまま公開される。
 
 - ファイル名は SVG と同じ規則（`figN-<内容>.png` など）。
-- **採用した画像の最終プロンプトと生成手段を `scripts/figs/<id>.py` へコメントか定数として残す。** 生成物そのものは再現できなくても、何をどう頼んだかは追えるようにする。スクリプト側では存在確認・寸法・ファイル名を検証対象に含める。
-- `check_figure.py` は SVG を解析する検査なのでラスタ画像には効かない。**PNG の目視だけが検査**になる。
+- **採用した画像の最終プロンプト、生成手段、期待するファイル名、検査結果を `scripts/figs/<id>.md` に残す。** 描画コードもある教材では `.py` と `.md` を併存させる。生成画像の記録や検査メモだけのために `.py` を作らない。
+- `check_figure.py` は SVG を解析する検査なのでラスタ画像の内容には効かない。ZIP検査器は形式と寸法を検査できるが、科学的内容は判断できない。**ラスタ図の内容検査は原寸と約360px幅の目視が必須**になる。
+
+### ChatGPTからZIPで受け取る
+
+ChatGPT向けの依頼は `chatgpt-image-prompt.md` の雛形から作る。出力は1枚ずつ独立したPNGとし、最終納品を1個のZIPに固定する。
+
+```text
+<id>-figures.zip
+└── <id>/
+    ├── fig1-<内容>.png
+    ├── fig2-<内容>.png
+    └── ...
+```
+
+- ZIP内の各ファイルは必ず `<id>/<filename>.png`。ルート直下のPNG、サブディレクトリの追加、総覧画像、コンタクトシート、説明用PDFは不可。
+- ユーザーには、ダウンロードしたZIPを**リポジトリルートの `tmp/` 配下**へ置いてもらう。絶対パスを決め打ちしない。
+- `tmp/` のZIPは受領原本なので変更しない。`docs/` へ直接展開しない。
+- まず `scripts/check_image_zip.py` で期待する内部パス、余分なファイル、PNG署名、寸法を検査し、安全な一時ディレクトリへ展開する。
+- 機械検査後、すべてのPNGを原寸と約360px幅で見る。ラベル、主経路、矢印の向き、本文との矛盾、禁止事項を1枚ずつ確認する。
+- 不合格があれば本文へ取り込まない。`chatgpt-image-prompt.md` の修正雛形に沿って、ChatGPT向け指示をユーザーへそのまま渡し、`scripts/figs/<id>.md` にも残す。
+- 修正依頼は新規ChatGPTセッションへ投入できる自己完結した内容にする。不合格ファイルだけを生成させ、修正ZIPにもそのファイルだけを入れさせる。合格済み画像を新しいセッションへ渡したり、修正ZIPへ再同梱させたりしない。
+- 修正ZIPは `<id>-figures-fix-<連番>.zip` とし、期待する内部パスを不合格ファイルだけに限定して検査する。合格した修正版だけを既存の `docs/books/<id>/figs/` へ差分適用する。
+
+検査例：
+
+```bash
+python3 .claude/skills/zuhan/scripts/check_image_zip.py \
+  tmp/<id>-figures.zip \
+  --id <id> \
+  --expect fig1-<内容>.png \
+  --expect fig2-<内容>.png \
+  --width 1536 --height 1024 \
+  --extract-to /tmp/zuhan-<id>
+```
+
+修正ZIPは `--expect` を修正対象だけにする。
+
+```bash
+python3 .claude/skills/zuhan/scripts/check_image_zip.py \
+  tmp/<id>-figures-fix-1.zip \
+  --id <id> \
+  --expect <不合格図1.png> \
+  --expect <不合格図2.png> \
+  --width 1536 --height 1024 \
+  --extract-to /tmp/zuhan-<id>-fix-1
+```
+
+検査器が不合格を報告したら、その出力をパッケージ修正指示の材料にする。機械検査を通っても科学的正しさは保証されないため、目視を省略しない。
 
 ## SVG の書き出し
 
@@ -57,8 +107,15 @@ docs/books/<id>/figs/<name>.svg   # 本文が参照する生成物
 ## 検査
 
 ```bash
+# 決定的な描画コードがある場合
 python3 scripts/figs/<id>.py
 python3 scripts/figs/<id>.py --check
+
+# ChatGPTのZIPを受け取った場合
+python3 .claude/skills/zuhan/scripts/check_image_zip.py tmp/<zip名>.zip \
+  --id <id> --expect <図1.png> --expect <図2.png> \
+  --width <幅> --height <高さ> --extract-to /tmp/zuhan-<id>
+
 python3 .claude/skills/zuhan/scripts/check_figure.py "docs/books/<id>/figs/*.svg" --png-dir /tmp/figpng
 python3 scripts/yaruo_lint.py docs/books/<id>/README.md --check --verbose
 python3 scripts/generate_site.py
