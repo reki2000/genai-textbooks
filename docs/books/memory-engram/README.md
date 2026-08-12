@@ -3018,11 +3018,11 @@ TrkB は穴が開かない。代わりにリン酸化のカスケードを起動
 
 **やらない夫**：
 そうだ。カルシウムの系統と、BDNF の系統が、同じ経路で合流する。
-そして BDNF 自体も CREB の標的遺伝子だ。
+そして BDNF の転写も CREB によって調節される。[^32]
 
 **やる夫**：
 ……えっ。
-BDNF が CREB を活性化して、CREB が BDNF を作らせるのかお。
+BDNF が CREB を活性化して、CREB が BDNF の設計図を転写させるのかお。
 それ、ぐるぐる回るお。
 一回動き出したら止まらなくなるお。
 
@@ -3036,13 +3036,13 @@ BDNF が CREB を活性化して、CREB が BDNF を作らせるのかお。
 そうだお。
 リン酸は外れるし、タンパク質は入れ替わるお。
 でも、輪っかになってれば話が別だお。
-BDNF が CREB を動かして、CREB が BDNF を作らせる。この輪が回ってるかぎり、部品が入れ替わっても状態は続くお。
+BDNF が CREB を動かして、CREB が BDNF の転写を促す。この輪が回ってるかぎり、部品が入れ替わっても状態は続くお。
 状態を保ってるのは分子じゃなくて、分子どうしの回り方だお。
 図4-4なら、核内の転写と核外の翻訳を分けたまま、その輪を一周できるお。
 
-[![BDNFがTrkBとERKを介して核内CREBを動かし、核外で作られた新しいBDNFが局所分泌へ戻る](figs/fig7-bdnf-feedback.png)](figs/fig7-bdnf-feedback.png)
+[![BDNFがTrkBとERKを介して核内CREBを動かし、核外で翻訳された新しいBDNFが局所分泌へ戻る](figs/fig7-bdnf-feedback.png)](figs/fig7-bdnf-feedback.png)
 
-図4-4：活動スパインから局所分泌されたBDNFはTrkBの相互リン酸化とERKを介して核内CREBを動かす。核内で転写されたBDNF mRNAは核外へ出て翻訳され、新しいBDNFが局所分泌へ戻る正のフィードバックを形成する（タップ／クリックで原寸表示）。
+図4-4：活動スパインから局所分泌されたBDNFはTrkBの相互リン酸化とERKを介して核内CREBを動かす。核内で転写されたBDNF mRNAは核外へ出て細胞質側で翻訳され、分泌経路を経た新しいBDNFが局所分泌へ戻る正のフィードバックを形成する（分泌経路は模式的に省略、タップ／クリックで原寸表示）。
 
 **やらない夫**：
 それが、一つの分子に記憶を求めても見つからん理由だ。
@@ -4746,7 +4746,7 @@ NMDA受容体とCaMKIIが全部やってるんじゃないのかお。
 
 **やらない夫**：
 そして、ここが今日の本題だ。
-平行線維と登上線維が同時に活動すると、その平行線維のシナプスはどうなると思う。
+平行線維が先に活動し、適切な時間窓で登上線維も活動すると、その平行線維のシナプスはどうなると思う。
 
 **やる夫**：
 強くなるお。同時だお。ヘッブ則だお。
@@ -4770,8 +4770,8 @@ NMDA受容体とCaMKIIが全部やってるんじゃないのかお。
 ……だから、覚えるときにシナプスを弱くするお！
 
 **やらない夫**：
-そうだ。しかも弱くするのは、誤差信号が来たタイミングに対応する平行線維だけだ。
-だから、そのタイミングでだけブレーキが外れる。0.5秒後に合わせられる理由がそれだ。
+そうだ。しかも弱くするのは、誤差信号と適切な時間窓で重なった平行線維だけだ。
+平行線維が先行する時間関係も重要になる。だから、そのタイミングでだけブレーキが外れる。0.5秒後に合わせられる理由がそれだ。
 
 **やる夫**：
 ……所長、これは相当面白いお。
@@ -4782,16 +4782,16 @@ NMDA受容体とCaMKIIが全部やってるんじゃないのかお。
 **やらない夫**：
 分子も違う。この LTD では、NMDA受容体は主役じゃない。
 代謝型グルタミン酸受容体という別の受容体が働いて、そこから PKC というキナーゼが動く。
-結果として AMPA受容体が膜から回収される。
+結果として AMPA受容体が膜から回収される。[^33]
 
 **やる夫**：
 出口は同じだお。AMPA受容体の数だお。
 でも、そこへ至る道が違うお。
 図7-3では、膜上のAMPA受容体が細胞内小胞へ回収される向きと、回路のブレーキが緩む帰結を上下で追えるお。
 
-[![平行線維と登上線維の一致がAMPA受容体回収を起こし、プルキンエ細胞の下流へのブレーキを緩める](figs/fig10-cerebellar-ltd.png)](figs/fig10-cerebellar-ltd.png)
+[![平行線維と登上線維の活動が適切な時間窓で重なりAMPA受容体回収を起こし、プルキンエ細胞の下流へのブレーキを緩める](figs/fig10-cerebellar-ltd.png)](figs/fig10-cerebellar-ltd.png)
 
-図7-3：平行線維と登上線維の同時活動は、代謝型グルタミン酸受容体とPKCを介して膜上AMPA受容体を細胞内小胞へ回収し、LTDを起こす。プルキンエ細胞への入力が弱まることで下流への抑制が緩み、まばたき出力が可能になる（タップ／クリックで原寸表示）。
+図7-3：平行線維が先行し、登上線維の活動と適切な時間窓で重なると、代謝型グルタミン酸受容体とPKCを介して膜上AMPA受容体が細胞内小胞へ回収され、LTDが起きる。プルキンエ細胞への入力が弱まることで下流への抑制が緩み、まばたき出力が可能になる（タップ／クリックで原寸表示）。
 
 **やらない夫**：
 そこが今週の結論に近い。
@@ -5046,7 +5046,7 @@ H.M. は昨日のことが分からないけど、言葉は通じたお。
 **やる夫**：
 (13)はずっと止まってるお。まばたきは出ないお。
 そこへ誤差信号が来るお。空気が目に当たったお。
-……ルールは、同時に活動した線を-1だお。
+……ルールは、平行線維が先に活動して、適切な時間窓で誤差信号が来た線を-1だお。
 音の(1)が発火してるときに誤差が来たら、(1)→(12)が2から1になるお。
 1では閾値2に届かないお。(12)が発火しなくなるお。
 (13)が動くお。まばたきが出るお！
@@ -7008,7 +7008,7 @@ BDNF は 4-5でやったお。TrkB にくっついて、ERK から CREB へ行�
 
 [^23]: M. G. Packard and J. L. McGaugh, "Inactivation of hippocampus or caudate nucleus with lidocaine differentially affects expression of place and response learning," *Neurobiology of Learning and Memory*, 65(1), 65–72, 1996. 本文7-1・7-5。十字迷路で訓練したラットは、初期には場所に基づく方略を、訓練が進むと反応（曲がる向き）に基づく方略を示す。海馬を一時的に不活性化すると後者が、尾状核を不活性化すると前者が現れ、二つの系が並行して学習し行動の主導権を競っていることが示された。
 
-[^24]: M. Ito, M. Sakurai and P. Tongroach, "Climbing fibre induced depression of both mossy fibre responsiveness and glutamate sensitivity of cerebellar Purkinje cells," *Journal of Physiology*, 324, 113–134, 1982. 本文7-4の小脳長期抑圧。平行線維と登上線維の同時活動が、プルキンエ細胞のグルタミン酸感受性を持続的に低下させることを示した。増強ではなく抑圧が学習を担う例であり、伊藤正男による小脳学習仮説の実験的な柱となった。
+[^24]: M. Ito, M. Sakurai and P. Tongroach, "Climbing fibre induced depression of both mossy fibre responsiveness and glutamate sensitivity of cerebellar Purkinje cells," *Journal of Physiology*, 324, 113–134, 1982. 本文7-4の小脳長期抑圧。平行線維と登上線維の適切な時間的組み合わせが、プルキンエ細胞のグルタミン酸感受性を持続的に低下させることを示した。増強ではなく抑圧が学習を担う例であり、伊藤正男による小脳学習仮説の実験的な柱となった。
 
 [^25]: P. R. Huttenlocher, "Synaptic density in human frontal cortex — developmental changes and effects of aging," *Brain Research*, 163(2), 195–205, 1979; P. R. Huttenlocher and A. S. Dabholkar, "Regional differences in synaptogenesis in human cerebral cortex," *Journal of Comparative Neurology*, 387(2), 167–178, 1997. 本文8-1。ヒト死後脳の電子顕微鏡計測により、シナプス密度が乳児期にピークを迎え、その後成人値まで減少すること、ピークの時期が視覚野で早く前頭前野で遅いことが示された。本文の表は傾向を示すために丸めた値である。
 
@@ -7023,3 +7023,7 @@ BDNF は 4-5でやったお。TrkB にくっついて、ERK から CREB へ行�
 [^30]: F. Wei, G.-D. Wang, G. A. Kerchner, S. J. Kim, H.-M. Xu, Z.-F. Chen and M. Zhuo, "Genetic enhancement of inflammatory pain by forebrain NR2B overexpression," *Nature Neuroscience*, 4(2), 164–169, 2001. 本文9-2。[^29] と同じ遺伝子操作を受けたマウスでは、炎症性の痛みに対する感受性が増大した。可塑性を高める操作が、記憶以外に可塑性を用いている系にも同時に作用することを示す例。
 
 [^31]: L. J. Volk, J. L. Bachman, R. Johnson, Y. Yu and R. L. Huganir, "PKM-ζ is not required for hippocampal synaptic plasticity, learning and memory," *Nature*, 493, 420–423, 2013; A. M. Lee, B. R. Kanter, D. Wang, J. P. Lim, M. E. Zou, C. Qiu, T. McMahon, J. Dadgar, S. C. Fischbach-Weiss and R. O. Messing, "Prkcz null mice show normal learning and memory," *Nature*, 493, 416–419, 2013. 本文9-3。阻害ペプチドZIPの投与で確立した記憶が消えることから記憶維持分子と目されたPKMζについて、遺伝子欠損マウスが正常に学習・記憶し、しかもZIPが同様に作用したことが二つのグループから同時に報告された。薬理学的な消去も遺伝的な欠損も、単独では分子の役割を確定しないことを示す事例。
+
+[^32]: X. Tao, S. Finkbeiner, D. B. Arnold, A. J. Shaywitz and M. E. Greenberg, "Ca2+ influx regulates BDNF transcription by a CRE-dependent mechanism," *Neuron*, 20(4), 709–726, 1998. 本文4-5。活動に伴うCa2+流入がCREを介してBDNFの転写を調節することを示した研究で、CREBとBDNFをつなぐ説明の根拠とした。
+
+[^33]: M. Ito, "Cerebellar long-term depression: characterization, signal transduction, and functional roles," *Physiological Reviews*, 81(3), 1143–1195, 2001. 本文7-4。小脳LTDについて、平行線維と登上線維の時間的な組み合わせ、代謝型グルタミン酸受容体・PKCを含む信号伝達、AMPA受容体の内在化をまとめた総説。
