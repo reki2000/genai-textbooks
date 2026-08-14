@@ -141,7 +141,13 @@ python3 scripts/comments.py stale --book {book} --id 0007
 
 ```bash
 python3 scripts/yaruo_lint.py docs/books/{book}/README.md --check --verbose
+python3 scripts/review_corpus.py harvest
 ```
+
+  `harvest` は、人が「確認して閉じる」を押した指摘だけを `review-corpus/` へ凍結する。
+  `comments/` は `.gitignore` 済みで機械ごとに消えるので、**凍結していない指摘は
+  消えたら戻らない。** 分類と再発防止ルールへの昇格は `yaruo-retrospect` の担当で、
+  ここでは取り込むだけでよい（**指摘を見てスキルのルールを書き換えない**）。
 
 ## 報告
 

@@ -35,11 +35,35 @@ documents:
 ## 教材追加手順
 
 1. `/yaruo-rediscovery` で教材を執筆 → `docs/books/{ID}/README.md`
-2. 同じディレクトリの `docs/books/{ID}/catalog.yml` に教材情報を登録
-3. `python3 scripts/generate_site.py` でビルド確認
-4. `git add docs/` でコミット
+2. `/yaruo-checkpoint` で到達目標を確定 → `docs/books/{ID}/checkpoints.yml`
+3. 同じディレクトリの `docs/books/{ID}/catalog.yml` に教材情報を登録
+4. `python3 scripts/generate_site.py` でビルド確認
+5. `git add docs/` でコミット
 
-外部（別モデル・別セッション）で書かれた教材を受け入れるときは、2の前に `/yaruo-review` で品質を検査する。判定基準と二者レビューの手順はスキルの `SKILL.md` を正本とする。
+外部（別モデル・別セッション）で書かれた教材を受け入れるときは、3の前に `/yaruo-review` で品質を検査する。判定基準と二者レビューの手順はスキルの `SKILL.md` を正本とする。
+
+## 学習成果
+
+本文は改訂され続けるので、「何幕まで読んだ」を学習成果の正本にしない。正本は概念で、`docs/books/{ID}/checkpoints.yml` に 5〜15 個の到達目標（「〜を説明できる」）と、読了直後・翌日・数日後の想起練習（説明・予測・転移）を置く。書式と個数の正本は `scripts/checkpoints.py`、作り方は `/yaruo-checkpoint`。
+
+```bash
+python3 scripts/checkpoints.py docs/books/{ID}/checkpoints.yml --check --verbose
+python3 scripts/checkpoints.py docs/books/{ID}/checkpoints.yml --quiz 翌日
+```
+
+id は学習記録の宛先なので振り直さない。概念が消えたら行を消さず `retired: true` にする。
+
+## レビューの資産化
+
+プレビューのコメント（`comments/`）は `.gitignore` 済みで消える。**人が resolved にした指摘だけ**を `review-corpus/` へ凍結し、類似の指摘を束ねてから再発防止ルールへ昇格させる。**1件の指摘を直接スキルのルールへ書き足さない。** 入口は `scripts/review_corpus.py`、判断と昇格の手順は `/yaruo-retrospect`。昇格には発生3件以上・2教材以上・人の承認が要る。
+
+## モデルと effort
+
+工程ごとの使い分けは [`MODELS.md`](./MODELS.md)。**一つの最強モデルを決めない。** 仮説と実測を分けて書き、実測は `bench/` の結果でのみ書き換える。
+
+## 制作工程ベンチマーク
+
+モデル選定用の評価セットは実際の制作物から作る（6タスク：問題発見・コメント対応・再発見化・難所説明・構成改善・新規執筆）。設計の正本は [`bench/README.md`](./bench/README.md)、道具は `scripts/bench.py`。**単一スコアで順位を決めず、能力プロファイルを出す。**
 
 ## 図版
 
@@ -66,6 +90,17 @@ python3 scripts/yaruo_lint.py docs/books/{ID}/README.md --check --verbose
 - **error** は必ず解消する。**warning** は人が内容を見て判断する。**info は診断であって合否に使わない。**
 - 話者行・非散文領域の判定は `scripts/yaruo_markdown.py` が正本。`yaruo_lint.py` と `count_textbooks.py` が共有する。
 - ルールを変えたら `python3 scripts/tests/run_lint_tests.py` を実行する（fixture は `scripts/tests/fixtures/<ルールID>/`）。
+
+スクリプトを変えたら、対応する回帰を走らせる。
+
+| 変えたもの | 走らせるもの |
+|---|---|
+| `yaruo_lint.py` | `scripts/tests/run_lint_tests.py` |
+| `comments.py` / `dev_server.py` | `scripts/tests/run_comment_tests.py` |
+| `yaruo_review_eval.py` | `scripts/tests/run_review_eval_tests.py` |
+| `checkpoints.py` | `scripts/tests/run_checkpoint_tests.py` |
+| `review_corpus.py` | `scripts/tests/run_corpus_tests.py` |
+| `bench.py` | `scripts/tests/run_bench_tests.py` |
 
 会話の同型反復は `scripts/yaruo_beat_repetition.py`（`--show` / `--beats` / `--units`）。lint とは別系統で、**合否ではなくレビュー時の候補区間の絞り込み**に使う。ラベル体系と指標の正本は `.claude/skills/yaruo-review/references/beat-labels.md`。
 
