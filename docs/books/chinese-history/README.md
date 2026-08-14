@@ -274,6 +274,15 @@
 **やらない夫**：
 その姿勢を保ったまま、｜殷《イン》末から｜周《ジョウ》成立へ進もう。
 
+**やらない夫**：
+ここで、文字が刻まれた甲骨そのものを見ておこう。後世の物語ではなく、王が何を問うたかへ近づく史料だ。
+
+[![殷代の占卜に用いられた牛の肩甲骨に刻まれた甲骨文字](https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Shang_Ox_Bone_Oracle_Bone_01.jpg/960px-Shang_Ox_Bone_Oracle_Bone_01.jpg)](https://commons.wikimedia.org/wiki/File:Shang_Ox_Bone_Oracle_Bone_01.jpg)
+
+図1：殷代の牛肩甲骨。刻文は同時代に近い政治・祭祀の問いを伝えるが、王都外の人々の声を直接記録したものではない（タップ／クリックで原寸表示）。
+
+*出典：Gary Lee Todd, Ph.D.「Shang Ox Bone Oracle Bone 01」[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Shang_Ox_Bone_Oracle_Bone_01.jpg)。CC0。*。
+
 ---
 ### 1-2　殷の王は何を支配していたのか
 
@@ -695,6 +704,15 @@
 **やる夫**：
 人口数そのものより、誰を数えられた数字かを読まないと、国家の視界を死亡者数に変えてしまうお。
 
+**やらない夫**：
+前漢の広がりを、紀元前60年という一点に固定した地図で確認しよう。王朝名だけでは、内陸アジアとの距離が消えてしまう。
+
+[![紀元前60年ごろの漢の領域と周辺勢力を示す地図](https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Han_dynasty_%2860_BC%29.png/960px-Han_dynasty_%2860_BC%29.png)](https://commons.wikimedia.org/wiki/File:Han_dynasty_(60_BC).png)
+
+図2：紀元前60年ごろの漢と周辺。色はこの時点の政治的広がりを示すもので、漢代400年間の固定国境ではない（タップ／クリックで原寸表示）。
+
+*出典：Qiushufang「Han dynasty (60 BC)」[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Han_dynasty_(60_BC).png)。CC BY-SA 4.0。*。
+
 ---
 ### 2-7　世界同時刻盤――漢はローマと隣国だったのか
 
@@ -965,6 +983,15 @@
 道教も教団と国家儀礼を発達させ、｜儒教《ルジャオ》も家族倫理だけでなく正統性の言語として再編される。
 三つは別々の箱ではなく、人は祖先祭祀をしながら仏寺へ行き、道教儀礼を頼む。
 
+**やらない夫**：
+北魏で作られた仏像を見れば、「外国宗教の受容」が翻訳語だけでなく、石材、衣文、礼拝空間を作り替える仕事だったと分かる。
+
+[![北魏時代の石造仏像](https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Northern_Wei_Stone_Buddha_Sculpture.jpg/960px-Northern_Wei_Stone_Buddha_Sculpture.jpg)](https://commons.wikimedia.org/wiki/File:Northern_Wei_Stone_Buddha_Sculpture.jpg)
+
+図3：北魏時代の石造仏像。造像は仏教受容の物質的証拠だが、像だけから信者全員の信仰内容までは復元できない（タップ／クリックで原寸表示）。
+
+*出典：Gary Todd「Northern Wei Stone Buddha Sculpture」[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Northern_Wei_Stone_Buddha_Sculpture.jpg)。CC0。*。
+
 ---
 ### 3-7　隋はなぜ秦と同じ速度で倒れたのか
 
@@ -1095,6 +1122,15 @@
 **やる夫**：
 ｜長安《チャンアン》＝奈良の都に、朝鮮人、日本人、ソグド人、ペルシア人、インド僧、テュルク系兵士が住み、街では複数言語が飛び交う。
 日本史の奈良に、コンスタンティノープルとバグダードの国際性を足した感じだお。
+
+**やらない夫**：
+人物像も史料批判が要る。次の太宗像は本人を前に描いた写生ではなく、明代に制作された後世の皇帝表象だ。
+
+[![明代に描かれた唐太宗の肖像](https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/TangTaizong.jpg/960px-TangTaizong.jpg)](https://commons.wikimedia.org/wiki/File:TangTaizong.jpg)
+
+図4：明代に描かれた唐太宗像。唐太宗の実際の顔の記録というより、後世が理想の皇帝をどう可視化したかを読む資料である（タップ／クリックで原寸表示）。
+
+*出典：作者不詳「TangTaizong」[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:TangTaizong.jpg)。パブリックドメイン。*。
 
 ---
 ### 4-2　唐成立編――統一戦争の後にも続いた王家の内戦
@@ -1269,6 +1305,15 @@
 ｜租庸調《ズヨンディャオ》は登録された成年男子と給付地を前提に、租の穀物、調の布、庸の労役を取る。
 その分母が崩れたから、780年の両税法は現在地の資産と土地へ課税対象を移し、年2回にまとめたんだお。
 税名の変更じゃなく、890万戸を直接つかめるという前提を捨てた修理だお。
+
+**やらない夫**：
+唐を「中国だけの大国」として閉じないため、700年ごろの地図で周辺の政体と交通空間を同時に見よう。
+
+[![700年ごろの唐と周辺諸国を示す地図](https://upload.wikimedia.org/wikipedia/commons/1/1c/Tang_Dynasty_circa_700_CE.png)](https://commons.wikimedia.org/wiki/File:Tang_Dynasty_circa_700_CE.png)
+
+図5：700年ごろの唐と周辺。最大版図を全盛期の固定国境とみなさず、吐蕃・突厥・朝鮮半島諸国との接続を見る（タップ／クリックで原寸表示）。
+
+*出典：Ian Kiu「Tang Dynasty circa 700 CE」[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Tang_Dynasty_circa_700_CE.png)。CC BY-SA 3.0。*。
 
 ---
 ### 4-7　世界同時刻盤――奈良の都は世界の端だったのか
@@ -1554,6 +1599,15 @@
 女性の財産権や再婚慣行は時代・地域で一様ではないが、後世には貞節や父系宗族を強調する規範が強まる。
 思想は書物の中だけでなく、相続と婚姻の設計になる。
 
+**やらない夫**：
+都市経済を「産業革命寸前」という一本の物差しで測る前に、後世が都市の繁栄をどう描いたかも見よう。
+
+[![清院本の清明上河図に描かれた都市・河川交通](https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Along_the_River_During_the_Qingming_Festival_%28Qing_Court_Version%29.jpg/960px-Along_the_River_During_the_Qingming_Festival_%28Qing_Court_Version%29.jpg)](https://commons.wikimedia.org/wiki/File:Along_the_River_During_the_Qingming_Festival_(Qing_Court_Version).jpg)
+
+図6：1736年の清院本『清明上河図』。宋代都市の同時代写真ではなく、清宮廷が過去の繁栄を再構成した絵画として読む（タップ／クリックで原寸表示）。
+
+*出典：陳枚・孫祜・金昆・戴洪・程志道「Along the River During the Qingming Festival (Qing Court Version)」[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Along_the_River_During_the_Qingming_Festival_(Qing_Court_Version).jpg)。パブリックドメイン。*。
+
 ---
 ### 5-9　世界同時刻盤――宋は産業革命寸前だったのか
 
@@ -1605,6 +1659,15 @@
 モンゴル語族は｜契丹《チダン》語と近縁関係を持つ可能性が高いが、｜契丹《チダン》国家がそのままモンゴル帝国になったのではない。
 ｜匈奴《ションヌ》との直接系譜も確定できない。
 ただし草原の可汗号、左右翼、婚姻同盟、部族再編など、政治技術の長期継承はある。
+
+**やらない夫**：
+チンギス・カン像も、征服当時の写生ではない。14世紀の元朝宮廷が祖先をどう王統へ収めたかを示す肖像として見ろ。
+
+[![14世紀の元朝宮廷で描かれたチンギス・カン肖像](https://upload.wikimedia.org/wikipedia/commons/4/4e/Genghis_Khan.jpg)](https://commons.wikimedia.org/wiki/File:Genghis_Khan.jpg)
+
+図7：14世紀の元朝宮廷画家によるチンギス・カン像。本人の容貌の確定資料ではなく、元の祖先表象を伝える（タップ／クリックで原寸表示）。
+
+*出典：作者不詳「Genghis Khan」[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Genghis_Khan.jpg)。パブリックドメイン。*。
 
 ---
 ### 6-2　モンゴル帝国・元成立編――四つの家への分配が内戦を生む
@@ -1746,6 +1809,15 @@ EUより翻訳制度が未整備で、ハプスブルク帝国より移動速度
 ｜元《ユエン》が中国から退いた後もモンゴル人は消えない。
 ｜北元《ベイユエン》（ほくげん、Běi Yuán、Northern Yuan）として草原で政権を続け、オイラト（Wǎlà、Oirats）など別のモンゴル系連合と競争する。
 ｜明《ミン》、｜清《チン》はその政治世界と数世紀にわたり向き合う。
+
+**やらない夫**：
+1279年のモンゴル諸政権を地球規模で見ると、元が巨大な接続網の東部だったという本文の意味が見える。
+
+[![1279年のモンゴル帝国系諸政権の広がりを地球上に示す地図](https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Mongol_Empire_in_1279_%28orthographic_projection%29.svg/960px-Mongol_Empire_in_1279_%28orthographic_projection%29.svg.png)](https://commons.wikimedia.org/wiki/File:Mongol_Empire_in_1279_(orthographic_projection).svg)
+
+図8：1279年のモンゴル帝国系諸政権。単一政府の均質な領土ではなく、分有された複数政権の空間的規模を見る（タップ／クリックで原寸表示）。
+
+*出典：VerifiLord「Mongol Empire in 1279 (orthographic projection)」[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Mongol_Empire_in_1279_(orthographic_projection).svg)。CC BY 4.0。*。
 
 ---
 ### 6-7　世界同時刻盤――マルコ・ポーロだけが世界を見たのか
@@ -1895,6 +1967,15 @@ EUより翻訳制度が未整備で、ハプスブルク帝国より移動速度
 **やる夫**：
 「一条」は税が一種類という意味じゃなく、納付の束ね方なんだお。
 銀一両の価値が動けば、同じ帳簿額でも穀物を何石売る必要があるかが変わるお。
+
+**やらない夫**：
+明の皇帝像を一枚見よう。宮廷肖像は個人の顔だけでなく、衣冠と正面性によって皇帝権威を制度化した政治資料だ。
+
+[![宮廷装束で正面を向く明宣宗の肖像](https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Ming_Xuanzong.jpg/960px-Ming_Xuanzong.jpg)](https://commons.wikimedia.org/wiki/File:Ming_Xuanzong.jpg)
+
+図9：明宣宗の宮廷肖像。衣冠・姿勢・画面構成を皇帝権威の表現として読み、私生活の写実記録とはみなさない（タップ／クリックで原寸表示）。
+
+*出典：作者不詳「Ming Xuanzong」[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Ming_Xuanzong.jpg)。パブリックドメイン。*。
 
 ---
 ### 7-3　全国民を帳簿へ固定できるのか
@@ -2169,6 +2250,15 @@ EUより翻訳制度が未整備で、ハプスブルク帝国より移動速度
 だが｜康熙帝《カンシディ》が削藩すると三藩の乱が起こる。
 ｜周《ジョウ》、｜漢《ハン》、｜晋《ジン》、｜明《ミン》初と同じく、創業功臣へ地方軍を預ける問題がまた現れる。
 
+**やらない夫**：
+清の宮廷肖像では、満洲王朝の皇帝がどの衣冠と構図で「中国皇帝」を演じたかを観察できる。
+
+[![朝服を着た康熙帝の宮廷肖像](https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Portrait_of_the_Kangxi_Emperor_in_Court_Dress.jpg/960px-Portrait_of_the_Kangxi_Emperor_in_Court_Dress.jpg)](https://commons.wikimedia.org/wiki/File:Portrait_of_the_Kangxi_Emperor_in_Court_Dress.jpg)
+
+図10：康熙帝晩年の宮廷肖像。服装と正面構図は複数の世界を統治する皇帝の一つの公的な顔であり、民族的「中国化」の単純な証明ではない（タップ／クリックで原寸表示）。
+
+*出典：清朝宮廷画家（作者不詳）「Portrait of the Kangxi Emperor in Court Dress」[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Portrait_of_the_Kangxi_Emperor_in_Court_Dress.jpg)。パブリックドメイン。*。
+
 ---
 ### 8-3　清は中国化したから成功したのか
 
@@ -2313,6 +2403,15 @@ EUより翻訳制度が未整備で、ハプスブルク帝国より移動速度
 中国社会では｜儒教《ルジャオ》・仏教・道教・民間信仰を排他的会員資格として選ばない人が多い。
 キリスト教やイスラム教の共同体原理とはそこが異なる。
 
+**やらない夫**：
+1820年の地図を見れば、清の統治対象が漢語圏だけでなかったことを空間として確認できる。
+
+[![1820年の清の領域と行政区分を示す地図](https://upload.wikimedia.org/wikipedia/commons/3/39/Qing_China_1820.png)](https://commons.wikimedia.org/wiki/File:Qing_China_1820.png)
+
+図11：1820年の清の領域。最大規模に近い一時点の図であり、全地域が内地の省と同じ制度で統治されたことを意味しない（タップ／クリックで原寸表示）。
+
+*出典：Pryaltonian、Wengier「Qing China 1820」[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Qing_China_1820.png)。CC BY-SA 3.0。*。
+
 ---
 ### 8-9　ヨーロッパとの戦争は、文明の優劣だけで決まったのか
 
@@ -2419,6 +2518,15 @@ EUより翻訳制度が未整備で、ハプスブルク帝国より移動速度
 臣民を皇帝へ属する多様な集団として束ねる帝国から、同じ国民が同じ主権を持つと称する国民国家へ移る。
 言語、民族、国境を以前より明確に分類する必要が生じる。
 
+**やらない夫**：
+軍事技術の差を抽象語だけで済ませず、1860年に撮影された戦争写真を史料として見よう。
+
+[![1860年の第二次アヘン戦争を記録した写真](https://upload.wikimedia.org/wikipedia/commons/4/4a/The_Second_Opium_War%2C_1856-1860_Q69841.jpg)](https://commons.wikimedia.org/wiki/File:The_Second_Opium_War,_1856-1860_Q69841.jpg)
+
+図12：フェリーチェ・ベアトが1860年に撮影した第二次アヘン戦争の写真。戦場の物的状況を伝える一方、撮影者と英仏軍側の視点に規定された記録でもある（タップ／クリックで原寸表示）。
+
+*出典：Felice Beato「The Second Opium War, 1856-1860 Q69841」[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:The_Second_Opium_War,_1856-1860_Q69841.jpg)。パブリックドメイン。*。
+
 ---
 ### 8-12　世界同時刻盤――清は世界最大の帝国だったのか
 
@@ -2478,6 +2586,15 @@ EUより翻訳制度が未整備で、ハプスブルク帝国より移動速度
 **やる夫**：
 ｜周《ジョウ》王、｜後漢《ドンハン》皇帝、｜唐《タン》末皇帝と同じで、正統な中央政府の看板があっても地方へ命令を強制できない状態だお。
 制度名は近代でも、課題は続いてるお。
+
+**やらない夫**：
+革命が作る政治記号も資料だ。武昌の軍政府旗は、共和国が複数地域を一つの政治共同体として表そうとした設計を見せる。
+
+[![1911年の湖北軍政府が用いた十八星旗](https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Chinese-army_Wuhan_flag_%281911-1928%29_18_dots.svg/960px-Chinese-army_Wuhan_flag_%281911-1928%29_18_dots.svg.png)](https://commons.wikimedia.org/wiki/File:Chinese-army_Wuhan_flag_(1911-1928)_18_dots.svg)
+
+図13：1911年の湖北軍政府の十八星旗。十八の星は政治的統合の主張を可視化するが、全住民が同じ国民意識を共有した証拠ではない（タップ／クリックで原寸表示）。
+
+*出典：湖北軍政府、ベクター化 AnonMoos「Chinese-army Wuhan flag (1911-1928) 18 dots」[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Chinese-army_Wuhan_flag_(1911-1928)_18_dots.svg)。パブリックドメイン。*。
 
 ---
 ### 9-2　民国・人民共和国成立編――王統に代わる軍・政党・思想の継承線
@@ -2664,6 +2781,13 @@ EUより翻訳制度が未整備で、ハプスブルク帝国より移動速度
 **やらない夫**：
 沿海の成長、内陸格差、地方政府の競争、中央の統制を同時に見る。
 市場対国家という二択ではなく、国家が市場を作り、市場が国家の財政と社会を変える循環だ。
+
+**やらない夫**：
+最後に、全幕の「世界同時刻盤」を共通の横軸へ重ねよう。中国の王朝交代と、他地域の区分の境目は揃っていない。
+
+[![中国、日本列島、中央・西アジア、欧州・地中海を同じ年代軸で並べた比較年表](figs/fig1-world-timeline.svg)](figs/fig1-world-timeline.svg)
+
+図14：中国史と三地域の比較年表。帯の長さは継続年数に比例し、各地域の区分がずれて併存することを見る。境界年は比較用の概数である（タップ／クリックで原寸表示）。
 
 ---
 ### 9-9　世界同時刻盤――中国史は世界史の外にあるのか
