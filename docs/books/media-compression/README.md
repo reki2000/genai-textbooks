@@ -206,7 +206,7 @@ $$= 0.360 + 0.411 + 0.332 + 0.216 = 1.32 \,[\text{bit}]$$
 ……この 1.32 より下には、どんな賢い符号でも行けないのかお？
 
 **やらない夫**：
-行けない。1948年にシャノンが証明した。
+行けない。1948年にシャノンが証明した[^shannon1948]。
 **無損失（1ビットも失わずに元に戻せる）で圧縮する限り、
 平均符号長はエントロピー $H$ を下回れない。**
 これがシャノンの情報源符号化定理（source coding theorem）──情報理論の土台だ。
@@ -286,7 +286,7 @@ PNG や可逆圧縮の世界だ。稼げるのはせいぜい **2倍から3倍**
 ## 第3幕　目のいい加減さを使う ── 静止画の圧縮
 
 ---
-### 3-1　隣は似ている ── 予測と差分（DPCM）
+### 3-1　隣は似ている ── 予測と差分
 
 **やらない夫**：
 まず1枚の絵の中を攻める。第1幕の白いボールに戻ろう。
@@ -329,7 +329,7 @@ $$[\,100,\ \underbrace{0}_{100-100},\ 0,\ \underbrace{100}_{200-100},\ 0,\ \unde
 その通り。捨てるために、絵を別の姿に着替えさせる。ここからが本番だ。
 
 ---
-### 3-2　絵を波に分解する ── 周波数変換（DCT）
+### 3-2　絵を波に分解する ── 周波数変換
 
 **やらない夫**：
 『人間の目に見えない情報を捨てる』と決めた。
@@ -499,7 +499,7 @@ DC（低周波）の係数が 400.0、ステップ16なら 400÷16=25.0 → 丸�
 4. **量子化**：高周波を粗く、低周波を細かく。目に見えない高周波を 0 に（目の穴・その1、**主要な非可逆工程**）
 5. **エントロピー符号化**：0だらけの係数をランレングス＋ハフマンで縮める（第2幕）
 
-これが……**JPEG** だお！　1992年の！
+これが……**JPEG** だお！　1992年の！[^jpeg-t81]
 
 **やらない夫**：
 そうだ。写真1枚を、目に見える劣化なしで **だいたい10分の1** にする。
@@ -1461,18 +1461,18 @@ $800\div400=2$倍、悪ければ$800\div300\approx2.7$倍も必要だお。
 これらは30年以上かけて実際の規格に育った。だが一直線の年表だと思うな。
 用途の違う二つの家系が、途中で合流している。
 
-- **1992年 JPEG**：静止画。DCT＋量子化＋エントロピー。お前が第3幕で組んだやつだ。
+- **1992年 JPEG**：静止画。DCT＋量子化＋エントロピー。お前が第3幕で組んだやつだ[^jpeg-t81]。
 - **1993〜95年 MPEG-1／MPEG-2**：ここで動き補償とI/P/Bが入り、動画になった。
-MPEG-2 は DVD と地上デジタル放送の土台だ。お前が第4幕で組んだ骨格そのものだ。
+MPEG-2 は DVD と地上デジタル放送の土台だ。お前が第4幕で組んだ骨格そのものだ[^mpeg1-video][^mpeg2-video]。
 - **1996年 H.263**：テレビ会議・低ビットレート通信の家系。
-小さな画面と細い回線で、低遅延に人の顔を送ることを優先した。
-- **2003年 H.264／AVC**：同じ画質を MPEG-2 の約半分のビットで。
+小さな画面と細い回線で、低遅延に人の顔を送ることを優先した[^h263]。
+- **2003年 H.264／AVC**：同じ画質を MPEG-2 の約半分のビットで[^h264-hist]。
 16×16マクロブロックを保ちながら予測区画を4×4まで分け、動き補償を精密にし、
 エントロピー符号化へCAVLCまたはCABACを使った。
 YouTube、Blu-ray、スマホ動画──2000〜2010年代の配信はこれが背骨だ。
-- **2013年 H.265／HEVC**：さらに約半分。4K・HDR時代の主役として設計された。
-- **2018年 AV1**：Web企業連合が作ったロイヤリティフリー志向の家系。
-- **2020年 H.266／VVC**：HEVCをさらに磨き、8Kや高精細を狙う世代。
+- **2013年 H.265／HEVC**：さらに約半分。4K・HDR時代の主役として設計された[^hevc-hist]。
+- **2018年 AV1**：Web企業連合が作ったロイヤリティフリー志向の家系[^aomedia]。
+- **2020年 H.266／VVC**：HEVCをさらに磨き、8Kや高精細を狙う世代[^vvc-hist]。
 
 「次世代で約半分」は、特定のテスト条件で掲げられる設計目標の目安で、
 どんな映像・画質・実装でも必ず半分になる保証ではない。
@@ -1997,16 +1997,16 @@ DCTの工夫、動き補償の探索法、CABACの実装……
 製品やサービスで規格を実装・提供するときは、関係する特許のライセンス条件を調べる必要がある。
 H.264 の時代は、後のHEVCと比べれば窓口が整理されて見えた。なぜか。
 特許を一つの窓口（MPEG-LA というパテントプール）にまとめ、
-料金体系と上限を提示したから、採用側が費用を見積もりやすかった。
+料金体系と上限を提示したから、採用側が費用を見積もりやすかった[^mpegla]。
 
 **やる夫**：
 じゃあ H.265／HEVC も同じにすればよかっただけだお。
 
 **やらない夫**：
 そこで崩れた。HEVC では特許の窓口が **3つ以上に分裂** した
-（MPEG-LA、HEVC Advance、Velos Media……さらにどこにも属さない権利者もいた）。
+（MPEG-LA、HEVC Advance、Velos Media……さらにどこにも属さない権利者もいた）[^hevc-licensing]。
 料金体系はバラバラで、しかも一部は
-『**配信したコンテンツの本数や収益にも課金する**』と言い出した。
+『**配信したコンテンツの本数や収益にも課金する**』と言い出した[^hevc-licensing]。
 企業から見ると、いくら払えばいいのか、誰に払えばいいのか分からない。
 特に無料で世界中に動画を流す Web・ストリーミング勢には、これは地雷原だ。
 
@@ -2040,14 +2040,15 @@ HEVC のライセンス混乱に業を煮やした巨大企業たちは、こう
 タダで使える規格……そんなことできるのかお?
 
 **やらない夫**：
-やった。前史がある。Google は動画技術の会社を買収し、
-VP8（2010年）、VP9（2013年、YouTube で使われた）という
+やった。前史がある。Google は動画技術の会社 On2 を買収し、
+VP8（On2 が2008年に発表、買収後の2010年にロイヤリティフリーで公開）[^on2]、
+VP9（2013年、YouTube で使われた）[^vp9]という
 ロイヤリティフリーの規格を出していた。
 そして2015年、Google、Amazon、Netflix、Microsoft、Cisco、Intel、Mozilla、
-のちに Apple まで加わった巨大連合 **Alliance for Open Media（AOMedia）** が結成された。
-彼らが2018年に出したのが **AV1**。
+のちに Apple まで加わった巨大連合 **Alliance for Open Media（AOMedia）** が結成された[^aomedia]。
+彼らが2018年に出したのが **AV1**[^aomedia]。
 HEVCと競う圧縮性能を狙い、AOMediaが **ロイヤリティフリーで利用できる形** を掲げた。
-ネトフリや YouTube なども、対応する端末や条件で採用している。
+ネトフリや YouTube なども、対応する端末や条件で採用している[^aomedia]。
 
 **やる夫**：
 つまり、こういう構図だお。
@@ -2068,10 +2069,10 @@ AV1 の次（AV2）も進む。放送・映画・Web でどの規格が主役か
 音声もかお?
 
 **やらない夫**：
-MP3 は Fraunhofer などが持つ特許で、ライセンス料の請求が厳しく行われた時期があった。
-次の AAC も特許がある。そこへ登場したのが **Opus**（2012年、IETFが標準化）。
+MP3 は Fraunhofer などが持つ特許で、ライセンス料の請求が厳しく行われた時期があった[^mp3-license]。
+次の AAC も特許がある。そこへ登場したのが **Opus**（2012年、IETFが標準化）[^opus]。
 これも **ロイヤリティフリー** で、しかも音楽から音声通話まで守備範囲が広い。
-いまや Web の音声、ビデオ会議、多くの配信で標準的に使われている。
+いまや Web の音声、ビデオ会議、多くの配信で使われている[^opus]。
 映像と同じ力学だ──**タダで誰でも使えることが、技術力と並ぶ武器になる**。
 
 **やる夫**：
@@ -2121,7 +2122,7 @@ MP3 は Fraunhofer などが持つ特許で、ライセンス料の請求が厳�
 映像を数秒ごとの小さな『チャンク』に切り、
 各チャンクを複数の画質（ビットレートの階段＝ラダー）で用意しておく。
 再生プレイヤーは、いま測った回線速度と手元のバッファ残量を見て、
-**チャンクごとに** ちょうど間に合う画質を選ぶ。この仕組みが HLS や DASH だ。
+**チャンクごとに** ちょうど間に合う画質を選ぶ。この仕組みが HLS や DASH だ[^abr]。
 
 **やる夫**：
 だから、回線が細るとネトフリは **止まらずに、そっと画質が落ちる** んだお!
@@ -2177,7 +2178,7 @@ GOP の設計が、そのままチャンク切り替えの単位になる。
 
 **やらない夫**：
 だから Netflix は、**人間が実際にどう感じるかを予測するモノサシ** を自分で作った。
-VMAF という指標だ。大勢の人に劣化した映像を見せて点をつけてもらい、
+VMAF という指標だ[^vmaf]。大勢の人に劣化した映像を見せて点をつけてもらい、
 その『人間の主観』を機械学習で再現する。
 単純な誤差ではなく、**人間の目の感じ方そのものをモデル化** して、
 『ここまでは気づかれない』を判定する。
@@ -2276,6 +2277,8 @@ AIが圧縮を全部やるようになったら、
 **── 完 ──**
 
 ---
+## 参考文献
+
 [^jpeg-t81]: ITU-T, [Recommendation T.81 — Digital compression and coding of continuous-tone still images](https://www.w3.org/Graphics/JPEG/itu-t81.pdf). JPEGの8×8 DCT、MCU、ハフマン符号化、マーカー、バイトスタッフィングの規範仕様。
 [^jpeg-jfif]: C-Cube Microsystems, [JPEG File Interchange Format Version 1.02](https://www.w3.org/Graphics/JPEG/jfif3.pdf). APP0の`JFIF`識別子、画素密度、thumbnail等の交換形式。
 [^mpeg1-video]: ISO, [ISO/IEC 11172-2:1993 — Coding of moving pictures and associated audio for digital storage media at up to about 1,5 Mbit/s — Part 2: Video](https://www.iso.org/standard/22411.html).
@@ -2287,3 +2290,16 @@ AIが圧縮を全部やるようになったら、
 [^h265]: ITU-T, [Recommendation H.265 (07/24) — High efficiency video coding](https://www.itu.int/rec/dologin_pub.asp?id=T-REC-H.265-202407-I%21%21PDF-E&lang=e&type=items). ISO/IEC 23008-2 HEVCと共同策定された規範仕様。
 [^av1]: Alliance for Open Media, [AV1 Bitstream & Decoding Process Specification](https://aomediacodec.github.io/av1-spec/av1-spec.html). OBU、LEB128、ブロック分割、予測、変換、フィルタを含む規範仕様。
 [^h266]: ITU-T, [Recommendation H.266 — Versatile video coding](https://www.itu.int/rec/T-REC-H.266/). ISO/IEC 23090-3 VVCと共同策定された規範仕様。
+[^shannon1948]: [Wikipedia『A Mathematical Theory of Communication』](https://en.wikipedia.org/wiki/A_Mathematical_Theory_of_Communication), 2026年8月12日参照. 1948年にBell System Technical Journalへ発表されたClaude Shannonの論文で、情報源符号化定理を含む情報理論の出発点。
+[^h264-hist]: [Wikipedia『Advanced Video Coding』](https://en.wikipedia.org/wiki/Advanced_Video_Coding), 2026年8月12日参照. H.264/AVCの最初の版は2003年5月に承認され、MPEG-2 Part 2比で50%以上のビットレート削減が報告されている。
+[^hevc-hist]: [Wikipedia『High Efficiency Video Coding』](https://en.wikipedia.org/wiki/High_Efficiency_Video_Coding), 2026年8月12日参照. HEVC（H.265）は2013年に標準化され、AVC比で25〜50%の圧縮効率向上を実現したとされる。
+[^aomedia]: [Wikipedia『Alliance for Open Media』](https://en.wikipedia.org/wiki/Alliance_for_Open_Media), 2026年8月12日参照. AOMediaは2015年9月にGoogle・Amazon・Cisco・Intel・Microsoft・Mozilla・Netflixが結成し、2018年1月にAppleが加わった。AV1のビットストリーム仕様は2018年3月に発表され、Netflix（2020年）とYouTube（2018年）が採用している。
+[^vvc-hist]: [Wikipedia『Versatile Video Coding』](https://en.wikipedia.org/wiki/Versatile_Video_Coding), 2026年8月12日参照. VVC（H.266）は2020年7月6日にJVETによって最終化された規格。
+[^mpegla]: [Wikipedia『MPEG LA』](https://en.wikipedia.org/wiki/MPEG_LA), 2026年8月12日参照. MPEG LAはMPEG-2、AVC/H.264、HEVCなどの必須特許をまとめてライセンスしたパテントプール。
+[^hevc-licensing]: [Wikipedia『High Efficiency Video Coding』](https://en.wikipedia.org/wiki/High_Efficiency_Video_Coding), 2026年8月12日参照. HEVCの特許ライセンスはMPEG LA・HEVC Advance・Velos Mediaなど複数の窓口に分裂し、HEVC Advanceは配信収益の0.5%を課すレベニューシェア条件を含んでいた。
+[^on2]: [Wikipedia『On2 Technologies』](https://en.wikipedia.org/wiki/On2_Technologies), 2026年8月12日参照. GoogleはOn2 Technologiesを2010年2月19日、約1.246億ドルで買収完了。On2が2008年に発表したVP8は買収後の2010年5月19日にBSDライセンスで公開された。
+[^vp9]: [Wikipedia『VP9』](https://en.wikipedia.org/wiki/VP9), 2026年8月12日参照. VP9はGoogleが開発したロイヤリティフリーの動画コーデックで、2013年6月17日に公開され、YouTubeが全解像度で採用している。
+[^mp3-license]: [Wikipedia『MP3』](https://en.wikipedia.org/wiki/MP3), 2026年8月12日参照. MP3はFraunhofer協会が主導して開発し、Fraunhofer・Thomson（後のTechnicolor）による特許ライセンス料の請求が厳しく行われた時期があった。
+[^opus]: [Wikipedia『Opus (audio format)』](https://en.wikipedia.org/wiki/Opus_%28audio_format%29), 2026年8月12日参照. OpusはXiph.Orgが開発し、2012年7月にIETFが標準化を承認、同年9月にRFC 6716として公開された。既知の特許はロイヤリティフリーでライセンスされている。
+[^vmaf]: [Wikipedia『Video Multimethod Assessment Fusion』](https://en.wikipedia.org/wiki/Video_Multimethod_Assessment_Fusion), 2026年8月12日参照. VMAFはNetflixが南カリフォルニア大学などと共同開発した客観的な映像品質指標で、主観評価を予測する。
+[^abr]: [Wikipedia『HTTP Live Streaming』](https://en.wikipedia.org/wiki/HTTP_Live_Streaming), 2026年8月12日参照. HLSはAppleが開発し2009年に公開したアダプティブビットレートストリーミング方式。DASHも同種の標準規格。
