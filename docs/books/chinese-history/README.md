@@ -1,5 +1,27 @@
 # やる夫で学ぶ中国史 ― 王朝は前王朝の何を捨て、何を受け継いだのか
 
+<style>
+  /* 中国史本文の図版は、引用画像も含めて縦400pxを上限にする。 */
+  .markdown-section img[src^="figs/"],
+  .markdown-section img[src*="/figs/"],
+  .markdown-section img[src*="upload.wikimedia.org"] {
+    max-width: 100%;
+    max-height: 400px;
+    width: auto;
+    height: auto;
+  }
+
+  /* 清院本『清明上河図』は横長のため、中央部分を高さ260pxで切り出す。 */
+  .markdown-section img[src*="Along_the_River_During_the_Qingming_Festival"] {
+    width: 100%;
+    height: 260px;
+    max-width: 100%;
+    max-height: 260px;
+    object-fit: cover;
+    object-position: center;
+  }
+</style>
+
 ---
 ## 登場人物
 
