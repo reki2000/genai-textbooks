@@ -1644,11 +1644,11 @@
 **やらない夫**：
 都市経済を「産業革命寸前」という一本の物差しで測る前に、後世が都市の繁栄をどう描いたかも見よう。
 
-[![清院本の清明上河図に描かれた都市・河川交通](https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Along_the_River_During_the_Qingming_Festival_%28Qing_Court_Version%29.jpg/960px-Along_the_River_During_the_Qingming_Festival_%28Qing_Court_Version%29.jpg)](https://commons.wikimedia.org/wiki/File:Along_the_River_During_the_Qingming_Festival_(Qing_Court_Version).jpg)
+[![清院本の清明上河図の高解像度部分図に描かれた都市・河川交通](https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Along_the_River_During_the_Qingming_Festival_%28Qing_Court_Version%29_01.jpg/1280px-Along_the_River_During_the_Qingming_Festival_%28Qing_Court_Version%29_01.jpg)](https://commons.wikimedia.org/wiki/File:Along_the_River_During_the_Qingming_Festival_(Qing_Court_Version)_01.jpg)
 
-図6：1736年の清院本『清明上河図』。宋代都市の同時代写真ではなく、清宮廷が過去の繁栄を再構成した絵画として読む（タップ／クリックで原寸表示）。
+図6：1736年の清院本『清明上河図』の部分図。宋代都市の同時代写真ではなく、清宮廷が過去の繁栄を再構成した絵画として読む（タップ／クリックで原寸表示）。
 
-*出典：陳枚・孫祜・金昆・戴洪・程志道「Along the River During the Qingming Festival (Qing Court Version)」[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Along_the_River_During_the_Qingming_Festival_(Qing_Court_Version).jpg)。パブリックドメイン。*。
+*出典：陳枚・孫祜・金昆・戴洪・程志道「Along the River During the Qingming Festival (Qing Court Version) 01」[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Along_the_River_During_the_Qingming_Festival_(Qing_Court_Version)_01.jpg)。パブリックドメイン。*。
 
 ---
 ### 5-9　世界同時刻盤――宋は産業革命寸前だったのか
