@@ -66,6 +66,12 @@ BOOKS_DIR = ROOT / "docs" / "books"
 MARP_CLI = ("npx", "--yes", "@marp-team/marp-cli@4")
 START_MARKER = "<!-- BEGIN GENERATED CATALOG -->"
 END_MARKER = "<!-- END GENERATED CATALOG -->"
+# Listing variants that include drafts. The browser picks between these and the
+# public README.md/_sidebar.md at boot; see the draft-mode block in
+# scripts/site_template.html.
+DRAFT_TOP_PAGE_NAME = "README.draft.md"
+DRAFT_SIDEBAR_NAME = "_sidebar.draft.md"
+DRAFT_MARKER = "【下書き】"
 
 # Generated-image PNGs stay under docs/ as source assets, while the public
 # build serves WebP derivatives. 1600 px covers the roughly 760 px article
@@ -218,12 +224,17 @@ def load_catalog() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
         "question",
         "plot",
     )
+    optional_document_fields = ("draft",)
     for index, (raw_document, catalog_path) in enumerate(
         zip(documents, document_sources, strict=True)
     ):
         document = require_mapping(raw_document, f"documents[{index}]")
         require_fields(document, required_document_fields, f"documents[{index}]")
-        unknown_fields = sorted(set(document) - set(required_document_fields))
+        unknown_fields = sorted(
+            set(document)
+            - set(required_document_fields)
+            - set(optional_document_fields)
+        )
         if unknown_fields:
             fail(
                 f"documents[{index}] has unknown fields: "
@@ -256,6 +267,10 @@ def load_catalog() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
         source_path = expected_catalog_path.parent / "README.md"
         if not source_path.is_file():
             fail(f"document {document_id} points to missing file: {source_path}")
+        draft = document.get("draft", False)
+        if not isinstance(draft, bool):
+            fail(f"document {document_id}.draft must be true or false")
+        document["draft"] = draft
         document["title"] = title_from_source(source_path, document_id)
         document_ids.add(document_id)
         registered_files.add(source_path.resolve())
@@ -282,13 +297,33 @@ def load_catalog() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     return categories, documents
 
 
+def public_documents(documents: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Documents that belong in the public listings. Drafts are still built and
+    reachable by URL; they are only withheld from the top page, the sidebar and
+    the sitemap until their catalog entry drops `draft: true`."""
+    return [document for document in documents if not document.get("draft")]
+
+
+def draft_marker(document: dict[str, Any]) -> str:
+    """Listing prefix for a draft. Only the draft listings ever carry a draft,
+    so this needs no separate flag to tell the two variants apart."""
+    return DRAFT_MARKER if document.get("draft") else ""
+
+
 def documents_by_category(
     categories: list[dict[str, Any]], documents: list[dict[str, Any]]
 ) -> list[tuple[dict[str, Any], list[dict[str, Any]]]]:
     grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for document in documents:
         grouped[document["category"]].append(document)
-    return [(category, grouped[category["id"]]) for category in categories]
+    # A category holding nothing but drafts disappears from the public listings
+    # rather than leaving an empty heading behind. The build-time check that
+    # every category has a document still runs against the full set.
+    return [
+        (category, grouped[category["id"]])
+        for category in categories
+        if grouped[category["id"]]
+    ]
 
 
 def document_path(document: dict[str, Any]) -> str:
@@ -367,13 +402,15 @@ def render_sidebar(
             minutes = parts_reading_minutes(document)
             if len(parts) == 1:
                 lines.append(
-                    f"  - [{sidebar_title(document)} ({minutes[0]}分)]({nav_href(document)})"
+                    f"  - [{draft_marker(document)}{sidebar_title(document)} "
+                    f"({minutes[0]}分)]({nav_href(document)})"
                 )
             else:
                 for index in range(len(parts)):
                     roman = to_roman(index + 1)
                     lines.append(
-                        f"  - [{sidebar_title(document, multi_part=True)} "
+                        f"  - [{draft_marker(document)}"
+                        f"{sidebar_title(document, multi_part=True)} "
                         f"{roman}部({minutes[index]}分)]"
                         f"({part_href(document, index)})"
                     )
@@ -391,7 +428,10 @@ def render_top_page_catalog(
         for document in category_documents:
             parts = discover_parts(document)
             minutes = parts_reading_minutes(document)
-            heading = f"#### [{document['title']}]({nav_href(document)}) ({minutes[0]}分)"
+            heading = (
+                f"#### [{draft_marker(document)}{document['title']}]"
+                f"({nav_href(document)}) ({minutes[0]}分)"
+            )
             for index in range(1, len(parts)):
                 roman = to_roman(index + 1)
                 heading += (
@@ -511,8 +551,12 @@ def render_slide_decks(documents: list[dict[str, Any]], out_docs: Path) -> None:
 
 def render_book_extra_head(document: dict[str, Any]) -> str:
     url = page_url(document)
+    # A draft page is reachable by URL on purpose, but nothing should index it
+    # while it is still withheld from the listings and the sitemap.
+    robots = '  <meta name="robots" content="noindex">\n' if document.get("draft") else ""
     return (
-        f'  <link rel="canonical" href="{url}">\n'
+        robots
+        + f'  <link rel="canonical" href="{url}">\n'
         f'  <meta property="og:type" content="article">\n'
         f'  <meta property="og:site_name" content="{SITE_TITLE}">\n'
         f'  <meta property="og:title" content="{document["title"]}">\n'
@@ -834,13 +878,24 @@ def generate(categories: list[dict[str, Any]], documents: list[dict[str, Any]], 
     shutil.copytree(ROOT / "docs", out_docs, dirs_exist_ok=True)
     optimize_public_images(out_docs)
 
-    sidebar = render_sidebar(categories, documents)
+    # Two listing variants: the public one, and the draft one the browser loads
+    # instead when draft mode is on. Everything else below is built from the
+    # full document set, so a draft gets the same page, figures and slides as a
+    # published book and only its listing entries differ.
+    published = public_documents(documents)
     current_top_page = (ROOT / "docs" / "README.md").read_text(encoding="utf-8")
-    top_page = replace_generated_catalog(current_top_page, render_top_page_catalog(categories, documents))
+
+    def top_page_for(subset: list[dict[str, Any]]) -> str:
+        return replace_generated_catalog(
+            current_top_page, render_top_page_catalog(categories, subset)
+        )
+
     slide_doc_ids = [document["id"] for document in documents if has_slide(document)]
 
-    write_file(out_docs / "_sidebar.md", sidebar)
-    write_file(out_docs / "README.md", top_page)
+    write_file(out_docs / "_sidebar.md", render_sidebar(categories, published))
+    write_file(out_docs / "README.md", top_page_for(published))
+    write_file(out_docs / DRAFT_SIDEBAR_NAME, render_sidebar(categories, documents))
+    write_file(out_docs / DRAFT_TOP_PAGE_NAME, top_page_for(documents))
     write_file(
         out_docs / "index.html",
         render_shell(SITE_TITLE, SITE_DESCRIPTION, render_site_extra_head(), slide_doc_ids),
@@ -861,7 +916,7 @@ def generate(categories: list[dict[str, Any]], documents: list[dict[str, Any]], 
     apply_ruby_conversion(out_docs)
     apply_footnote_backref_guard(out_docs)
 
-    write_file(out_docs / "sitemap.xml", render_sitemap(documents))
+    write_file(out_docs / "sitemap.xml", render_sitemap(published))
 
 
 def main() -> int:
@@ -887,7 +942,8 @@ def main() -> int:
     if args.check:
         print("catalog OK")
     else:
-        print("generated: build/_sidebar.md, build/README.md, build/index.html, build/404.html, "
+        print("generated: build/_sidebar.md, build/README.md, build/_sidebar.draft.md, "
+              "build/README.draft.md, build/index.html, build/404.html, "
               "build/books/*/index.html, build/books/*/slide.html, build/sitemap.xml")
     return 0
 
