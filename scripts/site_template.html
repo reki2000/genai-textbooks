@@ -168,6 +168,28 @@
       display: block;
     }
 
+    /* Badge shown while draft mode is on, bottom-right so it clears the
+       top-right slide toggle. Tapping it leaves draft mode. */
+    #draft-mode-badge {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      z-index: 30;
+      padding: 6px 14px;
+      border: none;
+      border-radius: 6px;
+      background-color: #b95c42;
+      color: #fff;
+      font: inherit;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    }
+
+    #draft-mode-badge:hover {
+      opacity: 0.85;
+    }
+
   </style>
 </head>
 
@@ -175,12 +197,45 @@
   <div id="app"></div>
   <script>
 
+    // Draft mode. Books flagged `draft: true` in catalog.yml are built and
+    // reachable by URL like any other, but scripts/generate_site.py keeps them
+    // out of README.md, _sidebar.md and sitemap.xml, listing them only in the
+    // README.draft.md / _sidebar.draft.md variants loaded below.
+    //
+    // ?draft=1 turns the mode on and ?draft=0 turns it off, but the choice has
+    // to be remembered: history-mode navigation drops the query string, so a
+    // query alone would fall back to the public listings on the first click.
+    // Reading it here, before docsify is configured, also means the listings
+    // are never rendered twice.
+    var draftMode = false
+    try {
+      var draftParam = new URLSearchParams(window.location.search).get('draft')
+      if (draftParam !== null) {
+        window.localStorage.setItem('draft-mode', draftParam === '0' ? '' : '1')
+      }
+      draftMode = window.localStorage.getItem('draft-mode') === '1'
+    } catch (e) {
+      // Private-mode browsers can throw on localStorage; the public site is
+      // the safe fallback.
+    }
+
     window.$docsify = {
       name: '<span style="display:flex; align-items:center; margin-left:12px;"><img src="@@BASE_PATH@@/assets/favicon.png" alt="@@SITE_TITLE@@" width="36" height="36" style="opacity:0.85;"> @@SITE_TITLE@@</span>',
       nameLink: '@@BASE_PATH@@/',
       routerMode: 'history',
       relativePath: true,
-      loadSidebar: true,
+      // The top page is swapped through `alias`, not through `homepage`:
+      // docsify only applies `homepage` when the route resolves to exactly
+      // "/README.md", and with basePath left empty (see nav_href in
+      // generate_site.py) this site's root route is "/genai-textbooks/",
+      // so `homepage` would never fire. `alias` matches the raw route path
+      // and does. The sidebar takes a plain filename, which docsify then
+      // looks up per directory and walks up on 404, exactly as it does for
+      // the default _sidebar.md.
+      alias: draftMode
+        ? { '@@BASE_PATH@@/?': '@@BASE_PATH@@/README.draft.md' }
+        : {},
+      loadSidebar: draftMode ? '_sidebar.draft.md' : true,
       loadFooter: "_footer.md",
       subMaxLevel: 2,
       auto2top: true,
@@ -189,6 +244,25 @@
       },
       plugins: [],
     };
+
+    // Draft-mode badge, so the mode is never on without saying so. Leaving it
+    // drops the stored flag and reloads the current page on the public
+    // listings; a draft page stays readable, it just goes back to being
+    // unlisted.
+    if (draftMode) {
+      var draftBadge = document.createElement('button')
+      draftBadge.id = 'draft-mode-badge'
+      draftBadge.type = 'button'
+      draftBadge.textContent = '下書き表示中 ✕'
+      draftBadge.title = '下書きを一覧から隠す'
+      draftBadge.addEventListener('click', function () {
+        try {
+          window.localStorage.removeItem('draft-mode')
+        } catch (e) {}
+        window.location.href = window.location.pathname
+      })
+      document.body.appendChild(draftBadge)
+    }
 
     // Aozora-style ruby (｜基底《よみ》, see AGENTS.md) is converted to <ruby>
     // HTML by scripts/generate_site.py before the page ever reaches the
