@@ -1,0 +1,7 @@
+documents:
+- id: topology-open-sets
+  category: math-information
+  created: '2026-09-07T22:08:45+00:00'
+  draft: true
+  question: 距離を測れば「近い」は決まるはずなのに、数学はなぜ距離を捨てて開集合だけの位相空間へ進んだのか。
+  plot: 万能な状態空間APIで一発当てようとしたやる夫が、角度・関数空間・弱収束・多様体に次々殴られながら、距離を削って開集合だけを残す位相空間を再発明していく。
