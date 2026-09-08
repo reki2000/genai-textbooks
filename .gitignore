@@ -6,6 +6,7 @@
 /build/
 
 # Development artifacts
+/.venv/
 __pycache__/
 **./*.pyc
 

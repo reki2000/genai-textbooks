@@ -81,6 +81,27 @@ docs/books/{id}/
 
 ## 開発時の手順
 
+### 依存関係のセットアップ
+
+Python の開発・ビルド依存は `requirements-dev.txt` にまとめる。Pillow は公開画像の変換に使うため、本文だけを編集した場合も全体ビルドに必要。
+
+初回はリポジトリルートで仮想環境を作る。
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python3 -m pip install -r requirements-dev.txt
+```
+
+`No module named pip` や `ensurepip is not available` が出る Debian・Ubuntu 環境では、先に OS 側のパッケージを導入してから上の手順を実行する。
+
+```bash
+sudo apt-get update
+sudo apt-get install python3-pip python3-venv
+```
+
+次回以降も作業開始時に `source .venv/bin/activate` を実行する。`git pull` で `requirements-dev.txt` が更新された場合は、仮想環境を有効にして `python3 -m pip install -r requirements-dev.txt` を再実行する。ビルドも同じ環境の `python3` で実行する。
+
 ### 開発サーバ（推奨）
 
 以下を実行し、表示された URL をブラウザで開く：

@@ -27,11 +27,18 @@ AI-Generated Japanese Short Textbooks: "Yaruo"-Style Dialogue Collection and AI 
 
 Claude Code または Codex をリポジトリルートで起動し、自然文で作業を依頼する。たとえば「○○をやる夫形式の教材にして」で新規執筆、「この教材をレビューして直して」で受け入れ検査と修正、「整形して」「校正して」で各工程を個別に実行できる。二者で方針を詰める場合は一方に「Claude（または Codex）と議論して」と依頼し、もう一方に `/discuss` で参加するよう伝える。
 
-初回だけ開発用依存関係を導入する。
+初回は仮想環境を作り、開発用依存関係を導入する。
 
 ```bash
+python3 -m venv .venv
+source .venv/bin/activate
 python3 -m pip install -r requirements-dev.txt
 ```
+
+次回以降も作業前に `source .venv/bin/activate` を実行する。
+`git pull` で `requirements-dev.txt` が更新されたら、同じインストールコマンドを再実行する。
+Pillow は本文だけの改訂でもサイト全体のビルドに必要。
+`pip` や `venv` がない環境の準備は [`BUILD.md` のセットアップ手順](BUILD.md#依存関係のセットアップ) を参照。
 
 新しい教材の基本フローは次のとおり。
 

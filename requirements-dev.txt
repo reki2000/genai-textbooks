@@ -1,3 +1,8 @@
+# 開発・ビルド依存の正本。clone 後と、このファイルが git pull で更新された後に
+# 有効な仮想環境で `python3 -m pip install -r requirements-dev.txt` を実行する。
+# pip / venv 自体が無い Debian・Ubuntu では先に python3-pip / python3-venv を導入する。
+# 初期セットアップと仮想環境の有効化は BUILD.md「依存関係のセットアップ」を参照。
+
 # バージョンは完全一致（==）で固定しない。
 # OS のパッケージ管理が入れた同名パッケージ（Debian/Ubuntu の python3-yaml など）は
 # dist-info に RECORD を持たないため pip が消せず、1つでも版が違うと install 全体が落ちる。
@@ -10,7 +15,7 @@
 # 使うのは yaml.safe_load / yaml.safe_dump のみ
 PyYAML>=6.0,<7
 
-# 公開用ラスタ図版の WebP 変換（scripts/generate_site.py）
+# 公開用ラスタ図版の WebP 変換（scripts/generate_site.py）。本文だけの改訂でも全体ビルドに必須。
 # Image.save(..., "WEBP") / ImageOps.exif_transpose / Resampling.LANCZOS を使用
 Pillow>=10.0,<13
 
