@@ -28,60 +28,24 @@ docs/books/<id>/figs/<name>.png         # 本文が参照する生成画像
 
 外部引用画像は `docs/books/<id>/figs/` へコピーせず、生成対象にも含めない。
 
-## 生成画像
+## 生成画像とZIP受領
 
-画像生成で作った図も置き場所は同じ `docs/books/<id>/figs/` で、ラスタ画像のままコミットする。`docs/` は丸ごとサイトへコピーされるので、ここに置けばそのまま公開される。
+生成画像は `figN-<内容>.png` などの名で生成先へ置き、コミットする。記録用 `.md` には生成手段・期待ファイル名と寸法・選定理由・検査結果を残し、プロンプト全文は上表の `.txt` を参照する。画像生成だけなら `.py` は不要。
 
-- ファイル名は SVG と同じ規則（`figN-<内容>.png` など）。
-- **採用した画像の生成手段、期待するファイル名、検査結果を `scripts/figs/<id>.md` に残す。** ChatGPTへ渡したプロンプトの全文は `.md` へ埋め込まず、`scripts/figs/<id>-prompt.txt`（初回）・`scripts/figs/<id>-prompt-fix-<連番>.txt`（修正）へ独立したファイルとして書き出し、`.md` からはパスだけを参照する。ユーザーがChatGPTへコピペする際に `.md` の見出しや解説文が混ざらないようにするため。描画コードもある教材では `.py` と `.md` を併存させる。生成画像の記録や検査メモだけのために `.py` を作らない。
-- `check_figure.py` は SVG を解析する検査なのでラスタ画像の内容には効かない。ZIP検査器は形式と寸法を検査できるが、科学的内容は判断できない。**ラスタ図の内容検査は原寸と約360px幅の目視が必須**になる。
+ChatGPTへの依頼・不合格時の再生成は [chatgpt-image-prompt.md](chatgpt-image-prompt.md)。受領時は次の順に処理する。
 
-### ChatGPTからZIPで受け取る
-
-ChatGPT向けの依頼は `chatgpt-image-prompt.md` の雛形から作る。出力は1枚ずつ独立したPNGとし、最終納品を1個のZIPに固定する。
-
-```text
-<id>-figures.zip
-└── <id>/
-    ├── fig1-<内容>.png
-    ├── fig2-<内容>.png
-    └── ...
-```
-
-- ZIP内の各ファイルは必ず `<id>/<filename>.png`。ルート直下のPNG、サブディレクトリの追加、総覧画像、コンタクトシート、説明用PDFは不可。
-- ユーザーには、ダウンロードしたZIPを**リポジトリルートの `tmp/` 配下**へ置いてもらう。絶対パスを決め打ちしない。
-- `tmp/` のZIPは受領原本なので変更しない。`docs/` へ直接展開しない。
-- まず `scripts/check_image_zip.py` で期待する内部パス、余分なファイル、PNG署名、寸法を検査し、安全な一時ディレクトリへ展開する。
-- 機械検査後、すべてのPNGを原寸と約360px幅で見る。ラベル、主経路、矢印の向き、本文との矛盾、禁止事項を1枚ずつ確認する。
-- 不合格があれば本文へ取り込まない。`chatgpt-image-prompt.md` の修正雛形に沿って、ChatGPT向け指示を `scripts/figs/<id>-prompt-fix-<連番>.txt` へ書き出し、ユーザーへそのファイルを渡す。`scripts/figs/<id>.md` にはそのパスだけを残す。
-- 修正依頼は新規ChatGPTセッションへ投入できる自己完結した内容にする。不合格ファイルだけを生成させ、修正ZIPにもそのファイルだけを入れさせる。合格済み画像を新しいセッションへ渡したり、修正ZIPへ再同梱させたりしない。
-- 修正ZIPは `<id>-figures-fix-<連番>.zip` とし、期待する内部パスを不合格ファイルだけに限定して検査する。合格した修正版だけを既存の `docs/books/<id>/figs/` へ差分適用する。
-
-検査例：
+1. ユーザーにZIPをリポジトリルートの `tmp/` へ置いてもらう。原本は変更せず、`docs/` へ直接展開しない。
+2. 下の検査器で `<id>/<filename>.png` の期待一覧、余分なファイル、PNG署名、寸法を確認し、一時ディレクトリへ展開する。総覧画像や追加資料は不可。
+3. 全PNGを原寸と約360px幅で見て、ラベル・経路・方向・本文整合・禁止事項を確認する。ZIP検査は内容の正しさを保証しない。
+4. 合格画像だけを `docs/books/<id>/figs/` へコピーし、判定を記録する。不合格図は再生成を依頼する。
 
 ```bash
-python3 .claude/skills/zuhan/scripts/check_image_zip.py \
-  tmp/<id>-figures.zip \
-  --id <id> \
-  --expect fig1-<内容>.png \
-  --expect fig2-<内容>.png \
-  --width 1536 --height 1024 \
-  --extract-to /tmp/zuhan-<id>
+python3 .claude/skills/zuhan/scripts/check_image_zip.py tmp/<id>-figures.zip \
+  --id <id> --expect fig1-<内容>.png --expect fig2-<内容>.png \
+  --width 1536 --height 1024 --extract-to /tmp/zuhan-<id>
 ```
 
-修正ZIPは `--expect` を修正対象だけにする。
-
-```bash
-python3 .claude/skills/zuhan/scripts/check_image_zip.py \
-  tmp/<id>-figures-fix-1.zip \
-  --id <id> \
-  --expect <不合格図1.png> \
-  --expect <不合格図2.png> \
-  --width 1536 --height 1024 \
-  --extract-to /tmp/zuhan-<id>-fix-1
-```
-
-検査器が不合格を報告したら、その出力をパッケージ修正指示の材料にする。機械検査を通っても科学的正しさは保証されないため、目視を省略しない。
+修正ZIPは `<id>-figures-fix-<連番>.zip`。`--expect` は不合格図だけにし、別の一時ディレクトリで検査する。合格した修正版だけを差分適用する。
 
 ## SVG の書き出し
 
@@ -102,7 +66,7 @@ python3 .claude/skills/zuhan/scripts/check_image_zip.py \
 
 単独行の画像は `yaruo_markdown.py` が非散文領域として扱う。直後の `図N：…` キャプションは表記の検査は受けるが、発言長の集計からは図版ブロックとして除外される（`yaruo_markdown.figure_block_lines`）。
 
-**キャプションは必ず句点で終える。** `dialogue-period`（発言末の句点）がキャプションにも効くので、`（タップ／クリックで原寸表示）` で終えると全図が error になる。上の例のとおり閉じ括弧の後ろに `。` を置く。
+キャプションにも `dialogue-period` が適用されるため、末尾に括弧があっても `。` で閉じる。
 
 図を挿す位置は、直前の発言の末尾に**その図を指す一文を足してから**、発言ブロックの外に置く。発言の中へ画像を差し込まない。
 
@@ -113,11 +77,7 @@ python3 .claude/skills/zuhan/scripts/check_image_zip.py \
 python3 scripts/figs/<id>.py
 python3 scripts/figs/<id>.py --check
 
-# ChatGPTのZIPを受け取った場合
-python3 .claude/skills/zuhan/scripts/check_image_zip.py tmp/<zip名>.zip \
-  --id <id> --expect <図1.png> --expect <図2.png> \
-  --width <幅> --height <高さ> --extract-to /tmp/zuhan-<id>
-
+# ZIPは上記の受領手順で検査済みとする。次はSVGがある場合だけ。
 python3 .claude/skills/zuhan/scripts/check_figure.py "docs/books/<id>/figs/*.svg" --png-dir /tmp/figpng
 python3 scripts/yaruo_lint.py docs/books/<id>/README.md --check --verbose
 python3 scripts/generate_site.py
@@ -132,7 +92,7 @@ git diff --check
 
 ## PNG の目視
 
-**必ず実画像を見る。** ソースを読み返す自己レビューは、ラベルの重なり・矢印の頭の肥大・図形の食い違いを1つも捕まえない。matplotlib の SVG は文字がパスになるので `check_figure.py` の文字検査が効かず、目視が唯一の砦になる。
+実画像でラベルの重なり・矢印・図形の配置を確認する。matplotlib のSVGでは文字がパスになり、`check_figure.py` の文字検査が効かないため、文字も目視する。
 
 見るのは**デスクトップ幅と約360px幅の2つ**。360px ではタイトル・主経路・結論が分かることを必須とし、細部は原寸リンクへ逃がす。全ての細字を縮小状態で読ませようとして情報を削らない。
 
