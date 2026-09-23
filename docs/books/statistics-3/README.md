@@ -1,7 +1,7 @@
 # やる夫で学ぶ統計学 III ── 同じデータを、四つの学問はどう問うか
 
 ---
-[I部](./README.md) ／ [II部](./README.2.md) ／ **III部**
+[I部](../statistics/README.md) ／ [II部](../statistics-2/README.md) ／ **III部**
 
 ---
 ## 登場人物
@@ -2666,7 +2666,7 @@ Cは疑わしいbatchを隔離し、更新と部品を分けた再現試験。D�
 **── III部 完 ──**
 
 ---
-[I部へ戻る](./README.md) ／ [II部へ戻る](./README.2.md)
+[I部へ戻る](../statistics/README.md) ／ [II部へ戻る](../statistics-2/README.md)
 
 ---
 ## 参考文献

@@ -1045,7 +1045,7 @@ def parse_sections(
 # --------------------------------------------------------------------------
 
 END_MARKER = "**── 完 ──**"
-# 終端マーカーの解析は1本。`**── I部 完 ──**` のような分冊の部完結も同じ形とみなし、
+# 終端マーカーの解析は1本。`**── I部 完 ──**` のようなシリーズの巻の完結も同じ形とみなし、
 # 接頭辞を group(1) に取る。罫線・太字・空白は正規形へ厳密に統一する。
 END_MARKER_RE = re.compile(
     r"^(?P<bold_open>\*{0,2})\s*(?P<rule_open>[─—―-]{0,4})\s*"
@@ -1124,7 +1124,7 @@ def rule_structure(lines: list[str], result: Result) -> list[str]:
 # --------------------------------------------------------------------------
 
 def rule_end_marker(lines: list[str], result: Result) -> list[str]:
-    """終端マーカーを `**── 完 ──**` へ揃える。分冊の部完結の接頭辞は保つ。"""
+    """終端マーカーを `**── 完 ──**` へ揃える。シリーズの巻の完結の接頭辞は保つ。"""
     out = list(lines)
     marker_lines: list[int] = []
     bodies = [split_eol(line)[0] for line in lines]

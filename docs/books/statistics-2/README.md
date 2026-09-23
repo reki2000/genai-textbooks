@@ -1,7 +1,7 @@
 # やる夫で学ぶ統計学 II ── 複雑なデータにも、作られ方から道を付ける
 
 ---
-[I部](./README.md) ／ **II部** ／ [III部](./README.3.md)
+[I部](../statistics/README.md) ／ **II部** ／ [III部](../statistics-3/README.md)
 
 ---
 ## 登場人物
@@ -5472,7 +5472,7 @@ II部修了記念に、全手法を一つの自動分析鞄へまとめました
 **── II部 完 ──**
 
 ---
-[III部へ進む](./README.3.md)
+[III部へ進む](../statistics-3/README.md)
 
 ---
 ## 参考文献
