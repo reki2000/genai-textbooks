@@ -43,7 +43,7 @@ documents:
 
 まだ読み返していない教材は、2で `draft: true` を付けて登録する。main にマージしてデプロイしても一覧には出ないので、`?draft=1` を付けたサイトで実際の表示のまま確認でき、よければ `draft: true` の1行を消して公開する。
 
-外部（別モデル・別セッション）で書かれた教材を受け入れるときは、2の前に `/yaruo-review` で品質を検査する。判定基準と二者レビューの手順はスキルの `SKILL.md` を正本とする。
+外部（別モデル・別セッション）で書かれた教材を受け入れるときは、2の前に `/yaruo-review` で品質を検査する。判定基準と手順はスキルの `SKILL.md` を正本とする。
 
 ## 図版
 
@@ -89,7 +89,3 @@ python3 scripts/yaruo_lint.py docs/books/{ID}/README.md --check --verbose
 概算：ファイルサイズ ÷ 3
 
 正確な集計が必要なら `/yaruo-count` スキルを使用。
-
-## エージェント間の書面協議
-
-Codex と Claude の設計比較・レビュー照合・合意形成には `/discuss` を使う。進行中の議論は `discussion/CURRENT` だけから特定し、自分宛ての発言ファイルは作成・編集しない。ファイル形式、待機、合意、終了処理の正本は `.claude/skills/discuss/SKILL.md` とする（`discussion/` はコミットしない）。

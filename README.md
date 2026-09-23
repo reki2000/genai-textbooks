@@ -5,7 +5,7 @@ AI-Generated Japanese Short Textbooks: "Yaruo"-Style Dialogue Collection and AI 
 [公開サイト](https://reki2000.github.io/genai-textbooks/)
 
 - GitHub Pages で公開されるテキスト本体（`docs/books/*/README.md`）。公開用の目次・サイドバー・各教材ページ（SEO用meta含む）は各 `README.md` の隣にある `catalog.yml` を `scripts/generate_site.py` がビルド時に統合して自動生成する（`scripts/site_template.html` 参照）
-- 「やる夫で学ぶ」形式の教材を執筆・検査・公開するための Claude Code / Codex 用スキル 9 種（`.claude/skills/`、`.codex/skills/`）
+- 「やる夫で学ぶ」形式の教材を執筆・検査・公開するための Claude Code / Codex 用スキル 8 種（`.claude/skills/`、`.codex/skills/`）
 
 ## Claude Code / Codex 用スキル
 
@@ -21,11 +21,10 @@ AI-Generated Japanese Short Textbooks: "Yaruo"-Style Dialogue Collection and AI 
 | `zuhan` | 教材本文へ説明図を追加。図が要る箇所を選び、SVG直書き・グラフ・外部引用を使い分け、作図規約と機械検査で仕上げる | 図を追加／図解／模式図／ダイアグラム |
 | `yaruo-slide` | 教材から物語を除き学習内容だけを圧縮した marp スライド `slide.md` を作成・更新する | スライド／marp／要約スライド／発表資料 |
 | `comment-eater` | 開発サーバのプレビューに投稿されたコメントを1件ずつ拾い、該当箇所だけを読んで直す | コメント対応／コメントを待って／プレビューのコメント |
-| `discuss` | Codex と Claude がファイルを介して設計案やレビューを照合し、合意を残す | 議論して／Claude・Codex と相談／合意を取って |
 
 ## この執筆環境の使い方
 
-Claude Code または Codex をリポジトリルートで起動し、自然文で作業を依頼する。たとえば「○○をやる夫形式の教材にして」で新規執筆、「この教材をレビューして直して」で受け入れ検査と修正、「整形して」「校正して」で各工程を個別に実行できる。二者で方針を詰める場合は一方に「Claude（または Codex）と議論して」と依頼し、もう一方に `/discuss` で参加するよう伝える。
+Claude Code または Codex をリポジトリルートで起動し、自然文で作業を依頼する。たとえば「○○をやる夫形式の教材にして」で新規執筆、「この教材をレビューして直して」で受け入れ検査と修正、「整形して」「校正して」で各工程を個別に実行できる。
 
 初回は仮想環境を作り、開発用依存関係を導入する。
 
