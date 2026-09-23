@@ -89,27 +89,11 @@ _PNG_REFERENCE_RE = re.compile(
     re.IGNORECASE,
 )
 
-# Multi-part documents split their body across docs/books/{id}/README.md
-# (part 1), README.2.md (part 2), README.3.md (part 3), ... Numbering must
-# start at 1 and be contiguous; see BUILD.md.
-PART_FILE_PATTERN = re.compile(r"^README(?:\.(?P<n>[1-9][0-9]*))?\.md$")
+# Each book is exactly one README.md. The former multi-part layout
+# (README.2.md, README.3.md, ...) is rejected: a series is split into separate
+# documents chained with `follows`; see BUILD.md.
+LEGACY_PART_FILE_PATTERN = re.compile(r"^README\.[1-9][0-9]*\.md$")
 DOCUMENT_ID_PATTERN = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
-
-_ROMAN_NUMERAL_TABLE: tuple[tuple[int, str], ...] = (
-    (1000, "M"), (900, "CM"), (500, "D"), (400, "CD"),
-    (100, "C"), (90, "XC"), (50, "L"), (40, "XL"),
-    (10, "X"), (9, "IX"), (5, "V"), (4, "IV"), (1, "I"),
-)
-
-
-def to_roman(number: int) -> str:
-    symbols = []
-    remainder = number
-    for value, symbol in _ROMAN_NUMERAL_TABLE:
-        while remainder >= value:
-            symbols.append(symbol)
-            remainder -= value
-    return "".join(symbols)
 
 SITE_ORIGIN = "https://reki2000.github.io"
 SITE_BASE_PATH = "/genai-textbooks"
@@ -224,7 +208,7 @@ def load_catalog() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
         "question",
         "plot",
     )
-    optional_document_fields = ("draft",)
+    optional_document_fields = ("draft", "follows")
     for index, (raw_document, catalog_path) in enumerate(
         zip(documents, document_sources, strict=True)
     ):
@@ -271,6 +255,17 @@ def load_catalog() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
         if not isinstance(draft, bool):
             fail(f"document {document_id}.draft must be true or false")
         document["draft"] = draft
+        legacy_parts = sorted(
+            path.name
+            for path in source_path.parent.glob("README.*.md")
+            if LEGACY_PART_FILE_PATTERN.fullmatch(path.name)
+        )
+        if legacy_parts:
+            fail(
+                f"document {document_id} has part files {', '.join(legacy_parts)}; "
+                "split each part into its own document and chain them with "
+                "`follows` (see BUILD.md)"
+            )
         document["title"] = title_from_source(source_path, document_id)
         document_ids.add(document_id)
         registered_files.add(source_path.resolve())
@@ -287,14 +282,54 @@ def load_catalog() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
         fail(f"categories without documents: {', '.join(sorted(empty_categories))}")
 
     categories.sort(key=lambda item: item["order"])
-    documents.sort(
-        key=lambda item: (
-            item["category"],
-            parse_created(item["created"], f"document {item['id']}.created"),
-            item["id"],
+    return categories, order_documents(documents)
+
+
+def order_documents(documents: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Sort by (category, created, id), except that a document carrying
+    `follows: <id>` is placed right after the document it follows (its own
+    followers right after it, and so on). `follows` only affects the order;
+    each volume of a series is still an ordinary, independent document."""
+    by_id = {document["id"]: document for document in documents}
+    followers: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    heads: list[dict[str, Any]] = []
+    for document in documents:
+        previous_id = document.get("follows")
+        if previous_id is None:
+            heads.append(document)
+            continue
+        label = f"document {document['id']}.follows"
+        if not isinstance(previous_id, str) or not previous_id:
+            fail(f"{label} must be a document id")
+        if previous_id not in by_id:
+            fail(f"{label} references unknown document: {previous_id}")
+        if by_id[previous_id]["category"] != document["category"]:
+            fail(
+                f"{label} references {previous_id} in another category; "
+                "a series must stay in one category"
+            )
+        followers[previous_id].append(document)
+
+    def created_key(document: dict[str, Any]) -> tuple[datetime, str]:
+        created = parse_created(
+            document["created"], f"document {document['id']}.created"
         )
-    )
-    return categories, documents
+        return created, document["id"]
+
+    ordered: list[dict[str, Any]] = []
+
+    def place(document: dict[str, Any]) -> None:
+        ordered.append(document)
+        for follower in sorted(followers[document["id"]], key=created_key):
+            place(follower)
+
+    for head in sorted(heads, key=lambda item: (item["category"], *created_key(item))):
+        place(head)
+    if len(ordered) != len(documents):
+        placed = {document["id"] for document in ordered}
+        stuck = sorted(set(by_id) - placed)
+        fail(f"follows forms a cycle among: {', '.join(stuck)}")
+    return ordered
 
 
 def public_documents(documents: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -330,28 +365,8 @@ def document_path(document: dict[str, Any]) -> str:
     return f"/books/{document['id']}"
 
 
-def discover_parts(document: dict[str, Any]) -> list[Path]:
-    """Ordered part files for a document: README.md, README.2.md, README.3.md,
-    ... Numbering must start at 1 and be contiguous."""
-    directory = BOOKS_DIR / document["id"]
-    numbered: dict[int, Path] = {}
-    for candidate in directory.glob("README*.md"):
-        match = PART_FILE_PATTERN.match(candidate.name)
-        if not match:
-            continue
-        number = int(match["n"]) if match["n"] else 1
-        numbered[number] = candidate
-    expected = set(range(1, len(numbered) + 1))
-    if set(numbered) != expected:
-        fail(
-            f"document {document['id']} has non-contiguous parts "
-            f"{sorted(numbered)}, expected 1..{len(numbered)}"
-        )
-    return [numbered[number] for number in sorted(numbered)]
-
-
-def parts_reading_minutes(document: dict[str, Any]) -> list[int]:
-    return [count_document(path)["reading_minutes"] for path in discover_parts(document)]
+def reading_minutes(document: dict[str, Any]) -> int:
+    return count_document(BOOKS_DIR / document["id"] / "README.md")["reading_minutes"]
 
 
 def page_url(document: dict[str, Any]) -> str:
@@ -371,21 +386,8 @@ def nav_href(document: dict[str, Any]) -> str:
     return f"{SITE_BASE_PATH}{document_path(document)}/"
 
 
-def part_href(document: dict[str, Any], part_index: int) -> str:
-    """Site-root-relative link to one part of a multi-part document. Part 1
-    keeps the directory-style nav_href; later parts link straight to their
-    README.N route, which docsify's history-mode router resolves to
-    README.N.md the same way it already resolves any other clean route."""
-    if part_index == 0:
-        return nav_href(document)
-    return f"{SITE_BASE_PATH}{document_path(document)}/README.{part_index + 1}"
-
-
-def sidebar_title(document: dict[str, Any], multi_part: bool = False) -> str:
-    title = re.split(r"[―─]", document["title"], maxsplit=1)[0].rstrip()
-    if multi_part:
-        title = re.sub(r"\s+[IVXLCDM]+$", "", title)
-    return title
+def sidebar_title(document: dict[str, Any]) -> str:
+    return re.split(r"[―─]", document["title"], maxsplit=1)[0].rstrip()
 
 
 def render_sidebar(
@@ -398,22 +400,10 @@ def render_sidebar(
     for category, category_documents in documents_by_category(categories, documents):
         lines.append(f"- {category['title']}")
         for document in category_documents:
-            parts = discover_parts(document)
-            minutes = parts_reading_minutes(document)
-            if len(parts) == 1:
-                lines.append(
-                    f"  - [{draft_marker(document)}{sidebar_title(document)} "
-                    f"({minutes[0]}分)]({nav_href(document)})"
-                )
-            else:
-                for index in range(len(parts)):
-                    roman = to_roman(index + 1)
-                    lines.append(
-                        f"  - [{draft_marker(document)}"
-                        f"{sidebar_title(document, multi_part=True)} "
-                        f"{roman}部({minutes[index]}分)]"
-                        f"({part_href(document, index)})"
-                    )
+            lines.append(
+                f"  - [{draft_marker(document)}{sidebar_title(document)} "
+                f"({reading_minutes(document)}分)]({nav_href(document)})"
+            )
         lines.append("")
     return "\n".join(lines).rstrip() + "\n"
 
@@ -426,20 +416,10 @@ def render_top_page_catalog(
         lines.append(f"### {category['title']}")
         lines.append("")
         for document in category_documents:
-            parts = discover_parts(document)
-            minutes = parts_reading_minutes(document)
-            heading = (
-                f"#### [{draft_marker(document)}{document['title']}]"
-                f"({nav_href(document)}) ({minutes[0]}分)"
-            )
-            for index in range(1, len(parts)):
-                roman = to_roman(index + 1)
-                heading += (
-                    f" ・ [{roman}部({minutes[index]}分)]({part_href(document, index)})"
-                )
             lines.extend(
                 [
-                    heading,
+                    f"#### [{draft_marker(document)}{document['title']}]"
+                    f"({nav_href(document)}) ({reading_minutes(document)}分)",
                     f"問い：{document['question']}",
                     f"プロット：{document['plot']}",
                     "",

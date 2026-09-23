@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""docs/books/statistics/figs/*.svg を決定的に生成する。
+"""統計学シリーズ3巻の図を決定的に生成する。
+
+出力先は図番号の幕で巻へ振り分ける（fig_out_dir）。
+  第1〜9幕   → docs/books/statistics/figs/
+  第10〜24幕 → docs/books/statistics-2/figs/
+  第25幕〜   → docs/books/statistics-3/figs/
+共通ヘルパと配色を3巻で共有するため、生成元はこの1本にまとめている。
 
 配色の割り当て（この教材での意味づけ。作図規約の3系統に対応させる）
   青 #1f6fd0 : いま推定・比較したい量、正しく作った比較、残っている情報
@@ -24,7 +30,18 @@ from svgkit import (  # noqa: E402
     TINT_MAIN, TINT_FOCUS, TINT_WARN, TINT_MUTED,
 )
 
-OUT_DIR = Path(__file__).resolve().parents[2] / "docs" / "books" / "statistics" / "figs"
+BOOKS_DIR = Path(__file__).resolve().parents[2] / "docs" / "books"
+# (その巻の最初の幕, 教材ID)。幕番号の降順に照合する。
+VOLUMES = ((25, "statistics-3"), (10, "statistics-2"), (1, "statistics"))
+
+
+def fig_out_dir(name):
+    """figN-... の N（幕）から、その図を置く巻の figs/ を返す。"""
+    act = int(name[3:].split("-", 1)[0])
+    for first_act, book in VOLUMES:
+        if act >= first_act:
+            return BOOKS_DIR / book / "figs"
+    raise ValueError("幕番号を読めない図名: %s" % name)
 
 
 # ---------------------------------------------------------------- 共通ヘルパ
@@ -2686,18 +2703,18 @@ def main(argv):
     for i, a in enumerate(argv):
         if a == "--only" and i + 1 < len(argv):
             only = argv[i + 1]
-    out = Path(tempfile.mkdtemp()) if check else OUT_DIR
+    tmp = Path(tempfile.mkdtemp()) if check else None
     diff = []
     for name, build in sorted(FIGS.items()):
         if only and only not in name:
             continue
-        path = build().save(out / ("%s.svg" % name))
+        cur = fig_out_dir(name) / ("%s.svg" % name)
+        path = build().save(tmp / cur.name if check else cur)
         if check:
-            cur = OUT_DIR / ("%s.svg" % name)
             if not cur.exists() or not filecmp.cmp(cur, path, shallow=False):
                 diff.append(name)
     if check:
-        shutil.rmtree(out)
+        shutil.rmtree(tmp)
         if diff:
             print("差分あり: " + ", ".join(diff))
             return 1

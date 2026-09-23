@@ -1,7 +1,7 @@
 # やる夫で学ぶ統計学 I ── 62人の「買いたい」から、データの読み方を作り直す
 
 ---
-**I部** ／ [II部](./README.2.md) ／ [III部](./README.3.md)
+**I部** ／ [II部](../statistics-2/README.md) ／ [III部](../statistics-3/README.md)
 
 ---
 ## 登場人物
@@ -2096,7 +2096,7 @@ A/B差は無作為実験か。利益が出る最低率はいくつか。
 **── I部 完 ──**
 
 ---
-[II部へ進む](./README.2.md)
+[II部へ進む](../statistics-2/README.md)
 
 ---
 ## 参考文献

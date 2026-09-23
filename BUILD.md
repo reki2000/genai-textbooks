@@ -39,6 +39,7 @@ build/                 ← 生成ファイル（git 除外）
 - 教材の公開パスは `id` から `/books/{id}` として自動生成する
 - 教材情報を `docs/books/{id}/catalog.yml` 以外に置いた場合や、IDが重複した場合はビルドエラー
 - 生成対象：サイドバー・トップページ・教材SEOページ・サイトマップ
+- `follows: <ID>` を持つ教材は `created` の順ではなく、その教材の直後に並ぶ。詳細は下の「シリーズ（連続する教材）」を参照
 - `draft: true` の教材は一覧から外す。詳細は下の「下書き（draft）」を参照
 - 生成ファイルは直接編集したりコミットしたりしない（`.gitignore` で `build/` を除外）
 
@@ -60,24 +61,33 @@ build/                 ← 生成ファイル（git 除外）
 
 なお下書きの教材ページ自体は、下書き表示が off でもURL直打ちで読める。隠しているのは一覧とサイトマップだけで、認証ではない。
 
-### 複数パート教材（分冊）
+### シリーズ（連続する教材）
 
-長大な教材は `docs/books/{id}/` 内で複数ファイルに分割できる：
+1冊に収まらない教材は、巻ごとに独立した教材として書き、`follows` で前の巻につなぐ。1つの教材ディレクトリに本文を複数置く分冊（`README.2.md` など）は廃止した。`docs/books/{id}/` に `README.<数字>.md` があるとビルドエラーになる。
 
 ```
-docs/books/{id}/
-├── README.md      ← I部
-├── README.2.md    ← II部
-├── README.3.md    ← III部（以降 README.4.md ... と連番）
-└── catalog.yml    ← パート分割してもエントリは1つのまま
+docs/books/statistics/     ← I巻（README.md, catalog.yml, figs/）
+docs/books/statistics-2/   ← II巻。catalog.yml に follows: statistics
+docs/books/statistics-3/   ← III巻。catalog.yml に follows: statistics-2
 ```
 
-- ファイル名は `README.md`（1部目）・`README.2.md`（2部目）・`README.3.md`（3部目）...の連番。1から始まり、欠番があるとビルドエラーになる
-- `catalog.yml` のエントリはパート数によらず1教材1エントリ。`generate_site.py` がディレクトリ内の `README*.md` を自動検出してパート扱いするため、パート専用のカタログ登録は不要
-- サイドバーには各パートが独立したエントリとして並び、タイトルを毎行繰り返した上でパート名と読了時間を付ける（例：`やる夫で学ぶ統計学 I部(20分)` `やる夫で学ぶ統計学 II部(53分)` ...）。パートごとに独立したリンクなので、docsify の `subMaxLevel` 設定により開いているパート内の見出し目次がそのリンクの下に自動表示される
-- トップページ（教材一覧）では見出しをI部へのリンクのまま残し、その右にII部以降へのリンクを分数付きで並べる（例：`#### [やる夫で学ぶ統計学](...) (20分) ・ [II部(53分)](...) ・ [III部(24分)](...)`）。問い・プロットはシリーズ全体として1つだけ表示する
-- 各パート本文の冒頭には手書きでパート間ナビ（例：`**I部** ／ [II部](./README.2.md) ／ [III部](./README.3.md)`）を置く。GitHub上でファイル単体を開いた読者や、サイトのパート個別URLへ直接来た読者が迷わないようにするため
-- 本文中の相対リンク（`./README.2.md` など）は docsify の `relativePath: true`（`scripts/site_template.html`）により、現在開いているページのディレクトリを基準に解決される。この設定がないと相対リンクがサイトの basePath を失って404になるため、`docs/**/README*.md` 内で他ページへ相対リンクする際は素の相対パス（`./foo.md` や `../bar.md`）をそのまま使ってよい
+```yaml
+documents:
+- id: statistics-2
+  category: math-information
+  created: '2026-07-29T00:12:20+09:00'
+  follows: statistics
+  question: ...
+  plot: ...
+```
+
+- 各巻は普通の教材と同じく、ID・`README.md`・`catalog.yml`（`question` と `plot` はその巻の内容）・`figs/`・URL・読了時間・サイトマップ項目をそれぞれ持つ。サイドバーとトップページにも1巻1項目で出る
+- `follows` が変えるのは並び順だけ。`follows: <前の巻のID>` を持つ教材は、自分の `created` にかかわらず前の巻の直後に並ぶ。連鎖はそのまま続くので、I巻→II巻→III巻と途切れずに並ぶ。同じ巻の直後に複数の教材が続く場合は、その間を `created` と `id` の昇順で並べる
+- `follows` の先は存在するIDで、同じカテゴリでなければならない。循環もビルドエラー
+- 巻のIDは先頭巻のIDに `-2`・`-3` … を付ける（改訂版の `-v2` とは別物）。タイトルは各巻の `README.md` の `# ` 見出しで、`やる夫で学ぶ統計学 II ── …` のように巻番号を入れる
+- 下書きは巻ごとに付けられる。前の巻が下書きで一覧から消えても、後の巻は前後の位置を保ったまま表示される
+- 巻の冒頭と末尾には手書きで巻間ナビ（例：`**I部** ／ [II部](../statistics-2/README.md) ／ [III部](../statistics-3/README.md)`）を置く。GitHub上でファイル単体を開いた読者や、途中の巻へ直接来た読者が迷わないようにするため
+- 本文中の相対リンクは docsify の `relativePath: true`（`scripts/site_template.html`）により、現在開いているページのディレクトリを基準に解決される。この設定がないと相対リンクがサイトの basePath を失って404になるため、`docs/**/README.md` 内で他の教材へリンクする際は素の相対パス（`../statistics-2/README.md`）をそのまま使ってよい
 
 ## 開発時の手順
 
@@ -118,7 +128,7 @@ python3 scripts/dev_server.py
 python3 scripts/dev_server.py --host 0.0.0.0 --port 8000
 ```
 
-本文 Markdown（`docs/books/*/README*.md`）だけが変わったときは、全体ビルドを回さずにそのファイルだけをルビ変換して差し替える。ブラウザ側は更新種別にかかわらずページ全体を再読み込みせず、現在開いている Markdown を取り直す。内容が変わっていれば docsify の本文だけを描画し直し、スクロール位置を保ったまま更新する（`/__dev/revision` を更新通知として使う）。
+本文 Markdown（`docs/books/*/README.md`）だけが変わったときは、全体ビルドを回さずにそのファイルだけをルビ変換して差し替える。ブラウザ側は更新種別にかかわらずページ全体を再読み込みせず、現在開いている Markdown を取り直す。内容が変わっていれば docsify の本文だけを描画し直し、スクロール位置を保ったまま更新する（`/__dev/revision` を更新通知として使う）。
 
 ### プレビュー上のコメント
 

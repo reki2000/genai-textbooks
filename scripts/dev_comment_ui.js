@@ -43,7 +43,6 @@
     // 決めつけると、画面リロードのたびに担当が消えたように見えてしまう。
     agent: { state: 'loading' },
     book: null,
-    part: 1,
     vm: null,
     index: null,
     selection: null, // { range, unit, block }
@@ -304,7 +303,7 @@
     state.markers = []
     if (!index) return
     state.comments.forEach(function (comment) {
-      if (comment.part !== state.part || comment.status === 'resolved') return
+      if (comment.status === 'resolved') return
       var found = findQuote(index, comment.anchor.quote, comment.anchor.occurrence)
       if (!found) return
       var range = rangeFromIndex(index, found.start, found.end)
@@ -415,7 +414,7 @@
     }
     panel.style.display = 'flex'
 
-    var mine = state.comments.filter(function (comment) { return comment.part === state.part })
+    var mine = state.comments.slice()
     mine.sort(function (a, b) { return a.id < b.id ? -1 : 1 })
     var shown = mine.filter(function (comment) { return state.filters[comment.status] })
 
@@ -817,7 +816,6 @@
 
     return {
       book: state.book,
-      part: state.part,
       kind: kind,
       unit: selection.unit,
       body: body,
@@ -870,9 +868,9 @@
 
   function routeInfo() {
     var path = window.location.pathname
-    var match = path.match(/\/books\/([a-z0-9-]+)\/(?:README\.([0-9]+))?/)
+    var match = path.match(/\/books\/([a-z0-9-]+)\//)
     if (!match) return null
-    return { book: match[1], part: match[2] ? parseInt(match[2], 10) : 1 }
+    return { book: match[1] }
   }
 
   function onRender() {
@@ -890,7 +888,6 @@
     }
     ensureChrome()
     state.book = route.book
-    state.part = route.part
     if (state.markdownPath !== currentMarkdownPath()) {
       state.markdownPath = currentMarkdownPath()
       state.markdown = ''
@@ -905,7 +902,7 @@
   function currentMarkdownPath() {
     var route = routeInfo()
     if (!route) return null
-    return 'books/' + route.book + '/' + (route.part === 1 ? 'README.md' : 'README.' + route.part + '.md')
+    return 'books/' + route.book + '/README.md'
   }
 
   function sitePath() {
