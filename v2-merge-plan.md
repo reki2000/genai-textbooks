@@ -9,6 +9,8 @@
 | rhetoric | v1 部分改訂／v2 全体改訂 | v1 の筋を土台に、v2 の配列・文体と数値例を取り込む |
 | rental-car-operations | v1 全体改訂／v2 部分改訂 | CoE を主題に構成を新しく組む。v2 の道具は案件として使う |
 
+幕・節ごとの構成、伏線、直す欠陥、事実確認を含む詳細プランは [v2-merge-plan/rhetoric.md](v2-merge-plan/rhetoric.md) と [v2-merge-plan/rental-car-operations.md](v2-merge-plan/rental-car-operations.md)。この文書と食い違う場合は、この文書（と現行のスキル）を優先する。
+
 ## 共通方針
 
 - v2 からは数値例、意思決定の道具、欠けている学習項目を取り込む。識別子の読み上げ、幕ごとに同じ型の装置、やる夫の用語先取り、やらない夫の命令駆動は持ち込まない。
