@@ -60,7 +60,6 @@ def anchor_comment(**kwargs) -> C.Comment:
     defaults = dict(
         id="0001",
         book="sample",
-        part=1,
         kind="wording",
         unit="sentence",
         status="open",
@@ -90,7 +89,7 @@ def test_normalize() -> None:
 
 
 def test_resolve_basic(root: Path) -> None:
-    lines = C.read_lines(C.source_path("sample", 1))
+    lines = C.read_lines(C.source_path("sample"))
     comment = anchor_comment(
         anchor=C.Anchor(heading="1-1　最初の問い", heading_level=3, quote="転移は治療の障害ではないのかお。")
     )
@@ -99,7 +98,7 @@ def test_resolve_basic(root: Path) -> None:
 
 def test_resolve_occurrence(root: Path) -> None:
     """同じ文が別の節にもあるとき、節で絞って正しい方を引く。"""
-    lines = C.read_lines(C.source_path("sample", 1))
+    lines = C.read_lines(C.source_path("sample"))
     first = anchor_comment(
         anchor=C.Anchor(heading="1-1　最初の問い", heading_level=3, quote="前は障害だと言っていたお。")
     )
@@ -112,7 +111,7 @@ def test_resolve_occurrence(root: Path) -> None:
 
 def test_resolve_after_edit(root: Path) -> None:
     """前の方を編集して行がずれても、引用で追随する。"""
-    path = C.source_path("sample", 1)
+    path = C.source_path("sample")
     lines = C.read_lines(path)
     comment = anchor_comment(
         anchor=C.Anchor(heading="1-2　次の問い", heading_level=3, quote="同じ言葉が出てきたお。", line_hint=17)
@@ -131,7 +130,7 @@ def test_resolve_after_edit(root: Path) -> None:
 
 def test_resolve_missing(root: Path) -> None:
     """引用が消えたら None。似た場所へ落とさない。"""
-    lines = C.read_lines(C.source_path("sample", 1))
+    lines = C.read_lines(C.source_path("sample"))
     comment = anchor_comment(
         anchor=C.Anchor(heading="1-1　最初の問い", heading_level=3, quote="この文はどこにも無い。")
     )
@@ -147,7 +146,7 @@ def test_resolve_missing(root: Path) -> None:
 
 
 def test_resolve_section(root: Path) -> None:
-    lines = C.read_lines(C.source_path("sample", 1))
+    lines = C.read_lines(C.source_path("sample"))
     comment = anchor_comment(
         unit="section",
         anchor=C.Anchor(heading="1-1　最初の問い", heading_level=3, quote="転移は"),
@@ -156,7 +155,7 @@ def test_resolve_section(root: Path) -> None:
 
 
 def test_window(root: Path) -> None:
-    lines = C.read_lines(C.source_path("sample", 1))
+    lines = C.read_lines(C.source_path("sample"))
     wording = anchor_comment(
         kind="wording", anchor=C.Anchor(heading="1-1　最初の問い", heading_level=3, quote="転移は治療の障害")
     )
@@ -171,7 +170,7 @@ def test_window(root: Path) -> None:
 
 
 def test_outline_metadata(root: Path) -> None:
-    path = C.source_path("sample", 1)
+    path = C.source_path("sample")
     timestamp = 1_786_233_600
     path.touch()
     os.utime(path, (timestamp, timestamp))
@@ -188,7 +187,7 @@ def test_outline_metadata(root: Path) -> None:
 
 
 def test_edit_anchor(root: Path) -> None:
-    lines = C.read_lines(C.source_path("sample", 1))
+    lines = C.read_lines(C.source_path("sample"))
     unique = C.edit_anchor(lines, (7, 7))
     check("edit_anchor: 一意なら1行", unique[1], True)
     # 「前は障害だと言っていたお。」は2箇所にあるので、前の行まで広げて一意にする
@@ -215,7 +214,6 @@ def test_edit_anchor(root: Path) -> None:
 def test_schema_revision_and_legacy_upgrade(root: Path) -> None:
     comment = C.create_comment(
         book="sample",
-        part=1,
         kind="wording",
         unit="sentence",
         body="schema の検査",
@@ -251,7 +249,6 @@ def test_schema_revision_and_legacy_upgrade(root: Path) -> None:
 def test_atomic_write_and_conflicts(root: Path) -> None:
     comment = C.create_comment(
         book="sample",
-        part=1,
         kind="wording",
         unit="sentence",
         body="競合の検査",
@@ -333,7 +330,6 @@ def test_conflict_http_status() -> None:
 def test_create_and_status(root: Path) -> None:
     comment = C.create_comment(
         book="sample",
-        part=1,
         kind="wording",
         unit="sentence",
         body="唐突に感じる",
@@ -389,7 +385,6 @@ def test_create_and_status(root: Path) -> None:
 
     second = C.create_comment(
         book="sample",
-        part=1,
         kind="substance",
         unit="paragraph",
         body="二件目",
@@ -408,7 +403,6 @@ def test_create_rejects_unresolvable(root: Path) -> None:
     try:
         C.create_comment(
             book="sample",
-            part=1,
             kind="wording",
             unit="sentence",
             body="どこでもない",
@@ -435,7 +429,7 @@ def test_browser_quote_parity(root: Path) -> None:
     それらを落とした結果がソース側の `normalize()` と一致していなければ、
     どんな選択もアンカーできない。
     """
-    lines = C.read_lines(C.source_path("sample", 1))
+    lines = C.read_lines(C.source_path("sample"))
     from_browser = "やる夫:転移は治療の障害ではないのかお。前は障害だと言っていたお。"
     comment = anchor_comment(
         unit="paragraph",

@@ -262,7 +262,6 @@ class ThreadMessage:
 class Comment:
     id: str
     book: str
-    part: int
     kind: str
     unit: str
     status: str
@@ -289,7 +288,6 @@ class Comment:
             "revision": revision if revision is not None else self.revision,
             "id": self.id,
             "book": self.book,
-            "part": self.part,
             "kind": self.kind,
             "unit": self.unit,
             "status": self.status,
@@ -327,7 +325,7 @@ class Comment:
         return messages
 
     def source_path(self) -> Path:
-        return source_path(self.book, self.part)
+        return source_path(self.book)
 
     def source_lines(self) -> list[str]:
         return read_lines(self.source_path())
@@ -392,14 +390,16 @@ def parse_comment(text: str) -> Comment:
         if answer:
             history.append(ThreadMessage("assistant", str(front.get("answered", "")), answer))
 
-    try:
-        part = int(front.get("part", 1) or 1)
-    except (TypeError, ValueError) as exc:
-        raise CommentError("part が不正") from exc
+    # 分冊（README.2.md など）を廃止する前の形式は part を持つ。1部目への
+    # コメントはそのまま読み、2部目以降は行き先の本文が無いので弾く。
+    if front.get("part", 1) not in (1, None):
+        raise CommentError(
+            f"part {front.get('part')!r} への旧形式コメント。分冊は廃止したので、"
+            "分割後の教材へ投稿し直す"
+        )
     comment = Comment(
         id=str(front.get("id", "")),
         book=str(front.get("book", "")),
-        part=part,
         kind=str(front.get("kind", "wording")),
         unit=str(front.get("unit", "sentence")),
         status=str(front.get("status", "open")),
@@ -428,12 +428,9 @@ def check_book_id(book: str) -> str:
     return book
 
 
-def source_path(book: str, part: int) -> Path:
+def source_path(book: str) -> Path:
     check_book_id(book)
-    if part < 1:
-        raise CommentError(f"part が不正: {part}")
-    name = "README.md" if part == 1 else f"README.{part}.md"
-    path = BOOKS_DIR / book / name
+    path = BOOKS_DIR / book / "README.md"
     if not path.is_file():
         raise CommentError(f"本文が無い: {path.relative_to(ROOT)}")
     return path
@@ -478,8 +475,6 @@ def _validate_comment(comment: Comment) -> None:
     if not COMMENT_ID_RE.match(comment.id):
         raise CommentError(f"comment id が不正: {comment.id!r}")
     check_book_id(comment.book)
-    if comment.part < 1:
-        raise CommentError(f"part が不正: {comment.part}")
     if comment.kind not in KINDS:
         raise CommentError(f"kind が不正: {comment.kind!r}")
     if comment.unit not in UNITS:
@@ -568,7 +563,7 @@ def outline_path(book: str) -> Path:
 
 def readme_modified_at(book: str) -> str:
     """README.md のファイル更新日時を UTC の ISO 8601 形式で返す。"""
-    modified = source_path(book, 1).stat().st_mtime
+    modified = source_path(book).stat().st_mtime
     return datetime.fromtimestamp(modified, timezone.utc).isoformat(timespec="seconds")
 
 
@@ -664,10 +659,10 @@ def window_for(
 
     `scope` は対応する側からの明示的な要求。選択範囲は「どこへのコメントか」を
     示すだけで、どこまで直すかはコメントの内容しだいなので、狭い選択に全体の
-    指摘が書かれていたら `section` や `part` で引き直せるようにしてある。
+    指摘が書かれていたら `section` や `book` で引き直せるようにしてある。
     """
     start, end = span
-    if scope == "part":
+    if scope == "book":
         return 0, len(lines)
     if scope == "paragraph":
         pass
@@ -728,7 +723,6 @@ def edit_anchor(
 def create_comment(
     *,
     book: str,
-    part: int,
     kind: str,
     unit: str,
     body: str,
@@ -760,13 +754,12 @@ def create_comment(
     if len(quote_tail or "") > MAX_QUOTE_CHARS:
         quote_tail = quote_tail[-MAX_QUOTE_CHARS:]
 
-    path = source_path(book, part)
+    path = source_path(book)
     lines = read_lines(path)
 
     comment = Comment(
         id=next_comment_id(book),
         book=book,
-        part=part,
         kind=kind,
         unit=unit,
         status="open",
@@ -1012,8 +1005,8 @@ def group_with_same_section(comments: list[Comment]) -> list[Comment]:
     落ちず、連打されたときだけ自然に合流する。
     """
     head = comments[0]
-    key = (head.part, normalize(head.anchor.heading))
-    return [c for c in comments if (c.part, normalize(c.anchor.heading)) == key]
+    key = normalize(head.anchor.heading)
+    return [c for c in comments if normalize(c.anchor.heading) == key]
 
 
 # --------------------------------------------------------------------------
@@ -1033,7 +1026,7 @@ def cmd_list(args: argparse.Namespace) -> int:
         head = comment.body.strip().splitlines()[0][:40]
         print(
             f"{comment.book}/{comment.id}  {comment.status:8s} {comment.kind:9s} "
-            f"part{comment.part} {path_text}  {head}"
+            f"{path_text}  {head}"
         )
     return 0
 
@@ -1128,7 +1121,7 @@ def build_parser() -> argparse.ArgumentParser:
     show.add_argument("--id", required=True)
     show.add_argument(
         "--scope",
-        choices=("auto", "paragraph", "section", "part"),
+        choices=("auto", "paragraph", "section", "book"),
         default="auto",
         help="窓の広さ。コメントの内容がもっと広い範囲に関わるときに引き直す",
     )
@@ -1138,7 +1131,7 @@ def build_parser() -> argparse.ArgumentParser:
     wait.add_argument("--timeout", type=float, default=900.0)
     wait.add_argument("--server", default="http://127.0.0.1:3000", help="dev_server の URL（空でファイル監視）")
     wait.add_argument("--no-group", dest="group", action="store_false", help="同一節のまとめ処理をしない")
-    wait.add_argument("--scope", choices=("auto", "paragraph", "section", "part"), default="auto")
+    wait.add_argument("--scope", choices=("auto", "paragraph", "section", "book"), default="auto")
     wait.add_argument("--model", default="", help="自分のモデル名（画面に出る）")
     wait.add_argument("--effort", default="", help="自分の effort（画面に出る）")
     wait.add_argument(
