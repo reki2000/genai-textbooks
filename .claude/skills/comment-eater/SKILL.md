@@ -88,10 +88,10 @@ dev_server が居ればロングポールで待つので、投稿から即座に
 
 ```bash
 python3 scripts/comments.py show --book {book} --id 0007 --scope section   # 節ぜんぶ
-python3 scripts/comments.py show --book {book} --id 0007 --scope part      # その部ぜんぶ（最後の手段）
+python3 scripts/comments.py show --book {book} --id 0007 --scope book      # 本文ぜんぶ（最後の手段）
 ```
 
-   `--scope part` は全文を読むのと同じ費用がかかる。他の節との整合が問題に
+   `--scope book` は全文を読むのと同じ費用がかかる。他の節との整合が問題に
    なっているなら、まず `docs/books/{book}/outline.md` を見る。
 4. `old_string` 候補があり「一意性: OK」なら、そのまま使って編集する。
    「一意性: NG」なら窓の範囲で前後の行を足して一意にする。「該当なし」なら、

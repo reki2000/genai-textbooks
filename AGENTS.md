@@ -34,6 +34,8 @@ documents:
 
 `created` には、旧 `docs/books/{ID}.md` と現行の本文パスを含む Git 履歴上の初出コミット日時を設定する。教材はカテゴリ内で `created` の昇順に表示し、同一日時の場合は `id` の昇順。
 
+続きものは巻ごとに別の教材（`statistics` → `statistics-2` → `statistics-3`）として書き、後の巻のエントリに `follows: <前の巻のID>` を付ける。`follows` は並び順だけを変え、その巻を前の巻の直後に置く。1教材の中で本文を `README.2.md` などに分ける分冊は廃止した（ビルドエラーになる）。仕様は [`BUILD.md`](./BUILD.md) の「シリーズ（連続する教材）」を参照。
+
 ## 教材追加手順
 
 1. `/yaruo-rediscovery` で教材を執筆 → `docs/books/{ID}/README.md`

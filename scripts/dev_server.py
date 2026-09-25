@@ -324,7 +324,6 @@ class PreviewHandler(BaseHTTPRequestHandler):
         with self.server.create_lock:  # id の採番が競合しないように直列化する
             comment = comments_module.create_comment(
                 book=str(payload.get("book", "")),
-                part=int(payload.get("part", 1) or 1),
                 kind=str(payload.get("kind", "wording")),
                 unit=str(payload.get("unit", "sentence")),
                 body=str(payload.get("body", "")),
@@ -369,7 +368,6 @@ class PreviewHandler(BaseHTTPRequestHandler):
                     {
                         "id": comment.id,
                         "book": comment.book,
-                        "part": comment.part,
                         "kind": comment.kind,
                         "unit": comment.unit,
                         "status": comment.status,

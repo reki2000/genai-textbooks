@@ -62,4 +62,4 @@ Pillow は本文だけの改訂でもサイト全体のビルドに必要。
    git add docs/
    ```
 
-外部のモデルや別セッションが書いた教材は、カタログ登録前に `yaruo-review` で検査する。詳しいカタログ仕様、分冊、プレビュー、デプロイ手順は [`BUILD.md`](BUILD.md) を参照。プレビュー上のコメント機能は [`COMMENTS.md`](COMMENTS.md)。
+外部のモデルや別セッションが書いた教材は、カタログ登録前に `yaruo-review` で検査する。詳しいカタログ仕様、シリーズ（`follows`）、プレビュー、デプロイ手順は [`BUILD.md`](BUILD.md) を参照。プレビュー上のコメント機能は [`COMMENTS.md`](COMMENTS.md)。
