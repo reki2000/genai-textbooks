@@ -5,7 +5,7 @@ AI-Generated Japanese Short Textbooks: "Yaruo"-Style Dialogue Collection and AI 
 [公開サイト](https://reki2000.github.io/genai-textbooks/)
 
 - GitHub Pages で公開されるテキスト本体（`docs/books/*/README.md`）。公開用の目次・サイドバー・各教材ページ（SEO用meta含む）は各 `README.md` の隣にある `catalog.yml` を `scripts/generate_site.py` がビルド時に統合して自動生成する（`scripts/site_template.html` 参照）
-- 「やる夫で学ぶ」形式の教材を執筆・検査・公開するための Claude Code / Codex 用スキル 9 種（`.claude/skills/`、`.codex/skills/`）
+- 「やる夫で学ぶ」形式の教材を執筆・検査・公開するための Claude Code / Codex 用スキル 8 種（`.claude/skills/`、`.codex/skills/`）
 
 ## Claude Code / Codex 用スキル
 
@@ -14,18 +14,17 @@ AI-Generated Japanese Short Textbooks: "Yaruo"-Style Dialogue Collection and AI 
 | スキル | 役割 | 主な起動キーワード |
 |---|---|---|
 | `yaruo-rediscovery` | 対話形式教材の**作成**。生徒が素朴案→反例→修正のサイクルで概念を自ら再発見する物語を書く | やる夫形式／対話形式の教材／再発見／続編・改訂 |
-| `yaruo-review` | 外部で書かれた教材の**受け入れ検査**。物語性、学習内容、再発見の過程を証拠つきで評価する | レビュー／受け入れ検査／品質チェック |
+| `yaruo-review` | 外部で書かれた教材の**受け入れ検査**。学習の蓄積と継続性、発見と物語の一体化、伏線回収、会話のテンポ、人物の役割を証拠つきで評価し、改訂要否を出す | レビュー／受け入れ検査／品質チェック |
 | `yaruo-format` | 教材の**書式整形**。Markdown の強調、表、会話表記などを lint・修正する | 整形／フォーマット／lint／太字や表の崩れ |
 | `yaruo-proofread` | 教材の**校正・検証**。事実、出典、論理展開、数式と会話の整合性を確認する | 校正／ファクトチェック／出典／数式チェック |
 | `yaruo-count` | 教材の文字数、行数、数式量、推定読了時間を統一ルールで正確に集計する | 正確な文字数／行数／読了時間 |
 | `zuhan` | 教材本文へ説明図を追加。図が要る箇所を選び、SVG直書き・グラフ・外部引用を使い分け、作図規約と機械検査で仕上げる | 図を追加／図解／模式図／ダイアグラム |
 | `yaruo-slide` | 教材から物語を除き学習内容だけを圧縮した marp スライド `slide.md` を作成・更新する | スライド／marp／要約スライド／発表資料 |
 | `comment-eater` | 開発サーバのプレビューに投稿されたコメントを1件ずつ拾い、該当箇所だけを読んで直す | コメント対応／コメントを待って／プレビューのコメント |
-| `discuss` | Codex と Claude がファイルを介して設計案やレビューを照合し、合意を残す | 議論して／Claude・Codex と相談／合意を取って |
 
 ## この執筆環境の使い方
 
-Claude Code または Codex をリポジトリルートで起動し、自然文で作業を依頼する。たとえば「○○をやる夫形式の教材にして」で新規執筆、「この教材をレビューして直して」で受け入れ検査と修正、「整形して」「校正して」で各工程を個別に実行できる。二者で方針を詰める場合は一方に「Claude（または Codex）と議論して」と依頼し、もう一方に `/discuss` で参加するよう伝える。
+Claude Code または Codex をリポジトリルートで起動し、自然文で作業を依頼する。たとえば「○○をやる夫形式の教材にして」で新規執筆、「この教材をレビューして直して」で受け入れ検査と修正、「整形して」「校正して」で各工程を個別に実行できる。
 
 初回は仮想環境を作り、開発用依存関係を導入する。
 
