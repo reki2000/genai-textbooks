@@ -1,7 +1,7 @@
 ---
 type: outline
 book: succinct-data-structures
-readme_updated: '2026-08-09T07:37:26+00:00'
+readme_updated: '2026-08-14T10:44:24+00:00'
 ---
 
 # やる夫が1ビットも無駄にできないようです ── 簡潔データ構造を再発見する の骨格

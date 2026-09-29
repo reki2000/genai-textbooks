@@ -1,7 +1,7 @@
 ---
 type: outline
 book: energy-policy
-readme_updated: '2026-08-09T07:37:26+00:00'
+readme_updated: '2026-08-14T09:25:18+00:00'
 ---
 
 # やる夫が夢見るエネルギー政策 ── エネルギーミックスを再発明する の骨格

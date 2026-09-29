@@ -1,7 +1,7 @@
 ---
 type: outline
 book: media-compression
-readme_updated: '2026-08-09T07:37:26+00:00'
+readme_updated: '2026-08-14T09:25:18+00:00'
 ---
 
 # やる夫の4K動画がカクつくようです ── 圧縮を再発明する の骨格
