@@ -44,8 +44,7 @@
     }
 
     .sidebar-toggle,
-    .sidebar > h1.app-name,
-    .sidebar .app-sub-sidebar {
+    .sidebar > h1.app-name {
       display: none !important;
     }
 
@@ -191,78 +190,6 @@
     .markdown-section h2,
     .markdown-section h3 {
       scroll-margin-top: calc(var(--bar-height) + 12px);
-    }
-
-    /* この教材 / 教材一覧 tabs at the top of the sidebar on book pages. */
-    #nav-tabs {
-      display: none;
-      position: sticky;
-      top: 0;
-      z-index: 1;
-      gap: 4px;
-      padding: 10px 12px;
-      background: var(--background, #fff);
-      border-bottom: 1px solid var(--borderColor, #eee);
-    }
-
-    body.on-book #nav-tabs {
-      display: flex;
-    }
-
-    #nav-tabs button {
-      flex: 1;
-      height: 32px;
-      border: 1px solid var(--borderColor, #ddd);
-      border-radius: 8px;
-      background: transparent;
-      color: inherit;
-      font: inherit;
-      font-size: 14px;
-      cursor: pointer;
-    }
-
-    #nav-tabs button[aria-selected="true"] {
-      border-color: var(--chrome-accent);
-      color: var(--chrome-accent);
-      font-weight: 600;
-    }
-
-    #book-toc {
-      display: none;
-      margin: 0;
-      padding: 12px 0 24px;
-      list-style: none;
-    }
-
-    body.on-book.tab-book #book-toc {
-      display: block;
-    }
-
-    body.on-book.tab-book .sidebar-nav {
-      display: none;
-    }
-
-    #book-toc a {
-      display: block;
-      padding: 6px 16px 6px 20px;
-      border-left: 3px solid transparent;
-      color: inherit;
-      font-size: 14px;
-      line-height: 1.5;
-      text-decoration: none;
-    }
-
-    #book-toc li.level-3 a {
-      padding-left: 36px;
-      font-size: 13px;
-      opacity: 0.85;
-    }
-
-    #book-toc a.current {
-      border-left-color: var(--chrome-accent);
-      color: var(--chrome-accent);
-      font-weight: 600;
-      opacity: 1;
     }
 
     #nav-scrim {
@@ -588,67 +515,7 @@
       })
       syncNavButton()
 
-      // この教材 / 教材一覧 tabs. On a book page the sidebar opens on the
-      // book's own headings; the catalog is one tap away.
-      var tabs = document.createElement('div')
-      tabs.id = 'nav-tabs'
-      tabs.setAttribute('role', 'tablist')
-      tabs.innerHTML =
-        '<button type="button" role="tab" data-tab="book">この教材</button>' +
-        '<button type="button" role="tab" data-tab="catalog">教材一覧</button>'
-      var toc = document.createElement('ol')
-      toc.id = 'book-toc'
-
-      function setTab(name) {
-        body.classList.toggle('tab-book', name === 'book')
-        tabs.querySelectorAll('button').forEach(function (button) {
-          button.setAttribute('aria-selected', button.getAttribute('data-tab') === name ? 'true' : 'false')
-        })
-      }
-      tabs.addEventListener('click', function (event) {
-        var button = event.target.closest('button')
-        if (button) setTab(button.getAttribute('data-tab'))
-      })
-
-      function mountSidebarExtras() {
-        var sidebar = document.querySelector('.sidebar')
-        if (!sidebar) return
-        sidebar.id = 'app-sidebar'
-        if (tabs.parentNode !== sidebar) {
-          sidebar.insertBefore(toc, sidebar.firstChild)
-          sidebar.insertBefore(tabs, sidebar.firstChild)
-        }
-      }
-
-      var headings = []
-
-      function buildToc() {
-        toc.innerHTML = ''
-        headings = Array.prototype.slice.call(
-          document.querySelectorAll('.markdown-section h2[id], .markdown-section h3[id]'))
-        headings.forEach(function (heading) {
-          var item = document.createElement('li')
-          item.className = 'level-' + heading.tagName.charAt(1)
-          var link = document.createElement('a')
-          link.href = '#' + heading.id
-          link.textContent = heading.textContent
-          link.addEventListener('click', function (event) {
-            event.preventDefault()
-            body.classList.remove('slide-mode')
-            syncViewSwitch()
-            heading.scrollIntoView()
-            if (!DOCK_QUERY.matches) {
-              body.classList.remove('nav-open')
-              syncNavButton()
-            }
-          })
-          item.appendChild(link)
-          toc.appendChild(item)
-        })
-      }
-
-      // Reading position: progress line under the bar, and the current
-      // heading highlighted in the book's table of contents.
+      // Reading position: progress line under the bar.
       var ticking = false
       function onScroll() {
         if (ticking) return
@@ -660,24 +527,6 @@
           var ratio = max > 0 ? Math.min(1, window.scrollY / max) : 0
           document.getElementById('read-progress').style.width =
             body.classList.contains('on-book') ? (ratio * 100) + '%' : '0'
-          var line = parseInt(getComputedStyle(doc).getPropertyValue('--bar-height'), 10) + 24
-          var current = null
-          for (var i = 0; i < headings.length; i++) {
-            if (headings[i].getBoundingClientRect().top <= line) current = i
-            else break
-          }
-          var links = toc.querySelectorAll('a')
-          links.forEach(function (link, index) {
-            link.classList.toggle('current', index === current)
-          })
-          if (current !== null && body.classList.contains('tab-book')) {
-            var active = links[current]
-            var sidebar = document.querySelector('.sidebar')
-            var top = active.offsetTop
-            if (top < sidebar.scrollTop + 60 || top > sidebar.scrollTop + sidebar.clientHeight - 60) {
-              sidebar.scrollTop = top - sidebar.clientHeight / 3
-            }
-          }
         })
       }
       window.addEventListener('scroll', onScroll, { passive: true })
@@ -714,9 +563,17 @@
         var h1 = document.querySelector('.markdown-section h1')
         document.getElementById('bar-title').textContent = bookId && h1 ? h1.textContent : ''
 
-        mountSidebarExtras()
-        buildToc()
-        setTab(bookId && headings.length ? 'book' : 'catalog')
+        // The catalog is long; bring the current book (and the headings
+        // docsify expands under it) into view in the sidebar.
+        var sidebar = document.querySelector('.sidebar')
+        if (sidebar) {
+          sidebar.id = 'app-sidebar'
+          var active = sidebar.querySelector('.sidebar-nav li.active')
+          if (active) {
+            var top = active.getBoundingClientRect().top - sidebar.getBoundingClientRect().top
+            sidebar.scrollTop += top - 12
+          }
+        }
 
         var hasSlide = !!bookId && slideDocIds.indexOf(bookId) !== -1
         viewSwitch.hidden = !hasSlide
