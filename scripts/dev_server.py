@@ -5,6 +5,9 @@
 コメントの永続化・アンカーの解決はすべて `comments.py` に委ね、ここは HTTP 層
 だけを持つ。ファイルが唯一の真実で、ブラウザも `comments.py wait` で待っている
 エージェントも、同じ `comments/{book}/*.md` を見ている。
+
+推敲（選択 → 候補 → 採用）の API も持つ。候補の生成・検証・適用は `revise.py`
+に委ね、ここは Server-Sent Events で逐次返す HTTP 層だけを持つ（REVISE.md）。
 """
 
 from __future__ import annotations
@@ -27,6 +30,7 @@ from urllib.parse import parse_qs, unquote, urlsplit
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import comments as comments_module  # noqa: E402
 import generate_site  # noqa: E402
+import revise as revise_module  # noqa: E402
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -37,6 +41,10 @@ REVISION_PATH = "/__dev/revision"
 COMMENT_UI_PATH = "/__dev/comment-ui.js"
 COMMENT_API_PATH = "/__dev/comments"
 COMMENT_UI_FILE = ROOT / "scripts" / "dev_comment_ui.js"
+REVISE_UI_PATH = "/__dev/revise-ui.js"
+REVISE_API_PATH = "/__dev/revise"
+REVISE_UI_FILE = ROOT / "scripts" / "dev_revise_ui.js"
+REVISE_REAP_INTERVAL = 30.0
 WATCH_PATHS = (
     DOCS_DIR,
     ROOT / "scripts" / "generate_site.py",
@@ -53,6 +61,7 @@ WAITER_GRACE_SECONDS = 120.0
 
 DOCSIFY_TAG = '<script src="https://cdn.jsdelivr.net/npm/docsify@4"></script>'
 COMMENT_UI_TAG = f'<script src="{COMMENT_UI_PATH}"></script>'
+REVISE_UI_TAG = f'<script src="{REVISE_UI_PATH}"></script>'
 
 
 def log(message: str) -> None:
@@ -247,6 +256,16 @@ class PreviewServer(ThreadingHTTPServer):
         self.comment_condition = threading.Condition()
         self.create_lock = threading.Lock()
         self.waiters = WaiterRegistry()
+        self._revise: revise_module.Service | None = None
+        self._revise_lock = threading.Lock()
+
+    @property
+    def revise(self) -> revise_module.Service:
+        """推敲の窓口。設定の誤りでプレビューごと落ちないよう、初回の利用時に作る。"""
+        with self._revise_lock:
+            if self._revise is None:
+                self._revise = revise_module.Service()
+            return self._revise
 
     def bump(self, changed: list[str]) -> None:
         self.changed = changed
@@ -270,6 +289,12 @@ class PreviewHandler(BaseHTTPRequestHandler):
     def do_POST(self) -> None:
         request = urlsplit(self.path)
         path = unquote(request.path)
+        if path.startswith(REVISE_API_PATH):
+            if not self._check_origin():
+                self.send_error(403, "cross-origin request rejected")
+                return
+            self._revise_post(path[len(REVISE_API_PATH) :].strip("/"))
+            return
         if not path.startswith(COMMENT_API_PATH):
             self.send_error(404)
             return
@@ -296,6 +321,73 @@ class PreviewHandler(BaseHTTPRequestHandler):
             self._send_bytes(str(exc).encode("utf-8"), "text/plain; charset=utf-8", True, status=400)
             return
         self.send_error(404)
+
+    # -- revise API --------------------------------------------------------
+
+    def _revise_post(self, rest: str) -> None:
+        """推敲の依頼・採否。依頼の応答は Server-Sent Events で逐次返す。"""
+        try:
+            payload = self._read_json() if int(self.headers.get("Content-Length") or 0) else {}
+            if not rest:
+                self._revise_stream(payload)
+                return
+            parts = rest.split("/")
+            service = self.server.revise
+            if parts == ["undo"]:
+                self._send_json(service.undo(str(payload.get("book", ""))))
+                return
+            if len(parts) == 2 and parts[1] == "adopt":
+                self._send_json(service.adopt(parts[0], int(payload.get("index", -1))))
+                return
+            if len(parts) == 2 and parts[1] == "reject":
+                self._send_json(service.reject(parts[0], str(payload.get("reason", ""))))
+                return
+        except (revise_module.ReviseError, comments_module.CommentError, ValueError) as exc:
+            self._send_bytes(str(exc).encode("utf-8"), "text/plain; charset=utf-8", True, status=400)
+            return
+        self.send_error(404)
+
+    def _revise_stream(self, payload: dict) -> None:
+        events = self.server.revise.generate(payload)
+        # 対象の特定や設定の誤りは最初の1件を取り出すときに出る。ストリームを
+        # 始める前に拾い、普通のエラー応答として返す。
+        first = next(events)
+        try:
+            self.send_response(200)
+            self.send_header("Content-Type", "text/event-stream; charset=utf-8")
+            self.send_header("Cache-Control", "no-store")
+            self.send_header("X-Accel-Buffering", "no")
+            self.end_headers()
+            self._send_event(first)
+            for event in events:
+                self._send_event(event)
+        except (BrokenPipeError, ConnectionResetError):
+            # 画面側が待たずに閉じた（取り消し・次の依頼）。生成を止めてプロセスを落とす。
+            events.close()
+            log("revise stream closed by the browser")
+        except revise_module.ReviseError as exc:
+            self._send_event({"event": "error", "message": str(exc)})
+
+    def _send_event(self, event: dict) -> None:
+        self.wfile.write(b"data: " + json.dumps(event, ensure_ascii=False).encode("utf-8") + b"\n\n")
+        self.wfile.flush()
+
+    def _revise_config(self, query: dict[str, list[str]]) -> None:
+        try:
+            service = self.server.revise
+        except (OSError, ValueError) as exc:
+            self._send_bytes(f"revise.toml を読めない: {exc}".encode("utf-8"),
+                             "text/plain; charset=utf-8", True, status=500)
+            return
+        book = (query.get("book") or [""])[0]
+        backend = (query.get("backend") or [service.config.default_backend])[0]
+        if book and backend in revise_module.backends.BACKENDS:
+            try:
+                # 教材を開いた時点で待機プロセスを起こしておく（最初の依頼から速く）。
+                service.prewarm(book, backend)
+            except (revise_module.ReviseError, comments_module.CommentError, OSError) as exc:
+                log(f"revise prewarm failed: {exc}")
+        self._send_json(service.describe())
 
     # -- comment API -------------------------------------------------------
 
@@ -498,6 +590,14 @@ class PreviewHandler(BaseHTTPRequestHandler):
             self._send_file(COMMENT_UI_FILE, send_body)
             return
 
+        if request_path == REVISE_UI_PATH:
+            self._send_file(REVISE_UI_FILE, send_body)
+            return
+
+        if request_path == REVISE_API_PATH + "/config":
+            self._revise_config(query)
+            return
+
         if request_path == COMMENT_API_PATH + "/wait":
             self._wait_comments(query)
             return
@@ -576,7 +676,7 @@ class PreviewHandler(BaseHTTPRequestHandler):
         self._send_bytes(payload, content_type, send_body)
 
     def _inject(self, html: str) -> str:
-        """docsify のシェルにだけコメント UI を差し込む。
+        """docsify のシェルにだけコメント UI と推敲 UI を差し込む。
 
         marp のスライド HTML には docsify が無いので、そちらへは入れない。
         docsify 本体より前に置くのは、UI が `$docsify.plugins` へ登録して
@@ -584,7 +684,7 @@ class PreviewHandler(BaseHTTPRequestHandler):
         """
         if DOCSIFY_TAG not in html:
             return html
-        return html.replace(DOCSIFY_TAG, COMMENT_UI_TAG + "\n  " + DOCSIFY_TAG, 1)
+        return html.replace(DOCSIFY_TAG, COMMENT_UI_TAG + "\n  " + REVISE_UI_TAG + "\n  " + DOCSIFY_TAG, 1)
 
     def _send_json(self, payload: dict) -> None:
         self._send_bytes(
@@ -644,6 +744,7 @@ def watch(server: PreviewServer, interval: float) -> None:
             settled = current
 
         fast_paths = changed_relative_paths(previous, settled)
+        observe_revisions(server, fast_paths or [])
         if fast_paths and fast_rebuild(fast_paths):
             server.bump(fast_paths)
         elif build():
@@ -651,6 +752,27 @@ def watch(server: PreviewServer, interval: float) -> None:
         # Keep the pre-build snapshot. If another save happened during a slow
         # build, the next poll sees it and schedules one more build.
         previous = settled
+
+
+def observe_revisions(server: PreviewServer, relative_paths: list[str]) -> None:
+    """推敲で採用した箇所を人が手直ししたかを記録する（提案の質を上げる材料）。"""
+    if server._revise is None:
+        return
+    for relative in relative_paths:
+        parts = relative.split("/")
+        if len(parts) == 3 and parts[2] == "README.md":
+            try:
+                for event in server.revise.observe(parts[1]):
+                    log(f"revise post-edit recorded for {event['id']}")
+            except (OSError, ValueError) as exc:
+                log(f"revise observe failed: {exc}")
+
+
+def reap_revise(server: PreviewServer) -> None:
+    while True:
+        time.sleep(REVISE_REAP_INTERVAL)
+        if server._revise is not None:
+            server._revise.reap()
 
 
 def watch_comments(server: PreviewServer, interval: float) -> None:
@@ -695,6 +817,7 @@ def main() -> int:
     server = PreviewServer((args.host, args.port))
     threading.Thread(target=watch, args=(server, args.interval), daemon=True).start()
     threading.Thread(target=watch_comments, args=(server, COMMENT_POLL_INTERVAL), daemon=True).start()
+    threading.Thread(target=reap_revise, args=(server,), daemon=True).start()
 
     host, port = server.server_address[:2]
     display_host = "localhost" if host in {"127.0.0.1", "::1"} else host
@@ -705,6 +828,8 @@ def main() -> int:
     except KeyboardInterrupt:
         log("Stopping development server.")
     finally:
+        if server._revise is not None:
+            server._revise.close()
         server.server_close()
     return 0
 

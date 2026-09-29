@@ -1,0 +1,91 @@
+# プレビュー上の推敲（scripts/revise.py）の設定。仕様は REVISE.md。
+#
+# ティア（light / heavy）ごとに、バックエンド別のモデルと思考の有無を決める。
+# model を空にすると各 CLI の既定モデルを使う。
+
+default_backend = "claude"
+candidates = 3
+
+[pool]
+# ティアごとに待たせておく起動済みプロセスの数。0 にすると依頼のたびに起動する。
+light = 1
+heavy = 1
+# 使われないまま、この秒数を過ぎた待機プロセスは落とす。
+idle_ttl = 600
+
+[routing]
+# auto のとき、選択が節にまたがるか、target がこの行数・文字数を超えたら heavy。
+heavy_lines = 12
+heavy_chars = 1200
+# 自由指示がこの字数を超えたら heavy。
+heavy_instruction_chars = 60
+
+[context]
+# target の前後に渡す発言の数（それぞれ）。6 で前後3往復。
+utterances = 6
+
+[tiers.light.claude]
+# Haiku 4.5 は直後の台詞が受ける語を消しやすかった（REVISE.md「質の評価」）。
+model = "claude-sonnet-5-5"
+thinking = false
+
+[tiers.heavy.claude]
+model = "claude-opus-5-5"
+thinking = true
+effort = "high"
+
+[tiers.light.codex]
+model = "luna"
+thinking = false
+effort = "minimal"
+
+[tiers.heavy.codex]
+model = ""
+thinking = true
+effort = "high"
+
+[tiers.light.fake]
+[tiers.heavy.fake]
+
+# アクション。key はプレビューで選択中に押す数字キー。tier は auto のときの既定。
+[[actions]]
+id = "shorten"
+label = "短く"
+key = "1"
+tier = "light"
+instruction = "意味・話者の口調・学びに要る具体を保ったまま、冗長な語や重複を削って短くする。"
+
+[[actions]]
+id = "plain"
+label = "噛み砕く"
+key = "2"
+tier = "light"
+instruction = "初めて読む人にも分かるよう噛み砕く。専門用語や数値は消さずに残し、身近な言い方や具体を短く添えて分かりやすくする。新しい専門用語・事実は足さない。"
+
+[[actions]]
+id = "tempo"
+label = "テンポ"
+key = "3"
+tier = "light"
+instruction = "会話のテンポをよくする。一発言に詰め込みすぎた内容を分け、台詞の長さとリズムを整える。"
+
+[[actions]]
+id = "voice"
+label = "口調"
+key = "4"
+tier = "light"
+instruction = "話者の人物像と相手との関係に合った口調・語尾に整える。内容は変えない。"
+
+[[actions]]
+id = "connect"
+label = "前後とつなぐ"
+key = "5"
+tier = "heavy"
+instruction = "直前・直後の台詞と自然につながるようにする。話の飛躍・重複・受け答えのずれを直す。"
+
+[[actions]]
+id = "logic"
+label = "論理"
+key = "6"
+tier = "heavy"
+instruction = "説明の論理の飛躍や根拠の抜けを埋め、読者が結論の根拠をたどれるようにする。分量は必要最小限に。"

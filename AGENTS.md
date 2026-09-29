@@ -79,6 +79,10 @@ python3 scripts/yaruo_lint.py docs/books/{ID}/README.md --check --verbose
 
 開発サーバのプレビューで本文にコメントを付け、常駐したエージェント（`/comment-eater`）がその場で直す経路がある。ファイル形式・アンカー解決・状態遷移の詳細は [`COMMENTS.md`](./COMMENTS.md) を参照。
 
+## プレビュー上の推敲
+
+開発サーバのプレビューで本文を選んでアクションを押すと、LLM（claude / codex、軽量・高性能を切り替え）が書き換えの候補を返し、選ぶだけで本文へ適用される経路がある。LLM は本文を直接編集しない。設定は `scripts/revise.toml`、作法は `scripts/revise_card.md`、仕様は [`REVISE.md`](./REVISE.md)。変更したら `python3 scripts/tests/run_revise_tests.py`。
+
 ## ビルドシステム
 
 ソース・生成の分離詳細は [`BUILD.md`](./BUILD.md) を参照。
