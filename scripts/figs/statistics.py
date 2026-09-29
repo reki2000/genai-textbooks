@@ -1207,6 +1207,178 @@ FIGS2 = {
 }
 
 
+# ================================================================ 第3巻
+def fig25_1():
+    """25-1 閾値は50%ではなく、二つの期待損失が交差する4.85%。正方 M 540x420。
+
+    x: 危険確率 0 → 80、0.12 → 500。y: 期待損失 0 → 340、12 → 60。
+    """
+    thr = 5 / 103
+    assert abs(thr - 0.04854) < 1e-5 and 100 * 0.04 < 5 - 3 * 0.04 and 100 * 0.06 > 5 - 3 * 0.06
+    s = SVG(540, 420, "継続の期待損失100pと停止の期待損失5−3pは危険確率4.85%で交わり、4%なら継続、6%なら停止")
+    X = lin(80, 500, 0, 0.12)
+    Y = lin(340, 60, 0, 12)
+    s.rect(X(0), Y(12), X(thr) - X(0), Y(0) - Y(12), fill=TINT[MAIN], stroke="none")
+    s.rect(X(thr), Y(12), X(0.12) - X(thr), Y(0) - Y(12), fill=TINT[WARN], stroke="none")
+    s.text((X(0) + X(thr)) / 2, Y(11), "継続", size=15, anchor="middle", bold=True, fill=MAIN)
+    s.text((X(thr) + X(0.12)) / 2, Y(11), "停止", size=15, anchor="middle", bold=True, fill=WARN)
+    s.line(X(0), Y(0), X(0.12), Y(12), stroke=WARN, sw=3)
+    s.line(X(0), Y(5), X(0.12), Y(5 - 3 * 0.12), stroke=MAIN, sw=3)
+    s.text(X(0.093) - 10, Y(9.5), "継続の損失 100p", size=14, fill=WARN, bold=True, anchor="end", halo=True)
+    s.text(X(0.12) - 4, Y(5 - 3 * 0.12) + 22, "停止の損失 5 − 3p", size=14, fill=MAIN, bold=True, anchor="end")
+    s.line(X(thr), Y(0), X(thr), Y(12), stroke=FOCUS, sw=2.4, dash="6 4")
+    s.circle(X(thr), Y(100 * thr), 7, fill=FOCUS, stroke="#ffffff", sw=2)
+    s.text(X(thr) + 10, Y(100 * thr) - 10, "4.85%", size=16, fill=FOCUS, bold=True)
+    for p_, lab in ((0.04, "4%"), (0.06, "6%")):
+        s.line(X(p_), Y(0), X(p_), Y(0) - 10, stroke=INK, sw=2.4)
+        s.text(X(p_), Y(0) - 16, lab, size=14, anchor="middle", bold=True)
+    xaxis(s, X, 340, [0, 0.02, 0.04, 0.06, 0.08, 0.1, 0.12], lambda v: f"{v:.0%}", "危険確率 p")
+    s.text(24, 44, "期待損失", size=15, fill=SUB)
+    return s
+
+
+def fig25_4():
+    """25-4 合計400件・率4%が同じでも、時間の形はまったく違う。小さな多数 2段 横長 L 720x380。
+
+    x: 時 0..23 → 帯 120 + 24*h（幅 20）。縦軸は2段で共通（360件で 120px）。段の底 y = 170 / 330。
+    """
+    flat = [400 / 24] * 24
+    burst = [40 / 23] * 24
+    burst[9] = 360
+    assert abs(sum(flat) - 400) < 1e-9 and abs(sum(burst) - 400) < 1e-9 and 400 / 10000 == 0.04
+    s = SVG(720, 380, "どちらも一日400件・率4%だが、一時間あたり約17件に均した形と、一時間に360件が束になった形は別の工程")
+    for base, data, title, col in ((170, flat, "全期間へ均すと：毎時 約17件", MUTED),
+                                   (330, burst, "実際：更新直後の一時間に 360件", WARN)):
+        s.text(24, base - 132, title, size=16, bold=True, fill=INK if col == MUTED else WARN)
+        for h, v in enumerate(data):
+            hgt = v / 360 * 120
+            s.rect(120 + 24 * h, base - hgt, 20, hgt, fill=col if col == MUTED or h == 9 else TINT[WARN],
+                   stroke="none")
+        s.line(110, base, 700, base, stroke=MUTED)
+    for h in (0, 6, 12, 18, 23):
+        s.text(130 + 24 * h, 352, f"{h}時", size=13, fill=SUB, anchor="middle")
+    s.text(100, 330 - 120 + 5, "360", size=13, fill=SUB, anchor="end")
+    s.text(100, 170 - 120 + 5, "360", size=13, fill=SUB, anchor="end")
+    s.note(380, 60, "縦軸は上下で同じ")
+    return s
+
+
+def interval_row(s, X, y, lo, hi, est, col, label, sub=None):
+    s.line(X(lo), y, X(hi), y, stroke=col, sw=4)
+    s.circle(X(est), y, 7, fill=col, stroke="#ffffff", sw=1.5)
+    s.text(24, y + 5, label, size=15, bold=True)
+    if sub:
+        s.text(24, y + 25, sub, size=13, fill=SUB)
+
+
+def fig27_5():
+    """27-5 同じ推定値でも幅が違うと片方だけ有意になるが、二つの差の区間は0を含む。横長 M 600x340。
+
+    x: 効果 -16 → 180、12 → 580。行 y 90 / 160 / 250。
+    """
+    est, se_c, se_s = -6.0, 2.3, 4.7
+    d_se = math.sqrt(se_c ** 2 + se_s ** 2)
+    assert est + 1.96 * se_c < 0 < est + 1.96 * se_s and -1.96 * d_se < 0 < 1.96 * d_se
+    s = SVG(600, 340, "大都市と小地域はどちらも効果−6ポイントで、大都市だけ0をまたがないが、二つの差の区間は0を含む")
+    X = lin(180, 580, -16, 12)
+    s.line(X(0), 50, X(0), 280, stroke=INK, sw=1.4, dash="4 4")
+    s.text(X(0), 40, "効果 0", size=14, anchor="middle", fill=SUB)
+    interval_row(s, X, 90, est - 1.96 * se_c, est + 1.96 * se_c, est, MAIN, "大都市", "p = 0.01")
+    interval_row(s, X, 160, est - 1.96 * se_s, est + 1.96 * se_s, est, MUTED, "小地域", "p = 0.20")
+    s.line(24, 205, 576, 205, stroke=MUTED)
+    interval_row(s, X, 250, -1.96 * d_se, 1.96 * d_se, 0, FOCUS, "二つの差", "比べるべきはこれ")
+    xaxis(s, X, 290, [-15, -10, -5, 0, 5, 10], lambda v: f"{v:+g}" if v else "0", "効果（ポイント）")
+    return s
+
+
+def fig27_7():
+    """27-7 有意でないことと、害の上限が十分小さいと示すことは別。横長 M 600x340。
+
+    x: 害の差 -8 → 200、10 → 580。行 y 90 / 150 / 210。上限 4 の線と 0 の線。
+    """
+    margin = 4.0
+    cases = [("2/100 対 0/100", 2.0, -2.0, 7.0, FOCUS, "上限をまたぐ：まだ示せない"),
+             ("追跡を増やした場合", 1.0, -1.4, 3.4, MAIN, "上限未満を示せた"),
+             ("害が大きかった場合", 6.0, 3.1, 8.9, WARN, "害が増えている")]
+    assert cases[0][2] < 0 < cases[0][3] and cases[1][3] < margin
+    s = SVG(600, 340, "0を含む区間でも、上端が害の上限4ポイントをまたげば安全とは言えず、上限未満に収まって初めて示せる")
+    X = lin(200, 580, -8, 10)
+    s.line(X(0), 56, X(0), 250, stroke=INK, sw=1.4, dash="4 4")
+    s.text(X(0), 46, "差 0", size=14, anchor="middle", fill=SUB)
+    s.rect(X(margin), 56, X(10) - X(margin), 194, fill=s.hatch(WARN), stroke="none")
+    s.line(X(margin), 56, X(margin), 250, stroke=WARN, sw=2.4)
+    s.text(X(margin) + 6, 46, "害の許容上限 4", size=14, fill=WARN, bold=True)
+    for k, (name, e, lo, hi, col, verdict) in enumerate(cases):
+        y = 90 + 60 * k
+        interval_row(s, X, y, lo, hi, e, col, name, verdict)
+    xaxis(s, X, 260, [-5, 0, 5, 10], lambda v: f"{v:+g}" if v else "0", "負傷率の差（ポイント、正が害）")
+    return s
+
+
+def fig28_1():
+    """28-1 同じ四つの観測でも、罰し方を替えると釣り合う場所が動く。横長 M 600x340。
+
+    x: θ -4 → 70、110 → 560。各損失は自分の最大値で正規化、底 y=250、高さ 180。
+    """
+    data = [1, 1, 1, 101]
+    sq = lambda t: sum((v - t) ** 2 for v in data)
+    ab = lambda t: sum(abs(v - t) for v in data)
+    assert sum(data) / 4 == 26
+    s = SVG(600, 340, "停止時間1・1・1・101秒では、二乗誤差の谷は平均26秒、絶対誤差の谷は中央値1秒")
+    X = lin(70, 560, -4, 110)
+    ts = [-4 + i * 0.5 for i in range(229)]
+    for f, col, sw in ((sq, MAIN, 3), (ab, FOCUS, 3)):
+        m = max(f(t) for t in ts)
+        s.poly([(X(t), 250 - f(t) / m * 180) for t in ts], stroke=col, sw=sw)
+    s.line(X(26), 70, X(26), 250, stroke=MAIN, sw=1.6, dash="5 4")
+    s.line(X(1), 70, X(1), 250, stroke=FOCUS, sw=1.6, dash="5 4")
+    s.text(X(26) + 8, 84, "二乗誤差の谷：平均 26", size=15, fill=MAIN, bold=True)
+    s.text(X(1) + 8, 108, "絶対誤差の谷：中央値 1", size=15, fill=FOCUS, bold=True)
+    for v, n in ((1, 3), (101, 1)):
+        for k in range(n):
+            s.circle(X(v), 268 - 14 * k, 6, fill=INK, stroke="#ffffff", sw=1.5)
+    xaxis(s, X, 284, [0, 25, 50, 75, 100], str, "停止時間 θ（秒）")
+    s.text(24, 44, "損失（それぞれ最大を1に）", size=14, fill=SUB)
+    return s
+
+
+def fig29_1():
+    """29-1 支配される案を落としてから、重みか最悪かで選び分ける。正方 M 500x480。
+
+    縦横同じ縮尺：状態1の損失 0..10 → 80..420、状態2の損失 0..10 → 400..60。
+    """
+    plans = {"P": (1.0, 9.0), "Q": (4.0, 4.0), "R": (5.0, 7.0)}
+    assert plans["Q"][0] < plans["R"][0] and plans["Q"][1] < plans["R"][1]
+    s = SVG(500, 480, "RはQに支配されて落ち、残るPとQは、重みを置けば平均、置けなければ最悪で勝者が入れ替わる")
+    X = lin(80, 420, 0, 10)
+    Y = lin(400, 60, 0, 10)
+    s.rect(X(4), Y(10), X(10) - X(4), Y(4) - Y(10), fill=s.hatch(WARN), stroke="none")
+    s.text(X(7), Y(9.4), "Qに支配される範囲", size=14, fill=WARN, bold=True, anchor="middle", halo=True)
+    s.line(X(0), Y(8), X(8), Y(0), stroke=MAIN, sw=2, dash="6 4")
+    s.text(X(7.6) + 6, Y(0.8), "同確率：平均が等しい線", size=13, fill=MAIN)
+    s.poly([(X(0), Y(4)), (X(4), Y(4)), (X(4), Y(0))], stroke=FOCUS, sw=2)
+    s.text(X(0.2), Y(4) - 8, "最悪 4 の角", size=13, fill=FOCUS)
+    for k, (x, y) in plans.items():
+        col = WARN if k == "R" else INK
+        s.circle(X(x), Y(y), 9, fill=col, stroke="#ffffff", sw=2)
+        s.text(X(x) + 14, Y(y) + 6, f"{k} ({x:g}, {y:g})", size=16, bold=True, fill=col)
+    s.line(X(0), Y(0), X(10), Y(0), stroke=MUTED)
+    s.line(X(0), Y(0), X(0), Y(10), stroke=MUTED)
+    for v in (0, 5, 10):
+        s.text(X(v), Y(0) + 22, str(v), size=14, fill=SUB, anchor="middle")
+        s.text(X(0) - 8, Y(v) + 5, str(v), size=14, fill=SUB, anchor="end")
+    s.text(X(5), 452, "状態1での損失", size=14, fill=SUB, anchor="middle")
+    s.text(24, 40, "状態2での損失", size=14, fill=SUB)
+    s.text(24, 474, "同確率なら Q（平均4）、状態1が90%なら P（平均1.8）、最悪を守るなら Q", size=13, fill=SUB)
+    return s
+
+
+FIGS3 = {
+    "fig25-1-loss-threshold": fig25_1, "fig25-4-burst": fig25_4, "fig27-5-two-intervals": fig27_5,
+    "fig27-7-equivalence-margin": fig27_7, "fig28-1-m-estimation": fig28_1, "fig29-1-minimax": fig29_1,
+}
+
+
 FIGS = {
     "fig1-2-same-mean": fig1_2, "fig1-3-same-margins": fig1_3, "fig2-1-weighted-mean": fig2_1,
     "fig3-2-base-rate": fig3_2, "fig3-3-expected-value": fig3_3, "fig4-1-poisson-observed": fig4_1,
@@ -1215,4 +1387,4 @@ FIGS = {
 }
 
 if __name__ == "__main__":
-    sys.exit(build({out(k): v for k, v in {**FIGS, **FIGS2}.items()}))
+    sys.exit(build({out(k): v for k, v in {**FIGS, **FIGS2, **FIGS3}.items()}))
