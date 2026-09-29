@@ -260,6 +260,32 @@
     state.selection = { range: range.cloneRange(), unit: unit, block: block }
     repaint()
     renderPanel()
+    announceSelection()
+  }
+
+  // 推敲 UI（dev_revise_ui.js）へ選択の変化を知らせる。アンカーの組み立ては
+  // コメントと同じもの（buildPayload）を使い、位置の確定はサーバに任せる。
+  function announceSelection() {
+    document.dispatchEvent(new CustomEvent('dev-selection-change'))
+  }
+
+  window.__devSelection = function () {
+    if (!state.book || !state.selection) return null
+    var payload = buildPayload('', 'wording')
+    return {
+      book: payload.book,
+      unit: payload.unit,
+      digest: selectionDigest(),
+      rect: state.selection.range.getBoundingClientRect(),
+      anchor: {
+        heading: payload.heading,
+        heading_level: payload.heading_level,
+        heading_path: payload.heading_path,
+        quote: payload.quote,
+        quote_tail: payload.quote_tail,
+        occurrence: payload.occurrence,
+      },
+    }
   }
 
   // ------------------------------------------------------------ ハイライト
@@ -747,8 +773,10 @@
   }
 
   function clearSelection() {
+    var had = !!state.selection
     state.selection = null
     repaint()
+    if (had) announceSelection()
   }
 
   function showError(message) {
@@ -835,7 +863,7 @@
   // なった場合は、直前のコメント対象を外す。
   document.addEventListener('mouseup', function (event) {
     if (!state.book) return
-    if (event.target.closest && event.target.closest('#dev-comment-panel')) return
+    if (event.target.closest && event.target.closest('#dev-comment-panel, #dev-revise-pop')) return
     var article = event.target.closest && event.target.closest('.markdown-section')
     window.setTimeout(function () {
       var selection = window.getSelection()
@@ -877,6 +905,7 @@
     state.index = null
     state.markers = null
     state.selection = null
+    announceSelection()
     var route = routeInfo()
     document.body.classList.toggle('dev-comment-mode', !!route)
     if (!route) {

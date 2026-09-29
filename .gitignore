@@ -21,3 +21,6 @@ __pycache__/
 .DS_Store
 
 /.worktree/
+
+# プレビューの推敲ログ（依頼・候補・採否。提案の改善に使う作業データ）
+/revisions/
