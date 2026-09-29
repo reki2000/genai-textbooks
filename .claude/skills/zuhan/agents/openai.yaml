@@ -1,4 +1,4 @@
 interface:
   display_name: "教材図版の追加"
-  short_description: "図版を選定し、作図またはChatGPT用ZIP依頼から検査・教材反映まで実行"
-  default_prompt: "Use $zuhan to select, create or request, validate, and add explanatory figures to this textbook."
+  short_description: "図版を選定し、自力で描画するか参考写真を引用して、検査・教材反映まで実行"
+  default_prompt: "Use $zuhan to select, draw or cite, validate, and add explanatory figures to this textbook."

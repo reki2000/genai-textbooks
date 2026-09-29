@@ -1,114 +1,53 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""統計学シリーズ3巻の図を決定的に生成する。
+"""statistics シリーズ（statistics / statistics-2 / statistics-3）の図。
 
-出力先は図番号の幕で巻へ振り分ける（fig_out_dir）。
-  第1〜9幕   → docs/books/statistics/figs/
-  第10〜24幕 → docs/books/statistics-2/figs/
-  第25幕〜   → docs/books/statistics-3/figs/
-共通ヘルパと配色を3巻で共有するため、生成元はこの1本にまとめている。
-
-配色の割り当て（この教材での意味づけ。作図規約の3系統に対応させる）
-  青 #1f6fd0 : いま推定・比較したい量、正しく作った比較、残っている情報
-  橙 #e07b1f : いま条件を絞った場所、注目する一点、問い合わせ
-  赤 #cf3b2d : 誤った読み方、失われた比較、破綻する案
-  灰 #8d8d8d : 目盛り、母集団や背景の構造、動かないもの
-形でも必ず区別する（塗り／白抜き、実線／破線、○／△／×）。
-
-本文の数値は各関数の冒頭で assert して突き合わせてから描く。
+色：青=観測・推定の主役／橙=注目点（平均・閾値・問い）／赤=誤り・破綻。
+灰は背景・比較対象・目盛。出力先は図番号の幕で巻へ振り分ける（out）。
 """
-import filecmp
 import math
-import shutil
 import sys
-import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from svgkit import (  # noqa: E402
-    SVG, INK, SUB, MAIN, FOCUS, WARN, MUTED,
-    TINT_MAIN, TINT_FOCUS, TINT_WARN, TINT_MUTED,
-)
+from svgkit import SVG, MAIN, FOCUS, WARN, MUTED, INK, SUB, TINT, build  # noqa: E402
 
-BOOKS_DIR = Path(__file__).resolve().parents[2] / "docs" / "books"
-# (その巻の最初の幕, 教材ID)。幕番号の降順に照合する。
-VOLUMES = ((25, "statistics-3"), (10, "statistics-2"), (1, "statistics"))
+BOOKS = Path(__file__).resolve().parents[2] / "docs/books"
 
 
-def fig_out_dir(name):
-    """figN-... の N（幕）から、その図を置く巻の figs/ を返す。"""
-    act = int(name[3:].split("-", 1)[0])
-    for first_act, book in VOLUMES:
-        if act >= first_act:
-            return BOOKS_DIR / book / "figs"
-    raise ValueError("幕番号を読めない図名: %s" % name)
+def out(name):
+    """図番号の幕（fig12-3 なら12）で巻を決める。1〜9幕は1巻、10〜24幕は2巻、25幕以降は3巻。"""
+    act = int(name[3:].split("-")[0])
+    book = "statistics" if act <= 9 else "statistics-2" if act <= 24 else "statistics-3"
+    return BOOKS / book / "figs" / f"{name}.svg"
 
 
-# ---------------------------------------------------------------- 共通ヘルパ
-def lin(p0, p1, v0, v1):
-    """値 v を座標へ写す一次関数。丸めて決定的な出力にする。"""
-    def f(v):
-        return round(p0 + (v - v0) * (p1 - p0) / float(v1 - v0), 2)
-    return f
+def lin(a0, a1, v0, v1):
+    return lambda v: a0 + (v - v0) / (v1 - v0) * (a1 - a0)
 
 
-def xaxis(s, x0, x1, y, ticks, tx, labels=None, color=SUB, size=10, sw=1.2):
-    """水平の目盛り軸。ticks は値のリスト、labels は同じ長さの文字列。"""
-    s.line(x0, y, x1, y, stroke=color, sw=sw, cap="butt")
-    for i, v in enumerate(ticks):
-        px = tx(v)
-        s.line(px, y, px, y + 5, stroke=color, sw=sw, cap="butt")
-        if labels is not None:
-            s.text(px, y + 18, labels[i], size=size, fill=color, anchor="middle")
+def xaxis(s, X, y, ticks, fmt=str, label=None, x_label=None):
+    s.line(X(ticks[0]), y, X(ticks[-1]), y, stroke=MUTED)
+    for t in ticks:
+        s.line(X(t), y, X(t), y + 5, stroke=MUTED)
+        s.text(X(t), y + 22, fmt(t), size=14, fill=SUB, anchor="middle")
+    if label:
+        s.text(x_label if x_label else (X(ticks[0]) + X(ticks[-1])) / 2, y + 46, label, size=15,
+               fill=SUB, anchor="middle")
 
 
-def yaxis(s, y0, y1, x, ticks, ty, labels=None, color=SUB, size=10, sw=1.2):
-    """垂直の目盛り軸。y0 が下端、y1 が上端。"""
-    s.line(x, y0, x, y1, stroke=color, sw=sw, cap="butt")
-    for i, v in enumerate(ticks):
-        py = ty(v)
-        s.line(x - 5, py, x, py, stroke=color, sw=sw, cap="butt")
-        if labels is not None:
-            s.text(x - 9, py + 4, labels[i], size=size, fill=color, anchor="end")
-
-
-def polyline(s, pts, stroke=MAIN, sw=2.0, dash=None):
-    d = "M " + " L ".join("%g %g" % (round(x, 2), round(y, 2)) for x, y in pts)
-    s.path(d, stroke=stroke, sw=sw, dash=dash)
-
-
-def tri_up(s, cx, cy, r=6, fill=FOCUS, stroke=None, sw=1.2):
-    """上向き三角。色だけでなく形でも区別するための印。"""
-    d = "M %g %g L %g %g L %g %g Z" % (
-        round(cx, 2), round(cy - r, 2),
-        round(cx + r * 0.9, 2), round(cy + r * 0.7, 2),
-        round(cx - r * 0.9, 2), round(cy + r * 0.7, 2))
-    s.path(d, stroke=stroke or fill, sw=sw, fill=fill)
-
-
-def tri_down(s, cx, cy, r=6, fill=FOCUS, stroke=None, sw=1.2):
-    d = "M %g %g L %g %g L %g %g Z" % (
-        round(cx, 2), round(cy + r, 2),
-        round(cx + r * 0.9, 2), round(cy - r * 0.7, 2),
-        round(cx - r * 0.9, 2), round(cy - r * 0.7, 2))
-    s.path(d, stroke=stroke or fill, sw=sw, fill=fill)
-
-
-def poisson_pmf(k, lam):
-    return math.exp(-lam) * lam ** k / math.factorial(k)
-
-
-def binom_pmf(k, n, p):
-    c = math.factorial(n) // (math.factorial(k) * math.factorial(n - k))
-    return c * p ** k * (1 - p) ** (n - k)
-
-
-def normal_pdf(x, mu, sd):
+def npdf(x, mu, sd):
     return math.exp(-0.5 * ((x - mu) / sd) ** 2) / (sd * math.sqrt(2 * math.pi))
 
 
+def ncdf(x, mu=0.0, sd=1.0):
+    return 0.5 * (1 + math.erf((x - mu) / (sd * math.sqrt(2))))
+
+
+def poisson(k, lam):
+    return math.exp(-lam) * lam ** k / math.factorial(k)
+
+
 def lcg(seed):
-    """決定的な擬似乱数（線形合同法）。Date/Random を使わずに図を再現可能にする。"""
     state = [seed]
 
     def nxt():
@@ -117,2610 +56,1335 @@ def lcg(seed):
     return nxt
 
 
-def std_normal_pair(u1, u2):
-    """Box-Muller。u1, u2 は (0,1) の一様乱数。"""
-    r = math.sqrt(-2.0 * math.log(max(u1, 1e-12)))
-    return r * math.cos(2 * math.pi * u2), r * math.sin(2 * math.pi * u2)
+def normals(seed, k):
+    r, zs = lcg(seed), []
+    while len(zs) < k:
+        u1, u2 = r(), r()
+        rr = math.sqrt(-2.0 * math.log(max(u1, 1e-12)))
+        zs += [rr * math.cos(2 * math.pi * u2), rr * math.sin(2 * math.pi * u2)]
+    return zs[:k]
 
 
-# ---------------------------------------------------------------- 1-2
+def fit(pts):
+    k = len(pts)
+    mx, my = sum(x for x, _ in pts) / k, sum(y for _, y in pts) / k
+    b = sum((x - mx) * (y - my) for x, y in pts) / sum((x - mx) ** 2 for x, _ in pts)
+    return b, my - b * mx
+
+
+# ================================================================ 第1巻
 def fig1_2():
-    """1-2 同じ平均3,000円でも、並べると形が違う。
+    """1-2 同じ平均3,000円でも、Aは一か所に固まりBは両端へ割れる。横長 M 600x340。
 
-    本文の二市場 A=2800,2900,3000,3100,3200 / B=0,0,1000,4000,10000。
-    どちらも合計15,000円・平均3,000円。中央値は3,000円と1,000円。
-
-    グリッド（先に宣言し、この座標だけを使う）
-      価格軸  px(v) = 80 + v*0.061   (0円 → 80 / 10,000円 → 690)
-      y  40 タイトル / 92 A の帯ラベル / 120 A の点列 / 150 A の中央値印
-         190 B の帯ラベル / 218 B の点列 / 248 B の中央値印
-         276 価格目盛り軸 / 300 目盛りラベル
-      色  青＝観測した回答（塗り丸） / 橙＝中央値（三角） / 灰＝平均3,000円の縦線
+    x: 0円 → 60、10,000円 → 560。A の行 y=150、B の行 y=240。A の拡大枠は右上。
     """
-    a = [2800, 2900, 3000, 3100, 3200]
-    b = [0, 0, 1000, 4000, 10000]
-    assert sum(a) == 15000 and sum(b) == 15000
-    assert sum(a) / 5 == 3000 and sum(b) / 5 == 3000
-    assert sorted(a)[2] == 3000 and sorted(b)[2] == 1000
-    assert max(a) - min(a) == 400 and max(b) - min(b) == 10000
-
-    s = SVG(760, 366,
-            "同じ平均3,000円でも、Aは中心に固まりBは両端へ割れる")
-    px = lin(96, 690, 0, 10000)
-
-    s.text(52, 32, "平均はどちらも 3,000 円。同じ物差しへ並べると別の市場になる",
-           size=14, weight="700")
-
-    # 平均3,000円の縦線（両方の帯を貫く、動かない基準）
-    s.line(px(3000), 118, px(3000), 296, stroke=MUTED, sw=1.6, dash="6 4")
-
-    # 商品A：主軸の上ではひと塊にしか見えない
-    s.text(52, 126, "商品A", size=13, weight="700", fill=INK)
-    s.text(52, 144, "2,800〜3,200 円", size=10, fill=SUB)
-    s.rect(px(2800) - 9, 124, px(3200) - px(2800) + 18, 26,
-           fill=TINT_MAIN, stroke=MAIN, sw=1.6, rx=13)
-    for v in a:
-        s.circle(px(v), 137, 4, fill=MAIN, stroke=MAIN, sw=1.0)
-    s.line(px(3200) + 12, 140, 374, 152, stroke=MUTED, sw=1.0, dash="4 3")
-
-    # 商品A の拡大パネル
-    s.rect(378, 62, 322, 108, fill="#ffffff", stroke=MUTED, sw=1.2, rx=4)
-    s.text(392, 80, "商品A の拡大", size=11, fill=SUB, weight="700")
-    zx = lin(408, 674, 2750, 3250)
-    s.dim(zx(2800), zx(3200), 98, "範囲 400 円", up=True)
-    for v in a:
-        s.circle(zx(v), 122, 6.5, fill=TINT_MAIN, stroke=MAIN, sw=1.8)
-    tri_up(s, zx(3000), 138, 6, fill=FOCUS)
-    s.text(zx(3000), 160, "中央値 3,000 円", size=10, fill=FOCUS, anchor="middle")
-
-    # 二つの市場で共通の平均
-    s.dim(px(0), px(10000), 186, "範囲 10,000 円", up=True)
-    s.text(px(3000) + 10, 208, "平均 3,000 円", size=11, fill=SUB, weight="700")
-    s.text(px(3000) + 10, 224, "← 二つの市場で共通", size=10, fill=SUB)
-
-    # 商品B
-    s.text(52, 230, "商品B", size=13, weight="700", fill=INK)
+    A = [2800, 2900, 3000, 3100, 3200]
+    B = [0, 0, 1000, 4000, 10000]
+    assert sum(A) / 5 == sum(B) / 5 == 3000 and sorted(B)[2] == 1000
+    s = SVG(600, 340, "同じ平均3,000円でも、Aは3,000円の近くに固まり、Bは0円と1万円へ割れる")
+    X = lin(60, 560, 0, 10000)
+    xaxis(s, X, 280, [0, 2000, 4000, 6000, 8000, 10000], lambda v: f"{v:,}", "希望価格（円）")
+    for y, name in ((150, "A"), (240, "B")):
+        s.text(24, y + 6, name, size=18, bold=True)
+        s.line(X(0), y, X(10000), y, stroke=MUTED, dash="2 4")
+        s.poly([(X(3000), y + 12), (X(3000) - 8, y + 26), (X(3000) + 8, y + 26)], fill=FOCUS,
+               stroke="none", closed=True)
     seen = {}
-    for v in b:
-        n = seen.get(v, 0)
-        seen[v] = n + 1
-        s.circle(px(v), 256 - n * 17, 6.5, fill=TINT_MAIN, stroke=MAIN, sw=1.8)
-    tri_up(s, px(1000), 278, 6.5, fill=FOCUS)
-    s.text(px(1000), 300, "中央値 1,000 円", size=10, fill=FOCUS, anchor="middle")
-
-    xaxis(s, 76, 706, 322,
-          [0, 2000, 4000, 6000, 8000, 10000], px,
-          ["0", "2,000", "4,000", "6,000", "8,000", "10,000 円"])
-    s.text(391, 358, "希望価格", size=10, fill=SUB, anchor="middle")
+    for v in B:
+        k = seen.get(v, 0)
+        seen[v] = k + 1
+        s.circle(X(v), 240 - 18 * k, 8, fill=MAIN, stroke="#ffffff", sw=1.5)
+    for v in A:
+        s.circle(X(v), 150, 4, fill=MAIN, stroke="none")
+    s.text(X(3000) + 14, 176, "平均 3,000", size=14, fill=FOCUS, bold=True)
+    s.line(X(1000), 222, X(1000), 256, stroke=INK, sw=2)
+    s.text(X(1000) + 8, 214, "中央値 1,000", size=14)
+    Z = lin(360, 560, 2700, 3300)
+    s.zoom((X(2650), 140, X(3350) - X(2650), 20), (330, 24, 250, 80))
+    for v in A:
+        s.circle(Z(v), 52, 7, fill=MAIN, stroke="#ffffff", sw=1.5)
+    for v in (2800, 3000, 3200):
+        s.text(Z(v), 88, f"{v:,}", size=13, fill=SUB, anchor="middle")
+    s.note(40, 44, ["平均は同じ", "形はまるで違う"])
     return s
 
 
-# ---------------------------------------------------------------- 1-3
 def fig1_3():
-    """1-3 各列の分布は同じまま、組み方だけで向きが逆になる。
+    """1-3 列ごとの分布が同じでも、組を替えると点は逆向きに走る。対照の2枚 横長 M 640x330。
 
-    本文の二調査。時間 5,10,15,20,25 分と価格 1,000〜3,000 円は共通で、
-    調査1は小さい順どうし、調査2は価格だけ逆順で組む。
-
-    グリッド
-      調査1 作図領域 x 118..330 / 調査2 x 458..670（同一スケール）
-      tx(分) = lin(118,330,5,25)（調査2は +340）
-      ty(円) = lin(232,72,1000,3000)
-      y  36 タイトル / 60 パネル名 / 72..232 作図領域 / 252 時間の周辺
-         x  100（調査2は 440）価格の周辺
-      色  青＝同じ人の時間と価格の組（塗り丸） / 灰＝周辺（列ごとの分布、白抜き丸）
+    パネル k の左端 x0 = 70 + 300*k、幅 230。時間 5..25分、価格 1,000..3,000円。
+    軸の外側に各列の分布（白丸）を置く。両パネルで同じ。
     """
-    times = [5, 10, 15, 20, 25]
-    up = [1000, 1500, 2000, 2500, 3000]
-    down = [3000, 2500, 2000, 1500, 1000]
-    assert sorted(up) == sorted(down)
-    assert sum(up) == sum(down)
-
-    s = SVG(760, 312,
-            "列ごとの分布が同じでも、組を替えると散布図は逆向きになる")
-    s.text(40, 32, "同じ二つの列。組を切り替えると、点の向きだけが反転する",
-           size=14, weight="700")
-    s.text(40, 50, "縦＝希望価格 1,000〜3,000 円　／　横＝遊んだ時間 5〜25 分",
-           size=10, fill=SUB)
-
-    def panel(x0, prices, name, arrow_up):
-        tx = lin(x0, x0 + 212, 5, 25)
-        ty = lin(248, 88, 1000, 3000)
-        s.text(x0 - 18, 74, name, size=12, weight="700", fill=INK)
-        s.rect(x0 - 14, 82, 240, 172, fill="#ffffff", stroke=MUTED, sw=1.0)
-        # 周辺（列ごとの分布）は両パネルで同一
-        for t in times:
-            s.circle(tx(t), 268, 4.5, fill="#ffffff", stroke=MUTED, sw=1.4)
-        for p in [1000, 1500, 2000, 2500, 3000]:
-            s.circle(x0 - 32, ty(p), 4.5, fill="#ffffff", stroke=MUTED, sw=1.4)
-        pts = [(tx(t), ty(p)) for t, p in zip(times, prices)]
-        polyline(s, pts, stroke=MAIN, sw=1.4, dash="5 4")
-        for cx, cy in pts:
-            s.circle(cx, cy, 6, fill=TINT_MAIN, stroke=MAIN, sw=1.9)
-        lab = "長く遊ぶほど高い" if arrow_up else "長く遊ぶほど安い"
-        s.text(x0 + 106, 294, lab, size=11, fill=MAIN,
-               anchor="middle", weight="700")
-
-    panel(118, up, "調査1", True)
-    panel(458, down, "調査2", False)
-
-    s.text(40, 272, "時間の分布", size=10, fill=SUB)
-    s.text(78, 100, "価格の", size=10, fill=SUB, anchor="end")
-    s.text(78, 113, "分布", size=10, fill=SUB, anchor="end")
-    s.text(702, 272, "どちらも同じ", size=10, fill=SUB)
-    s.text(702, 285, "白丸の並び", size=10, fill=SUB)
+    t = [5, 10, 15, 20, 25]
+    p = [1000, 1500, 2000, 2500, 3000]
+    s = SVG(640, 346, "列ごとの分布は同じでも、組を替えると散布図は右上がりから右下がりに変わる")
+    for k, (title, pp) in enumerate((("一つ目の組", p), ("二つ目の組", p[::-1]))):
+        x0 = 70 + 300 * k
+        X = lin(x0 + 20, x0 + 210, 5, 25)
+        Y = lin(240, 70, 1000, 3000)
+        s.text(x0, 36, title, size=16, bold=True)
+        s.rect(x0, 60, 230, 190, stroke=MUTED)
+        for v in t:
+            s.circle(X(v), 272, 5, fill="#ffffff", stroke=SUB, sw=1.4)
+        for v in p:
+            s.circle(x0 - 16, Y(v), 5, fill="#ffffff", stroke=SUB, sw=1.4)
+        s.poly([(X(a), Y(b)) for a, b in zip(t, pp)], stroke=MAIN, sw=1.2, dash="4 4")
+        for a, b in zip(t, pp):
+            s.circle(X(a), Y(b), 8, fill=MAIN, stroke="#ffffff", sw=1.5)
+    s.text(320, 302, "横：遊んだ時間　縦：希望価格　白丸：各列の値（二枚で同じ）", size=13,
+           fill=SUB, anchor="middle")
+    s.note(230, 332, "列は同じ。組だけが違う")
     return s
 
 
-# ---------------------------------------------------------------- 2-1
 def fig2_1():
-    """2-1 幅が人口比、高さが購入希望率。面積の合計が34%。
+    """2-1 幅を人口比、高さを購入希望率にすると、市場全体は面積の平均34%。正方 S 460x400。
 
-    本文の設定。一般家庭30%が市場の90%、ファンクラブ会員70%が10%。
-    0.1*0.7 + 0.9*0.3 = 0.34。二率の単純平均50%とは別の量。
-
-    グリッド
-      x  幅 = 市場に占める割合。sx(w) = lin(90,690,0,1)
-         会員 0..0.10 → 90..150 / 一般 0.10..1.00 → 150..690
-      y  高さ = 購入希望率。sy(p) = lin(286,66,0,1)
-         70% → 132 / 30% → 220 / 34% → 211.2 / 50% → 176
-      y  34 タイトル / 300 目盛り軸 / 318 目盛りラベル
-      色  青＝人口比で重み付けした34% / 赤＝重みを捨てた50%（誤り） / 橙＝会員の柱
+    x: 人口比 0 → 70、1 → 430。y: 0% → 330、100% → 50。
     """
-    p_member, p_general, share_member = 0.70, 0.30, 0.10
-    weighted = share_member * p_member + (1 - share_member) * p_general
-    assert abs(weighted - 0.34) < 1e-12
-    assert abs((p_member + p_general) / 2 - 0.50) < 1e-12
-
-    s = SVG(760, 344,
-            "幅を人口比、高さを購入希望率にすると、市場全体は34%になる")
-    sx = lin(90, 690, 0, 1)
-    sy = lin(286, 66, 0, 1)
-    s.text(60, 32, "会員を1万人集めても、届くのは左の細い柱の高さだけ",
-           size=14, weight="700")
-    s.text(90, 52, "縦＝購入希望率　／　横＝市場に占める割合（面積が人数）",
-           size=10, fill=SUB)
-
-    # 一般家庭（背景の構造）
-    s.rect(sx(0.10), sy(p_general), sx(1.0) - sx(0.10), 286 - sy(p_general),
-           fill=TINT_MUTED, stroke=MUTED, sw=1.4)
-    s.text((sx(0.10) + sx(1.0)) / 2, sy(p_general) + 34,
-           "一般家庭　市場の90%・購入希望30%", size=12, fill=INK, anchor="middle")
-
-    # 会員（いま注目している柱）
-    s.rect(sx(0), sy(p_member), sx(0.10) - sx(0), 286 - sy(p_member),
-           fill=TINT_FOCUS, stroke=FOCUS, sw=2.0)
-    s.text(sx(0.05), sy(p_member) - 26, "会員", size=12, fill=FOCUS,
-           anchor="middle", weight="700")
-    s.text(sx(0.05), sy(p_member) - 12, "市場の10%", size=10, fill=FOCUS,
-           anchor="middle")
-    s.text(sx(0.10) + 8, sy(p_member) + 14, "購入希望 70%", size=11, fill=FOCUS)
-
-    # 重みを捨てた単純平均（誤り）
-    s.line(sx(0), sy(0.50), sx(1.0), sy(0.50), stroke=WARN, sw=1.8, dash="7 4")
-    s.text(sx(1.0) + 6, sy(0.50) + 4, "50%", size=11, fill=WARN, weight="700")
-    s.text(sx(0.36), sy(0.50) - 8, "二つの率を同じ重さで平均した 50%（誤り）",
-           size=11, fill=WARN)
-
-    # 人口比で重み付けした値
-    s.line(sx(0), sy(weighted), sx(1.0), sy(weighted), stroke=MAIN, sw=2.4)
-    s.text(sx(1.0) + 6, sy(weighted) + 4, "34%", size=11, fill=MAIN, weight="700")
-    s.text(sx(0.32), sy(weighted) - 8,
-           "0.1×0.7 ＋ 0.9×0.3 ＝ 34%（この線より下の面積 ＝ 二本の柱の面積）",
-           size=11, fill=MAIN)
-
-    xaxis(s, 90, 700, 300, [0, 0.10, 0.5, 1.0], sx,
-          ["0", "10%", "50%", "100%"])
-    yaxis(s, 286, 66, 90, [0, 0.5, 1.0], sy, ["0", "50%", "100%"])
+    w_mem, r_mem, r_gen = 0.1, 0.7, 0.3
+    total = w_mem * r_mem + (1 - w_mem) * r_gen
+    assert abs(total - 0.34) < 1e-12
+    s = SVG(460, 400, "会員10%・希望率70%と一般90%・希望率30%を人口比で重み付けすると、市場全体は34%")
+    X = lin(70, 430, 0, 1)
+    Y = lin(330, 60, 0, 0.8)
+    s.rect(X(0), Y(r_mem), X(w_mem) - X(0), Y(0) - Y(r_mem), fill=TINT[FOCUS], stroke=FOCUS, sw=2)
+    s.rect(X(w_mem), Y(r_gen), X(1) - X(w_mem), Y(0) - Y(r_gen), fill=TINT[MAIN], stroke=MAIN, sw=2)
+    s.line(X(0), Y(total), X(1), Y(total), stroke=MAIN, sw=3, dash="8 5")
+    s.text(X(1) - 4, Y(total) - 10, "市場全体 34%", size=16, fill=MAIN, anchor="end", bold=True)
+    s.text(X(0.55), Y(0.15), "一般家庭 30%", size=15, anchor="middle")
+    s.text(X(0), Y(r_mem) - 10, "会員 70%", size=15, bold=True)
+    for v in (0, 0.4, 0.8):
+        s.text(X(0) - 8, Y(v) + 5, f"{v:.0%}", size=14, fill=SUB, anchor="end")
+    s.line(X(0), Y(0), X(1), Y(0), stroke=MUTED)
+    s.text(X(0.05), Y(0) + 22, "10%", size=14, fill=SUB, anchor="middle")
+    s.text(X(0.55), Y(0) + 22, "90%", size=14, fill=SUB, anchor="middle")
+    s.text(X(0.5), 382, "幅：人口に占める割合　高さ：購入希望率", size=14, fill=SUB, anchor="middle")
+    s.note(X(w_mem) + 20, Y(0.62), ["会員を1万人集めても", "左の細い柱が精密になるだけ"], color=FOCUS)
     return s
 
 
-# ---------------------------------------------------------------- 3-2
 def fig3_2():
-    """3-2 同じ検査機でも、入口の故障率で警報の意味が変わる。
+    """3-2 同じ検査機でも、故障率1%と50%では警報の意味が変わる。横長 M 620x330。
 
-    本文の二場面。工場（1,000台中10台が故障＝1%）と修理工場（故障率50%）。
-    感度90%・誤警報5%は共通。警報後の故障確率は 9/58.5≒15% と 45/47.5≒95%。
-
-    グリッド（二パネルで座標を固定し、変えるのは入口の故障率だけ）
-      パネル左 x 70..360 / 右 x 430..720
-      幅 = 母集団に占める割合、高さ = 警報が出る確率
-      sy(p) = lin(268,74,0,1)  （0% → 268 / 90% → 93.4 / 5% → 258.3）
-      y  34 タイトル / 60 パネル名 / 268 底辺 / 286 幅ラベル / 312 結論
-      色  青＝故障から出た警報（実線・塗り） / 赤＝正常から出た誤警報（破線・淡塗り）
-          灰＝警報が出なかった部分
+    行 k（故障率1%／50%）：入口の帯 y = 70 + 140*k、警報箱の帯 y = 110 + 140*k。
+    帯は幅 400（x 180..580）を割合で分ける。
     """
-    sens, fpr = 0.90, 0.05
-    cases = []
-    for n, rate in ((1000, 0.01), (100, 0.50)):
-        tp = n * rate * sens
-        fp = n * (1 - rate) * fpr
-        cases.append((n, rate, tp, fp, tp / (tp + fp)))
-    assert abs(cases[0][2] - 9.0) < 1e-9 and abs(cases[0][3] - 49.5) < 1e-9
-    assert abs(cases[0][4] - 0.1538461538) < 1e-9
-    assert abs(cases[1][2] - 45.0) < 1e-9 and abs(cases[1][3] - 2.5) < 1e-9
-    assert abs(cases[1][4] - 0.9473684210) < 1e-9
-
-    s = SVG(760, 330,
-            "感度90%・誤警報5%は同じでも、故障率1%と50%では警報の意味が変わる")
-    s.text(46, 32, "同じ検査機。入口の故障率だけを替えると、警報の中身が入れ替わる",
-           size=14, weight="700")
-    s.text(46, 50, "縦＝警報が出る確率（感度90% と 誤警報5%）　／　横＝母集団に占める割合",
-           size=10, fill=SUB)
-    sy = lin(268, 78, 0, 1)
-
-    def panel(x0, title, n, rate, tp, fp, ppv):
-        x1 = x0 + 288
-        sx = lin(x0, x1, 0, 1)
-        s.text(x0, 76, title, size=13, weight="700", fill=INK)
-        s.text(x0 + 74, 76, "全%d台のうち故障 %d%%"
-               % (n, round(rate * 100)), size=11, fill=SUB)
-        # 全体の枠（白抜きにして、中のラベルが読めるようにする）
-        s.rect(x0, sy(1.0), x1 - x0, 268 - sy(1.0),
-               fill="#ffffff", stroke=MUTED, sw=1.2)
-        xb = sx(rate)
-        s.line(xb, sy(1.0), xb, 268, stroke=MUTED, sw=1.2)
-        # 故障から出た警報（実線・塗り）
-        s.rect(x0, sy(sens), xb - x0, 268 - sy(sens),
-               fill=TINT_MAIN, stroke=MAIN, sw=2.0)
-        # 正常から出た誤警報（破線・淡塗り）
-        s.rect(xb, sy(fpr), x1 - xb, 268 - sy(fpr),
-               fill=TINT_WARN, stroke=WARN, sw=1.8, dash="5 3")
-        s.text(max(x0 + 8, xb + 6), sy(sens) - 9,
-               "故障→警報 %s台" % ("%g" % tp),
-               size=11, fill=MAIN, weight="700")
-        s.text(x1 - 4, sy(fpr) - 9, "正常→誤警報 %s台" % ("%g" % fp),
-               size=11, fill=WARN, weight="700", anchor="end")
-        s.text(x0, 288, "← 故障", size=10, fill=SUB)
-        s.text(x1, 288, "正常 →", size=10, fill=SUB, anchor="end")
-        s.text(x0 + 144, 314,
-               "警報のうち本当の故障は %.0f%%" % round(ppv * 100),
-               size=13, fill=FOCUS, anchor="middle", weight="700")
-
-    panel(72, "工場", *cases[0])
-    panel(432, "修理工場", *cases[1])
-    yaxis(s, 268, 78, 72, [0, 0.5, 1.0], sy, ["0", "50%", "100%"])
+    sens, fpr = 0.9, 0.05
+    s = SVG(620, 330, "故障率1%の工場では警報のうち故障は15%、故障率50%の修理工場では95%")
+    X = lin(180, 580, 0, 1)
+    for k, prior in enumerate((0.01, 0.5)):
+        y = 60 + 140 * k
+        tp, fp = prior * sens, (1 - prior) * fpr
+        post = tp / (tp + fp)
+        s.text(24, y - 18, f"故障率 {prior:.0%} の場所", size=16, bold=True)
+        s.text(170, y + 20, "入口", size=15, fill=SUB, anchor="end")
+        s.rect(X(0), y, X(prior) - X(0), 28, fill=MAIN, stroke="none")
+        s.rect(X(prior), y, X(1) - X(prior), 28, fill=TINT[MUTED], stroke=MUTED)
+        s.text(170, y + 60, "警報箱", size=15, fill=INK, anchor="end", bold=True)
+        s.rect(X(0), y + 40, X(post) - X(0), 32, fill=MAIN, stroke="none")
+        s.rect(X(post), y + 40, X(1) - X(post), 32, fill=s.hatch(WARN), stroke=WARN)
+        s.text(X(post / 2) if post > 0.3 else X(post) + 8, y + 62, f"故障 {post:.0%}", size=16,
+               fill="#ffffff" if post > 0.3 else MAIN, anchor="middle" if post > 0.3 else "start",
+               bold=True)
+        if post < 0.5:
+            s.text(X(0.62), y + 62, "正常品の誤警報", size=14, fill=WARN, anchor="middle", bold=True,
+                   halo=True)
+        assert abs(post - (0.154 if k == 0 else 0.947)) < 0.001
+    s.text(X(1), 318, "青：故障品　灰：正常品　斜線：正常品への誤警報", size=13, fill=SUB, anchor="end")
     return s
 
 
-# ---------------------------------------------------------------- 3-3
 def fig3_3():
-    """3-3 重りの置き方が違っても、支点（期待値）は同じ800円。
-
-    本文の見積もり 0円80% / 2,000円15% / 10,000円5% は期待値800円。
-    案B 0円92% / 10,000円8% も期待値800円で、分散だけが違う。
-    重りの面積を確率へ比例させる（半径 ∝ √p）。
-
-    グリッド
-      費用軸 px(v) = lin(96, 690, 0, 10000)  （800円 → 143.5 / 2,000円 → 214.8）
-      y  34 タイトル / 108 見積もりの梁 / 148 支点 / 228 案Bの梁 / 268 支点
-         296 費用目盛り / 314 目盛りラベル
-      色  青＝重り（確率） / 橙＝支点＝期待値800円 / 灰＝目盛り
+    """3-3 重りの置き方が違っても、支点（期待値）は同じ800円。揺れ（標準偏差）は違う。
+    小さな多数 3段、横長 M 600x420。x: 0円 → 210、10,000円 → 560。段 k の梁 y = 100 + 120*k。
     """
-    est = [(0, 0.80), (2000, 0.15), (10000, 0.05)]
-    alt = [(0, 0.92), (10000, 0.08)]
-    ev_est = sum(v * p for v, p in est)
-    ev_alt = sum(v * p for v, p in alt)
-    var_alt = sum(v ** 2 * p for v, p in alt) - ev_alt ** 2
-    var_est = sum(v ** 2 * p for v, p in est) - ev_est ** 2
-    assert ev_est == 800 and ev_alt == 800
-    assert abs(var_alt / 1e6 - 7.36) < 1e-9          # 本文の 7.36（千円単位）
-    assert abs(math.sqrt(var_alt) / 1000 - 2.7129) < 1e-3
-
-    s = SVG(760, 356,
-            "重りの置き方が違っても、期待値という支点は同じ800円に来る")
-    px = lin(96, 690, 0, 10000)
-    s.text(60, 32, "期待値800円は、一度も起こらない値。重りを支える点として決まる",
-           size=14, weight="700")
-    s.text(60, 50, "丸の面積が確率、支点が期待値", size=10, fill=SUB)
-
-    def beam(y, items, name, name_y, sd_yen):
-        s.text(60, name_y, name, size=12, weight="700", fill=INK)
-        s.line(px(0) - 20, y, px(10000) + 20, y, stroke=INK, sw=2.2, cap="butt")
-        for v, p in items:
-            r = round(26 * math.sqrt(p), 2)
-            s.circle(px(v), y - r - 2, r, fill=TINT_MAIN, stroke=MAIN, sw=1.8)
-            s.text(px(v), y - r * 2 - 10, "%d%%" % round(p * 100),
-                   size=11, fill=MAIN, anchor="middle", weight="700")
-        tri_up(s, px(800), y + 12, 9, fill=FOCUS)
-        s.text(px(800) + 14, y + 32, "期待値 800 円", size=11, fill=FOCUS,
-               weight="700")
-        s.text(px(10000) + 20, y + 26,
-               "標準偏差 約 %s 円" % format(sd_yen, ","),
-               size=10, fill=SUB, anchor="end", weight="700")
-
-    beam(152, est, "品質部の見積もり　0円80% ／ 2,000円15% ／ 10,000円5%", 78,
-         int(round(math.sqrt(var_est) / 10) * 10))
-    beam(272, alt, "案B　0円92% ／ 10,000円8%", 200,
-         int(round(math.sqrt(var_alt) / 10) * 10))
-
-    xaxis(s, 76, 706, 316, [0, 2000, 4000, 6000, 8000, 10000], px,
-          ["0", "2,000", "4,000", "6,000", "8,000", "10,000 円"])
-    s.text(391, 350, "一台あたりの保証費用", size=10, fill=SUB, anchor="middle")
+    plans = [("案A：毎回800円", [(0.8, 1.0)]),
+             ("見積もり", [(0, 0.80), (2, 0.15), (10, 0.05)]),
+             ("案B", [(0, 0.92), (10, 0.08)])]
+    s = SVG(600, 420, "3つの費用計画は期待値がどれも800円だが、標準偏差は0円、約2,230円、約2,710円と違う")
+    X = lin(210, 560, 0, 10)
+    for k, (name, dist) in enumerate(plans):
+        y = 100 + 120 * k
+        mu = sum(v * p for v, p in dist)
+        sd = math.sqrt(sum(v * v * p for v, p in dist) - mu ** 2)
+        assert abs(mu - 0.8) < 1e-9
+        s.text(24, y - 30, name, size=15, bold=True)
+        s.text(24, y - 8, f"標準偏差 約{round(sd * 1000, -1):,.0f}円", size=14,
+               fill=MAIN if sd > 0 else SUB, bold=sd > 2.5, halo=True)
+        s.line(X(0), y, X(10), y, stroke=INK, sw=3)
+        s.poly([(X(mu), y + 3), (X(mu) - 11, y + 22), (X(mu) + 11, y + 22)], fill=FOCUS,
+               stroke="none", closed=True)
+        for v, p in dist:
+            r = 26 * math.sqrt(p)
+            s.circle(X(v), y - r - 2, r, fill=TINT[MAIN], stroke=MAIN, sw=1.6)
+            s.text(X(v) + r + 6, y - r + 3, f"{p:.0%}", size=13, fill=SUB)
+    s.text(X(0.8) + 18, 120, "支点 ＝ 期待値 800円（3本とも同じ）", size=14, fill=FOCUS, bold=True)
+    xaxis(s, X, 372, [0, 2, 4, 6, 8, 10], lambda v: f"{v * 1000:,}", None)
     return s
 
 
-# ---------------------------------------------------------------- 4-1
+GAO = [0, 1, 2, 5, 1, 3, 0, 2, 4, 2]
+
+
 def fig4_1():
-    """4-1 十時間の実測と、平均2のポアソン分布。
-
-    本文の実測 0,1,2,5,1,3,0,2,4,2（合計20、平均2）。
-    P(N=0)=e^-2≒0.135 に対し、十時間の実測では0回が2つで20%。
-
-    グリッド
-      左パネル  時刻軸 tx(i) = lin(96, 336, 0, 9) / 件数軸 ly(c) = lin(232, 82, 0, 5)
-      右パネル  回数軸 kx(k) = lin(444, 690, 0, 6) / 確率軸 ry(p) = lin(232, 82, 0, 0.3)
-      y  34 タイトル / 60 パネル名 / 232 底辺 / 250 目盛りラベル / 276 注記
-      色  青＝実測 / 橙＝0回のところ（理論13.5%対実測20%） / 灰＝ポアソンの理論値
+    """4-1 十時間の実測と、平均2のポアソン分布。0回は理論13.5%に対し実測20%。
+    横長 M 640x330。左 x 40..260 は時間順、右 x 330..620 は回数ごとの割合。
     """
-    obs = [0, 1, 2, 5, 1, 3, 0, 2, 4, 2]
-    assert sum(obs) == 20 and sum(obs) / len(obs) == 2
-    assert abs(poisson_pmf(0, 2) - 0.1353352832) < 1e-9
-    assert obs.count(0) / len(obs) == 0.2
-
-    s = SVG(760, 302, "十時間の実測と、平均2のポアソン分布を並べる")
-    s.text(60, 32, "平均2でも、黙る時間と五回鳴く時間が同じ模型から出る",
-           size=14, weight="700")
-
-    # 左：時間順の実測
-    tx = lin(96, 336, 0, 9)
-    ly = lin(232, 82, 0, 5)
-    s.text(74, 60, "十時間の実測（件／時）", size=12, weight="700", fill=INK)
-    for i, c in enumerate(obs):
-        col = FOCUS if c == 0 else MAIN
-        s.rect(tx(i) - 8, ly(c), 16, 232 - ly(c),
-               fill=TINT_FOCUS if c == 0 else TINT_MAIN, stroke=col, sw=1.6)
-        s.text(tx(i), ly(c) - 6, str(c), size=10, fill=col, anchor="middle")
-    s.line(74, ly(2), 352, ly(2), stroke=MUTED, sw=1.6, dash="6 4")
-    s.text(354, ly(2) + 4, "平均2", size=10, fill=SUB)
-    xaxis(s, 74, 352, 232, [0, 2, 4, 6, 8], tx, ["1", "3", "5", "7", "9"])
-    s.text(205, 268, "何時間目", size=10, fill=SUB, anchor="middle")
-
-    # 右：理論分布と実測割合
-    kx = lin(486, 700, 0, 6)
-    ry = lin(232, 82, 0, 0.30)
-    s.text(422, 60, "平均2のポアソンと、十時間の割合", size=12, weight="700", fill=INK)
+    lam = sum(GAO) / len(GAO)
+    assert lam == 2 and abs(poisson(0, 2) - 0.1353) < 1e-3
+    s = SVG(640, 330, "十時間の実測と平均2のポアソン分布。0回の割合は理論13.5%、実測20%")
+    s.text(24, 36, "時間順の記録", size=15, bold=True)
+    Xt = lin(50, 250, 1, 10)
+    Yc = lin(250, 80, 0, 5)
+    for i, c in enumerate(GAO):
+        x = Xt(i + 1)
+        s.line(x, Yc(0), x, Yc(c), stroke=MAIN, sw=3)
+        s.circle(x, Yc(c), 6, fill=FOCUS if c == 0 else MAIN, stroke="#ffffff", sw=1.5)
+    s.line(Xt(1) - 10, Yc(0), Xt(10) + 10, Yc(0), stroke=MUTED)
+    for v in (0, 5):
+        s.text(Xt(1) - 18, Yc(v) + 5, str(v), size=14, fill=SUB, anchor="end")
+    s.text(150, 276, "1〜10時間目", size=14, fill=SUB, anchor="middle")
+    s.text(310, 36, "回数ごとの割合", size=15, bold=True)
+    Xk = lin(350, 610, 0, 6)
+    Yp = lin(250, 80, 0, 0.3)
     for k in range(7):
-        th = poisson_pmf(k, 2)
-        s.rect(kx(k) - 12, ry(th), 24, 232 - ry(th),
-               fill=TINT_MUTED, stroke=MUTED, sw=1.4)
-        emp = obs.count(k) / 10.0
-        if emp > 0:
-            col = FOCUS if k == 0 else MAIN
-            s.line(kx(k) - 14, ry(emp), kx(k) + 14, ry(emp), stroke=col, sw=2.8)
-    s.text(468, ry(0.20) + 4, "0回の実測 20%", size=10, fill=FOCUS,
-           anchor="end", weight="700")
-    s.text(468, ry(0.1353) + 4, "0回の理論 13.5%", size=10, fill=SUB,
-           anchor="end")
-    xaxis(s, 464, 716, 232, [0, 1, 2, 3, 4, 5, 6], kx,
-          ["0", "1", "2", "3", "4", "5", "6"])
-    s.text(590, 268, "一時間あたりの件数", size=10, fill=SUB, anchor="middle")
-    s.text(422, 292, "灰の柱＝ポアソンの確率、横棒＝十時間での割合",
-           size=10, fill=SUB)
+        th = poisson(k, lam)
+        ob = GAO.count(k) / len(GAO)
+        x = Xk(k)
+        s.rect(x - 14, Yp(th), 28, Yp(0) - Yp(th), fill=TINT[MUTED], stroke=MUTED)
+        if ob:
+            s.line(x - 20, Yp(ob), x + 20, Yp(ob), stroke=FOCUS if k == 0 else MAIN, sw=4)
+        s.text(x, 276, str(k), size=14, fill=SUB, anchor="middle")
+    s.line(Xk(0) - 24, Yp(0), Xk(6) + 24, Yp(0), stroke=MUTED)
+    s.text(Xk(3), 300, "1時間に鳴いた回数", size=14, fill=SUB, anchor="middle")
+    s.text(Xk(4), 90, "灰の柱：理論", size=14, fill=SUB)
+    s.text(Xk(4), 112, "横棒：実測", size=14, fill=MAIN)
+    s.note(40, 314, "0回：理論 13.5% に対し実測 20%（十回だけの揺れ）")
     return s
 
 
-# ---------------------------------------------------------------- 5-1
 def fig5_1():
-    """5-1 個体の散らばり（標準偏差）と、推定値の散らばり（標準誤差）は階層が違う。
+    """5-1 個体の散らばりと、推定値の散らばりは階層が違う。縦長 M 520x560。
 
-    本文の三回の100人調査（62人・57人・66人）。
-    Var(p^)=p(1-p)/n なので標準誤差は sqrt(0.62*0.38/100)≒0.0485＝約4.9ポイント。
-
-    グリッド
-      上段（推定値の階層）  px(p) = lin(150, 660, 0.44, 0.80)
-        曲線 y 84..194（正規近似、頂点の高さ110）/ 底辺 194
-        62/57/66 の印 y 194 / 標準誤差の寸法線 y 218
-      下段（個体の階層）  帯 x 150..660、y 268..296 を100分割
-      y  32 タイトル / 68 上段ラベル / 250 下段ラベル / 314 注記
-      色  青＝標本ごとに動く推定値の分布 / 橙＝実際に得た三つの値 / 灰＝個体
+    上段（推定値）：標本比率の分布 x = lin(60, 460, 0.45, 0.79)、山の底 y=220。
+    下段（個体）：1回の調査の100人を 20x5 の格子（y 360..460）。
     """
     p, n = 0.62, 100
     se = math.sqrt(p * (1 - p) / n)
-    assert abs(se - 0.048538) < 1e-6
-    assert round(se * 100, 1) == 4.9
-
-    s = SVG(760, 340,
-            "標本比率が揺れる。個体の散らばりと推定値の散らばりは階層が違う")
-    px = lin(150, 660, 0.44, 0.80)
-    s.text(52, 32, "同じ手順で選び直すたび、標本比率は別の値になる", size=14, weight="700")
-
-    # 上段：推定値の標本分布
-    s.text(52, 68, "調査を繰り返したときの標本比率（中心 62%）", size=12,
-           weight="700", fill=INK)
-    peak = normal_pdf(p, p, se)
-    pts = []
-    v = 0.44
-    while v <= 0.8001:
-        pts.append((px(v), 194 - 110 * normal_pdf(v, p, se) / peak))
-        v += 0.002
-    polyline(s, pts, stroke=MAIN, sw=2.2)
-    s.line(150, 194, 660, 194, stroke=SUB, sw=1.2, cap="butt")
-    for val, lab in ((0.62, "62人"), (0.57, "57人"), (0.66, "66人")):
-        top = 194 - 110 * normal_pdf(val, p, se) / peak
-        s.line(px(val), 194, px(val), top, stroke=FOCUS, sw=1.6, dash="4 3")
-        s.circle(px(val), top, 4.5, fill=FOCUS, stroke=FOCUS, sw=1.0)
-        s.text(px(val), top - 10, lab, size=11, fill=FOCUS, anchor="middle",
-               weight="700")
-    s.dim(px(p - se), px(p + se), 176, "")
-    s.text(px(p + se) + 12, 180, "標準誤差 約4.9ポイント", size=10, fill=SUB)
-    xaxis(s, 140, 670, 194, [0.45, 0.55, 0.65, 0.75], px,
-          ["45%", "55%", "65%", "75%"])
-    s.text(680, 198, "推定値の散らばり", size=10, fill=MAIN, weight="700")
-
-    # 下段：一回の調査の中身
-    s.text(52, 268, "一回の調査：100人の回答（この中の違いが標準偏差）",
-           size=12, weight="700", fill=INK)
+    s = SVG(520, 560, "一回の調査の100人の違いが標準偏差、調査を繰り返したときの比率の揺れが標準誤差")
+    X = lin(60, 460, 0.45, 0.79)
+    Y = lambda d: 220 - d / npdf(p, p, se) * 150
+    s.text(24, 34, "調査を繰り返したときの比率（推定値の散らばり）", size=15, bold=True)
+    pts = [(X(v), Y(npdf(v, p, se))) for v in [0.45 + i * 0.34 / 120 for i in range(121)]]
+    s.poly(pts, stroke=MAIN, sw=3)
+    s.line(X(0.45), 220, X(0.79), 220, stroke=MUTED)
+    for v in (0.5, 0.6, 0.7):
+        s.text(X(v), 242, f"{v:.0%}", size=14, fill=SUB, anchor="middle")
+    s.line(X(p - se), Y(npdf(p - se, p, se)), X(p + se), Y(npdf(p + se, p, se)), stroke=FOCUS, sw=3)
+    s.text(X(p + se) + 8, Y(npdf(p + se, p, se)) + 4, "標準誤差 約4.9ポイント", size=14,
+           fill=FOCUS, bold=True)
+    for v in (0.57, 0.62, 0.66):
+        s.circle(X(v), 220, 6, fill=FOCUS, stroke="#ffffff", sw=1.5)
+    s.text(X(0.57), 266, "57", size=14, fill=FOCUS, anchor="middle")
+    s.text(X(0.62), 266, "62", size=14, fill=FOCUS, anchor="middle")
+    s.text(X(0.66), 266, "66", size=14, fill=FOCUS, anchor="middle")
+    s.text(24, 330, "一回の調査の100人（個体の散らばり）", size=15, bold=True)
     for i in range(100):
-        cx = 150 + i * 5.1
-        filled = i < 62
-        s.rect(cx, 286, 4.0, 24, fill=TINT_MAIN if filled else "#ffffff",
-               stroke=MAIN if filled else MUTED, sw=0.9)
-    s.text(52, 302, "個体の散らばり", size=10, fill=SUB)
-    s.text(664, 302, "62人が「買いたい」", size=10, fill=SUB)
-    s.arrow(px(p), 282, px(p), 232, stroke=MUTED, sw=1.4)
-    s.text(px(p) + 10, 254, "この一回が、上の分布から引いた一点", size=10, fill=SUB)
+        cx, cy = 60 + (i % 20) * 21, 360 + (i // 20) * 22
+        yes = i < 62
+        s.circle(cx, cy, 7, fill=MAIN if yes else "#ffffff", stroke=MAIN if yes else MUTED, sw=1.4)
+    s.text(24, 490, "塗り：買いたい 62人　白：買わない 38人", size=14, fill=SUB)
+    s.arrow(X(0.62), 350, X(0.62), 278, stroke=FOCUS, sw=2)
+    s.note(24, 536, "カメラを向ける階層が違う")
     return s
 
 
-# ---------------------------------------------------------------- 6-2
 def fig6_2():
-    """6-2 動くのは網（区間）で、杭（真値）は固定されている。
-
-    真の率0.62・n=100 から同じ手順で20回作った95%信頼区間。
-    seed 6 の擬似乱数では20本のうち1本だけが真値を外す。
-
-    グリッド
-      px(p) = lin(150, 700, 0.42, 0.84)
-      i 本目の区間  y = 78 + i*14   （i = 0..19）
-      y  32 タイトル / 58 真値ラベル / 348 凡例 / 360 目盛り軸 / 378 ラベル
-      色  青＝真値を覆った区間 / 赤＝外した区間（×印つき） / 灰＝固定した真値の縦線
+    """6-2 動くのは網（区間）で、杭（真値62%）は固定。20本中19本が杭を覆う。
+    縦長 M 480x560。x = lin(80, 440, 0.42, 0.84)、i 本目 y = 70 + 22*i。
     """
-    p, n, seed = 0.62, 100, 6
-    se_true = math.sqrt(p * (1 - p) / n)
-    r = lcg(seed)
-    zs = []
-    while len(zs) < 20:
-        z1, z2 = std_normal_pair(r(), r())
-        zs += [z1, z2]
+    p, n = 0.62, 100
+    se = math.sqrt(p * (1 - p) / n)
     rows = []
-    for z in zs[:20]:
-        ph = p + z * se_true
+    for z in normals(6, 20):
+        ph = p + z * se
         half = 1.96 * math.sqrt(ph * (1 - ph) / n)
         rows.append((ph, ph - half, ph + half))
-    misses = [i for i, (_, lo, hi) in enumerate(rows) if not lo <= p <= hi]
-    assert len(misses) == 1
-
-    s = SVG(760, 392,
-            "同じ手順で作り直した20本の区間。19本が固定した真値を覆う")
-    px = lin(150, 700, 0.42, 0.84)
-    s.text(52, 32, "真値は固定した杭。投げ直すのは網のほうで、その95%が杭を囲む",
-           size=14, weight="700")
-    s.line(px(p), 62, px(p), 356, stroke=MUTED, sw=2.0, dash="7 4")
-    s.text(px(p), 56, "真の率 62%（固定）", size=11, fill=SUB, anchor="middle")
-
+    miss = [i for i, (_, lo, hi) in enumerate(rows) if not lo <= p <= hi]
+    assert len(miss) == 1
+    s = SVG(480, 560, "同じ手順で作り直した20本の95%信頼区間のうち、19本が固定した真値62%を覆う")
+    X = lin(80, 440, 0.42, 0.84)
+    s.line(X(p), 52, X(p), 510, stroke=FOCUS, sw=2.4, dash="7 4")
+    s.text(X(p), 40, "真の率 62%（固定）", size=15, fill=FOCUS, anchor="middle", bold=True)
     for i, (ph, lo, hi) in enumerate(rows):
-        y = 78 + i * 14
-        col = WARN if i in misses else MAIN
-        s.line(px(lo), y, px(hi), y, stroke=col, sw=2.2)
-        s.line(px(lo), y - 4, px(lo), y + 4, stroke=col, sw=1.6)
-        s.line(px(hi), y - 4, px(hi), y + 4, stroke=col, sw=1.6)
-        s.circle(px(ph), y, 3.0, fill=col, stroke=col, sw=1.0)
-        if i in misses:
-            s.cross(px(p), y, 5, stroke=WARN, sw=2.0)
-            s.text(px(lo) - 10, y + 4, "外した1本", size=10, fill=WARN,
-                   weight="700", anchor="end")
-    s.text(52, 84, "1回目", size=10, fill=SUB)
-    s.text(52, 350, "20回目", size=10, fill=SUB)
-
-    xaxis(s, 140, 712, 360, [0.45, 0.55, 0.65, 0.75], px,
-          ["45%", "55%", "65%", "75%"])
-    s.text(426, 386, "調査ごとの95%信頼区間", size=10, fill=SUB, anchor="middle")
+        y = 70 + 22 * i
+        col = WARN if i in miss else MAIN
+        s.line(X(lo), y, X(hi), y, stroke=col, sw=3)
+        s.circle(X(ph), y, 4, fill=col, stroke="none")
+        s.text(60, y + 5, str(i + 1), size=13, fill=SUB, anchor="end")
+        if i in miss:
+            s.text(X(hi) + 10, y + 5, "外れた1本", size=14, fill=WARN, bold=True)
+    xaxis(s, X, 520, [0.45, 0.55, 0.65, 0.75], lambda v: f"{v:.0%}")
     return s
 
 
-# ---------------------------------------------------------------- 7-1
+def two_curves(s, y0, h, X, thr, alpha, beta):
+    """7-1 の1パネル。H0（灰）と真の世界（青）の2つの山、閾値の右が棄却域。"""
+    p0, p1, n = 0.5, 0.62, 100
+    sd0, sd1 = math.sqrt(p0 * (1 - p0) / n), math.sqrt(p1 * (1 - p1) / n)
+    peak = npdf(p0, p0, sd0)
+    Y = lambda d: y0 + h - d / peak * (h - 20)
+    xs = [0.3 + i * 0.5 / 200 for i in range(201)]
+    s.poly([(X(thr), y0 + h)] + [(X(v), Y(npdf(v, p0, sd0))) for v in xs if v >= thr] +
+           [(X(0.8), y0 + h)], fill=WARN, stroke="none", closed=True)
+    s.poly([(X(0.3), y0 + h)] + [(X(v), Y(npdf(v, p1, sd1))) for v in xs if v <= thr] +
+           [(X(thr), y0 + h)], fill=s.hatch(MAIN), stroke="none", closed=True)
+    s.poly([(X(v), Y(npdf(v, p0, sd0))) for v in xs], stroke=SUB, sw=2)
+    s.poly([(X(v), Y(npdf(v, p1, sd1))) for v in xs], stroke=MAIN, sw=3)
+    s.line(X(0.3), y0 + h, X(0.8), y0 + h, stroke=MUTED)
+    s.line(X(thr), y0 + 4, X(thr), y0 + h, stroke=FOCUS, sw=2.4)
+    s.text(X(thr) + 8, y0 + 18, "境界", size=14, fill=FOCUS, bold=True)
+    s.text(X(0.7) + 6, y0 + h - 30, f"誤発売 {alpha:.0%}", size=15, fill=WARN, bold=True)
+    s.text(X(0.45) - 6, y0 + h - 30, f"見逃し {beta:.0%}", size=15, fill=MAIN, bold=True,
+           anchor="end")
+
+
 def fig7_1():
-    """7-1 標本数を変えずに閾値だけ動かすと、二つの誤りが綱引きになる。
-
-    基準 p=0.5（n=100、標準誤差0.05）と、真の率0.62（標準誤差0.0485）。
-    有意水準5%の閾値 0.5+1.645*0.05=0.582 で検出力78%、
-    1%の閾値 0.5+2.326*0.05=0.616 で検出力53%。
-
-    グリッド（二パネルで座標を固定し、変えるのは閾値だけ）
-      左 x 70..368 / 右 x 402..700、px(p) = lin(x0, x0+298, 0.34, 0.80)
-      曲線 y 96..214（頂点の高さ118）/ 底辺 214
-      y  32 タイトル / 54 副題 / 78 パネル名 / 234 閾値ラベル / 268 面積の内訳
-      色  赤＝誤って発売する確率（第一種） / 青＝見逃す確率（第二種） / 灰＝分布の輪郭
+    """7-1 境界を右へ動かすと誤発売は5%→1%へ減り、見逃しは22%→47%へ増える。
+    縦長 M 540x520。2パネルを上下に、x は共通 lin(50, 510, 0.3, 0.8)。
     """
     p0, p1, n = 0.5, 0.62, 100
-    se0 = math.sqrt(p0 * (1 - p0) / n)
-    se1 = math.sqrt(p1 * (1 - p1) / n)
-    assert abs(se0 - 0.05) < 1e-12
-    cases = []
-    for z, alpha in ((1.645, 0.05), (2.326, 0.01)):
-        thr = p0 + z * se0
-        beta = 0.5 * (1 + math.erf((thr - p1) / (se1 * math.sqrt(2))))
-        cases.append((thr, alpha, 1 - beta))
-    assert abs(cases[0][0] - 0.58225) < 1e-6
-    assert abs(cases[0][2] - 0.7816) < 1e-3
-    assert abs(cases[1][2] - 0.5304) < 1e-3
-
-    s = SVG(760, 328,
-            "閾値を厳しくすると誤発売は減るが、見逃しが増える")
-    s.text(52, 32, "標本数を変えずに閾値だけ動かすと、二つの誤りは綱引きになる",
-           size=14, weight="700")
-    s.text(52, 52, "灰＝基準50%が正しい世界　／　青＝真の率が62%の世界",
-           size=10, fill=SUB)
-
-    def panel(x0, title, thr, alpha, power):
-        px = lin(x0, x0 + 298, 0.34, 0.80)
-        s.text(x0, 78, title, size=12, weight="700", fill=INK)
-        peak = normal_pdf(p0, p0, se0)
-        for mu, sd, col, tint in ((p0, se0, MUTED, TINT_MUTED),
-                                  (p1, se1, MAIN, TINT_MAIN)):
-            pts, area = [], []
-            v = 0.34
-            while v <= 0.8001:
-                y = 218 - 118 * normal_pdf(v, mu, sd) / peak
-                pts.append((px(v), y))
-                inside = v >= thr if mu == p0 else v <= thr
-                if inside:
-                    area.append((px(v), y))
-                v += 0.002
-            if area:
-                d = ("M %g %g L " % (area[0][0], 218)
-                     + " L ".join("%g %g" % (round(x, 2), round(y, 2))
-                                  for x, y in area)
-                     + " L %g %g Z" % (area[-1][0], 218))
-                s.path(d, stroke="none", sw=0,
-                       fill=TINT_WARN if mu == p0 else tint, op=0.95)
-            polyline(s, pts, stroke=col, sw=2.0)
-        s.line(x0, 218, x0 + 298, 218, stroke=SUB, sw=1.2, cap="butt")
-        s.line(px(thr), 100, px(thr), 232, stroke=FOCUS, sw=2.2)
-        tri_up(s, px(thr), 240, 6, fill=FOCUS)
-        s.text(px(thr), 262, "境界", size=11, fill=FOCUS,
-               anchor="middle", weight="700")
-        s.text(x0 + 149, 288,
-               "誤って発売 %d%%　／　売れるのに見逃し %d%%"
-               % (round(alpha * 100), round((1 - power) * 100)),
-               size=11, anchor="middle", fill=INK)
-        s.text(x0 + 149, 308, "検出力 %d%%" % round(power * 100),
-               size=12, anchor="middle", fill=FOCUS, weight="700")
-        for val, lab in ((0.4, "40%"), (0.5, "50%"), (0.7, "70%")):
-            s.text(px(val), 234, lab, size=9, fill=SUB, anchor="middle")
-
-    panel(70, "有意水準 5%（緩い境界）", *cases[0])
-    panel(402, "有意水準 1%（厳しい境界）", *cases[1])
-    s.text(380, 322, "赤い面積＝誤って発売する確率、青い面積＝見逃す確率",
-           size=10, fill=SUB, anchor="middle")
+    sd0, sd1 = math.sqrt(p0 * (1 - p0) / n), math.sqrt(p1 * (1 - p1) / n)
+    s = SVG(540, 520, "境界を右へ動かすと誤発売は5%から1%へ減るが、見逃しは22%から47%へ増える")
+    X = lin(50, 510, 0.3, 0.8)
+    for k, (a, z) in enumerate(((0.05, 1.645), (0.01, 2.326))):
+        thr = p0 + z * sd0
+        beta = ncdf(thr, p1, sd1)
+        assert abs(beta - (0.22 if k == 0 else 0.47)) < 0.01
+        y0 = 50 + 210 * k
+        s.text(24, y0 - 12, f"有意水準 {a:.0%}", size=16, bold=True)
+        two_curves(s, y0, 170, X, thr, a, beta)
+    xaxis(s, X, 434, [0.4, 0.5, 0.6, 0.7], lambda v: f"{v:.0%}", "100人中の購入希望率")
+    s.text(X(0.5), 58, "基準50%の世界", size=14, fill=SUB, anchor="middle")
+    s.text(X(0.62) + 34, 72, "真の率62%の世界", size=14, fill=MAIN)
     return s
 
 
-# ---------------------------------------------------------------- 8-1
 def fig8_1():
-    """8-1 残差が大きい点と、傾きを回す点は別物。
+    """8-1 残差の大きさと、傾きを回す力は別。対照の2枚 横長 M 640x340。
 
-    直線 y=x+1 にちょうど乗る5点 (1,2)(2,3)(3,4)(4,5)(5,6) へ一点を足す。
-    (3,8) を足すと残差3.33だが傾きは1のまま。
-    (12,9) を足すと残差-0.43しかないのに傾きは1から0.613へ回る。
-
-    グリッド（二パネルで座標を固定し、変えるのは足した一点だけ）
-      左 x 96..368 / 右 x 428..700、tx = lin(x0, x0+272, 0, 13)
-      ty = lin(252, 88, 0, 14)
-      y  32 タイトル / 76 パネル名 / 252 底辺 / 270 目盛り / 292 結論
-      色  青＝もとの5点と、それだけで引いた線 / 橙＝足した一点と、足した後の線
+    もとの5点は y=x+1 上。左は (3,8)、右は (12,9) を足す。
+    パネル k の x0 = 60 + 300*k、幅 250。x 0..13、y 0..14。
     """
     base = [(1, 2), (2, 3), (3, 4), (4, 5), (5, 6)]
-
-    def fit(pts):
-        k = len(pts)
-        mx = sum(x for x, _ in pts) / k
-        my = sum(y for _, y in pts) / k
-        sxy = sum((x - mx) * (y - my) for x, y in pts)
-        sxx = sum((x - mx) ** 2 for x, _ in pts)
-        b = sxy / sxx
-        return b, my - b * mx
-
-    b0, a0 = fit(base)
-    assert abs(b0 - 1.0) < 1e-12 and abs(a0 - 1.0) < 1e-12
-    b_far, a_far = fit(base + [(3, 8)])
-    b_lev, a_lev = fit(base + [(12, 9)])
-    assert abs(b_far - 1.0) < 1e-9
-    assert abs(b_lev - 0.612903) < 1e-6
-    assert abs((8 - (a_far + b_far * 3)) - 3.3333) < 1e-3
-    assert abs((9 - (a_lev + b_lev * 12)) + 0.4301) < 1e-3
-
-    s = SVG(760, 320, "残差の大きさと、傾きを回す力は別の診断")
-    ty = lin(252, 88, 0, 14)
-    s.text(52, 32, "線から遠い点と、線に近いのに傾きを回す点を分けて探す",
-           size=14, weight="700")
-    s.text(52, 52, "破線＝もとの5点だけで引いた線　／　実線＝一点を足した後の線",
-           size=10, fill=SUB)
-
-    def panel(x0, title, extra, b, a, resid, note):
-        tx = lin(x0, x0 + 272, 0, 13)
-        s.text(x0 - 24, 76, title, size=12, weight="700", fill=INK)
-        s.rect(x0 - 20, 84, 300, 172, fill="#ffffff", stroke=MUTED, sw=1.0)
-        # もとの5点だけで引いた線
-        s.line(tx(0), ty(a0), tx(13), ty(a0 + b0 * 13),
-               stroke=MAIN, sw=1.8, dash="6 4")
-        # 一点を足した後の線
-        s.line(tx(0), ty(a), tx(13), ty(a + b * 13), stroke=FOCUS, sw=2.4)
-        for cx, cy in base:
-            s.circle(tx(cx), ty(cy), 5.5, fill=TINT_MAIN, stroke=MAIN, sw=1.8)
-        s.line(tx(extra[0]), ty(extra[1]), tx(extra[0]),
-               ty(a + b * extra[0]), stroke=FOCUS, sw=1.4, dash="3 3")
-        s.circle(tx(extra[0]), ty(extra[1]), 7, fill=FOCUS, stroke=FOCUS, sw=1.8)
-        s.text(x0 + 126, 274, "足した点の残差 %.2f　傾き %.2f" % (resid, b),
-               size=11, anchor="middle", fill=INK)
-        s.text(x0 + 126, 296, note, size=12, anchor="middle",
-               fill=FOCUS, weight="700")
-
-    panel(96, "線から遠い点（3, 8）", (3, 8), b_far, a_far,
-          8 - (a_far + b_far * 3), "傾きは 1 のまま動かない")
-    panel(428, "端にある点（12, 9）", (12, 9), b_lev, a_lev,
-          9 - (a_lev + b_lev * 12), "残差は小さいのに傾きが回る")
+    s = SVG(640, 340, "線から遠い点は傾きを変えず、横の端の点は残差が小さいのに傾きを回す")
+    for k, (pt, title) in enumerate((((3, 8), "線から遠い一点"), ((12, 9), "横の端の一点"))):
+        b, a = fit(base + [pt])
+        res = pt[1] - (a + b * pt[0])
+        x0 = 60 + 300 * k
+        X = lin(x0, x0 + 250, 0, 13)
+        Y = lin(270, 70, 0, 14)
+        s.text(x0, 40, title, size=16, bold=True)
+        s.rect(x0, 60, 250, 210, stroke=MUTED)
+        s.line(X(0), Y(1), X(13), Y(14), stroke=MUTED, sw=2, dash="5 4")
+        s.line(X(0), Y(a), X(13), Y(a + b * 13), stroke=FOCUS, sw=3)
+        for x, y in base:
+            s.circle(X(x), Y(y), 6, fill=MAIN, stroke="#ffffff", sw=1.5)
+        s.line(X(pt[0]), Y(pt[1]), X(pt[0]), Y(a + b * pt[0]), stroke=WARN, sw=2)
+        s.circle(X(pt[0]), Y(pt[1]), 8, fill=FOCUS, stroke="#ffffff", sw=1.5)
+        s.text(x0 + 125, 298, f"残差 {res:+.2f}　傾き 1 → {b:.2f}", size=15, anchor="middle",
+               bold=True, fill=WARN if abs(b - 1) > 0.1 else INK)
+    s.text(320, 330, "灰の破線：もとの5点の線　橙：一点を足した後の線", size=13, fill=SUB, anchor="middle")
     return s
 
 
-# ---------------------------------------------------------------- 8-2
 def fig8_2():
-    """8-2 「人口をそろえて広告費だけ違う地域」がデータに無い。
+    """8-2 人口をそろえると広告費がほとんど動かず、二本の坂を分けられない。正方 M 540x440。
 
-    12地域の人口と広告費が細い帯へ乗ると、帯に直交する向きの比較が作れない。
-    座標は人口 10,15,…,65 万人、広告費 = 人口*0.5 + 決められたずれ。
-
-    グリッド
-      tx(人口) = lin(150, 640, 5, 70) / ty(広告費) = lin(268, 84, 0, 40)
-      照会する縦帯  人口 35〜40万人（tx で 414..452）
-      y  32 タイトル / 58 副題 / 288 目盛り / 312 注記
-      色  青＝観測した地域 / 橙＝答えたい比較（人口を固定して広告費だけ動かす）
-          赤＝その比較にデータが無い区間
+    x: 人口 5..70万人 → 80..500、y: 広告費 0..40 → 360..60。
     """
     pops = [10, 15, 20, 25, 30, 36, 38, 44, 49, 54, 60, 65]
     offs = [0.8, -0.6, 1.0, -0.9, 0.5, -0.4, 0.4, -1.0, 0.6, -0.7, 1.1, -0.5]
     ads = [round(p * 0.5 + o, 2) for p, o in zip(pops, offs)]
-    in_band = [a for p, a in zip(pops, ads) if 35 <= p <= 39]
-    assert len(in_band) == 2
-    # 帯の中で広告費が動く幅は、全体の広がりの1割ほどしかない
-    assert max(in_band) - min(in_band) < 2.0
-    assert max(ads) - min(ads) > 20.0
-
-    s = SVG(760, 330,
-            "人口をそろえると広告費がほとんど動かず、二本の坂を分けられない")
-    tx = lin(150, 640, 5, 70)
-    ty = lin(268, 84, 0, 40)
-    s.text(52, 32, "係数を分けるには、片方だけ動いた地域が要る", size=14, weight="700")
-    s.text(52, 52, "点はどれも一本の帯に乗り、帯に直交する向きの比較が作れない",
-           size=10, fill=SUB)
-
-    s.rect(tx(35), 84, tx(39) - tx(35), 184, fill=TINT_FOCUS, stroke=FOCUS,
-           sw=1.6, dash="5 3")
-    s.text(tx(37), 78, "人口をそろえた地域", size=10, fill=FOCUS,
-           anchor="middle", weight="700")
+    band = [a for p, a in zip(pops, ads) if 35 <= p <= 39]
+    inner, outer = max(band) - min(band), max(ads) - min(ads)
+    assert round(inner, 1) == 1.8 and round(outer, 1) == 26.2
+    s = SVG(540, 440, "人口をそろえた地域では広告費が1.8しか動かず、全体の広がり26.2と桁が違う")
+    X = lin(80, 500, 5, 70)
+    Y = lin(360, 60, 0, 40)
+    s.rect(X(35), Y(40), X(39) - X(35), Y(0) - Y(40), fill=TINT[FOCUS], stroke=FOCUS, dash="5 3")
+    s.text(X(37), Y(40) - 10, "人口をそろえた地域", size=14, fill=FOCUS, anchor="middle", bold=True)
     for p, a in zip(pops, ads):
-        s.circle(tx(p), ty(a), 6, fill=TINT_MAIN, stroke=MAIN, sw=1.9)
-    # 広告費は縦軸なので、その幅も縦方向へ比例させて描く。
-    dim_x = tx(39) + 18
-    dim_y1, dim_y2 = ty(max(in_band)), ty(min(in_band))
-    s.line(dim_x, dim_y1, dim_x, dim_y2, stroke=FOCUS, sw=1.6)
-    s.line(dim_x - 5, dim_y1, dim_x + 5, dim_y1, stroke=FOCUS, sw=1.4)
-    s.line(dim_x - 5, dim_y2, dim_x + 5, dim_y2, stroke=FOCUS, sw=1.4)
-    s.text(dim_x + 9, (dim_y1 + dim_y2) / 2 + 4,
-           "幅 %.1f" % (max(in_band) - min(in_band)), size=10,
-           fill=FOCUS, weight="700")
-    s.text(tx(43), ty(8), "全体の幅 %.1f" % (max(ads) - min(ads)),
-           size=10, fill=SUB)
-    s.arrow(tx(52), ty(32), tx(41), ty(25), stroke=WARN, sw=2.0)
-    s.text(tx(52) + 6, ty(32) - 2, "この向きの観測が無い", size=11, fill=WARN,
-           weight="700")
-
-    xaxis(s, 130, 660, 288, [10, 25, 40, 55, 70], tx,
-          ["10", "25", "40", "55", "70"])
-    s.text(395, 322, "人口（万人）", size=10, fill=SUB, anchor="middle")
-    yaxis(s, 268, 84, 150, [0, 10, 20, 30, 40], ty,
-          ["0", "10", "20", "30", "40"])
-    s.text(150, 68, "広告費（百万円）", size=10, fill=SUB)
+        s.circle(X(p), Y(a), 7, fill=MAIN, stroke="#ffffff", sw=1.5)
+    s.line(X(39) + 16, Y(max(band)), X(39) + 16, Y(min(band)), stroke=FOCUS, sw=3)
+    s.text(X(39) + 24, Y(min(band)) + 20, "1.8", size=15, fill=FOCUS, bold=True)
+    s.line(X(70) - 6, Y(max(ads)), X(70) - 6, Y(min(ads)), stroke=MAIN, sw=3)
+    s.text(X(70) - 14, Y(min(ads)) + 4, "26.2", size=15, fill=MAIN, bold=True, anchor="end")
+    xaxis(s, X, 370, [10, 20, 30, 40, 50, 60, 70], str, "人口（万人）")
+    s.line(X(5), Y(0), X(5), Y(40), stroke=MUTED)
+    for v in (0, 20, 40):
+        s.text(X(5) - 8, Y(v) + 5, str(v), size=14, fill=SUB, anchor="end")
+    s.text(24, 40, "広告費（万円）", size=15, fill=SUB)
+    s.note(X(5) + 14, Y(34), ["片方だけ動いた地域が", "ほとんど無い"])
     return s
 
 
-# ---------------------------------------------------------------- 9-2
 def fig9_2():
-    """9-2 混同したまま人数を増やすか、同じ引き出しへ両方を入れるか。
+    """9-2 同じ引き出しにA/Bが両方あるかを、人数より先に見る。対照の2枚 横長 M 600x320。
 
-    できる子の指摘（Aは午前・新品電池、Bは午後・再利用電池）を配置表にする。
-    左は対角の二マスしか埋まらず、機種差と時間帯・電池差を分けられない。
-    右は時間帯×電池の四マスすべてでA/Bを無作為割付する。
-
-    グリッド（二パネルで座標を固定し、変えるのは各マスの中身だけ）
-      左 表 x 150..368 / 右 x 470..688、行高 46、列幅 109
-      行  午前（y 118..164）／ 午後（y 164..210）
-      列  新品電池 ／ 再利用電池
-      y  32 タイトル / 76 パネル名 / 100 列見出し / 232 結論
-      色  青＝比較が成立するマス / 赤＝比較相手がいない空マス / 灰＝表の罫線
+    パネル k の左上 x0 = 120 + 250*k。マス 100x80、行=時間帯、列=電池。
     """
-    s = SVG(760, 268, "同じ引き出しの中にA/Bが両方あるかを、人数より先に見る")
-    s.text(52, 32, "人数を増やしても、機種と時間帯が重なったままなら比較は生まれない",
-           size=14, weight="700")
-
-    def table(x0, title, cells, note, note_col):
-        s.text(x0 - 8, 76, title, size=12, weight="700", fill=INK)
-        s.text(x0 + 54, 100, "新品電池", size=11, fill=SUB, anchor="middle")
-        s.text(x0 + 163, 100, "再利用電池", size=11, fill=SUB, anchor="middle")
-        for i, row in enumerate(("午前", "午後")):
-            s.text(x0 - 12, 147 + i * 46, row, size=11, fill=SUB, anchor="end")
-            for j in range(2):
-                cx, cy = x0 + j * 109, 118 + i * 46
-                body = cells[i][j]
-                filled = body != ""
-                s.rect(cx, cy, 109, 46,
-                       fill=TINT_MAIN if filled else TINT_WARN,
-                       stroke=MAIN if filled else WARN,
-                       sw=1.6, dash=None if filled else "5 3")
-                if filled:
-                    s.text(cx + 54, cy + 29, body, size=13,
-                           fill=MAIN, anchor="middle", weight="700")
-                else:
-                    s.cross(cx + 54, cy + 23, 9, stroke=WARN, sw=2.2)
-        s.text(x0 + 109, 232, note, size=12, anchor="middle",
-               fill=note_col, weight="700")
-
-    table(150, "できる子が見つけた配置",
-          [["A のみ", ""], ["", "B のみ"]],
-          "空きマスに比較相手がいない", WARN)
-    table(470, "ブロック内で無作為割付",
-          [["A と B", "A と B"], ["A と B", "A と B"]],
-          "どのマスでも機種差を比べられる", MAIN)
+    s = SVG(600, 320, "左は対角の2マスしか埋まらず機種差を分けられない。右はどのマスにもAとBがある")
+    cells = [
+        ("いまの配置", {(0, 0): "AAA", (1, 1): "BBB"}),
+        ("無作為化とブロック", {(0, 0): "AB", (0, 1): "BA", (1, 0): "AB", (1, 1): "BA"}),
+    ]
+    for k, (title, fill) in enumerate(cells):
+        x0 = 120 + 250 * k
+        s.text(x0, 40, title, size=16, bold=True)
+        for c, lab in enumerate(("新品電池", "再利用")):
+            s.text(x0 + 50 + 100 * c, 70, lab, size=14, fill=SUB, anchor="middle")
+        for r in range(2):
+            if k == 0:
+                s.text(x0 - 12, 124 + 80 * r, ("午前", "午後")[r], size=14, fill=SUB, anchor="end")
+            for c in range(2):
+                x, y = x0 + 100 * c, 84 + 80 * r
+                tok = fill.get((r, c), "")
+                s.rect(x, y, 100, 80, fill=TINT[MUTED] if not tok else "#ffffff", stroke=MUTED)
+                for j, t in enumerate(tok):
+                    cx = x + 50 + (j - (len(tok) - 1) / 2) * 26
+                    col = MAIN if t == "A" else FOCUS
+                    s.circle(cx, y + 40, 11, fill=col, stroke="#ffffff", sw=1.5)
+                    s.text(cx, y + 45.5, t, size=14, fill="#ffffff", anchor="middle", bold=True)
+    s.text(170, 276, "空のマス：比べる相手がいない", size=14, fill=WARN, anchor="middle")
+    s.note(370, 290, "どのマスにもAとB")
     return s
 
 
-# ---------------------------------------------------------------- 10-1
+# ================================================================ 第2巻
+def binom(k, n, p):
+    return math.comb(n, k) * p ** k * (1 - p) ** (n - k)
+
+
+def panel_axes(s, x0, y0, w, h):
+    s.line(x0, y0 + h, x0 + w, y0 + h, stroke=MUTED)
+    s.line(x0, y0, x0, y0 + h, stroke=MUTED)
+
+
 def fig10_1():
-    """10-1 周辺が同じでも、同時の四箱は一つに決まらない。
+    """10-1 行和も列和も同じ二店舗が、まったく違う四箱を持つ。対照の2枚 横長 M 600x330。
 
-    本文の店舗A（会員返品20・会員非返品30・非会員返品0・非会員非返品50）と
-    店舗B（10・40・10・40）。行和も列和も同じで、中身だけが違う。
-
-    グリッド（二表で座標を固定し、変えるのは四箱の中身だけ）
-      表A 左上 (150,116) / 表B 左上 (470,116)、セル 96×52
-      周辺の列 セルの右 x+192..x+250、周辺の行 y 220..252
-      y  32 タイトル / 96 列見出し / 116..220 四箱 / 240 行和 / 268 列和
-         292 条件付き返品率
-      色  青＝同時分布の四箱 / 橙＝会員を知ったときの返品率 / 灰＝周辺（行和・列和）
+    表 k の左上 x0 = 110 + 270*k, y0 = 80。セル 80x56。右と下に周辺（灰）。
     """
-    a = [[20, 30], [0, 50]]
-    b = [[10, 40], [10, 40]]
-    for t in (a, b):
-        assert [r[0] + r[1] for r in t] == [50, 50]
-        assert [t[0][j] + t[1][j] for j in (0, 1)] == [20, 80]
-    assert a[0][0] / 50 == 0.4 and a[1][0] / 50 == 0.0
-    assert b[0][0] / 50 == 0.2 and b[1][0] / 50 == 0.2
-
-    s = SVG(760, 320, "行和も列和も同じ二店舗が、まったく違う四箱を持つ")
-    s.text(52, 32, "周辺を二枚そろえても、同時の四箱は一つに決まらない",
-           size=14, weight="700")
-
-    def table(x0, name, t, hi):
-        s.text(x0, 74, name, size=13, weight="700", fill=INK)
-        s.text(x0 + 48, 100, "返品", size=10, fill=SUB, anchor="middle")
-        s.text(x0 + 144, 100, "返品なし", size=10, fill=SUB, anchor="middle")
-        s.text(x0 + 220, 100, "行和", size=10, fill=SUB, anchor="middle")
-        for i, rname in enumerate(("会員", "非会員")):
-            s.text(x0 - 10, 148 + i * 52, rname, size=11, fill=SUB, anchor="end")
+    tabs = {"店舗A": [[20, 30], [0, 50]], "店舗B": [[10, 40], [10, 40]]}
+    for t in tabs.values():
+        assert [sum(r) for r in t] == [50, 50] and [t[0][j] + t[1][j] for j in (0, 1)] == [20, 80]
+    s = SVG(600, 330, "行和も列和も同じ二店舗でも、会員の返品率はAが40%、Bが20%と違う")
+    for k, (name, t) in enumerate(tabs.items()):
+        x0, y0 = 110 + 270 * k, 80
+        s.text(x0, 40, name, size=16, bold=True)
+        for j, lab in enumerate(("返品", "非返品")):
+            s.text(x0 + 40 + 80 * j, y0 - 10, lab, size=14, fill=SUB, anchor="middle")
+        for i, lab in enumerate(("会員", "非会員")):
+            if k == 0:
+                s.text(x0 - 10, y0 + 34 + 56 * i, lab, size=14, fill=SUB, anchor="end")
             for j in range(2):
-                cx, cy = x0 + j * 96, 116 + i * 52
-                mark = (i, j) == hi
-                s.rect(cx, cy, 96, 52,
-                       fill=TINT_FOCUS if mark else TINT_MAIN,
-                       stroke=FOCUS if mark else MAIN, sw=2.0 if mark else 1.4)
-                s.text(cx + 48, cy + 32, str(t[i][j]), size=15,
-                       fill=FOCUS if mark else MAIN, anchor="middle",
-                       weight="700")
-            s.rect(x0 + 192, 116 + i * 52, 56, 52,
-                   fill=TINT_MUTED, stroke=MUTED, sw=1.2)
-            s.text(x0 + 220, 148 + i * 52, "50", size=13, fill=SUB,
-                   anchor="middle")
+                v = t[i][j]
+                f = i == 0 and j == 0
+                s.rect(x0 + 80 * j, y0 + 56 * i, 80, 56, fill=TINT[FOCUS] if f else "#ffffff",
+                       stroke=FOCUS if f else MUTED, sw=2 if f else 1)
+                s.text(x0 + 40 + 80 * j, y0 + 35 + 56 * i, str(v), size=20, anchor="middle",
+                       bold=f, fill=INK)
+            s.text(x0 + 176, y0 + 34 + 56 * i, str(sum(t[i])), size=15, fill=SUB, anchor="middle")
         for j in range(2):
-            s.rect(x0 + j * 96, 220, 96, 32, fill=TINT_MUTED, stroke=MUTED,
-                   sw=1.2)
-            s.text(x0 + j * 96 + 48, 241, str([20, 80][j]), size=13, fill=SUB,
+            s.text(x0 + 40 + 80 * j, y0 + 136, str(t[0][j] + t[1][j]), size=15, fill=SUB,
                    anchor="middle")
-        s.text(x0 + 220, 241, "列和", size=10, fill=SUB, anchor="middle")
-        s.text(x0 + 96, 282,
-               "会員の返品率 %d%% ／ 非会員 %d%%"
-               % (round(t[0][0] / 50 * 100), round(t[1][0] / 50 * 100)),
-               size=11, fill=FOCUS, anchor="middle", weight="700")
-
-    table(150, "店舗A", a, (0, 0))
-    table(470, "店舗B", b, (0, 0))
-    s.text(380, 308, "灰のマスは二店舗で同じ。青と橙のマスだけが違う",
-           size=10, fill=SUB, anchor="middle")
+        s.note(x0, y0 + 190, f"会員の返品率 {t[0][0] * 2}%")
+    s.text(300, 316, "灰の数字（行和・列和）は二店舗で同じ", size=13, fill=SUB, anchor="middle")
     return s
 
 
-# ---------------------------------------------------------------- 10-3
 def fig10_3():
-    """10-3 一マスが6倍へ伸びたら、密度は1/6へ薄める。
+    """10-3 座標を横2倍・縦3倍に伸ばしたら、密度は1/6へ薄める。横長 M 560x280。
 
-    本文の U=2X, V=3Y。元の単位正方形（面積1・密度1）が
-    0<U<2, 0<V<3 の長方形（面積6）へ伸びる。密度を据え置くと総量が6になる。
-    左半分の確率1/2も、密度1/6なら保たれる（面積3×1/6）。
-
-    グリッド（1単位 = 70px）
-      元  x 150..220 / y 250..180   （4×4 の方眼、一マス 17.5×17.5）
-      先  x 420..560 / y 250..40    （同じ方眼、一マス 35×52.5）
-      y  32 タイトル / 60 副題 / 268 面積の注記 / 292 密度の注記 / 312 結論
-      色  青＝確率が保たれている領域（左半分） / 橙＝伸びた一マス / 赤＝密度を据え置いた誤り
+    1単位 = 60px。元の正方形 x 60..120 / y 220..160、先の長方形 x 260..380 / y 220..40。
+    どちらも4x4の方眼。左下から2列目・2行目のマスを橙にする。
     """
-    jac = 2 * 3
-    assert jac == 6
-    assert abs(1.0 / jac * (2 * 3) - 1.0) < 1e-12          # 総量1
-    assert abs(1.0 / jac * (1 * 3) - 0.5) < 1e-12          # 左半分も1/2
+    assert 2 * 3 == 6 and abs((1 / 6) * 6 - 1) < 1e-12 and abs((1 / 6) * 3 - 0.5) < 1e-12
+    s = SVG(560, 280, "座標を横2倍・縦3倍に伸ばすと面積は6倍になるので、密度は1から1/6へ薄める")
 
-    s = SVG(760, 330, "座標を伸ばした分だけ密度を薄めないと、確率が6倍に増える")
-    s.text(52, 32, "ゴム方眼の一マスが何倍になったかが、掛けるべき領収書",
-           size=14, weight="700")
-    s.text(52, 54, "U = 2X, V = 3Y", size=11, fill=SUB)
-
-    def grid(x0, y0, w, h, name, note, tint_left):
-        s.rect(x0, y0 - h, w, h, fill="#ffffff", stroke=INK, sw=1.8)
-        s.rect(x0, y0 - h, w / 2.0, h, fill=TINT_MAIN, stroke="none", sw=0)
+    def grid(x0, y0, w, h, fill):
+        s.rect(x0, y0 - h, w, h, fill=fill, stroke=MAIN, sw=2)
         for i in range(1, 4):
-            s.line(x0 + w * i / 4.0, y0 - h, x0 + w * i / 4.0, y0,
-                   stroke=MUTED, sw=0.9)
-            s.line(x0, y0 - h * i / 4.0, x0 + w, y0 - h * i / 4.0,
-                   stroke=MUTED, sw=0.9)
-        s.rect(x0, y0 - h / 4.0, w / 4.0, h / 4.0,
-               fill=TINT_FOCUS, stroke=FOCUS, sw=2.0)
-        s.text(x0, y0 + 22, name, size=12, weight="700", fill=INK)
-        s.text(x0, y0 + 40, note, size=10, fill=SUB)
-        s.text(x0 + w / 4.0, y0 - h - 10, tint_left, size=10, fill=MAIN,
-               anchor="middle", weight="700")
-
-    grid(150, 258, 56, 56, "もとの正方形",
-         "面積1・密度1・総量1", "左半分 1/2")
-    grid(430, 258, 112, 168, "変換後の長方形",
-         "面積6・密度1/6・総量1", "左半分 1/2")
-    s.arrow(236, 226, 406, 226, stroke=INK, sw=2.0)
-    s.text(321, 218, "横2倍・縦3倍", size=11, anchor="middle", weight="700")
-    s.text(321, 244, "一マスの面積が6倍", size=11, fill=FOCUS,
-           anchor="middle", weight="700")
-    s.text(52, 322, "密度1のまま塗ると総量が 2×3×1 ＝ 6 になる（確率にならない）",
-           size=11, fill=WARN, weight="700")
+            s.line(x0 + w * i / 4, y0 - h, x0 + w * i / 4, y0, stroke=MAIN, sw=0.8)
+            s.line(x0, y0 - h * i / 4, x0 + w, y0 - h * i / 4, stroke=MAIN, sw=0.8)
+        s.rect(x0 + w / 4, y0 - h / 2, w / 4, h / 4, fill=FOCUS, stroke=FOCUS)
+    grid(60, 220, 60, 60, TINT[MAIN])
+    grid(260, 220, 120, 180, "#f5f8fd")
+    s.text(90, 148, "元：面積1", size=15, anchor="middle")
+    s.text(90, 246, "密度 1", size=16, anchor="middle", bold=True, fill=MAIN)
+    s.text(320, 28, "先：面積6", size=15, anchor="middle")
+    s.text(320, 246, "密度 1/6", size=16, anchor="middle", bold=True, fill=MAIN)
+    s.arrow(140, 190, 240, 190, stroke=SUB, sw=2)
+    s.text(190, 178, "横2倍・縦3倍", size=14, fill=SUB, anchor="middle")
+    s.note(400, 90, ["橙の一マスは", "元でも先でも", "確率 1/16"])
     return s
 
 
-# ---------------------------------------------------------------- 11-2
-def fig11_2():
-    """11-2 台数を増やすと、最小値だけが早い側へ動く。
-
-    本文の耐久試験（平均寿命1,000時間、各台が210時間以内に壊れる確率2%）。
-    この二条件を満たすWeibull（形状 k、尺度 eta）を数値的に決めてから描く。
-    最小値が210時間以内である確率は 1-0.98^n で、n=1/10/100 が 2%/18%/87%。
-
-    グリッド
-      tx(時間) = lin(140, 690, 0, 2500) / 密度は各曲線の最大値で正規化
-      曲線の底辺 y 262、高さ 150（n ごとに同じ倍率で描く）
-      y  32 タイトル / 56 副題 / 262 底辺 / 280 目盛り / 306 注記
-      色  青＝一台の寿命 / 橙＝100台の最小値 / 灰＝10台の最小値 / 赤＝210時間の線
-    """
+def weibull_fit():
     lo, hi = 1.0, 6.0
     for _ in range(200):
         k = (lo + hi) / 2
-        eta = 210.0 / (0.020202707 ** (1.0 / k))
-        mean = eta * math.gamma(1 + 1.0 / k)
-        if mean > 1000.0:
+        eta = 210.0 / (-math.log(0.98)) ** (1.0 / k)
+        if eta * math.gamma(1 + 1.0 / k) > 1000.0:
             lo = k
         else:
             hi = k
     k = (lo + hi) / 2
-    eta = 210.0 / (0.020202707 ** (1.0 / k))
-    assert abs(eta * math.gamma(1 + 1.0 / k) - 1000.0) < 0.5
-    assert abs((1 - math.exp(-(210.0 / eta) ** k)) - 0.02) < 1e-4
-    probs = [1 - 0.98 ** n for n in (1, 10, 100)]
-    assert abs(probs[0] - 0.02) < 1e-9
-    assert abs(probs[2] - 0.8674) < 1e-3
+    return k, 210.0 / (-math.log(0.98)) ** (1.0 / k)
 
-    def cdf(t, n):
-        return 1 - math.exp(-n * (t / eta) ** k)
 
-    s = SVG(760, 330, "台数を増やすほど、最初の故障は早い側へ動く")
-    tx = lin(150, 640, 0, 2000)
-    ty = lin(268, 84, 0, 1)
-    s.text(52, 32, "一位のタイムは、走者の速さだけでなく参加人数も背負う",
-           size=14, weight="700")
-    s.text(52, 54, "平均寿命1,000時間・210時間以内に壊れる確率2%の分布から",
-           size=10, fill=SUB)
+def fig11_2():
+    """11-2 台数を増やすほど、最初の故障は早い側へ動く。最小値の累積分布。横長 M 600x340。
 
-    for n, col in ((1, MAIN), (10, MUTED), (100, FOCUS)):
-        pts = []
-        t = 0.0
-        while t <= 2000:
-            pts.append((tx(t), ty(cdf(t, n))))
-            t += 8
-        polyline(s, pts, stroke=col, sw=2.4)
-    s.line(tx(210), 76, tx(210), 278, stroke=WARN, sw=2.0, dash="6 4")
-    s.text(tx(210) + 8, 72, "210時間（実際に出た最初の故障）", size=11,
-           fill=WARN, weight="700")
-    for n, col, lab, dy in ((1, MAIN, "1台なら 2%", 20),
-                            (10, MUTED, "10台の最小値なら 18%", -8),
-                            (100, FOCUS, "100台の最小値なら 87%", -8)):
+    x: 0時間 → 80、1,500時間 → 560。y: 0 → 280、1 → 60。
+    """
+    k, eta = weibull_fit()
+    assert abs(eta * math.gamma(1 + 1 / k) - 1000) < 1
+    s = SVG(600, 340, "210時間までに最初の故障が起きる確率は、1台なら2%、10台なら18%、100台なら87%")
+    X = lin(80, 560, 0, 1500)
+    Y = lin(280, 60, 0, 1)
+    cdf = lambda t, n: 1 - math.exp(-n * (t / eta) ** k)
+    s.line(X(210), Y(0), X(210), Y(1.04), stroke=FOCUS, sw=2, dash="6 4")
+    s.text(X(210) + 6, Y(1.04) + 4, "210時間", size=14, fill=FOCUS, bold=True)
+    for n, col, sw in ((1, MUTED, 2), (10, MAIN, 2), (100, MAIN, 3.5)):
+        pts = [(X(t), Y(cdf(t, n))) for t in range(0, 1501, 10)]
+        s.poly(pts, stroke=col, sw=sw)
         v = cdf(210, n)
-        s.circle(tx(210), ty(v), 5.5, fill=col, stroke=col, sw=1.0)
-        s.text(tx(210) + 12, ty(v) + dy, lab, size=12, fill=col, weight="700")
-
-    xaxis(s, 140, 660, 268, [0, 500, 1000, 1500, 2000], tx,
-          ["0", "500", "1,000", "1,500", "2,000"])
-    s.text(395, 320, "故障までの時間（時間）", size=10, fill=SUB, anchor="middle")
-    yaxis(s, 268, 84, 150, [0, 0.5, 1.0], ty, ["0", "50%", "100%"])
-    s.text(60, 76, "その時間までに壊れている確率", size=10, fill=SUB)
+        assert abs(v - (1 - 0.98 ** n)) < 1e-3
+        s.circle(X(210), Y(v), 6, fill=FOCUS, stroke="#ffffff", sw=1.5)
+        s.text(X(210) - 10, Y(v) + 5, f"{v:.0%}", size=15, anchor="end", bold=True, fill=FOCUS)
+        lx = {1: 900, 10: 470, 100: 300}[n]
+        s.text(X(lx) + 8, Y(cdf(lx, n)) + 18, f"{n}台の最小", size=15, fill=SUB if n == 1 else MAIN,
+               bold=n == 100)
+    xaxis(s, X, 280, [0, 500, 1000, 1500], lambda v: f"{v:,}", "時間")
+    for v in (0, 0.5, 1):
+        s.text(X(0) - 8, Y(v) + 5, f"{v:.0%}", size=14, fill=SUB, anchor="end")
+    s.text(24, 36, "最初の故障がそれまでに起きる確率", size=15, fill=SUB)
     return s
 
 
-# ---------------------------------------------------------------- 12-1
 def fig12_1():
-    """12-1 分布のカメラが同じでも、一本の軌跡は別物になる。
+    """12-1 山が0へ潰れる収束と、山が変わらない収束。2x2 の小さな多数 M 640x460。
 
-    左は X_n = Z_n/sqrt(n)（0へ確率収束し、山も0へ潰れる）。
-    右は Z_n がいつも標準正規（山は変わらないが、一本の軌跡は落ち着かない）。
-    乱数は seed 11 の線形合同法から決定的に作る。
-
-    グリッド（左右で座標を固定し、変えるのは列の作り方だけ）
-      軌跡  x 120..370（右は +320）、n = 1..60、y 190（0）を中心に ±86
-      分布  同じパネル幅、底辺 y 306、高さ 76、横軸は軌跡と同じ値域 -3.2..3.2
-      y  32 タイトル / 74 パネル名 / 190 0 の線 / 226 分布ラベル / 320 目盛り
-      色  青＝観測した一本の軌跡 / 橙＝n=60 での分布 / 灰＝0 の基準線
+    列 k の左端 x0 = 90 + 290*k、幅 250。上段 軌跡 y 60..200（0 は y=130）、下段 分布 y 280..400。
     """
-    r = lcg(11)
-    zs = []
-    while len(zs) < 120:
-        z1, z2 = std_normal_pair(r(), r())
-        zs += [z1, z2]
+    zs = normals(11, 120)
     shrink = [zs[i] / math.sqrt(i + 1) for i in range(60)]
     stay = zs[60:120]
-    assert abs(shrink[59]) < 0.5          # 終盤は0の近くへ縮む
-    assert max(abs(v) for v in stay[40:]) > 0.8   # 終盤も同じ幅で暴れる
-
-    s = SVG(760, 348, "山が0へ潰れる収束と、山が変わらない収束を分ける")
-    s.text(52, 32, "「近づく」の主語を、一本の軌跡と分布の山へ分ける",
-           size=14, weight="700")
-
-    def panel(x0, series, sd, title, note, note_col):
-        tx = lin(x0, x0 + 250, 1, 60)
-
-        def yv(v):
-            return round(145 - v / 3.2 * 55, 2)
-        s.text(x0 - 12, 74, title, size=12, weight="700", fill=INK)
-        s.line(x0 - 8, 145, x0 + 258, 145, stroke=MUTED, sw=1.4)
-        s.text(x0 - 14, 149, "0", size=10, fill=SUB, anchor="end")
-        polyline(s, [(tx(i + 1), yv(v)) for i, v in enumerate(series)],
-                 stroke=MAIN, sw=1.6)
-        s.text(x0 + 262, 149, "n=60", size=9, fill=SUB)
-        # n=60 での分布
-        base, hgt = 302, 82
-        peak = normal_pdf(0, 0, sd)
-        pts = []
-        v = -3.2
-        while v <= 3.201:
-            pts.append((tx(1) + (v + 3.2) / 6.4 * 250,
-                        base - hgt * normal_pdf(v, 0, sd) / peak))
-            v += 0.02
-        polyline(s, pts, stroke=FOCUS, sw=2.2)
-        s.line(x0, base, x0 + 250, base, stroke=SUB, sw=1.2, cap="butt")
-        s.text(x0 - 12, 236, "n=60 での分布", size=11, fill=FOCUS, weight="700")
-        s.text(x0 - 12, 336, note, size=11, fill=note_col, weight="700")
-
-    panel(120, shrink, 1 / math.sqrt(60),
-          "① 各回の値を sqrt(n) で割る",
-          "軌跡も山も 0 へ寄る（確率収束）", MAIN)
-    panel(440, stay, 1.0,
-          "② 毎回あらためて引き直す",
-          "山は同じでも軌跡は落ち着かない", WARN)
+    assert abs(shrink[59]) < 0.5 and max(abs(v) for v in stay[40:]) > 0.8
+    s = SVG(640, 460, "Z/√n は軌跡も分布も0へ潰れるが、毎回引き直す標準正規は分布が変わらず軌跡も落ち着かない")
+    for k, (title, seq, sd) in enumerate((("Z / √n：0へ確率収束", shrink, 1 / math.sqrt(60)),
+                                          ("毎回引き直す Z：分布だけ一定", stay, 1.0))):
+        x0 = 90 + 290 * k
+        X = lin(x0, x0 + 250, 1, 60)
+        Y = lin(130, 60, 0, 3)
+        s.text(x0, 34, title, size=15, bold=True)
+        s.line(x0, 130, x0 + 250, 130, stroke=MUTED)
+        s.poly([(X(i + 1), Y(max(-3, min(3, v)))) for i, v in enumerate(seq)], stroke=MAIN, sw=2)
+        s.text(x0, 220, "n = 1", size=13, fill=SUB)
+        s.text(x0 + 250, 220, "n = 60", size=13, fill=SUB, anchor="end")
+        Xv = lin(x0, x0 + 250, -3.2, 3.2)
+        peak = npdf(0, 0, 1 / math.sqrt(60))
+        pts = [(Xv(v), 400 - npdf(v, 0, sd) / peak * 110) for v in [-3.2 + i * 0.04 for i in range(161)]]
+        s.poly(pts, stroke=FOCUS, sw=3)
+        s.line(x0, 400, x0 + 250, 400, stroke=MUTED)
+        s.text(Xv(0), 422, "0", size=14, fill=SUB, anchor="middle")
+    s.text(24, 134, "軌跡", size=14, fill=SUB)
+    s.text(24, 360, "分布", size=14, fill=SUB)
+    s.text(320, 250, "上：一人を追った軌跡　下：n=60 での値の分布", size=13, fill=SUB, anchor="middle")
     return s
 
 
-# ---------------------------------------------------------------- 12-3
 def fig12_3():
-    """12-3 同じ0.01の揺れが、坂の急さで別の幅になる。
+    """12-3 同じ0.01の入力の揺れでも、曲線の急な場所では出力が大きく伸びる。正方 M 540x440。
 
-    本文の値。p=0.50→0.51 でオッズは 1.000→1.041（+0.041）、
-    p=0.90→0.91 では 9.000→10.111（+1.111）。接線の傾き 1/(1-p)^2 は 4 と 100。
-
-    橙の箱は本文どおり入力幅0.01で、縦幅は接線近似の 0.01*g'(p)。
-
-    グリッド
-      tx(p) = lin(140, 660, 0.30, 0.92) / ty(odds) = lin(272, 76, 0, 12)
-      注目点  p=0.50 → (313.4, 252.7) / p=0.90 → (648.6, 125.0)
-      y  32 タイトル / 56 副題 / 272 底辺 / 290 目盛り / 314 軸ラベル
-      色  青＝オッズ曲線 / 橙＝入力の揺れ0.01と、その出力幅 / 灰＝目盛り
+    x: p 0.3 → 80、0.95 → 500。y: オッズ 0 → 380、14 → 60。
     """
-    def odds(p):
-        return p / (1 - p)
-    d1 = odds(0.51) - odds(0.50)
-    d2 = odds(0.91) - odds(0.90)
-    assert abs(d1 - 0.040816) < 1e-6
-    assert abs(d2 - 1.111111) < 1e-6
-    assert abs(1 / (1 - 0.5) ** 2 - 4.0) < 1e-12
-    assert abs(1 / (1 - 0.9) ** 2 - 100.0) < 1e-9
-
-    s = SVG(760, 330, "同じ入力の揺れでも、曲線の急な場所では出力が大きく伸びる")
-    tx = lin(140, 660, 0.30, 0.92)
-    ty = lin(272, 76, 0, 12)
-    s.text(52, 32, "揺れの大きさは、入力の揺れ × 足元の傾きで決まる",
-           size=14, weight="700")
-    s.text(52, 54, "オッズ p /（1 − p）", size=11, fill=SUB)
-
-    pts = []
-    v = 0.30
-    while v <= 0.9201:
-        pts.append((tx(v), ty(odds(v))))
-        v += 0.002
-    polyline(s, pts, stroke=MAIN, sw=2.4)
-
-    for p, dd, slope, lab_dy in ((0.50, d1, 4, 34), (0.90, d2, 100, -60)):
-        x1, x2 = tx(p), tx(p + 0.01)
-        y1, y2 = ty(odds(p)), ty(odds(p) + 0.01 * slope)
-        s.rect(x1, min(y1, y2), x2 - x1, abs(y2 - y1),
-               fill=TINT_FOCUS, stroke=FOCUS, sw=1.8)
-        s.circle(x1, y1, 5.5, fill=FOCUS, stroke=FOCUS, sw=1.0)
-        s.text(x1 + 10, y1 + lab_dy,
-               "p = %.2f　傾き %d 倍" % (p, slope), size=11, fill=FOCUS,
-               weight="700")
-        s.text(x1 + 10, y1 + lab_dy + 16,
-               "0.01 の揺れ → オッズ %+.3f" % dd, size=10, fill=SUB)
-
-    xaxis(s, 130, 670, 272, [0.3, 0.5, 0.7, 0.9], tx,
-          ["0.30", "0.50", "0.70", "0.90"])
-    s.text(400, 314, "推定した割合 p", size=10, fill=SUB, anchor="middle")
-    yaxis(s, 272, 76, 140, [0, 4, 8, 12], ty, ["0", "4", "8", "12"])
-    s.text(112, 68, "オッズ", size=10, fill=SUB)
+    odds = lambda p: p / (1 - p)
+    slope = lambda p: 1 / (1 - p) ** 2
+    assert abs(odds(0.51) - odds(0.5) - 0.0408) < 1e-3 and abs(odds(0.91) - odds(0.9) - 1.111) < 1e-3
+    s = SVG(540, 440, "入力の揺れ0.01は、p=0.5では出力0.04に、p=0.9では1.00に伸びる")
+    X = lin(80, 500, 0.3, 0.95)
+    Y = lin(380, 60, 0, 14)
+    s.poly([(X(p), Y(odds(p))) for p in [0.3 + i * 0.0025 for i in range(254)]], stroke=MAIN, sw=3)
+    for p in (0.5, 0.9):
+        g = slope(p)
+        d = 0.06
+        s.line(X(p - d), Y(odds(p) - g * d), X(p + d), Y(odds(p) + g * d), stroke=FOCUS, sw=2,
+               dash="5 4")
+        h = g * 0.01
+        s.rect(X(p) - 5, Y(odds(p) + h / 2), 10, max(2, Y(odds(p) - h / 2) - Y(odds(p) + h / 2)),
+               fill=FOCUS, stroke="none")
+        s.circle(X(p), Y(odds(p)), 5, fill=INK, stroke="#ffffff", sw=1.5)
+        s.text(X(p) - 14, Y(odds(p)) - 16, f"傾き {g:.0f}：出力幅 {h:.2f}", size=15, anchor="end",
+               bold=True, fill=FOCUS)
+    xaxis(s, X, 380, [0.3, 0.5, 0.7, 0.9], lambda v: f"{v:.1f}", "p")
+    for v in (0, 5, 10):
+        s.text(X(0.3) - 8, Y(v) + 5, str(v), size=14, fill=SUB, anchor="end")
+    s.text(24, 40, "オッズ p/(1−p)", size=15, fill=SUB)
+    s.note(96, 110, ["同じ入力幅 0.01 が", "25倍違う出力幅になる"])
     return s
 
 
-# ---------------------------------------------------------------- 13-2
 def fig13_2():
-    """13-2 尤度の最大は、滑らかな山頂ではなく崖の縁に来る。
+    """13-2 一様分布の尤度は境界 θ=6 で最大になり、微分0では拾えない。横長 M 580x320。
 
-    本文の一様(0, θ) と観測 2, 4, 6。θ<6 では尤度0、θ>=6 では θ^-3。
-    最大は境界の θ=6。モーメント法の答え 8 は同じ図の別の場所にある。
-
-    グリッド
-      tx(θ) = lin(150, 680, 3.5, 14) / 尤度は最大値で正規化して 高さ160
-      y  32 タイトル / 56 副題 / 262 底辺 / 280 目盛り / 306 軸ラベル
-      色  橙＝最尤の崖（θ=6） / 青＝尤度曲線 / 赤＝観測を出せない範囲（θ<6）
+    x: θ 3 → 80、14 → 540。y: 尤度（最大で正規化）0 → 260、1 → 70。
     """
     obs = [2, 4, 6]
-    m = max(obs)
-    mom = 2 * (sum(obs) / len(obs))
-    assert m == 6 and mom == 8
-
-    def lik(th):
-        return 0.0 if th < m else th ** (-len(obs))
-
-    s = SVG(760, 330, "一様分布の尤度は境界で最大になり、微分0では拾えない")
-    tx = lin(150, 680, 1.5, 14)
-    s.text(52, 32, "観測 2・4・6 を全部収める、いちばん狭い箱が最尤",
-           size=14, weight="700")
-    s.text(52, 54, "尤度 L(θ) は θ < 6 で 0、θ ≧ 6 で θ の3乗に反比例",
-           size=10, fill=SUB)
-
-    peak = lik(m)
-    s.line(tx(1.5), 262, tx(m), 262, stroke=WARN, sw=3.4)
-    s.text(tx(m) - 12, 240, "この範囲の箱からは 6 が出ない（尤度 0）", size=11,
-           fill=WARN, weight="700", anchor="end")
-    pts = []
-    th = m
-    while th <= 14.001:
-        pts.append((tx(th), 262 - 160 * lik(th) / peak))
-        th += 0.02
-    s.line(tx(m), 262, tx(m), 102, stroke=MAIN, sw=2.4)
-    polyline(s, pts, stroke=MAIN, sw=2.4)
-    s.circle(tx(m), 102, 6.5, fill=FOCUS, stroke=FOCUS, sw=1.0)
-    s.text(tx(m) + 12, 96, "最尤推定 θ = 6（崖の縁）", size=12, fill=FOCUS,
-           weight="700")
-    s.text(tx(m) + 12, 114, "微分 0 の内点を探すソフトは、ここを見落とす",
-           size=10, fill=SUB)
-
-    s.line(tx(mom), 262 - 160 * lik(mom) / peak, tx(mom), 262,
-           stroke=MUTED, sw=1.8, dash="5 3")
-    s.circle(tx(mom), 262 - 160 * lik(mom) / peak, 5.5,
-             fill="#ffffff", stroke=MUTED, sw=2.0)
-    s.text(tx(mom) + 10, 262 - 160 * lik(mom) / peak - 8,
-           "モーメント法 θ = 8", size=11, fill=SUB, weight="700")
-
-    for v in obs:
-        tri_up(s, tx(v), 278, 5.5, fill=INK)
-    s.text(tx(2), 302, "観測 2", size=10, fill=SUB, anchor="middle")
-    s.text(tx(4), 302, "4", size=10, fill=SUB, anchor="middle")
-    s.text(tx(6), 302, "6", size=10, fill=SUB, anchor="middle")
-    s.line(140, 262, 692, 262, stroke=SUB, sw=1.2, cap="butt")
-    for v in (2, 4, 6, 8, 10, 12, 14):
-        s.line(tx(v), 262, tx(v), 267, stroke=SUB, sw=1.2)
-    s.text(700, 266, "θ", size=12, fill=SUB, style="italic")
-    s.text(395, 324, "未知の上限 θ の候補", size=10, fill=SUB, anchor="middle")
+    lik = lambda th: 0.0 if th < max(obs) else th ** -3
+    top = lik(6)
+    assert 2 * sum(obs) / 3 == 8
+    s = SVG(580, 320, "θが6より小さいと観測6が出ないので尤度は0、θ=6の縁で最大になる")
+    X = lin(80, 540, 3, 14)
+    Y = lin(260, 70, 0, 1)
+    s.rect(X(3), Y(1.05), X(6) - X(3), Y(0) - Y(1.05), fill=s.hatch(WARN), stroke="none")
+    s.text((X(3) + X(6)) / 2, Y(0.5), "6を出せない", size=15, fill=WARN, anchor="middle", bold=True,
+           halo=True)
+    s.poly([(X(3), Y(0)), (X(6), Y(0)), (X(6), Y(1))] +
+           [(X(t), Y(lik(t) / top)) for t in [6 + i * 0.05 for i in range(161)]], stroke=MAIN, sw=3)
+    s.circle(X(6), Y(1), 7, fill=FOCUS, stroke="#ffffff", sw=1.5)
+    s.text(X(6) + 12, Y(1) + 5, "最尤 θ = 6（崖の縁）", size=15, fill=FOCUS, bold=True)
+    s.line(X(8), Y(0), X(8), Y(lik(8) / top), stroke=SUB, dash="4 3")
+    s.text(X(8) + 6, Y(lik(8) / top) - 8, "モーメント法 8", size=14, fill=SUB)
+    xaxis(s, X, 260, [4, 6, 8, 10, 12, 14], str, "θ")
+    s.text(24, 40, "尤度", size=15, fill=SUB)
     return s
 
 
-# ---------------------------------------------------------------- 15-2
 def fig15_2():
-    """15-2 誤報予算を守るには、二仮説を強く見分ける入口から配る。
+    """15-2 尤度比の大きい結果から棄却域へ入れる。横長 M 600x420。
 
-    本文の設定。二人中の購入者数について H0:p=0.1、H1:p=0.6。
-    尤度比は 0人 0.20 / 1人 2.67 / 2人 36。1人・2人を棄却域にすると
-    誤報19%・検出力84%。0人・2人という左右対称形は誤報82%で、同じ予算ではない。
-
-    グリッド
-      三つの結果を x 中心 210 / 400 / 590 に置く。柱の幅 42、対で並べる
-      柱の底辺 y 246、高さ = 確率 × 150
-      y  32 タイトル / 58 副題 / 88 尤度比 / 246 底辺 / 266 結果ラベル
-         292 棄却域の帯 / 316 まとめ
-      色  灰＝H0（正常）で出る確率 / 青＝H1（売れる）で出る確率 / 橙＝尤度比
-          赤＝左右対称にした棄却域（予算超過）
+    結果 k（0,1,2人）の中心 x = 260 + 130*k。柱の底 y=240、高さ = 確率*170。
+    下に棄却域の2案を帯で（名前と結果は左、帯は各結果の下）。
     """
-    p0, p1 = 0.1, 0.6
-    h0 = [binom_pmf(k, 2, p0) for k in range(3)]
-    h1 = [binom_pmf(k, 2, p1) for k in range(3)]
-    lr = [h1[k] / h0[k] for k in range(3)]
-    assert abs(lr[0] - 0.19753) < 1e-4
-    assert abs(lr[1] - 2.66667) < 1e-4
-    assert abs(lr[2] - 36.0) < 1e-9
-    good = h0[2] + h0[1]
-    bad = h0[2] + h0[0]
-    assert abs(good - 0.19) < 1e-9 and abs(bad - 0.82) < 1e-9
-
-    s = SVG(760, 368, "尤度比順なら誤報19%、左右対称形は誤報82%で予算を超える")
-    s.text(52, 32, "「珍しい順」ではなく「二つの世界を見分ける倍率順」に配る",
-           size=14, weight="700")
-    s.text(52, 56, "灰＝基準 p=0.1 の世界　／　青＝p=0.6 の世界（二人中の購入者数）",
-           size=10, fill=SUB)
-
-    centers = (210, 400, 590)
-    for k, cx in enumerate(centers):
-        s.text(cx, 88, "尤度比 %.2f" % lr[k], size=12, fill=FOCUS,
-               anchor="middle", weight="700")
-        for j, (v, col, tint) in enumerate(((h0[k], MUTED, TINT_MUTED),
-                                            (h1[k], MAIN, TINT_MAIN))):
-            bx = cx - 44 + j * 46
-            s.rect(bx, 246 - 150 * v, 42, 150 * v, fill=tint, stroke=col,
-                   sw=1.6)
-            s.text(bx + 21, 246 - 150 * v - 7, "%.2f" % v, size=10, fill=col,
-                   anchor="middle")
-        s.text(cx, 268, "%d人が購入" % k, size=11, anchor="middle", fill=INK)
-    s.line(150, 246, 660, 246, stroke=SUB, sw=1.2, cap="butt")
-
-    s.text(52, 308, "尤度比順に配る", size=11, fill=MAIN, weight="700")
-    s.rect(centers[1] - 52, 294, 210, 22, fill=TINT_MAIN, stroke=MAIN, sw=1.6)
-    s.text(centers[1] + 53, 309, "誤報 19% ／ 検出力 84%", size=11, fill=MAIN,
-           anchor="middle", weight="700")
-    s.text(52, 356, "左右対称に配る", size=11, fill=WARN, weight="700")
-    s.rect(centers[0] - 52, 342, 104, 22, fill=TINT_WARN, stroke=WARN,
-           sw=1.6, dash="5 3")
-    s.rect(centers[2] - 52, 342, 104, 22, fill=TINT_WARN, stroke=WARN,
-           sw=1.6, dash="5 3")
-    s.text(centers[1], 357, "誤報 82%（予算を大きく超える）", size=11,
-           fill=WARN, anchor="middle", weight="700")
+    h0 = [binom(k, 2, 0.1) for k in range(3)]
+    h1 = [binom(k, 2, 0.6) for k in range(3)]
+    lr = [b / a for a, b in zip(h0, h1)]
+    assert abs(h0[1] + h0[2] - 0.19) < 1e-9 and abs(h1[1] + h1[2] - 0.84) < 1e-9
+    assert abs(h0[0] + h0[2] - 0.82) < 1e-9
+    s = SVG(600, 420, "尤度比の大きい1人・2人を棄却域にすれば誤報19%で検出力84%、左右対称の0人・2人では誤報82%")
+    for k in range(3):
+        x = 260 + 130 * k
+        s.rect(x - 38, 240 - h0[k] * 170, 34, h0[k] * 170, fill=TINT[MUTED], stroke=MUTED)
+        s.rect(x + 4, 240 - h1[k] * 170, 34, h1[k] * 170, fill=MAIN, stroke="none")
+        s.text(x, 264, f"{k}人購入", size=15, anchor="middle")
+        s.text(x, 48, f"尤度比 {lr[k]:.2f}" if k < 2 else "尤度比 36", size=15, anchor="middle",
+               bold=True, fill=FOCUS)
+    s.line(200, 240, 580, 240, stroke=MUTED)
+    s.text(24, 150, "灰：H0（p=0.1）", size=14, fill=SUB)
+    s.text(24, 172, "青：H1（p=0.6）", size=14, fill=MAIN)
+    s.text(24, 202, "高さ：確率", size=14, fill=SUB)
+    for r, (name, ks, col, res) in enumerate((("尤度比順", (1, 2), MAIN, "誤報19%・検出力84%"),
+                                              ("左右対称", (0, 2), WARN, "誤報82%（予算超過）"))):
+        y = 300 + 56 * r
+        s.text(24, y + 8, name, size=15, bold=True, fill=col)
+        s.text(24, y + 30, res, size=14, bold=True, fill=col)
+        for k in ks:
+            s.rect(260 + 130 * k - 50, y, 100, 28, rx=4, fill=TINT[col], stroke=col, sw=2)
+            s.text(260 + 130 * k, y + 20, "棄却", size=14, fill=col, anchor="middle", bold=True)
     return s
 
 
-# ---------------------------------------------------------------- 15-3
 def fig15_3():
-    """15-3 同じ尤度の山を、高さ・距離・傾きの三方向から測る。
+    """15-3 同じ対数尤度の山を、高さ・距離・旗での傾きの三方向から測る。正方 M 560x460。
 
-    二項 n=20・購入13人、帰無仮説 p=0.5 の対数尤度で三統計量を計算する。
-    尤度比 2*(logL(0.65)-logL(0.5))=1.83、Wald 1.98、score 1.80。
-
-    グリッド
-      tx(p) = lin(150, 680, 0.30, 0.92) / 対数尤度は最大値からの差で 高さ200
-      旗 p=0.5 → 268.6 / 星 p=0.65 → 397.0
-      y  32 タイトル / 56 副題 / 262 底辺 / 284 目盛り / 312 三つの数値
-      色  青＝対数尤度の山 / 橙＝帰無仮説の点（旗）と傾き / 灰＝頂上（星）
+    x: p 0.3 → 70、0.9 → 530。y: 対数尤度（頂上からの差）0 → 120、4 → 330。
     """
-    n, x0_, p_null = 20, 13, 0.5
-    phat = x0_ / n
-
-    def ll(p):
-        return x0_ * math.log(p) + (n - x0_) * math.log(1 - p)
-
-    lr = 2 * (ll(phat) - ll(p_null))
-    score_stat = (x0_ / p_null - (n - x0_) / (1 - p_null)) ** 2 / (n / (p_null * (1 - p_null)))
-    wald = (phat - p_null) ** 2 / (phat * (1 - phat) / n)
-    assert abs(phat - 0.65) < 1e-12
-    assert abs(lr - 1.8280) < 1e-3
-    assert abs(score_stat - 1.8) < 1e-9
-    assert abs(wald - 1.9780) < 1e-3
-
-    s = SVG(760, 340, "同じ尤度の山を、高さ・距離・出発点の傾きで測る三方式")
-    tx = lin(150, 680, 0.38, 0.88)
-    s.text(52, 32, "三つの検定は別の道具ではなく、一つの山の測り方が違う",
-           size=14, weight="700")
-    s.text(52, 54, "20人中13人が購入、帰無仮説は p = 0.5", size=10, fill=SUB)
-
-    sc = 45.0
-
-    def ly(p):
-        return round(96 + (ll(phat) - ll(p)) * sc, 2)
-    pts = []
-    v = 0.38
-    while v <= 0.8801:
-        pts.append((tx(v), ly(v)))
-        v += 0.002
-    polyline(s, pts, stroke=MAIN, sw=2.4)
-    s.line(150, 262, 690, 262, stroke=SUB, sw=1.2, cap="butt")
-
-    # 頂上（灰）と帰無点（橙の旗）
-    s.line(tx(phat), ly(phat), tx(phat), 262, stroke=MUTED, sw=1.4, dash="5 3")
-    s.circle(tx(phat), ly(phat), 6.5, fill=MUTED, stroke=MUTED, sw=1.0)
-    s.text(tx(phat) + 12, ly(phat) - 4, "頂上 p = 0.65", size=11, fill=SUB,
-           weight="700")
-    s.line(tx(p_null), ly(p_null), tx(p_null), 262, stroke=FOCUS, sw=2.0)
-    s.circle(tx(p_null), ly(p_null), 6.5, fill=FOCUS, stroke=FOCUS, sw=1.0)
-    s.text(tx(p_null) + 12, ly(p_null) + 34, "帰無 p = 0.5", size=11,
-           fill=FOCUS, weight="700")
-
-    # 高さの差／頂上までの距離／旗での傾き
-    s.line(tx(p_null) - 46, ly(phat), tx(p_null) - 46, ly(p_null),
-           stroke=INK, sw=2.0)
-    s.text(tx(p_null) - 54, (ly(phat) + ly(p_null)) / 2 + 4, "高さの差",
-           size=11, anchor="end", weight="700")
-    s.dim(tx(p_null), tx(phat), 246, "頂上までの距離", up=True)
-    slope = (x0_ / p_null - (n - x0_) / (1 - p_null))
-    dx = 0.055
-    s.line(tx(p_null - dx), ly(p_null) + slope * dx * sc,
-           tx(p_null + dx), ly(p_null) - slope * dx * sc,
-           stroke=FOCUS, sw=2.6)
-    s.text(tx(p_null + dx) + 8, ly(p_null) - slope * dx * sc - 4,
-           "旗での傾き", size=11, fill=FOCUS, weight="700")
-
-    xaxis(s, 140, 690, 262, [0.4, 0.5, 0.65, 0.8], tx,
-          ["0.40", "0.50", "0.65", "0.80"])
-    s.text(415, 302, "購入率 p の候補", size=10, fill=SUB, anchor="middle")
-    s.text(415, 328,
-           "尤度比 %.2f　／　Wald %.2f　／　score %.2f　（大標本では近づく）"
-           % (lr, wald, score_stat),
-           size=12, anchor="middle", weight="700", fill=INK)
+    n, x, p0 = 20, 13, 0.5
+    ph = x / n
+    ll = lambda p: x * math.log(p) + (n - x) * math.log(1 - p)
+    lr = 2 * (ll(ph) - ll(p0))
+    wald = (ph - p0) ** 2 / (ph * (1 - ph) / n)
+    score = (x / p0 - (n - x) / (1 - p0)) ** 2 / (n / (p0 * (1 - p0)))
+    assert (round(lr, 2), round(wald, 2), round(score, 2)) == (1.83, 1.98, 1.8)
+    s = SVG(560, 460, "20人中13人の対数尤度の山を、高さの差・頂上までの距離・旗での傾きで測ると1.83・1.98・1.80")
+    X = lin(70, 530, 0.3, 0.9)
+    Y = lin(120, 330, 0, 4)
+    top = ll(ph)
+    s.poly([(X(p), Y(top - ll(p))) for p in [0.3 + i * 0.005 for i in range(121)] if top - ll(p) <= 4.2],
+           stroke=MAIN, sw=3)
+    fx, fy = X(p0), Y(top - ll(p0))
+    sx, sy = X(ph), Y(0)
+    # 1 高さ：旗の高さを右へ延ばし、頂上の右で縦に測る
+    s.line(fx, fy, sx + 70, fy, stroke=MUTED, dash="4 3")
+    s.line(sx, sy, sx + 70, sy, stroke=MUTED, dash="4 3")
+    s.line(sx + 60, sy, sx + 60, fy, stroke=INK, sw=2.4)
+    s.badge(sx + 36, (sy + fy) / 2, 1)
+    # 2 距離：頂上の上で横に測る
+    s.line(fx, sy - 36, (fx + sx) / 2 - 16, sy - 36, stroke=INK, sw=2.4)
+    s.line((fx + sx) / 2 + 16, sy - 36, sx, sy - 36, stroke=INK, sw=2.4)
+    s.line(fx, sy - 44, fx, sy - 28, stroke=INK, sw=2)
+    s.line(sx, sy - 44, sx, sy - 28, stroke=INK, sw=2)
+    s.badge((fx + sx) / 2, sy - 36, 2)
+    # 3 傾き：旗での接線
+    g = x / p0 - (n - x) / (1 - p0)
+    d = 0.08
+    dy = Y(g * d) - Y(0)
+    s.line(X(p0 - d), fy + dy, X(p0 + d), fy - dy, stroke=FOCUS, sw=2.4)
+    s.badge(X(p0 - d) - 18, fy + dy, 3)
+    s.circle(sx, sy, 7, fill=MUTED, stroke="#ffffff", sw=1.5)
+    s.text(sx - 12, sy + 34, "頂上 0.65", size=14, fill=SUB, anchor="end")
+    s.circle(fx, fy, 7, fill=FOCUS, stroke="#ffffff", sw=1.5)
+    s.text(fx + 12, fy + 26, "旗：帰無 0.5", size=14, fill=FOCUS, bold=True)
+    s.text(40, 380, [f"1 高さの差：尤度比 {lr:.2f}", f"2 頂上までの距離：Wald {wald:.2f}",
+                     f"3 旗での傾き：score {score:.2f}"], size=15)
     return s
 
 
-# ---------------------------------------------------------------- 16-4
 def fig16_4():
-    """16-4 罰則は係数を一意にしても、識別不能な比較を観測済みにはしない。
+    """16-4 罰則は係数を一意にしても、片方だけ動かす比較を観測済みにはしない。正方 M 520x460。
 
-    総広告費が常にテレビ広告費の2倍（X2 = 2X1）なら、予測は b1 + 2b2 だけで決まる。
-    b1 + 2b2 = 2 を満たす係数の組はすべて同じ無罰則予測を返す（尾根）。
-    目的関数を (b1+2b2-2)^2 + lambda*penalty、lambda=1 とすると、
-    ridge は (1/3, 2/3)、lasso は (0, 7/8) を選ぶ。どちらも縮小により
-    無罰則の尾根から原点側へ動くが、データが見分けられる方向は増えていない。
-
-    グリッド
-      bx(b1) = lin(150, 620, -0.6, 2.6) / by(b2) = lin(276, 76, -0.3, 1.3)
-      尾根の直線  b1 = 2 - 2*b2
-      y  32 タイトル / 56 副題 / 300 軸ラベル / 322 結論
-      色  赤＝無罰則で同じ予測を返す尾根（識別不能） / 青＝ridgeの選ぶ点
-          橙＝lassoの選ぶ点 / 灰＝罰則の等高線
+    縦横同じ縮尺（1単位 125px）。x: b1 -0.6 → 70、2.6 → 470。y: b2 -0.3 → 360、1.3 → 160。
     """
-    c = 2.0
-    lam = 1.0
-    ridge = (c / (5.0 + lam), 2 * c / (5.0 + lam))
-    lasso = (0.0, (4 * c - lam) / 8.0)
-    assert abs(ridge[0] - 1.0 / 3.0) < 1e-12
-    assert abs(ridge[1] - 2.0 / 3.0) < 1e-12
-    assert abs(lasso[1] - 7.0 / 8.0) < 1e-12
-    assert ridge[0] + 2 * ridge[1] < c
-    assert lasso[0] + 2 * lasso[1] < c
-
-    s = SVG(760, 358, "罰則で解が一意になっても、未観測の比較が識別されたわけではない")
-    # 縦横で1単位の長さをそろえる（等高線の接し方が意味を持つため）
-    bx = lin(240, 700, -0.3, 2.6)
-    by = lin(300, 80, -0.3, 1.087)
-    s.text(52, 32, "一意な答えが出たことと、データが答えを見分けたことは別",
-           size=14, weight="700")
-    s.text(52, 54, "総広告費がテレビ広告費のちょうど2倍なら、予測は b1 + 2b2 だけで決まる",
-           size=10, fill=SUB)
-
-    # 罰則の等高線（見えている範囲だけ描く）
-    r = math.sqrt(ridge[0] ** 2 + ridge[1] ** 2)
-    arc = []
-    a = 0.0
-    while a <= math.pi / 2 + 1e-9:
-        arc.append((bx(r * math.cos(a)), by(r * math.sin(a))))
-        a += math.pi / 120
-    polyline(s, arc, stroke=MUTED, sw=1.4, dash="5 3")
-    l1 = abs(lasso[0]) + abs(lasso[1])
-    s.line(bx(l1), by(0.0), bx(0.0), by(l1), stroke=MUTED, sw=1.4, dash="4 3")
-    s.text(bx(0.72), by(0.50), "ridge の輪", size=10, fill=SUB)
-    s.text(bx(0.36), by(0.26), "lasso の輪", size=10, fill=SUB)
-
-    # 尾根
-    s.line(bx(-0.3), by((c + 0.3) / 2), bx(2.6), by((c - 2.6) / 2),
-           stroke=WARN, sw=3.0)
-    s.text(bx(1.35), by(0.42), "無罰則の尾根  b1 + 2b2 = 2", size=12, fill=WARN,
-           weight="700")
-    s.text(bx(1.35), by(0.30), "この線上はどれも同じ当てはまり", size=11,
-           fill=WARN, weight="700")
-
-    s.circle(bx(ridge[0]), by(ridge[1]), 7, fill=MAIN, stroke=MAIN, sw=1.0)
-    s.text(bx(ridge[0]) + 14, by(ridge[1]) + 4, "ridge lambda=1  (0.33, 0.67)",
-           size=11, fill=MAIN, weight="700")
-    s.circle(bx(lasso[0]), by(lasso[1]), 7, fill=FOCUS, stroke=FOCUS, sw=1.0)
-    s.text(bx(lasso[0]) + 14, by(lasso[1]) - 14, "lasso lambda=1  (0, 0.875)",
-           size=11, fill=FOCUS, weight="700")
-    s.circle(bx(2.0), by(0.0), 5, fill="#ffffff", stroke=WARN, sw=1.8)
-    s.text(bx(2.0) + 14, by(0.0) - 12, "(2, 0) も同じ予測", size=10, fill=WARN)
-
-    xaxis(s, 230, 712, by(0), [0, 1, 2], bx, ["0", "1", "2"])
-    s.text(716, by(0) + 4, "b1", size=11, fill=SUB)
-    yaxis(s, 300, 80, bx(0), [0, 1], by, ["0", "1"])
-    s.text(bx(0), 72, "b2", size=11, fill=SUB, anchor="middle")
-    s.text(52, 340,
-           "lambda=1 の一例。解が一意でも、片方だけ動かす観測は増えていない",
-           size=11, fill=SUB)
+    ridge = (1 / 3, 2 / 3)
+    lasso = (0.0, 7 / 8)
+    assert abs(ridge[0] + 2 * ridge[1] - 5 / 3) < 1e-12
+    s = SVG(520, 460, "無罰則で同じ予測を返す係数の組は直線上に並び、ridgeは(0.33,0.67)、lassoは(0,0.875)を選ぶ")
+    X = lin(70, 470, -0.6, 2.6)
+    Y = lin(360, 160, -0.3, 1.3)
+    s.line(X(-0.6), Y(0), X(2.6), Y(0), stroke=MUTED)
+    s.line(X(0), Y(-0.3), X(0), Y(1.3), stroke=MUTED)
+    rr = math.hypot(*ridge)
+    s.poly([(X(rr * math.cos(t / 36 * math.pi)), Y(rr * math.sin(t / 36 * math.pi))) for t in range(0, 37)],
+           stroke=MAIN, sw=1.4, dash="4 3")
+    r = lasso[1]
+    s.poly([(X(-0.6), Y(r - 0.6)), (X(0), Y(r)), (X(r), Y(0)), (X(r + 0.3), Y(-0.3))], stroke=FOCUS,
+           sw=1.4, dash="4 3")
+    s.line(X(2 - 2 * 1.3), Y(1.3), X(2.6), Y(-0.3), stroke=WARN, sw=3.5)
+    s.text(X(1.45), Y(0.62), "同じ予測を返す組", size=15, fill=WARN, bold=True)
+    s.text(X(1.45), Y(0.62) + 20, "b1 + 2b2 = 2", size=14, fill=WARN)
+    s.circle(X(ridge[0]), Y(ridge[1]), 8, fill=MAIN, stroke="#ffffff", sw=2)
+    s.text(X(ridge[0]) - 14, Y(ridge[1]) + 28, "ridge (0.33, 0.67)", size=15, fill=MAIN, bold=True,
+           anchor="end", halo=True)
+    s.circle(X(lasso[0]), Y(lasso[1]), 8, fill=FOCUS, stroke="#ffffff", sw=2)
+    s.text(X(lasso[0]) + 12, Y(lasso[1]) - 8, "lasso (0, 0.875)", size=15, fill=FOCUS, bold=True)
+    xaxis(s, X, 360, [-0.5, 0, 0.5, 1, 1.5, 2, 2.5], lambda v: f"{v:g}", "b1（テレビ）")
+    s.text(24, 150, "b2（総広告費）", size=15, fill=SUB)
+    s.text(24, 440, "破線：ridge と lasso の罰則が等しい線（円と菱形）", size=13, fill=SUB)
+    s.note(24, 50, ["罰則が一点を選んだだけで、", "片方だけ動かしたデータは増えていない"])
     return s
 
 
-# ---------------------------------------------------------------- 17-1
 def fig17_1():
-    """17-1 直線は控室に置き、応答の部屋に合う扉を通す。
-
-    左は件数の部屋。恒等リンクの直線は広告費0で −3件を返し、
-    log リンクなら同じ増え方でも正の範囲に留まる。
-    右は確率の部屋。恒等リンクは1を越え、logit リンクは0と1の間に収まる。
-
-    グリッド（二パネルで縦軸の意味だけが変わる）
-      左 tx = lin(96, 356, 0, 9) / ly = lin(250, 90, -5, 20)
-      右 tx = lin(456, 716, 0, 12) / ry = lin(250, 90, -0.1, 1.3)
-      y  32 タイトル / 56 副題 / 74 パネル名 / 250 底辺 / 268 目盛り / 300 結論
-      色  赤＝範囲を飛び出す直線 / 青＝範囲を守る扉つきの曲線 / 灰＝範囲の外
+    """17-1 直線を平均へ直接置くと範囲を飛び出す。扉（リンク）を挟めば範囲に収まる。
+    対照の2枚 横長 M 640x340。パネル k の x0 = 70 + 300*k、幅 240、y 60..260。
     """
-    lin_a, lin_b = -3.0, 2.5
-    assert lin_a == -3.0
-    log_d = (math.log(17.0) - math.log(2.0)) / 6.0
-    log_c = math.log(2.0) - 2 * log_d
-    assert abs(math.exp(log_c) - 0.98) < 0.02          # 広告費0でも正
-
-    s = SVG(760, 322, "応答の取り得る範囲に合う扉を、直線と平均の間へ挟む")
-    s.text(52, 32, "直線を捨てるのではなく、平均の出口を範囲へ戻す",
-           size=14, weight="700")
-    s.text(52, 54, "赤＝恒等リンク（範囲を飛び出す）　／　青＝log・logit の扉",
-           size=10, fill=SUB)
-
-    # 左：件数の部屋
-    tx = lin(96, 356, 0, 9)
-    ly = lin(250, 90, -5, 20)
-    s.text(72, 74, "件数の平均（0以上）", size=12, weight="700", fill=INK)
-    s.rect(96, ly(0), 260, 250 - ly(0), fill=TINT_MUTED, stroke="none", sw=0)
-    s.text(350, ly(-2.4), "件数にならない範囲", size=10, fill=SUB, anchor="end")
-    polyline(s, [(tx(v), ly(lin_a + lin_b * v)) for v in (0, 9)],
-             stroke=WARN, sw=2.4)
-    pts = []
-    v = 0.0
-    while v <= 9.001:
-        mu_v = math.exp(log_c + log_d * v)
-        if mu_v <= 20.0:
-            pts.append((tx(v), ly(mu_v)))
-        v += 0.05
-    polyline(s, pts, stroke=MAIN, sw=2.4)
-    s.circle(tx(0), ly(lin_a), 5.5, fill=WARN, stroke=WARN, sw=1.0)
-    s.text(tx(0) + 12, ly(lin_a) + 24, "広告費0で −3件", size=11, fill=WARN,
-           weight="700")
-    yaxis(s, 250, 90, 96, [-5, 0, 10, 20], ly, ["−5", "0", "10", "20"])
-    s.line(96, ly(0), 356, ly(0), stroke=SUB, sw=1.2, cap="butt")
-    xaxis(s, 88, 366, 250, [0, 3, 6, 9], tx, ["0", "3", "6", "9"])
-    s.text(226, 292, "広告費", size=10, fill=SUB, anchor="middle")
-
-    # 右：確率の部屋
-    tx2 = lin(456, 716, 0, 12)
-    ry = lin(250, 90, -0.1, 1.3)
-    s.text(432, 74, "確率の部屋（0から1）", size=12, weight="700", fill=INK)
-    s.rect(456, 90, 260, ry(1.0) - 90, fill=TINT_MUTED, stroke="none", sw=0)
-    s.rect(456, ry(0.0), 260, 250 - ry(0.0), fill=TINT_MUTED, stroke="none", sw=0)
-    s.text(462, ry(1.16), "確率にならない範囲", size=10, fill=SUB)
-    polyline(s, [(tx2(v), ry(0.10 + 0.10 * v)) for v in (0, 12)],
-             stroke=WARN, sw=2.4)
-    pts = []
-    v = 0.0
-    while v <= 12.001:
-        pts.append((tx2(v), ry(1.0 / (1 + math.exp(-(-2.2 + 0.55 * v))))))
-        v += 0.05
-    polyline(s, pts, stroke=MAIN, sw=2.4)
-    s.circle(tx2(11), ry(1.20), 5.5, fill=WARN, stroke=WARN, sw=1.0)
-    s.text(tx2(11) - 10, ry(1.20) - 8, "予測 120%", size=11, fill=WARN,
-           weight="700", anchor="end")
-    yaxis(s, 250, 90, 456, [0, 0.5, 1.0], ry, ["0", "50%", "100%"])
-    s.line(456, ry(0), 716, ry(0), stroke=SUB, sw=1.2, cap="butt")
-    s.line(456, ry(1), 716, ry(1), stroke=SUB, sw=1.2, cap="butt")
-    xaxis(s, 448, 726, 250, [0, 4, 8, 12], tx2, ["0", "4", "8", "12"])
-    s.text(586, 292, "広告費", size=10, fill=SUB, anchor="middle")
-
-    s.text(380, 314, "応答の部屋 → 確率の間取り → リンクの扉、の順で組む",
-           size=11, anchor="middle", weight="700", fill=INK)
+    s = SVG(640, 340, "恒等リンクの直線は件数で−3件、確率で120%へ飛び出すが、logとlogitの扉を通せば範囲に収まる")
+    # 件数：直線 y = -3 + 2.5x、log リンクは (2,2) と (8,17) を通る指数曲線
+    d = (math.log(17) - math.log(2)) / 6
+    c = math.log(2) - 2 * d
+    X = lin(70, 310, 0, 9)
+    Y = lin(260, 60, -5, 22)
+    s.text(70, 36, "件数の部屋", size=16, bold=True)
+    s.rect(70, Y(0), 240, Y(-5) - Y(0), fill=s.hatch(MUTED), stroke="none")
+    s.line(70, Y(0), 310, Y(0), stroke=INK, sw=1.4)
+    s.poly([(X(v), Y(-3 + 2.5 * v)) for v in (0, 9.5 * 0.9)], stroke=WARN, sw=3)
+    s.poly([(X(v / 10), Y(math.exp(c + d * v / 10))) for v in range(0, 86)], stroke=MAIN, sw=3)
+    s.circle(X(0), Y(-3), 6, fill=WARN, stroke="#ffffff", sw=1.5)
+    s.text(X(0) + 12, Y(-3) + 5, "−3件", size=15, fill=WARN, bold=True)
+    s.text(X(6.4), Y(16), "log の扉", size=15, fill=MAIN, bold=True, anchor="end")
+    s.text(X(4.5), 284, "広告費", size=14, fill=SUB, anchor="middle")
+    # 確率：直線 y = 0.1 x、logit 曲線
+    X2 = lin(370, 610, 0, 12)
+    Y2 = lin(260, 60, -0.1, 1.35)
+    s.text(370, 36, "確率の部屋", size=16, bold=True)
+    s.rect(370, Y2(1.35), 240, Y2(1) - Y2(1.35), fill=s.hatch(MUTED), stroke="none")
+    s.line(370, Y2(1), 610, Y2(1), stroke=INK, sw=1.4)
+    s.line(370, Y2(0), 610, Y2(0), stroke=INK, sw=1.4)
+    s.poly([(X2(0), Y2(0)), (X2(12), Y2(1.2))], stroke=WARN, sw=3)
+    s.poly([(X2(v / 10), Y2(1 / (1 + math.exp(-(v / 10 - 6) * 0.9)))) for v in range(0, 121)],
+           stroke=MAIN, sw=3)
+    s.circle(X2(12), Y2(1.2), 6, fill=WARN, stroke="#ffffff", sw=1.5)
+    s.text(X2(12) - 10, Y2(1.2) + 5, "120%", size=15, fill=WARN, bold=True, anchor="end")
+    s.text(X2(9), Y2(0.62), "logit の扉", size=15, fill=MAIN, bold=True)
+    s.text(X2(6), 284, "説明変数", size=14, fill=SUB, anchor="middle")
+    s.text(320, 326, "斜線：その応答が取れない範囲　赤：恒等リンクの直線", size=13, fill=SUB, anchor="middle")
     return s
 
 
-# ---------------------------------------------------------------- 17-3
 def fig17_3():
-    """17-3 平均が同じでも、混雑の幅が違えば人員配置は変わる。
+    """17-3 平均10件でも、分散50なら95%上側は15件でなく24件。横長 M 600x340。
 
-    本文の「平均10件・分散50」。Poisson は平均＝分散なので分散10しか作れない。
-    分散50を許す負の二項（r = mu^2/(var-mu) = 2.5）と並べ、95%上側点を比べる。
-
-    グリッド
-      kx(件数) = lin(150, 690, 0, 32) / 確率は Poisson の最大値で正規化して 高さ160
-      y  32 タイトル / 56 副題 / 254 底辺 / 272 目盛り / 300 上側点の注記
-      色  灰＝平均も分散も10のPoisson / 青＝平均10・分散50の分布 / 橙＝95%上側点
+    x: 件数 0 → 70、32 → 550。y: 確率 0 → 260、0.13 → 60。
     """
     mu, var = 10.0, 50.0
     r = mu ** 2 / (var - mu)
-    assert abs(r - 2.5) < 1e-12
     pp = r / (r + mu)
+    nb = lambda k: math.exp(math.lgamma(k + r) - math.lgamma(k + 1) - math.lgamma(r) +
+                            r * math.log(pp) + k * math.log(1 - pp))
 
-    def nb(k):
-        lg = (math.lgamma(k + r) - math.lgamma(k + 1) - math.lgamma(r)
-              + r * math.log(pp) + k * math.log(1 - pp))
-        return math.exp(lg)
-    assert abs(sum(nb(k) for k in range(0, 400)) - 1.0) < 1e-6
-    assert abs(sum(k * nb(k) for k in range(0, 900)) - mu) < 1e-2
-
-    def upper95(f):
+    def upper(f):
         acc = 0.0
-        for k in range(0, 400):
+        for k in range(400):
             acc += f(k)
             if acc >= 0.95:
                 return k
-        return 400
-    up_p = upper95(lambda k: poisson_pmf(k, mu))
-    up_n = upper95(nb)
-    assert up_p == 15 and up_n == 24
-
-    s = SVG(760, 330, "平均が同じでも、分散が広がれば必要な人員は変わる")
-    kx = lin(150, 690, 0, 32)
-    s.text(52, 32, "平均10件だけ合っていても、日ごとの山の幅は決まらない",
-           size=14, weight="700")
-    s.text(52, 54, "灰＝Poisson（平均＝分散＝10）　／　青＝平均10・分散50",
-           size=10, fill=SUB)
-
-    peak = poisson_pmf(int(mu), mu)
+    up_p, up_n = upper(lambda k: poisson(k, mu)), upper(nb)
+    assert (up_p, up_n) == (15, 24)
+    s = SVG(600, 340, "どちらも平均10件だが、95%上側はPoissonで15件、分散50の分布で24件")
+    X = lin(70, 550, 0, 32)
+    Y = lin(260, 60, 0, 0.13)
     for k in range(33):
-        w = 12
-        s.rect(kx(k) - w, 254 - 160 * poisson_pmf(k, mu) / peak, w,
-               160 * poisson_pmf(k, mu) / peak,
-               fill=TINT_MUTED, stroke=MUTED, sw=1.0)
-        s.rect(kx(k), 254 - 160 * nb(k) / peak, w, 160 * nb(k) / peak,
-               fill=TINT_MAIN, stroke=MAIN, sw=1.0)
-    s.line(150, 254, 700, 254, stroke=SUB, sw=1.2, cap="butt")
-
-    for val, col, lab, dy in (
-            (up_p, MUTED, "Poissonの95%%上側 %d件" % up_p, 36),
-            (up_n, FOCUS, "分散50なら95%%上側 %d件" % up_n, 12)):
-        s.line(kx(val), 96, kx(val), 262, stroke=col, sw=2.0, dash="6 4")
-        s.text(kx(val) + 8, 96 + dy, lab, size=11, fill=col, weight="700")
-
-    xaxis(s, 140, 700, 254, [0, 5, 10, 15, 20, 25, 30], kx,
-          ["0", "5", "10", "15", "20", "25", "30"])
-    s.text(420, 296, "一日の問い合わせ件数", size=10, fill=SUB, anchor="middle")
-    s.text(52, 320, "平均だけ合わせて上側を読むと、必要な人員を小さく見積もる",
-           size=11, fill=SUB)
+        s.rect(X(k) - 5, Y(poisson(k, mu)), 10, Y(0) - Y(poisson(k, mu)), fill=TINT[MUTED], stroke=MUTED,
+               sw=0.8)
+    s.poly([(X(k), Y(nb(k))) for k in range(33)], stroke=MAIN, sw=3)
+    for k, col, lab in ((up_p, SUB, "Poisson 上側 15件"), (up_n, FOCUS, "分散50 上側 24件")):
+        s.line(X(k), Y(0), X(k), Y(0.1), stroke=col, sw=2.4, dash="6 4")
+        s.text(X(k) + 6, Y(0.1) - (18 if k == up_p else 0), lab, size=15, fill=col, bold=True)
+    s.text(X(18), Y(0.06), "灰の柱：Poisson（分散10）", size=14, fill=SUB)
+    s.text(X(18), Y(0.06) + 22, "青の線：平均10・分散50", size=14, fill=MAIN)
+    xaxis(s, X, 260, [0, 10, 20, 30], str, "一日の問い合わせ件数")
     return s
 
 
-# ---------------------------------------------------------------- 19-1
+PCA_PTS = [(1, 2), (2, 1), (2, 3), (3, 2), (3, 4), (4, 3), (4, 5), (5, 4)]
+
+
 def fig19_1():
-    """19-1 点は動いていないのに、単位を替えると第一軸が倒れる。
+    """19-1 点は動いていないのに、単位を替えると第一主成分が倒れる。正方 S 460x460。
 
-    顧客8人の（価格, 満足度）＝(1,2)(2,1)(2,3)(3,2)(3,4)(4,3)(4,5)(5,4)。
-    1,000円単位なら共分散行列は [[1.5,1.0],[1.0,1.5]] で第一軸は45度。
-    価格を円単位（1,000倍）にすると第一軸は価格方向へ倒れ、角度はほぼ0度。
-
-    グリッド
-      tx(価格) = lin(180, 560, 0.4, 5.6) / ty(満足度) = lin(276, 84, 0.4, 5.6)
-      （縦横で1目盛りの長さを同じにした等方の図）
-      y  32 タイトル / 56 副題 / 296 目盛り / 320 結論
-      色  青＝千円単位での第一軸（45度） / 赤＝円単位での第一軸（ほぼ水平）
-          灰＝観測した顧客
+    縦横同じ縮尺：1単位 = 70px。x: 価格 0.4 → 70、5.6 → 434。y: 満足度 0.4 → 400、5.6 → 36。
     """
-    pts = [(1, 2), (2, 1), (2, 3), (3, 2), (3, 4), (4, 3), (4, 5), (5, 4)]
-    n = len(pts)
-    mx = sum(p for p, _ in pts) / n
-    my = sum(q for _, q in pts) / n
-    vxx = sum((p - mx) ** 2 for p, _ in pts) / n
-    vyy = sum((q - my) ** 2 for _, q in pts) / n
-    vxy = sum((p - mx) * (q - my) for p, q in pts) / n
-    assert abs(vxx - 1.5) < 1e-12 and abs(vyy - 1.5) < 1e-12
-    assert abs(vxy - 1.0) < 1e-12
-    ang_k = math.degrees(math.atan2(1.0, 1.0))
-    # 価格を1,000倍すると共分散は1,000倍、価格の分散は百万倍。
-    ang_y = 0.5 * math.degrees(math.atan2(2 * 1000 * vxy,
-                                          vxx * 1e6 - vyy))
-    assert abs(ang_k - 45.0) < 1e-9
-    assert ang_y < 0.04
-
-    s = SVG(760, 342, "同じ点群でも、単位を替えると第一主成分の向きが変わる")
-    tx = lin(180, 560, 0.4, 5.6)
-    ty = lin(276, 84, 0.4, 5.6)
-    s.text(52, 32, "分散最大の向きは、顧客の中身ではなく目盛りの大きさにも引かれる",
-           size=14, weight="700")
-    s.text(52, 54, "縦横で1目盛りの長さをそろえた図（主成分はこの空間で決まる）",
-           size=10, fill=SUB)
-
-    s.rect(170, 78, 400, 204, fill="#ffffff", stroke=MUTED, sw=1.0)
-    for p, q in pts:
-        s.circle(tx(p), ty(q), 6.5, fill=TINT_MUTED, stroke=MUTED, sw=1.8)
-    cx, cy = tx(mx), ty(my)
-    s.circle(cx, cy, 4, fill=INK, stroke=INK, sw=1.0)
-    s.arrow(cx, cy, tx(mx + 1.8), ty(my + 1.8), stroke=MAIN, sw=2.8)
-    s.arrow(cx, cy, tx(mx - 1.8), ty(my - 1.8), stroke=MAIN, sw=2.8)
-    s.arrow(cx, cy, tx(mx + 2.2), cy, stroke=WARN, sw=2.8)
-    s.arrow(cx, cy, tx(mx - 2.2), cy, stroke=WARN, sw=2.8)
-    s.text(tx(mx + 1.9), ty(my + 1.9) - 10, "1,000円単位の第一軸（45度）",
-           size=11, fill=MAIN, weight="700")
-    s.text(tx(mx + 2.3) + 4, cy + 20, "円単位の第一軸", size=11, fill=WARN,
-           weight="700")
-    s.text(tx(mx + 2.3) + 4, cy + 36, "（ほぼ0度）", size=11, fill=WARN,
-           weight="700")
-
-    xaxis(s, 170, 578, 282, [1, 2, 3, 4, 5], tx, ["1", "2", "3", "4", "5"])
-    s.text(375, 314, "希望価格（1,000円）", size=10, fill=SUB, anchor="middle")
-    yaxis(s, 276, 84, 170, [1, 3, 5], ty, ["1", "3", "5"])
-    s.text(132, 74, "満足度", size=10, fill=SUB)
-    s.text(52, 336,
-           "価格を1,000倍すると分散は百万倍。相関行列を使うか、"
-           "単位の意味を残すかは問いで決める", size=11, fill=SUB)
+    n = len(PCA_PTS)
+    mx = sum(p for p, _ in PCA_PTS) / n
+    my = sum(q for _, q in PCA_PTS) / n
+    vxx = sum((p - mx) ** 2 for p, _ in PCA_PTS) / n
+    vxy = sum((p - mx) * (q - my) for p, q in PCA_PTS) / n
+    vyy = sum((q - my) ** 2 for _, q in PCA_PTS) / n
+    ang_y = 0.5 * math.degrees(math.atan2(2 * 1000 * vxy, vxx * 1e6 - vyy))
+    assert (vxx, vxy, vyy) == (1.5, 1.0, 1.5) and ang_y < 0.04
+    s = SVG(460, 460, "同じ点群でも、1,000円単位なら第一主成分は45度、円単位ならほぼ水平に倒れる")
+    X = lin(70, 434, 0.4, 5.6)
+    Y = lin(400, 36, 0.4, 5.6)
+    L = 2.6
+    s.line(X(mx - L), Y(my - L), X(mx + L), Y(my + L), stroke=MAIN, sw=3)
+    s.line(X(mx - L), Y(my), X(mx + L), Y(my), stroke=WARN, sw=3, dash="8 5")
+    for p, q in PCA_PTS:
+        s.circle(X(p), Y(q), 8, fill=INK, stroke="#ffffff", sw=1.5)
+    s.text(X(mx + L) - 4, Y(my + L) + 22, "1,000円単位：45度", size=15, fill=MAIN, bold=True, anchor="end")
+    s.text(X(mx + L), Y(my) + 22, "円単位：ほぼ0度", size=15, fill=WARN, bold=True, anchor="end")
+    s.text(X(3), 440, "価格", size=15, fill=SUB, anchor="middle")
+    s.text(24, 36, "満足度", size=15, fill=SUB)
     return s
 
 
-# ---------------------------------------------------------------- 20-1
 def fig20_1():
-    """20-1 全体10%という集合写真が、二つの扉を隠している。
+    """20-1 全体10%が、正常の次5%と障害の次55%という二つの扉を隠す。横長 M 600x340。
 
-    本文の夜間監視。全100時間のうち障害は10時間で全体10%だが、
-    正常の次の一時間が障害になるのは5%、障害の次は55%。
-    障害が2時間続く構造を、時系列の帯として示す。
-
-    グリッド
-      帯 x 150..690 を40コマ（1コマ 13.5px）、y 96..126
-      柱 三本 中心 x 240 / 420 / 600、底辺 y 288、高さ = 率 × 150
-      y  32 タイトル / 56 副題 / 88 帯ラベル / 140 注記 / 288 底辺 / 308 柱ラベル
-      色  赤＝障害の時間 / 灰＝全体をならした率 / 橙＝いまいる部屋から出る率
+    帯：40時間を x 60..540（1時間 12px）、y 60..90。柱：中心 x 150 / 300 / 450、底 y 290、高さ=率*300。
     """
-    overall, from_ok, from_ng = 0.10, 0.05, 0.55
     strip = [0] * 40
-    for start in (9, 26):
-        strip[start] = strip[start + 1] = 1
-    assert sum(strip) / len(strip) == 0.10
-
-    s = SVG(760, 340, "全体の障害率10%が、正常の次と障害の次という二つの扉を隠す")
-    s.text(52, 32, "必要な過去を「現在」という部屋へ畳んでから、出る扉の率を見る",
-           size=14, weight="700")
-    s.text(52, 54, "一度落ちると復旧まで二時間かかるので、障害は固まって起きる",
-           size=10, fill=SUB)
-
-    s.text(52, 88, "直近40時間", size=11, fill=SUB, weight="700")
+    for a in (9, 26):
+        strip[a] = strip[a + 1] = 1
+    assert sum(strip) / 40 == 0.1
+    s = SVG(600, 340, "障害は全体では10%だが、正常の次の時間は5%、障害の次の時間は55%")
+    s.text(24, 40, "40時間の記録（赤が障害）", size=15, fill=SUB)
     for i, v in enumerate(strip):
-        s.rect(150 + i * 13.5, 96, 13.5, 30,
-               fill=TINT_WARN if v else "#ffffff",
-               stroke=WARN if v else MUTED, sw=1.2)
-    s.text(694, 116, "→ 時間", size=10, fill=SUB)
-    s.text(150, 148, "赤＝障害。ならせば10%でも、赤の隣は赤になりやすい",
-           size=11, fill=SUB)
-
-    for cx, val, col, lab in ((240, overall, MUTED, "全100時間をならした率"),
-                              (420, from_ok, MAIN, "正常だった次の一時間"),
-                              (600, from_ng, FOCUS, "障害だった次の一時間")):
-        s.rect(cx - 46, 288 - 150 * val, 92, 150 * val,
-               fill=TINT_MUTED if col is MUTED else
-               (TINT_MAIN if col is MAIN else TINT_FOCUS),
-               stroke=col, sw=2.0)
-        s.text(cx, 288 - 150 * val - 10, "%d%%" % round(val * 100), size=14,
-               fill=col, anchor="middle", weight="700")
-        s.text(cx, 308, lab, size=11, anchor="middle", fill=INK)
-    s.line(150, 288, 690, 288, stroke=SUB, sw=1.2, cap="butt")
-    s.text(52, 330, "同じログでも、どの部屋にいるかを条件にすると次の予報が変わる",
-           size=11, fill=SUB)
+        s.rect(60 + 12 * i, 56, 12, 28, fill=WARN if v else TINT[MUTED], stroke="#ffffff", sw=1)
+    for x, rate, lab, col in ((150, 0.10, "全体をならす", MUTED), (300, 0.05, "正常の次", MAIN),
+                              (450, 0.55, "障害の次", FOCUS)):
+        s.rect(x - 40, 290 - rate * 300, 80, rate * 300, fill=col, stroke="none")
+        s.text(x, 290 - rate * 300 - 10, f"{rate:.0%}", size=18, anchor="middle", bold=True,
+               fill=INK if col != MUTED else SUB)
+        s.text(x, 314, lab, size=15, anchor="middle", fill=INK if col != MUTED else SUB)
+    s.line(90, 290, 510, 290, stroke=MUTED)
+    s.note(24, 130, "次の1時間が障害になる率")
     return s
 
 
-# ---------------------------------------------------------------- 20-3
 def fig20_3():
-    """20-3 揺れの大きい証言は軽く、安定した証言は重くする。
+    """20-3 揺れの大きい証言は軽く、安定した証言は重くして更新する。横長 M 600x360。
 
-    本文の午前3時06分。第一センサーが5.0度、第二センサーが0.4度、
-    手持ち計が0.5度の上昇を示し、直前までの足取りからの予測はほぼ0度。
-    更新後は0.6度で、幅は通常より広い。
-
-    グリッド
-      tx(度) = lin(150, 660, -0.8, 7.2)
-      行 y  110 予測 / 152 第一センサー / 194 第二センサー / 236 手持ち計
-           284 更新後
-      誤差棒の長さは校正試験での揺れの大小だけを表す（本文に数値は無い）
-      y  32 タイトル / 56 副題 / 316 目盛り / 336 軸ラベル
-      色  灰＝直前までの予測 / 青＝観測した三つの値 / 橙＝更新後の推定
+    x: 度 -0.8 → 170、7.2 → 570。行 y = 70 + 52*i（予測・3観測）、更新後 y=300。
+    横棒の長さは校正での揺れの大小の比較で、数値区間ではない。
     """
-    obs = [("第一センサー", 5.0, 1.9), ("第二センサー", 0.4, 0.7),
-           ("手持ち計", 0.5, 0.35)]
-    pred = 0.05
-    updated = 0.6
-    assert obs[0][1] == 5.0 and obs[2][1] == 0.5 and updated == 0.6
-
-    s = SVG(760, 352, "揺れの大きい証言を軽く、安定した証言を重くして更新する")
-    tx = lin(150, 660, -0.8, 7.2)
-    s.text(52, 32, "五度を真実とせず、全部ノイズともせず、途中の像を更新する",
-           size=14, weight="700")
-    s.text(52, 54, "横棒は校正試験で分かった相対的な揺れ（数値区間ではない）",
-           size=10, fill=SUB)
-
-    s.line(tx(pred), 96, tx(pred), 300, stroke=MUTED, sw=1.4, dash="5 3")
-    rows = [("直前までの予測", pred, 0.5, MUTED, 110)]
-    rows += [(n, v, e, MAIN, y) for (n, v, e), y in
-             zip(obs, (152, 194, 236))]
-    for name, val, err, col, y in rows:
-        s.text(150, y + 4, name, size=11, fill=INK, anchor="end")
-        s.line(tx(val - err), y, tx(val + err), y, stroke=col, sw=2.0)
-        s.line(tx(val - err), y - 5, tx(val - err), y + 5, stroke=col, sw=1.6)
-        s.line(tx(val + err), y - 5, tx(val + err), y + 5, stroke=col, sw=1.6)
-        s.circle(tx(val), y, 6, fill=col, stroke=col, sw=1.0)
-        s.text(tx(val), y - 14, "%.1f 度" % val, size=10, fill=col,
-               anchor="middle", weight="700")
-    s.text(150, 288, "更新後の推定", size=12, fill=FOCUS, anchor="end",
-           weight="700")
-    s.line(tx(updated - 0.9), 284, tx(updated + 0.9), 284, stroke=FOCUS, sw=2.6)
-    s.line(tx(updated - 0.9), 278, tx(updated - 0.9), 290, stroke=FOCUS, sw=1.8)
-    s.line(tx(updated + 0.9), 278, tx(updated + 0.9), 290, stroke=FOCUS, sw=1.8)
-    s.circle(tx(updated), 284, 7.5, fill=FOCUS, stroke=FOCUS, sw=1.0)
-    s.text(tx(updated), 268, "0.6 度（幅は通常より広い）", size=11, fill=FOCUS,
-           anchor="middle", weight="700")
-
-    xaxis(s, 140, 680, 316, [0, 1, 2, 3, 4, 5, 6, 7], tx,
-          ["0", "1", "2", "3", "4", "5", "6", "7"])
-    s.text(410, 344, "内部温度の上昇量（度）", size=10, fill=SUB, anchor="middle")
+    rows = [("予測", 0.05, 0.9, MUTED), ("第一センサー", 5.0, 1.9, MAIN), ("第二センサー", 0.4, 0.7, MAIN),
+            ("手持ち計", 0.5, 0.35, MAIN)]
+    s = SVG(600, 360, "揺れの大きい第一センサーの5.0度は軽く、手持ち計の0.5度は重く効き、更新後は0.6度")
+    X = lin(170, 570, -0.8, 7.2)
+    s.line(X(0), 50, X(0), 320, stroke=MUTED, dash="3 4")
+    for i, (name, v, e, col) in enumerate(rows):
+        y = 70 + 52 * i
+        s.text(150, y + 5, name, size=15, anchor="end", fill=SUB if col == MUTED else INK)
+        s.line(X(v - e), y, X(v + e), y, stroke=col, sw=10 * 0.35 / e + 1.5)
+        s.circle(X(v), y, 6, fill=col, stroke="#ffffff", sw=1.5)
+        s.text(X(v + e) + 8, y + 5, f"{v:g}度", size=14, fill=SUB)
+    y = 300
+    s.text(150, y + 5, "更新後", size=16, anchor="end", bold=True, fill=FOCUS)
+    s.line(X(0.6 - 0.45), y, X(0.6 + 0.45), y, stroke=FOCUS, sw=4)
+    s.circle(X(0.6), y, 8, fill=FOCUS, stroke="#ffffff", sw=2)
+    s.text(X(1.05) + 8, y + 5, "0.6度", size=16, fill=FOCUS, bold=True)
+    s.line(160, 272, 580, 272, stroke=MUTED)
+    s.text(X(3.2), 346, "横棒が細く長いほど揺れが大きい（重みが軽い）", size=13, fill=SUB, anchor="middle")
     return s
 
 
-# ---------------------------------------------------------------- 21-1
 def fig21_1():
-    """21-1 同じ8個の空欄でも、どこが抜けるかで結論が変わる。
+    """21-1 同じ8個の空欄でも、どこが抜けたかで平均が変わる。小さな多数 3段 L 720x420。
 
-    本文の三つのログ。甲は校正係がくじで抜き、乙は旧型中継器の夜勤（前半）が抜け、
-    丙は真の温度が高いところで温度計が記録を止める。
-    温度列は seed 23 の擬似乱数で決定的に作り、抜けた後の平均を比べる。
-
-    グリッド
-      tx(枠) = lin(160, 680, 0, 39)、点は真の温度、ty(度) = lin(y0, y0-58, 35, 43)
-      行 y0  132（甲）/ 216（乙）/ 300（丙）
-      y  32 タイトル / 56 副題 / 各行 −70 見出し / 各行 +18 平均
-      色  青＝観測できた枠 / 赤＝欠測した枠（×印） / 灰＝真の平均
+    x: 枠 0..39 → 120..660。段 r の中心 y0 = 110 + 120*r、温度 35..43 → y0+40..y0-40。
     """
     r = lcg(23)
-    temps = []
-    for i in range(40):
-        base = 38.0 + 2.2 * math.sin(i * 0.42)
-        temps.append(round(base + (r() - 0.5) * 1.4, 3))
-    true_mean = sum(temps) / len(temps)
-    miss_a = [2, 7, 12, 18, 23, 29, 33, 38]
-    # 観測済みの時刻・機種に依存する欠測。夜勤に当たる前半20枠だけから選び、
-    # この具体例では観測平均をほぼ変えない配置にする。
-    miss_b = [0, 4, 6, 8, 10, 12, 15, 18]
-    miss_c = sorted(range(40), key=lambda i: -temps[i])[:8]
-    assert len(set(miss_a)) == len(set(miss_b)) == len(set(miss_c)) == 8
-    assert len(miss_b) == 8
-    assert max(miss_b) < 20                     # 乙は夜勤（前半）だけが欠測
-
-    def kept_mean(miss):
-        keep = [t for i, t in enumerate(temps) if i not in miss]
-        return sum(keep) / len(keep)
-    assert kept_mean(miss_c) < true_mean - 0.4      # 丙だけ平均が下へずれる
-    assert abs(kept_mean(miss_a) - true_mean) < 0.25
-    assert abs(kept_mean(miss_b) - true_mean) < 0.05
-
-    s = SVG(760, 356, "空欄の数ではなく、どこが空欄になったかが推測を左右する")
-    tx = lin(160, 680, 0, 39)
-    s.text(52, 32, "穴の大きさより、大きな魚だけ抜ける形の穴かを見る",
-           size=14, weight="700")
-    s.text(52, 54, "同じ温度記録40枠から、8枠が欠ける三つの仕組み", size=10, fill=SUB)
-
-    for y0, miss, name, note in ((132, miss_a, "甲：くじで抜いた",
-                                  "値にも札にも関係なく抜ける"),
-                                 (216, miss_b, "乙：旧型中継器の夜勤",
-                                  "観測済みの札（時刻・機種）で説明できる"),
-                                 (300, miss_c, "丙：高温で記録が止まる",
-                                  "抜けた値そのものが抜ける理由")):
-        ty = lin(y0, y0 - 58, 35, 43)
-        s.text(52, y0 - 46, name, size=12, weight="700", fill=INK)
-        s.text(198, y0 - 46, note, size=9, fill=SUB)
-        s.line(160, y0 + 2, 680, y0 + 2, stroke=MUTED, sw=1.0)
+    temps = [round(38.0 + 2.2 * math.sin(i * 0.42) + (r() - 0.5) * 1.4, 3) for i in range(40)]
+    true_mean = sum(temps) / 40
+    plans = [("甲：くじで抜ける", [2, 7, 12, 18, 23, 29, 33, 38]),
+             ("乙：夜勤の時間に抜ける", [0, 4, 6, 8, 10, 12, 15, 18]),
+             ("丙：高温のときに抜ける", sorted(range(40), key=lambda i: -temps[i])[:8])]
+    kept = lambda m: sum(t for i, t in enumerate(temps) if i not in m) / 32
+    assert kept(plans[2][1]) < true_mean - 0.4 and abs(kept(plans[0][1]) - true_mean) < 0.25
+    s = SVG(720, 420, "くじや夜勤で抜けても観測平均はほぼ動かないが、高温だけ抜けると平均が低く見える")
+    X = lin(120, 660, 0, 39)
+    for k, (name, miss) in enumerate(plans):
+        y0 = 110 + 120 * k
+        Y = lin(y0 + 40, y0 - 40, 35, 43)
+        s.text(24, y0 - 54, name, size=15, bold=True, fill=WARN if k == 2 else INK)
+        s.line(X(0), Y(true_mean), X(39), Y(true_mean), stroke=MUTED, dash="4 4")
+        m = kept(miss)
+        s.line(X(0), Y(m), X(39), Y(m), stroke=FOCUS if k == 2 else MAIN, sw=2)
         for i, t in enumerate(temps):
             if i in miss:
-                s.cross(tx(i), ty(t), 4.5, stroke=WARN, sw=1.8)
+                s.line(X(i) - 5, Y(t) - 5, X(i) + 5, Y(t) + 5, stroke=WARN, sw=2)
+                s.line(X(i) - 5, Y(t) + 5, X(i) + 5, Y(t) - 5, stroke=WARN, sw=2)
             else:
-                s.circle(tx(i), ty(t), 3.2, fill=MAIN, stroke=MAIN, sw=0.8)
-        km = kept_mean(miss)
-        s.line(160, ty(km), 680, ty(km), stroke=FOCUS, sw=1.8, dash="5 3")
-        s.text(686, ty(km) + 4, "観測平均 %.1f 度" % km, size=10, fill=FOCUS,
-               weight="700")
-    s.text(52, 348, "真の平均は %.1f 度。丙だけ、平均も分散も低く見える"
-           % true_mean, size=11, fill=SUB)
+                s.circle(X(i), Y(t), 4.5, fill=MAIN, stroke="none")
+        s.text(700, y0 - 54, f"観測平均 {m:.1f}度（真 {true_mean:.1f}）", size=14, anchor="end",
+               fill=FOCUS if k == 2 else SUB, bold=k == 2)
+    s.text(390, 410, "40枠の温度。×が欠測、破線が真の平均、実線が観測できた枠の平均", size=13,
+           fill=SUB, anchor="middle")
     return s
 
 
-# ---------------------------------------------------------------- 21-3
 def fig21_3():
-    """21-3 故障で階段が下がり、打切りでは下げずに次の段の人数だけ減る。
+    """21-3 打切りは階段を下げず、次の段の人数だけを減らす。縦長 M 520x520。
 
-    本文の五台。2日目に一台故障、3日目に一台が追跡終了、5日目に一台故障、
-    残る二台は6日目まで稼働。生存率は 1 → 0.8 → 0.8 → 0.533。
-
-    グリッド
-      tx(日) = lin(160, 620, 0, 6.6)
-      上段 五台の追跡線 y 100 + i*26（i = 0..4）
-      下段 生存曲線 ty(率) = lin(320, 200, 0, 1)、底辺 320
-      y  32 タイトル / 76 上段見出し / 240 下段見出し / 336 目盛り / 356 軸ラベル
-      色  赤＝故障（×） / 灰＝追跡終了（縦棒） / 青＝生存曲線 / 橙＝危険集合の人数
+    x: 日 0 → 110、6.6 → 480。上段 追跡線 y = 70 + 32*i、下段 生存曲線 y 320..470（率 0..1）。
     """
-    tracks = [(2.0, "fail"), (3.0, "censor"), (5.0, "fail"),
-              (6.0, "alive"), (6.0, "alive")]
-    steps = []
-    surv, at_risk = 1.0, 5
-    for t in (2.0, 5.0):
-        d = 1
-        surv *= (1 - d / at_risk)
-        steps.append((t, surv, at_risk))
-        at_risk -= d
-        if t == 2.0:
-            at_risk -= 1          # 3日目の追跡終了
-    assert abs(steps[0][1] - 0.8) < 1e-12
-    assert abs(steps[1][1] - 0.5333333) < 1e-6
-    assert steps[1][2] == 3
-
-    s = SVG(760, 400, "打切りは階段を下げず、次の段の人数だけを減らす")
-    tx = lin(160, 620, 0, 6.6)
-    ty = lin(330, 234, 0, 1)
-    s.text(52, 32, "途中まで走った時間を捨てず、観察の終わりと寿命の終わりを分ける",
-           size=14, weight="700")
-
-    s.text(52, 74, "五台の追跡", size=12, weight="700", fill=INK)
+    tracks = [(2, "fail"), (3, "censor"), (5, "fail"), (6, "alive"), (6, "alive")]
+    surv = [(0, 1.0), (2, 0.8), (5, 0.8 * 2 / 3)]
+    assert abs(surv[2][1] - 0.5333) < 1e-3
+    s = SVG(520, 520, "3日目の追跡終了では生存率は下がらず危険集合が減るだけ、5日目の故障で0.533へ落ちる")
+    X = lin(110, 480, 0, 6.6)
+    s.text(24, 40, "5台の追跡", size=15, bold=True)
     for i, (t, kind) in enumerate(tracks):
-        y = 96 + i * 22
-        s.text(150, y + 4, "%d号機" % (i + 1), size=10, fill=SUB, anchor="end")
-        s.line(tx(0), y, tx(t), y, stroke=MAIN, sw=2.2)
+        y = 70 + 32 * i
+        s.text(90, y + 5, f"{i + 1}号", size=14, fill=SUB, anchor="end")
+        s.line(X(0), y, X(t), y, stroke=MAIN if kind != "censor" else MUTED, sw=3)
         if kind == "fail":
-            s.cross(tx(t), y, 6, stroke=WARN, sw=2.4)
-            s.text(tx(t) + 12, y + 4, "故障", size=10, fill=WARN, weight="700")
+            s.line(X(t) - 7, y - 7, X(t) + 7, y + 7, stroke=WARN, sw=3)
+            s.line(X(t) - 7, y + 7, X(t) + 7, y - 7, stroke=WARN, sw=3)
         elif kind == "censor":
-            s.line(tx(t), y - 7, tx(t), y + 7, stroke=MUTED, sw=2.6)
-            s.text(tx(t) + 12, y + 4, "追跡終了", size=10, fill=SUB,
-                   weight="700")
-        else:
-            s.arrow(tx(t), y, tx(t) + 14, y, stroke=MAIN, sw=2.0)
-
-    s.text(52, 220, "そこから作る生存曲線", size=12, weight="700", fill=INK)
-    path = [(tx(0), ty(1.0))]
-    prev = 1.0
-    for t, sv, risk in steps:
-        path += [(tx(t), ty(prev)), (tx(t), ty(sv))]
-        prev = sv
-    path.append((tx(6.6), ty(prev)))
-    polyline(s, path, stroke=MAIN, sw=2.6)
-    for t, sv, risk in steps:
-        s.circle(tx(t), ty(sv), 5.5, fill=MAIN, stroke=MAIN, sw=1.0)
-        s.text(tx(t) + 10, ty(sv) - 8, "%.3f" % sv, size=11, fill=MAIN,
-               weight="700")
-        s.text(tx(t), 376, "危険集合 %d台" % risk, size=10, fill=FOCUS,
-               anchor="middle", weight="700")
-    s.line(tx(3.0), ty(0.8), tx(3.0), 330, stroke=MUTED, sw=1.6, dash="5 3")
-    s.text(tx(3.0) + 8, 306, "打切りでは下げない", size=10, fill=SUB,
-           weight="700")
-
-    xaxis(s, 150, 640, 330, [0, 1, 2, 3, 4, 5, 6], tx,
-          ["0", "1", "2", "3", "4", "5", "6"])
-    s.text(390, 394, "追跡日数（日）", size=10, fill=SUB, anchor="middle")
-    yaxis(s, 330, 234, 160, [0, 0.5, 1.0], ty, ["0", "0.5", "1.0"])
+            s.line(X(t), y - 10, X(t), y + 10, stroke=SUB, sw=3)
+            s.text(X(t) + 10, y + 5, "追跡終了（打切り）", size=14, fill=SUB)
+    for t, n in ((2, 5), (5, 3)):
+        s.line(X(t), 50, X(t), 470, stroke=MUTED, dash="3 4")
+        s.text(X(t), 250, f"危険集合 {n}台", size=14, fill=FOCUS, anchor="middle", bold=True)
+    s.text(24, 300, "生存率", size=15, bold=True)
+    Y = lin(470, 320, 0, 1)
+    pts = []
+    for (t0, v), (t1, _) in zip(surv, surv[1:] + [(6.6, None)]):
+        pts += [(X(t0), Y(v)), (X(t1), Y(v))]
+    s.poly(pts, stroke=MAIN, sw=3.5)
+    for t, v in surv[1:]:
+        s.text(X(t) + 8, Y(v) - 8, f"{v:.3g}", size=15, fill=MAIN, bold=True)
+    s.line(X(0), 470, X(6.6), 470, stroke=MUTED)
+    for d in range(7):
+        s.text(X(d), 492, str(d), size=14, fill=SUB, anchor="middle")
+    s.text(X(3.3), 514, "日", size=14, fill=SUB, anchor="middle")
+    s.note(X(2) + 8, Y(0.8) + 40, ["3日目は下がらない"])
     return s
 
 
-# ---------------------------------------------------------------- 22-1
 def fig22_1():
-    """22-1 適合の改善に、部品数の請求書を足して順位を付け直す。
+    """22-1 部品代を足すと、尤度で勝った大模型が負ける。正方 M 540x460。
 
-    本文の二模型。小 k=2・−2logL=100、大 k=10・−2logL=90。
-    AIC は 104 対 110、n=100 の BIC は 109.22 対 136.10 で、どちらも小模型が勝つ。
-    kを1増やすとき同点を保つのに必要な適合改善が、AICは2、BICは4.61になる。
-
-    グリッド
-      dx(−2logL) = lin(180, 620, 84, 116) / dy(k) = lin(292, 92, 0, 13)
-      小模型 (100, 2) → (455.0, 261.2) / 大模型 (90, 10) → (317.5, 138.5)
-      y  32 タイトル / 56 副題 / 312 目盛り / 336 軸ラベル
-      色  青＝小模型を通る等AIC線 / 橙＝等BIC線（n=100） / 灰＝二つの候補
+    x: −2logL 84 → 90、116 → 500。y: 部品数 k 0 → 390、13 → 60。
+    等AIC線・等BIC線は小模型を通り、左下ほど良い。
     """
     small, large = (100.0, 2), (90.0, 10)
-    aic = [d + 2 * k for d, k in (small, large)]
     pen = math.log(100)
-    bic = [d + pen * k for d, k in (small, large)]
-    assert aic == [104.0, 110.0]
-    assert abs(bic[0] - 109.21) < 0.02 and abs(bic[1] - 136.05) < 0.02
-    assert abs(math.log(10) - 2.3026) < 1e-3
-    assert abs(math.log(10000) - 9.2103) < 1e-3
-
-    s = SVG(760, 348, "適合の改善へ部品代を足すと、二模型の順位が入れ替わる")
-    dx = lin(180, 620, 84, 116)
-    dy = lin(292, 92, 0, 13)
-    s.text(52, 32, "尤度だけなら大模型。部品代を足すと小模型が勝つ",
-           size=14, weight="700")
-    s.text(52, 54, "線が左下にあるほど良い。傾きの絶対値が罰の重さ", size=10, fill=SUB)
-
-    for c, col, lab, slope in ((aic[0], MAIN, "等AIC線（罰 2k）", 2.0),
-                               (bic[0], FOCUS, "等BIC線（n=100、罰 4.61k）", pen)):
-        # 見えている k の範囲だけで端点を作る（y を切り詰めると傾きが崩れる）
-        k_hi = min(13.0, (c - 84.0) / slope)
-        polyline(s, [(dx(c), dy(0)), (dx(c - slope * k_hi), dy(k_hi))],
-                 stroke=col, sw=2.4, dash="7 4")
-        s.text(dx(c - slope * k_hi) + 8, dy(k_hi) - 8, lab, size=11, fill=col,
-               weight="700")
-
-    for (d, k), name, col, dyy in ((small, "小模型 k=2", MAIN, 22),
-                                   (large, "大模型 k=10", WARN, -16)):
-        s.circle(dx(d), dy(k), 8, fill=col, stroke=col, sw=1.0)
-        s.text(dx(d) + 14, dy(k) + dyy, name, size=12, fill=col, weight="700")
-    s.text(dx(small[0]) + 14, dy(small[1]) + 38, "AIC 104 ／ BIC 109.2",
-           size=10, fill=SUB)
-    s.text(dx(large[0]) + 14, dy(large[1]) + 2, "AIC 110 ／ BIC 136.1",
-           size=10, fill=SUB)
-
-    xaxis(s, 170, 632, 292, [90, 100, 110], dx, ["90", "100", "110"])
-    s.text(400, 336, "−2 log L（小さいほど当てはまりが良い）", size=10,
-           fill=SUB, anchor="middle")
-    yaxis(s, 292, 92, 180, [0, 5, 10], dy, ["0", "5", "10"])
-    s.text(140, 84, "部品数 k", size=10, fill=SUB)
+    assert small[0] + 2 * small[1] == 104 and large[0] + 2 * large[1] == 110
+    s = SVG(540, 460, "小模型を通る等AIC線・等BIC線より大模型は右上にあり、部品代込みではどちらも小模型が勝つ")
+    X = lin(90, 500, 84, 116)
+    Y = lin(390, 60, 0, 13)
+    for slope, col, name in ((2, MAIN, "等AIC（k1つに2）"), (pen, FOCUS, "等BIC（k1つに4.61）")):
+        k0, k1 = 0, 2 + 16 / slope
+        s.line(X(small[0] - slope * (k0 - small[1])), Y(k0), X(small[0] - slope * (k1 - small[1])), Y(k1),
+               stroke=col, sw=2.4)
+    s.text(X(small[0] - 2 * 8) + 10, Y(8) + 4, "等AIC（2改善）", size=14, fill=MAIN, bold=True)
+    s.text(X(small[0] - pen * 3.5) + 10, Y(3.5) + 4, "等BIC（4.61改善）", size=14, fill=FOCUS, bold=True)
+    for (d, k), name in ((small, "小模型"), (large, "大模型")):
+        s.circle(X(d), Y(k), 8, fill=INK, stroke="#ffffff", sw=2)
+        s.text(X(d) + 12, Y(k) + 5, f"{name}（{d:g}, {k}）", size=15, bold=True)
+    xaxis(s, X, 390, [85, 90, 95, 100, 105, 110, 115], str, "−2 log L（小さいほど当てはまる）")
+    for v in (0, 5, 10):
+        s.text(X(84) - 8, Y(v) + 5, str(v), size=14, fill=SUB, anchor="end")
+    s.text(24, 40, "部品数 k", size=15, fill=SUB)
+    s.note(X(104), Y(11.6), ["大模型は線の右上", "＝負け"], color=WARN)
     return s
 
 
-# ---------------------------------------------------------------- 22-2
 def fig22_2():
-    """22-2 セルをばらばらに隠すか、人を隠すか、未来を隠すか。
+    """22-2 同じ5セルを評価へ回しても、何を隠したかで試験の意味が変わる。小さな多数 L 720x330。
 
-    本文の予測大会。同じ顧客の月〜木で学び金曜を当てると95%、
-    顧客ごとに分けると72%。運用でまだ知らない単位を丸ごと隠したかを見る。
-
-    グリッド（三パネルで格子の座標を固定し、変えるのは評価へ回すセルだけ）
-      パネル左上 x 130 / 340 / 550、セル 34×30、5顧客 × 5日
-      y  32 タイトル / 76 パネル名 / 110..260 格子 / 284 結論
-      色  青＝訓練に使うセル / 橙＝評価へ回すセル / 灰＝格子の枠
+    パネル k の左上 x0 = 70 + 220*k, y0 = 90。セル 32x32、5顧客 x 5日。
     """
-    days = ["月", "火", "水", "木", "金"]
-    random_cells = {(0, 2), (1, 4), (2, 1), (3, 3), (4, 0)}
-    plans = [
-        ("セルを無作為に分ける",
-         lambda i, j: (i, j) in random_cells,
-         "同じ顧客の別の日を当てているだけ", WARN),
-        ("顧客ごとに分ける",
-         lambda i, j: i == 3,
-         "初めて会う顧客で測れる", MAIN),
-        ("未来の日で分ける",
-         lambda i, j: j == 4,
-         "過去から未来を当てる試験になる", MAIN),
-    ]
-    assert sum(1 for i in range(5) for j in range(5) if plans[0][1](i, j)) == 5
-    assert sum(1 for i in range(5) for j in range(5) if plans[1][1](i, j)) == 5
-    assert sum(1 for i in range(5) for j in range(5) if plans[2][1](i, j)) == 5
-
-    s = SVG(760, 308, "隠すのはセルではなく、運用でまだ知らない単位そのもの")
-    s.text(52, 32, "同じ25セルでも、どの単位を丸ごと隠したかで試験の意味が変わる",
-           size=14, weight="700")
-    s.text(52, 54, "橙＝評価へ回すセル　／　青＝訓練に使うセル", size=10, fill=SUB)
-
-    for p, (title, is_test, note, col) in enumerate(plans):
-        x0 = 130 + p * 212
-        s.text(x0, 78, title, size=12, weight="700", fill=INK)
-        for j, d in enumerate(days):
-            s.text(x0 + 17 + j * 34, 102, d, size=9, fill=SUB, anchor="middle")
+    rnd = {(0, 2), (1, 4), (2, 1), (3, 3), (4, 0)}
+    plans = [("セルを無作為に", lambda i, j: (i, j) in rnd, "同じ顧客の別の日", WARN),
+             ("顧客ごとに", lambda i, j: i == 3, "初めて会う顧客", MAIN),
+             ("未来の日で", lambda i, j: j == 4, "過去から未来", MAIN)]
+    s = SVG(720, 330, "評価へ回すのは同じ5セルでも、セル単位・顧客単位・未来の日で試験の意味が変わる")
+    for k, (title, f, meaning, col) in enumerate(plans):
+        x0, y0 = 70 + 220 * k, 90
+        s.text(x0, 40, title, size=16, bold=True)
+        for j, d in enumerate("月火水木金"):
+            s.text(x0 + 16 + 32 * j, y0 - 10, d, size=14, fill=SUB, anchor="middle")
         for i in range(5):
-            if p == 0:
-                s.text(x0 - 6, 128 + i * 30, "客%d" % (i + 1), size=9,
-                       fill=SUB, anchor="end")
+            if k == 0:
+                s.text(x0 - 10, y0 + 22 + 32 * i, f"客{i + 1}", size=14, fill=SUB, anchor="end")
             for j in range(5):
-                test = is_test(i, j)
-                s.rect(x0 + j * 34, 110 + i * 30, 34, 30,
-                       fill=TINT_FOCUS if test else TINT_MAIN,
-                       stroke=FOCUS if test else MAIN, sw=1.2)
-        s.text(x0 + 85, 284, note, size=11, fill=col, anchor="middle",
-               weight="700")
+                hit = f(i, j)
+                s.rect(x0 + 32 * j, y0 + 32 * i, 32, 32, fill=FOCUS if hit else TINT[MAIN], stroke="#ffffff",
+                       sw=2)
+        s.text(x0, y0 + 190, "測れるもの：", size=14, fill=SUB)
+        s.text(x0, y0 + 212, meaning, size=15, fill=col, bold=True)
+    s.text(360, 324, "橙：評価へ回すセル　青：学習に使うセル", size=13, fill=SUB, anchor="middle")
     return s
 
 
-def _beta_pdf(x, a, b):
-    if x <= 0 or x >= 1:
-        return 0.0
-    lg = (math.lgamma(a + b) - math.lgamma(a) - math.lgamma(b)
-          + (a - 1) * math.log(x) + (b - 1) * math.log(1 - x))
-    return math.exp(lg)
+def beta_pdf(x, a, b):
+    return math.exp((a - 1) * math.log(x) + (b - 1) * math.log(1 - x) - (math.lgamma(a) + math.lgamma(b)
+                                                                            - math.lgamma(a + b)))
 
 
-# ---------------------------------------------------------------- 23-1
 def fig23_1():
-    """23-1 同じ平均2%の事前分布でも、持ち込む強さで事後が動く。
+    """23-1 同じ平均2%の事前分布でも、持ち込む強さで事後の位置が変わる。縦長 M 560x480。
 
-    本文の新製品20台中2台。強さ100の Beta(2,98) なら事後は Beta(4,116) で平均3.33%、
-    強さ10の Beta(0.2,9.8) なら Beta(2.2,27.8) で平均7.33%。尤度は共通。
-
-    グリッド（二段で横軸を固定し、変えるのは事前分布の強さだけ）
-      tx(θ) = lin(150, 690, 0, 0.30)
-      上段 底辺 y 186、下段 底辺 y 306、高さはいずれも 92
-      y  32 タイトル / 56 副題 / 76 上段名 / 196 下段名 / 322 目盛り
-      色  灰＝事前分布 / 橙＝新製品20台の尤度 / 青＝事後分布
+    x: θ 0 → 70、0.3 → 530。段 k の底 y = 200 + 200*k、高さ 140（段ごとに最大値で正規化）。
     """
-    cases = []
-    for a0, b0, strength in ((2.0, 98.0, 100), (0.2, 9.8, 10)):
-        a1, b1 = a0 + 2, b0 + 18
-        cases.append((a0, b0, a1, b1, strength, a1 / (a1 + b1)))
-    assert cases[0][2] == 4.0 and cases[0][3] == 116.0
-    assert abs(cases[0][5] - 0.033333) < 1e-6
-    assert abs(cases[1][5] - 0.073333) < 1e-6
-
-    s = SVG(760, 394, "同じ平均の事前分布でも、持ち込む強さで事後の位置が変わる")
-    tx = lin(150, 690, 0, 0.30)
-    s.text(52, 32, "旧製品を何票ぶん持ち込むかは、自然法則ではなく選んだ重さ",
-           size=14, weight="700")
-    s.text(52, 54, "新製品20台中2台が故障（尤度は上下で共通）", size=10, fill=SUB)
-
-    def row(base, a0, b0, a1, b1, strength, post_mean, name):
-        s.text(52, base - 112, name, size=12, weight="700", fill=INK)
-        top = max(max(_beta_pdf(i / 600.0, a1, b1) for i in range(1, 200)),
-                  max(_beta_pdf(i / 600.0, a0, b0) for i in range(1, 200)))
-        for a, b, col, sw in ((a0, b0, MUTED, 2.0), (a1, b1, MAIN, 2.6)):
-            pts = []
-            i = 1
-            while i <= 180:
-                v = i / 600.0
-                pts.append((tx(v), base - 92 * _beta_pdf(v, a, b) / top))
-                i += 1
-            polyline(s, pts, stroke=col, sw=sw)
-        # 20台中2台の尤度（形だけを橙で重ねる）
-        lk = [(tx(i / 600.0),
-               base - 92 * (i / 600.0) ** 2 * (1 - i / 600.0) ** 18
-               / max((j / 600.0) ** 2 * (1 - j / 600.0) ** 18
-                     for j in range(1, 181)))
-              for i in range(1, 181)]
-        polyline(s, lk, stroke=FOCUS, sw=1.8, dash="5 3")
-        s.line(150, base, 690, base, stroke=SUB, sw=1.2, cap="butt")
-        s.line(tx(post_mean), base - 96, tx(post_mean), base + 6,
-               stroke=MAIN, sw=2.0)
-        s.text(tx(post_mean) + 8, base - 84,
-               "事後平均 %.2f%%" % (post_mean * 100), size=11, fill=MAIN,
-               weight="700")
-
-    row(196, *cases[0], name="強さ100 の事前分布（旧製品100台ぶん）")
-    row(334, *cases[1], name="強さ10 の事前分布（同じ平均2%）")
-    s.text(560, 76, "灰＝事前　橙＝尤度　青＝事後", size=10, fill=SUB)
-    xaxis(s, 140, 700, 350, [0, 0.05, 0.10, 0.15, 0.20, 0.25, 0.30], tx,
-          ["0", "5%", "10%", "15%", "20%", "25%", "30%"])
-    s.text(415, 384, "新製品の故障確率", size=10, fill=SUB, anchor="middle")
+    s = SVG(560, 480, "尤度は同じでも、事前分布の強さ100なら事後平均3.33%、強さ10なら7.33%")
+    X = lin(70, 530, 0, 0.3)
+    xs = [0.002 + i * 0.298 / 300 for i in range(301)]
+    lik = lambda t: t ** 2 * (1 - t) ** 18
+    for k, (a, b, strength) in enumerate(((2, 98, 100), (0.2, 9.8, 10))):
+        base = 200 + 200 * k
+        a1, b1 = a + 2, b + 18
+        mean = a1 / (a1 + b1)
+        assert abs(mean - (0.0333 if k == 0 else 0.0733)) < 1e-3
+        curves = [(lambda t, a=a, b=b: beta_pdf(t, a, b), MUTED, 2),
+                  (lik, FOCUS, 2.4), (lambda t, a=a1, b=b1: beta_pdf(t, a, b), MAIN, 3.5)]
+        s.text(24, base - 158, f"事前の強さ {strength}", size=16, bold=True)
+        for f, col, sw in curves:
+            vals = [f(t) for t in xs]
+            m = max(vals)
+            s.poly([(X(t), base - min(v / m, 1) * 130) for t, v in zip(xs, vals)], stroke=col, sw=sw)
+        s.line(X(0), base, X(0.3), base, stroke=MUTED)
+        s.line(X(mean), base, X(mean), base - 140, stroke=MAIN, dash="4 3")
+        s.text(X(mean) + 6, base - 142, f"事後平均 {mean:.2%}", size=15, fill=MAIN, bold=True)
+    for v in (0, 0.1, 0.2, 0.3):
+        s.text(X(v), 424, f"{v:.0%}", size=14, fill=SUB, anchor="middle")
+    s.text(300, 450, "故障率 θ", size=14, fill=SUB, anchor="middle")
+    s.text(24, 472, "灰：事前分布　橙：20台中2台の尤度　青：事後分布", size=13, fill=SUB)
     return s
 
 
-# ---------------------------------------------------------------- 23-2
 def fig23_2():
-    """23-2 分母が小さい地域ほど、共通の中心へ強く引き寄せられる。
+    """23-2 同じ0件でも、分母が違えば共通中心へ引き寄せられる量が違う。正方 M 540x440。
 
-    本文の練習。共通中心50%・強さ10の Beta(5,5) を貸すと、
-    A(0/2)は0%→41.7%、B(5/10)は50%→50%、C(50/100)は50%→50%。
-    D(0/100)は同じ0件でも4.5%までしか動かない。
-
-    グリッド
-      観測の列 x 250 / 縮小後の列 x 560、ty(率) = lin(300, 96, 0, 0.6)
-      行ラベル x 150、地域ごとの矢印は左右の点をまっすぐ結ぶ
-      y  32 タイトル / 56 副題 / 76 列見出し / 322 注記
-      色  橙＝観測した率 / 青＝共通情報を借りた後の率 / 灰＝共通中心50%
+    左の列 x=140（観測）、右の列 x=340（借りた後）。y: 率 0 → 370、0.6 → 70。
     """
-    prior_a, prior_b = 5.0, 5.0
-    regions = [("A地域", 0, 2), ("B地域", 5, 10), ("C地域", 50, 100),
-               ("D地域", 0, 100)]
-    rows = []
-    for name, x, n in regions:
+    rows = [("A 0/2", 0, 2), ("B 5/10", 5, 10), ("C 50/100", 50, 100), ("D 0/100", 0, 100)]
+    post = [(x + 5) / (n + 10) for _, x, n in rows]
+    assert abs(post[0] - 0.4167) < 1e-3 and abs(post[3] - 0.0455) < 1e-3
+    s = SVG(540, 440, "共通中心50%から同じ量を借りても、2台のAは0%から41.7%へ、100台のDは4.5%までしか動かない")
+    Y = lin(370, 70, 0, 0.6)
+    s.text(140, 44, "観測", size=15, anchor="middle", bold=True)
+    s.text(340, 44, "借りた後", size=15, anchor="middle", bold=True)
+    s.text(240, Y(0.5) - 10, "B・C は 50% のまま（共通中心も 50%）", size=13, fill=SUB, anchor="middle")
+    for (name, x, n), p in zip(rows, post):
         raw = x / n
-        post = (x + prior_a) / (n + prior_a + prior_b)
-        rows.append((name, x, n, raw, post))
-    assert abs(rows[0][4] - 0.4166667) < 1e-6
-    assert abs(rows[1][4] - 0.5) < 1e-12
-    assert abs(rows[2][4] - 0.5) < 1e-12
-    assert abs(rows[3][4] - 0.0454545) < 1e-6
-
-    s = SVG(760, 328, "同じ0件でも、分母が違えば縮む量が違う")
-    tx = lin(230, 640, 0, 0.60)
-    s.text(52, 32, "小さい島ほど本土の灯台を頼り、大きい島は自前の地図を使う",
-           size=14, weight="700")
-    s.text(52, 54, "共通中心50%・強さ10の情報を、どの地域へも同じだけ貸す",
-           size=10, fill=SUB)
-
-    s.line(tx(0.5), 88, tx(0.5), 260, stroke=MUTED, sw=1.8, dash="6 4")
-    s.text(tx(0.5), 82, "共通中心 50%", size=10, fill=SUB, anchor="middle")
-
-    notes = ["二台だけなので大きく縮む", "", "百台あるので動かない",
-             "同じ0件でも百台ぶんの証拠がある"]
-    for i, ((name, x, n, raw, post), note) in enumerate(zip(rows, notes)):
-        y = 116 + i * 36
-        s.text(222, y + 4, "%s　%d/%d" % (name, x, n), size=12, fill=INK,
-               anchor="end")
-        if abs(post - raw) > 1e-9:
-            s.arrow(tx(raw), y, tx(post), y, stroke=MUTED, sw=1.6)
-        s.circle(tx(raw), y, 6.5, fill=FOCUS, stroke=FOCUS, sw=1.0)
-        s.circle(tx(post), y, 6.5, fill=MAIN, stroke=MAIN, sw=1.0)
-        s.text(tx(post) + 12, y + 4, "%.1f%%" % (post * 100), size=12,
-               fill=MAIN, weight="700")
-        if note:
-            s.text(tx(post) + 62, y + 4, note, size=10, fill=SUB)
-
-    xaxis(s, 220, 652, 268, [0, 0.2, 0.4, 0.6], tx, ["0", "20%", "40%", "60%"])
-    s.text(436, 296, "故障率", size=10, fill=SUB, anchor="middle")
-    s.text(52, 88, "橙＝観測した率", size=10, fill=FOCUS, weight="700")
-    s.text(52, 104, "青＝借りた後の率", size=10, fill=MAIN, weight="700")
-    s.text(52, 320, "縮む量は観測率の見た目でなく、分母と群間のばらつきで決まる",
-           size=11, fill=SUB)
+        f = name[0] in "AD"
+        col = FOCUS if f else MUTED
+        s.line(140, Y(raw), 340, Y(p), stroke=col, sw=3 if f else 1.4)
+        s.circle(140, Y(raw), 7, fill=col, stroke="#ffffff", sw=1.5)
+        s.circle(340, Y(p), 7, fill=MAIN if f else MUTED, stroke="#ffffff", sw=1.5)
+        if f:
+            s.text(356, Y(p) + 5, f"{name}：{p:.1%}", size=15, bold=True)
+    s.text(128, Y(0) + 5, "A・D 0%", size=14, anchor="end", bold=True)
+    s.text(128, Y(0.5) + 5, "50%", size=14, anchor="end", fill=SUB)
+    s.text(24, 420, "太い2本が同じ0件。分母が小さいほど強く引き寄せられる", size=13, fill=SUB)
     return s
 
 
-# ---------------------------------------------------------------- 24-1
 def fig24_1():
-    """24-1 どちらの端末型でも更新群が低いのに、合計では逆転する。
+    """24-1 どちらの端末型でも更新群が低いのに、合計では更新群が高く見える。傾きグラフ 正方 M 520x440。
 
-    本文の数値。新型では更新10台中1台（10%）・未更新90台中18台（20%）、
-    旧型では更新90台中36台（40%）・未更新10台中5台（50%）。
-    合計は更新37%・未更新23%で、層内と逆向きになる。
-
-    グリッド（幅が台数、高さが故障率。面積が故障台数）
-      更新群 x 130..390 / 未更新群 x 430..690、sy(率) = lin(276, 96, 0, 0.6)
-      y  32 タイトル / 56 副題 / 78 群名 / 290 幅ラベル / 316 合計
-      色  青＝新型 / 灰＝旧型 / 赤＝合計（層内と逆向き）
+    左の列 x=170（更新群）、右の列 x=370（未更新群）。y: 故障率 0 → 380、60% → 80。
+    丸の面積は台数に比例（100台で半径 22）。
     """
-    groups = {
-        "更新": [("新型", 10, 1), ("旧型", 90, 36)],
-        "未更新": [("新型", 90, 18), ("旧型", 10, 5)],
-    }
-    tot = {}
-    for g, rows in groups.items():
-        tot[g] = sum(f for _, _, f in rows) / sum(n for _, n, _ in rows)
-    assert abs(tot["更新"] - 0.37) < 1e-12 and abs(tot["未更新"] - 0.23) < 1e-12
-    assert groups["更新"][0][2] / 10 == 0.1 and groups["未更新"][0][2] / 90 == 0.2
-    assert groups["更新"][1][2] / 90 == 0.4 and groups["未更新"][1][2] / 10 == 0.5
-
-    s = SVG(760, 336, "層の中では更新が低いのに、合計では更新が高く見える")
-    sy = lin(276, 96, 0, 0.6)
-    s.text(52, 32, "更新群へ故障しやすい旧型が多く入った構成差が、向きを反転させる",
-           size=14, weight="700")
-    s.text(52, 54, "幅が台数、高さが故障率（面積が故障台数）", size=10, fill=SUB)
-
-    def bars(x0, gname):
-        rows = groups[gname]
-        s.text(x0, 78, "%s群（100台）" % gname, size=12, weight="700", fill=INK)
-        cur = x0
-        for tname, n, f in rows:
-            w = n * 2.6
-            rate = f / n
-            s.rect(cur, sy(rate), w, 276 - sy(rate),
-                   fill=TINT_MAIN if tname == "新型" else TINT_MUTED,
-                   stroke=MAIN if tname == "新型" else MUTED, sw=1.8)
-            s.text(cur + w / 2, sy(rate) - 8, "%d%%" % round(rate * 100),
-                   size=12, anchor="middle", weight="700",
-                   fill=MAIN if tname == "新型" else SUB)
-            s.text(cur + w / 2, 292, "%s %d台" % (tname, n), size=10,
-                   fill=SUB, anchor="middle")
-            cur += w
-        s.line(x0, sy(tot[gname]), x0 + 260, sy(tot[gname]), stroke=WARN,
-               sw=2.4)
-        s.text(x0 + 130, 316, "合計 %d%%" % round(tot[gname] * 100), size=13,
-               fill=WARN, anchor="middle", weight="700")
-
-    bars(130, "更新")
-    bars(430, "未更新")
-    s.line(130, 276, 690, 276, stroke=SUB, sw=1.2, cap="butt")
-    yaxis(s, 276, 96, 130, [0, 0.25, 0.5], sy, ["0", "25%", "50%"])
-    return s
-
-
-# ---------------------------------------------------------------- 24-2
-def fig24_2():
-    """24-2 入庫という一つの升を消すと、無かった関係が生まれる。
-
-    本文の toy 例。更新 X と潜在劣化 U は独立で各50%、どちらかが1なら入庫 S=1、
-    故障 Y は U と同じ。全体では更新の有無で故障率は50%どうしだが、
-    入庫者だけに絞ると X=0 で100%、X=1 で50%になる。
-
-    グリッド（二パネルで四つの升の座標を固定し、消えるのは (0,0) だけ）
-      左 表 x 150..350 / 右 x 470..670、セル 100×72、行 y 118..262
-      y  32 タイトル / 76 パネル名 / 100 列見出し / 286 群ごとの故障率
-         312 結論
-      色  青＝残っている升 / 赤＝入庫で消える升 / 橙＝結論の数値
-    """
-    cells = {(0, 0): 0, (0, 1): 1, (1, 0): 0, (1, 1): 1}   # Y = U
-    all_x0 = [y for (x, _), y in cells.items() if x == 0]
-    all_x1 = [y for (x, _), y in cells.items() if x == 1]
-    assert sum(all_x0) / 2 == 0.5 and sum(all_x1) / 2 == 0.5
-    sel = {k: v for k, v in cells.items() if k != (0, 0)}
-    s_x0 = [y for (x, _), y in sel.items() if x == 0]
-    s_x1 = [y for (x, _), y in sel.items() if x == 1]
-    assert sum(s_x0) / len(s_x0) == 1.0
-    assert sum(s_x1) / len(s_x1) == 0.5
-
-    s = SVG(760, 340, "入庫者だけを見ると、効果0の更新が故障を半減して見える")
-    s.text(52, 32, "分岐点は閉じるために調整し、合流点は触ると閉じた道を開ける",
-           size=14, weight="700")
-
-    def table(x0, title, drop):
-        s.text(x0 - 8, 76, title, size=12, weight="700", fill=INK)
-        s.text(x0 + 50, 104, "更新なし", size=10, fill=SUB, anchor="middle")
-        s.text(x0 + 150, 104, "更新あり", size=10, fill=SUB, anchor="middle")
-        for i, u in enumerate((1, 0)):
-            s.text(x0 - 12, 158 + i * 72, "劣化%s" % ("あり" if u else "なし"),
-                   size=10, fill=SUB, anchor="end")
-            for j, x in enumerate((0, 1)):
-                cx, cy = x0 + j * 100, 118 + i * 72
-                gone = drop and (x, u) == (0, 0)
-                s.rect(cx, cy, 100, 72,
-                       fill=TINT_WARN if gone else TINT_MAIN,
-                       stroke=WARN if gone else MAIN, sw=1.8,
-                       dash="5 3" if gone else None)
-                if gone:
-                    s.cross(cx + 50, cy + 30, 11, stroke=WARN, sw=2.6)
-                    s.text(cx + 50, cy + 60, "入庫しない", size=10, fill=WARN,
-                           anchor="middle", weight="700")
-                else:
-                    s.text(cx + 50, cy + 42, "故障 %s" % ("あり" if cells[(x, u)]
-                                                       else "なし"),
-                           size=12, fill=MAIN, anchor="middle", weight="700")
-        for j, (x, vals) in enumerate((("なし", s_x0 if drop else all_x0),
-                                       ("あり", s_x1 if drop else all_x1))):
-            rate = sum(vals) / len(vals)
-            s.text(x0 + 50 + j * 100, 288, "故障 %d%%" % round(rate * 100),
-                   size=13, fill=FOCUS, anchor="middle", weight="700")
-
-    table(150, "全体で見る（更新の効果は0）", False)
-    table(470, "入庫した台だけで見る", True)
-    s.text(380, 320,
-           "効果0のまま、入庫という合流点を条件にしただけで 100% 対 50% になる",
-           size=11, anchor="middle", fill=INK, weight="700")
-    return s
-
-
-# ---------------------------------------------------------------- 25-1
-def fig25_1():
-    """25-1 閾値は気分ではなく、二つの期待損失が交差する踏切。
-
-    本文の料金表。危険なのに継続すると損失100、安全なのに停止すると5、
-    危険時に停止しても残余損失2。継続の期待損失は 100p、停止は 5-3p で、
-    交点は p = 5/103 ≒ 4.85%。危険確率4%と6%で旗が変わる。
-
-    グリッド
-      tx(p) = lin(150, 660, 0, 0.12) / ty(損失) = lin(276, 92, 0, 12)
-      交点 p = 0.04854 → (356.3, 202.5)
-      y  32 タイトル / 56 副題 / 292 目盛り / 316 二台の判定
-      色  赤＝継続の期待損失 / 青＝停止の期待損失 / 橙＝二つが交差する閾値
-    """
-    l_cont, l_stop_safe, l_stop_risk = 100.0, 5.0, 2.0
-    thr = l_stop_safe / (l_cont + l_stop_safe - l_stop_risk)
-    assert abs(thr - 5.0 / 103.0) < 1e-12
-    assert abs(thr - 0.048544) < 1e-6
-    at4 = (100 * 0.04, 5 - 3 * 0.04)
-    at6 = (100 * 0.06, 5 - 3 * 0.06)
-    assert at4[0] < at4[1] and at6[0] > at6[1]
-
-    s = SVG(760, 344, "閾値は50%ではなく、二つの期待損失が交差する4.85%")
-    tx = lin(150, 660, 0, 0.12)
-    ty = lin(276, 92, 0, 12)
-    s.text(52, 32, "確率を出した後に、間違え方の重さを置いて初めて行動が決まる",
-           size=14, weight="700")
-    s.text(52, 54, "危険なのに継続すると100、安全なのに停止すると5、危険時の停止は2",
-           size=10, fill=SUB)
-
-    polyline(s, [(tx(0), ty(0)), (tx(0.12), ty(12))], stroke=WARN, sw=2.6)
-    polyline(s, [(tx(0), ty(5)), (tx(0.12), ty(5 - 0.36))], stroke=MAIN, sw=2.6)
-    s.text(tx(0.104), ty(10.4) - 8, "継続の期待損失 100p", size=11, fill=WARN,
-           weight="700", anchor="end")
-    s.text(tx(0.104), ty(4.7) + 20, "停止の期待損失 5 − 3p", size=11,
-           fill=MAIN, weight="700", anchor="end")
-
-    s.line(tx(thr), 92, tx(thr), 286, stroke=FOCUS, sw=2.4)
-    s.circle(tx(thr), ty(100 * thr), 7, fill=FOCUS, stroke=FOCUS, sw=1.0)
-    s.text(tx(thr) + 10, 108, "閾値 4.85%", size=13, fill=FOCUS, weight="700")
-    s.text(tx(thr) + 10, 126, "ここより左は継続、右は停止", size=10, fill=SUB)
-
-    for p, (c, st), lab, lx_ in ((0.04, at4, "危険4% → 継続", 0.018),
-                                 (0.06, at6, "危険6% → 停止", 0.088)):
-        s.line(tx(p), ty(c), tx(p), ty(st), stroke=MUTED, sw=1.4, dash="4 3")
-        s.circle(tx(p), ty(c), 4.5, fill=WARN, stroke=WARN, sw=1.0)
-        s.circle(tx(p), ty(st), 4.5, fill=MAIN, stroke=MAIN, sw=1.0)
-        s.text(tx(lx_), 316, lab, size=11, anchor="middle", weight="700",
-               fill=INK)
-
-    xaxis(s, 140, 670, 276, [0, 0.02, 0.04, 0.06, 0.08, 0.10, 0.12], tx,
-          ["0", "2%", "4%", "6%", "8%", "10%", "12%"])
-    s.text(405, 336, "危険状態である確率", size=10, fill=SUB, anchor="middle")
-    yaxis(s, 276, 92, 150, [0, 5, 10], ty, ["0", "5", "10"])
-    s.text(112, 84, "期待損失", size=10, fill=SUB)
-    return s
-
-
-# ---------------------------------------------------------------- 25-4
-def fig25_4():
-    """25-4 同じ400件でも、時間の形が違えば別の工程になる。
-
-    本文の音声応答停止。10,000台中400件で率4%。だが400件のうち360件は
-    同一batch・software更新直後の一時間へ固まっていた。
-    合計も平均も同じ二つの時間の形を、同じ座標で並べる。
-
-    グリッド（二段で時間軸と縦軸を固定し、変えるのは件数の並びだけ）
-      tx(時) = lin(150, 690, 0, 23) / 高さは 360件で 96px
-      上段 底辺 y 168 / 下段 底辺 y 300（高さは 360件 で 110px）
-      y  32 タイトル / 56 副題 / 88 上段名 / 210 下段名 / 308 目盛り
-      色  灰＝全期間へならした形 / 赤＝一時間へ束になった形
-    """
-    total, n_units = 400, 10000
-    assert total / n_units == 0.04
-    flat = [total / 24.0] * 24
-    burst = [(400 - 360) / 23.0] * 24
-    burst[9] = 360
-    assert abs(sum(flat) - total) < 1e-9 and abs(sum(burst) - total) < 1e-9
-
-    s = SVG(760, 348, "合計400件・平均4%が同じでも、時間の形はまったく違う")
-    tx = lin(150, 690, 0, 23)
-    s.text(52, 32, "年平均の雨量で堤防を設計すると、集中豪雨の山が消える",
-           size=14, weight="700")
-    s.text(52, 54, "どちらも一日で400件、10,000台に対して率4%", size=10, fill=SUB)
-
-    def row(base, vals, col, tint, name_y, name, note):
-        s.text(52, name_y, name, size=12, weight="700", fill=INK)
-        s.text(52, name_y + 16, note, size=10, fill=SUB)
-        for i, v in enumerate(vals):
-            h = 110.0 * v / 360.0
-            s.rect(tx(i) - 9, base - h, 18, h, fill=tint, stroke=col, sw=1.2)
-        s.line(150, base, 700, base, stroke=SUB, sw=1.2, cap="butt")
-
-    row(168, flat, MUTED, TINT_MUTED, 110, "全期間へならした形",
-        "一時間あたり約17件")
-    row(300, burst, WARN, TINT_WARN, 212, "実際の形",
-        "一時間に360件、残り23時間で40件")
-    s.text(tx(9) + 16, 196, "software更新直後の一時間", size=11, fill=WARN,
-           weight="700")
-
-    xaxis(s, 140, 700, 300, [0, 6, 12, 18, 23], tx,
-          ["0時", "6時", "12時", "18時", "23時"])
-    s.text(420, 340, "発生時刻", size=10, fill=SUB, anchor="middle")
-    return s
-
-
-# ---------------------------------------------------------------- 27-5
-def fig27_5():
-    """27-5 片方だけ有意でも、二つが有意に違う証拠にはならない。
-
-    大都市と小地域で推定した効果は同じ −6ポイントだが、標本数が違うため
-    区間の幅が違い、大都市だけが0をまたがない。
-    二つの差そのものの区間は0を含む。
-
-    グリッド
-      tx(効果) = lin(200, 680, -16, 8)
-      行 y  120 大都市 / 176 小地域 / 250 二つの差
-      y  32 タイトル / 56 副題 / 100 0 の線ラベル / 296 目盛り / 330 結論
-      色  青＝0をまたがない区間 / 灰＝0をまたぐ区間 / 橙＝二つの差の区間
-    """
-    est = -6.0
-    se_city, se_small = 2.3, 4.7
-    rows = [("大都市", est, se_city), ("小地域", est, se_small)]
-    diff_se = math.sqrt(se_city ** 2 + se_small ** 2)
-    assert est - 1.96 * se_city < 0 and est + 1.96 * se_city < 0
-    assert est + 1.96 * se_small > 0
-    assert -1.96 * diff_se < 0 < 1.96 * diff_se
-
-    s = SVG(760, 352, "同じ推定値でも幅が違うだけで、片方だけが有意になる")
-    tx = lin(200, 680, -16, 8)
-    s.text(52, 32, "「片方だけ有意」は「二つが有意に違う」ではない",
-           size=14, weight="700")
-    s.text(52, 54, "推定した効果はどちらも −6 ポイント。違うのは標本数だけ",
-           size=10, fill=SUB)
-
-    s.line(tx(0), 96, tx(0), 286, stroke=MUTED, sw=1.8, dash="6 4")
-    s.text(tx(0), 90, "効果なし（0）", size=10, fill=SUB, anchor="middle")
-
-    for (name, e, se), y in zip(rows, (128, 184)):
-        lo, hi = e - 1.96 * se, e + 1.96 * se
-        col = MAIN if hi < 0 else MUTED
-        s.text(190, y + 4, name, size=12, fill=INK, anchor="end")
-        s.line(tx(lo), y, tx(hi), y, stroke=col, sw=2.6)
-        s.line(tx(lo), y - 6, tx(lo), y + 6, stroke=col, sw=1.8)
-        s.line(tx(hi), y - 6, tx(hi), y + 6, stroke=col, sw=1.8)
-        s.circle(tx(e), y, 6.5, fill=col, stroke=col, sw=1.0)
-        s.text(tx(hi) + 10, y + 4,
-               "有意" if hi < 0 else "有意でない", size=11, fill=col,
-               weight="700")
-
-    y = 250
-    lo, hi = -1.96 * diff_se, 1.96 * diff_se
-    s.text(190, y + 4, "二つの差", size=12, fill=FOCUS, anchor="end",
-           weight="700")
-    s.line(tx(lo), y, tx(hi), y, stroke=FOCUS, sw=2.6)
-    s.line(tx(lo), y - 6, tx(lo), y + 6, stroke=FOCUS, sw=1.8)
-    s.line(tx(hi), y - 6, tx(hi), y + 6, stroke=FOCUS, sw=1.8)
-    s.circle(tx(0), y, 6.5, fill=FOCUS, stroke=FOCUS, sw=1.0)
-    s.text(tx(hi) + 10, y + 4, "0 を含む", size=11, fill=FOCUS, weight="700")
-
-    xaxis(s, 190, 692, 286, [-15, -10, -5, 0, 5], tx,
-          ["−15", "−10", "−5", "0", "+5"])
-    s.text(440, 316, "返品率の変化（ポイント）", size=10, fill=SUB,
-           anchor="middle")
-    s.text(52, 344, "比べるべきは二本のハードルの越え方でなく、二人の距離の差",
-           size=11, fill=SUB)
-    return s
-
-
-# ---------------------------------------------------------------- 27-7
-def fig27_7():
-    """27-7 「差を検出できない」と「害の上限が小さいと示した」は違う。
-
-    許容できる害の上限（margin）を先に置くと、同じ「有意でない」区間でも、
-    害が上限未満だと示せる場合と示せない場合に分かれる。これは両側の
-    同等性ではなく、安全性について上側だけを見る非劣性型の問いである。
-    本文の更新群100人中2件・比較群0件は、Wilson区間を使うNewcombe法では
-    差がおよそ -2.0〜7.0ポイントとなり、4ポイントのmarginをまたぐ。
-
-    グリッド
-      tx(差) = lin(200, 680, -8, 10)
-      行 y  126 / 182 / 238（三つの区間）
-      y  32 タイトル / 56 副題 / 96 基準線ラベル / 272 目盛り / 316 結論
-      色  灰＝0 の線 / 赤＝許容できる害の上限 / 青＝上限未満を示せた区間
-          橙＝示せなかった区間
-    """
-    margin = 4.0
-
-    def wilson_interval(x, n, z=1.96):
-        p = x / n
-        den = 1 + z * z / n
-        center = (p + z * z / (2 * n)) / den
-        half = z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / den
-        return center - half, center + half
-
-    def newcombe_difference(x1, n1, x2, n2):
-        """Wilson score intervalsを合成したNewcombeの比率差区間（ポイント）。"""
-        p1, p2 = x1 / n1, x2 / n2
-        l1, u1 = wilson_interval(x1, n1)
-        l2, u2 = wilson_interval(x2, n2)
-        lo = p1 - p2 - math.sqrt((p1 - l1) ** 2 + (u2 - p2) ** 2)
-        hi = p1 - p2 + math.sqrt((u1 - p1) ** 2 + (p2 - l2) ** 2)
-        return 100 * (p1 - p2), 100 * lo, 100 * hi
-
-    observed = newcombe_difference(2, 100, 0, 100)
-    assert tuple(round(v, 1) for v in observed) == (2.0, -2.0, 7.0)
-    cases = [("更新群2/100・比較群0/100", *observed),
-             ("追跡を増やして幅が狭まった場合", 1.0, -1.4, 3.4),
-             ("害が実際に大きかった場合", 6.0, 3.1, 8.9)]
-    out = []
-    for name, e, lo, hi in cases:
-        if lo > 0:
-            verdict, col = "害が増えている", WARN
-        elif hi < margin:
-            verdict, col = "上限未満を示せた", MAIN
-        else:
-            verdict, col = "上限をまたぐ＝まだ示せていない", FOCUS
-        out.append((name, e, lo, hi, verdict, col))
-    assert out[0][5] is FOCUS and out[1][5] is MAIN and out[2][5] is WARN
-    assert out[0][2] < 0 < out[0][3] and out[1][2] < 0 < out[1][3]
-
-    s = SVG(760, 336, "有意でないことと、害の上限が十分小さいと示すことは別")
-    tx = lin(200, 660, -8, 11)
-    s.text(52, 32, "許容できる害の上限を先に置かないと、安心へ変換できない",
-           size=14, weight="700")
-    s.text(52, 54, "上の二つはどちらも「有意差なし」だが、言えることが違う",
-           size=10, fill=SUB)
-
-    s.line(tx(0), 96, tx(0), 262, stroke=MUTED, sw=1.6, dash="6 4")
-    s.text(tx(0), 90, "差なし", size=10, fill=SUB, anchor="middle")
-    s.line(tx(margin), 96, tx(margin), 262, stroke=WARN, sw=2.2)
-    s.text(tx(margin) + 8, 90, "許容できる害の上限（margin）", size=10,
-           fill=WARN, weight="700")
-
-    for (name, e, lo, hi, verdict, col), y in zip(out, (126, 182, 238)):
-        s.text(190, y + 4, name, size=11, fill=INK, anchor="end")
-        s.line(tx(lo), y, tx(hi), y, stroke=col, sw=2.6)
-        s.line(tx(lo), y - 6, tx(lo), y + 6, stroke=col, sw=1.8)
-        s.line(tx(hi), y - 6, tx(hi), y + 6, stroke=col, sw=1.8)
-        s.circle(tx(e), y, 6.5, fill=col, stroke=col, sw=1.0)
-        s.text(tx(lo), y - 14, verdict, size=10, fill=col, weight="700")
-
-    xaxis(s, 190, 672, 262, [-5, 0, 5, 10], tx, ["−5", "0", "+5", "+10"])
-    s.text(440, 294, "害の増加（ポイント、右ほど悪い）", size=10, fill=SUB,
-           anchor="middle")
-    s.text(52, 326, "margin は結果を見た後でなく、設計のときに置く", size=11,
-           fill=SUB)
-    return s
-
-
-# ---------------------------------------------------------------- 28-1
-def fig28_1():
-    """28-1 罰し方を替えると、釣り合う場所が動く。
-
-    本文の停止時間 1, 1, 1, 101 秒。二乗誤差の最小は平均26、
-    絶対誤差の最小は中央値1。同じデータでも目的関数で答えが変わる。
-
-    グリッド
-      tx(θ) = lin(150, 690, -4, 110) / 各損失は自分の最大値で正規化して 高さ150
-      y  32 タイトル / 56 副題 / 258 底辺 / 276 目盛り / 300 観測 / 326 結論
-      色  青＝二乗誤差（谷は平均26） / 橙＝絶対誤差（谷は中央値1） / 灰＝観測点
-    """
-    data = [1, 1, 1, 101]
-    mean = sum(data) / len(data)
-    med = 1.0
-    assert mean == 26.0
-    assert sum(abs(v - med) for v in data) < sum(abs(v - mean) for v in data)
-    assert (sum((v - mean) ** 2 for v in data)
-            < sum((v - med) ** 2 for v in data))
-
-    def sq(t):
-        return sum((v - t) ** 2 for v in data)
-
-    def ab(t):
-        return sum(abs(v - t) for v in data)
-
-    s = SVG(760, 348, "同じ四つの観測でも、罰し方を替えると釣り合う場所が動く")
-    tx = lin(150, 690, -4, 110)
-    s.text(52, 32, "推定量は道具の名前ではなく、何を罰するかという設計",
-           size=14, weight="700")
-    s.text(52, 54, "停止時間 1・1・1・101 秒", size=10, fill=SUB)
-
-    for f, col, lab, best, dy, dxx in ((sq, MAIN, "二乗誤差", mean, -18, 14),
-                                       (ab, FOCUS, "絶対誤差", med, 26, -14)):
-        top = max(f(-4), f(110))
+    groups = {"更新": [("新型", 10, 1), ("旧型", 90, 36)], "未更新": [("新型", 90, 18), ("旧型", 10, 5)]}
+    tot = {g: sum(f for _, _, f in r) / sum(n for _, n, _ in r) for g, r in groups.items()}
+    assert abs(tot["更新"] - 0.37) < 1e-9 and abs(tot["未更新"] - 0.23) < 1e-9
+    s = SVG(520, 440, "新型でも旧型でも更新群が10ポイント低いのに、合計では更新37%対未更新23%で逆転する")
+    Y = lin(380, 80, 0, 0.6)
+    xs = {"更新": 170, "未更新": 370}
+    for g, x in xs.items():
+        s.text(x, 44, f"{g}群", size=16, anchor="middle", bold=True)
+        s.line(x, Y(0), x, Y(0.6), stroke=MUTED)
+    for k, (name, col) in enumerate((("新型", MAIN), ("旧型", SUB))):
         pts = []
-        t = -4.0
-        while t <= 110.001:
-            pts.append((tx(t), 258 - 150 * f(t) / top))
-            t += 0.5
-        polyline(s, pts, stroke=col, sw=2.4)
-        s.circle(tx(best), 258 - 150 * f(best) / top, 6.5, fill=col,
-                 stroke=col, sw=1.0)
-        s.text(tx(best) + dxx, 258 - 150 * f(best) / top + dy,
-               "%sの谷 → %g" % (lab, best), size=12, fill=col, weight="700",
-               anchor="start" if dxx > 0 else "end")
-    s.line(150, 258, 700, 258, stroke=SUB, sw=1.2, cap="butt")
-    for v in set(data):
-        tri_up(s, tx(v), 250, 6, fill=INK)
-    s.text(tx(1), 302, "観測 1（三つ）", size=10, fill=SUB, anchor="middle")
-    s.text(tx(101), 302, "観測 101", size=10, fill=SUB, anchor="middle")
-
-    xaxis(s, 140, 700, 258, [25, 50, 75], tx, ["25", "50", "75"])
-    s.text(420, 330,
-           "101秒が入力ミスか本物の危険故障かで、どちらの谷を選ぶかが変わる",
-           size=11, fill=SUB, anchor="middle")
+        for g, x in xs.items():
+            _, n, f = groups[g][k]
+            pts.append((x, Y(f / n), n, f / n))
+        s.line(pts[0][0], pts[0][1], pts[1][0], pts[1][1], stroke=col, sw=2.4)
+        for x, y, n, r in pts:
+            s.circle(x, y, 22 * math.sqrt(n / 100), fill=TINT[MAIN] if col == MAIN else TINT[MUTED],
+                     stroke=col, sw=1.6)
+            s.text(x - 30 if x == 170 else x + 30, y + 5, f"{r:.0%}（{n}台）", size=14,
+                   anchor="end" if x == 170 else "start", fill=col)
+        s.text(270, (pts[0][1] + pts[1][1]) / 2 - 10, f"{name}：上がる", size=15, anchor="middle",
+               bold=True, fill=col, halo=True)
+    y1, y2 = Y(tot["更新"]), Y(tot["未更新"])
+    s.line(170, y1, 370, y2, stroke=WARN, sw=3.5, dash="8 5")
+    s.text(270, (y1 + y2) / 2 + 26, "合計：下がる", size=15, anchor="middle", bold=True, fill=WARN, halo=True)
+    s.text(140, y1 + 24, "37%", size=15, anchor="end", bold=True, fill=WARN)
+    s.text(382, y2 + 5, "23%", size=15, bold=True, fill=WARN)
+    for v in (0, 0.3, 0.6):
+        s.text(470, Y(v) + 5, f"{v:.0%}", size=13, fill=SUB, anchor="end")
+    s.text(24, 424, "縦：故障率　丸の大きさ：台数", size=13, fill=SUB)
     return s
 
 
-# ---------------------------------------------------------------- 29-1
-def fig29_1():
-    """29-1 支配される案を消し、重みを置けるなら平均し、置けないなら最悪を守る。
+def fig24_2():
+    """24-2 入庫者だけを見ると、効果0の更新が故障を半減したように見える。対照の2枚 M 600x340。
 
-    本文の三案。P=(1,9)、Q=(4,4)、R=(5,7)。
-    R はどちらの状態でも Q より損失が大きく、支配されている。
-    同確率なら Q（平均4）、状態1が90%なら P（平均1.8）。最悪損失なら Q（4）。
-
-    グリッド（縦横で1単位の長さをそろえた損失平面）
-      lx(状態1の損失) = lin(180, 500, 0, 10) / ly(状態2の損失) = lin(300, 60, 0, 10)
-      P → (212, 84) / Q → (308, 204) / R → (340, 132)
-      y  32 タイトル / 56 副題 / 320 軸ラベル / 各案の注記は点の脇
-      色  青＝残る候補 / 赤＝支配されて落ちる案 / 橙＝重みの置き方で変わる勝者
+    表 k の左上 x0 = 100 + 250*k, y0 = 90。行=更新 X、列=劣化 U、セル 90x70。故障 Y = U。
     """
-    plans = {"P": (1.0, 9.0), "Q": (4.0, 4.0), "R": (5.0, 7.0)}
-    assert plans["Q"][0] < plans["R"][0] and plans["Q"][1] < plans["R"][1]
-    eq = {k: (v[0] + v[1]) / 2 for k, v in plans.items()}
-    w9 = {k: 0.9 * v[0] + 0.1 * v[1] for k, v in plans.items()}
-    worst = {k: max(v) for k, v in plans.items()}
-    assert min(eq, key=eq.get) == "Q" and abs(eq["Q"] - 4.0) < 1e-12
-    assert min(w9, key=w9.get) == "P" and abs(w9["P"] - 1.8) < 1e-12
-    assert min(worst, key=worst.get) == "Q"
-
-    s = SVG(760, 348, "支配される案を落としてから、重みか最悪かで選び分ける")
-    lx = lin(180, 500, 0, 10)
-    ly = lin(300, 60, 0, 10)
-    s.text(52, 32, "同じ三案でも、置いた重みと守る最悪で勝者が入れ替わる",
-           size=14, weight="700")
-    s.text(52, 54, "軸はそれぞれの状態で受ける損失（小さいほど良い）",
-           size=10, fill=SUB)
-
-    # Q が支配する領域
-    s.rect(lx(4.0), 60, 500 - lx(4.0), ly(4.0) - 60,
-           fill=TINT_WARN, stroke="none", sw=0)
-    s.text(lx(7.4), ly(9.2), "Q に支配される領域", size=10, fill=WARN,
-           anchor="middle")
-
-    for name, (a, b) in plans.items():
-        col = WARN if name == "R" else MAIN
-        s.circle(lx(a), ly(b), 8, fill=col, stroke=col, sw=1.0)
-        s.text(lx(a) + 14, ly(b) + 5, "%s (%g, %g)" % (name, a, b), size=13,
-               fill=col, weight="700")
-    s.text(lx(5.0) + 14, ly(7.0) + 22, "Q に全状態で負ける（落選）",
-           size=10, fill=WARN)
-
-    xaxis(s, 170, 512, 300, [0, 5, 10], lx, ["0", "5", "10"])
-    s.text(340, 328, "状態1での損失", size=10, fill=SUB, anchor="middle")
-    yaxis(s, 300, 60, 180, [0, 5, 10], ly, ["0", "5", "10"])
-    s.text(146, 76, "状態2での損失", size=10, fill=SUB)
-
-    s.text(534, 100, "同じ確率で平均するなら", size=11, fill=INK, weight="700")
-    s.text(534, 118, "P 5.0 ／ Q 4.0 ／ R 6.0 → Q", size=11, fill=FOCUS,
-           weight="700")
-    s.text(534, 152, "状態1が90%だと信じるなら", size=11, fill=INK,
-           weight="700")
-    s.text(534, 170, "P 1.8 ／ Q 4.0 ／ R 5.2 → P", size=11, fill=FOCUS,
-           weight="700")
-    s.text(534, 204, "重みを置けないなら最悪で", size=11, fill=INK,
-           weight="700")
-    s.text(534, 222, "P 9 ／ Q 4 ／ R 7 → Q", size=11, fill=FOCUS,
-           weight="700")
-    s.text(534, 256, "順番は「落とす → 平均する", size=10, fill=SUB)
-    s.text(534, 270, "または最悪を守る」", size=10, fill=SUB)
+    s = SVG(600, 310, "全体では更新の有無で故障率は50%どうしだが、入庫者だけにすると100%対50%に見える")
+    for k, title in enumerate(("全体", "入庫者だけ")):
+        x0, y0 = 100 + 250 * k, 90
+        s.text(x0, 40, title, size=16, bold=True)
+        s.text(x0 + 196, y0 - 10, "故障率", size=13, fill=SUB)
+        for j, lab in enumerate(("劣化なし", "劣化あり")):
+            s.text(x0 + 45 + 90 * j, y0 - 10, lab, size=14, fill=SUB, anchor="middle")
+        for i, lab in enumerate(("更新なし", "更新あり")):
+            if k == 0:
+                s.text(x0 - 10, y0 + 40 + 70 * i, lab, size=14, fill=SUB, anchor="end")
+            for j in range(2):
+                gone = k == 1 and i == 0 and j == 0
+                x, y = x0 + 90 * j, y0 + 70 * i
+                s.rect(x, y, 90, 70, fill=s.hatch(WARN) if gone else (TINT[WARN] if j else TINT[MAIN]),
+                       stroke=MUTED)
+                s.text(x + 45, y + 42, "入庫しない" if gone else ("故障" if j else "正常"), size=15,
+                       anchor="middle", fill=WARN if gone else INK, bold=gone, halo=gone)
+            rate = ["50%", "50%"][i] if k == 0 else ["100%", "50%"][i]
+            s.text(x0 + 196, y0 + 42 + 70 * i, rate, size=16, bold=k == 1, fill=FOCUS if k == 1 else SUB)
+    s.note(100, 290, "升が一つ消えるだけで、効果0から差が生まれる")
     return s
 
 
-FIGS = {
-    "fig1-2-same-mean": fig1_2,
-    "fig25-1-loss-threshold": fig25_1,
-    "fig25-4-burst": fig25_4,
-    "fig27-5-two-intervals": fig27_5,
-    "fig27-7-equivalence-margin": fig27_7,
-    "fig28-1-m-estimation": fig28_1,
-    "fig29-1-minimax": fig29_1,
-    "fig23-1-prior-strength": fig23_1,
-    "fig23-2-partial-pooling": fig23_2,
-    "fig24-1-simpson": fig24_1,
-    "fig24-2-collider": fig24_2,
-    "fig20-1-markov-doors": fig20_1,
-    "fig20-3-kalman-update": fig20_3,
-    "fig21-1-missing-mechanism": fig21_1,
-    "fig21-3-kaplan-meier": fig21_3,
-    "fig22-1-aic-bic": fig22_1,
-    "fig22-2-cross-validation": fig22_2,
-    "fig15-3-three-tests": fig15_3,
-    "fig16-4-ridge-lasso": fig16_4,
-    "fig17-1-link-function": fig17_1,
-    "fig17-3-overdispersion": fig17_3,
-    "fig19-1-pca-units": fig19_1,
-    "fig10-1-margins-fixed": fig10_1,
-    "fig10-3-jacobian": fig10_3,
-    "fig11-2-minimum-order": fig11_2,
-    "fig12-1-convergence": fig12_1,
-    "fig12-3-delta-method": fig12_3,
-    "fig13-2-boundary-mle": fig13_2,
-    "fig15-2-likelihood-ratio": fig15_2,
-    "fig5-1-two-levels": fig5_1,
-    "fig6-2-coverage": fig6_2,
-    "fig7-1-two-errors": fig7_1,
-    "fig8-1-leverage": fig8_1,
-    "fig8-2-collinearity": fig8_2,
-    "fig9-2-blocking": fig9_2,
-    "fig1-3-same-margins": fig1_3,
-    "fig2-1-weighted-mean": fig2_1,
-    "fig3-2-base-rate": fig3_2,
-    "fig3-3-expected-value": fig3_3,
-    "fig4-1-poisson-observed": fig4_1,
+FIGS2 = {
+    "fig10-1-margins-fixed": fig10_1, "fig10-3-jacobian": fig10_3, "fig11-2-minimum-order": fig11_2,
+    "fig12-1-convergence": fig12_1, "fig12-3-delta-method": fig12_3, "fig13-2-boundary-mle": fig13_2,
+    "fig15-2-likelihood-ratio": fig15_2, "fig15-3-three-tests": fig15_3, "fig16-4-ridge-lasso": fig16_4,
+    "fig17-1-link-function": fig17_1, "fig17-3-overdispersion": fig17_3, "fig19-1-pca-units": fig19_1,
+    "fig20-1-markov-doors": fig20_1, "fig20-3-kalman-update": fig20_3,
+    "fig21-1-missing-mechanism": fig21_1, "fig21-3-kaplan-meier": fig21_3, "fig22-1-aic-bic": fig22_1,
+    "fig22-2-cross-validation": fig22_2, "fig23-1-prior-strength": fig23_1,
+    "fig23-2-partial-pooling": fig23_2, "fig24-1-simpson": fig24_1, "fig24-2-collider": fig24_2,
 }
 
 
-def main(argv):
-    check = "--check" in argv
-    only = None
-    for i, a in enumerate(argv):
-        if a == "--only" and i + 1 < len(argv):
-            only = argv[i + 1]
-    tmp = Path(tempfile.mkdtemp()) if check else None
-    diff = []
-    for name, build in sorted(FIGS.items()):
-        if only and only not in name:
-            continue
-        cur = fig_out_dir(name) / ("%s.svg" % name)
-        path = build().save(tmp / cur.name if check else cur)
-        if check:
-            if not cur.exists() or not filecmp.cmp(cur, path, shallow=False):
-                diff.append(name)
-    if check:
-        shutil.rmtree(tmp)
-        if diff:
-            print("差分あり: " + ", ".join(diff))
-            return 1
-        print("既存の図と一致")
-    return 0
+# ================================================================ 第3巻
+def fig25_1():
+    """25-1 閾値は50%ではなく、二つの期待損失が交差する4.85%。正方 M 540x420。
 
+    x: 危険確率 0 → 80、0.12 → 500。y: 期待損失 0 → 340、12 → 60。
+    """
+    thr = 5 / 103
+    assert abs(thr - 0.04854) < 1e-5 and 100 * 0.04 < 5 - 3 * 0.04 and 100 * 0.06 > 5 - 3 * 0.06
+    s = SVG(540, 420, "継続の期待損失100pと停止の期待損失5−3pは危険確率4.85%で交わり、4%なら継続、6%なら停止")
+    X = lin(80, 500, 0, 0.12)
+    Y = lin(340, 60, 0, 12)
+    s.rect(X(0), Y(12), X(thr) - X(0), Y(0) - Y(12), fill=TINT[MAIN], stroke="none")
+    s.rect(X(thr), Y(12), X(0.12) - X(thr), Y(0) - Y(12), fill=TINT[WARN], stroke="none")
+    s.text((X(0) + X(thr)) / 2, Y(11), "継続", size=15, anchor="middle", bold=True, fill=MAIN)
+    s.text((X(thr) + X(0.12)) / 2, Y(11), "停止", size=15, anchor="middle", bold=True, fill=WARN)
+    s.line(X(0), Y(0), X(0.12), Y(12), stroke=WARN, sw=3)
+    s.line(X(0), Y(5), X(0.12), Y(5 - 3 * 0.12), stroke=MAIN, sw=3)
+    s.text(X(0.093) - 10, Y(9.5), "継続の損失 100p", size=14, fill=WARN, bold=True, anchor="end", halo=True)
+    s.text(X(0.12) - 4, Y(5 - 3 * 0.12) + 22, "停止の損失 5 − 3p", size=14, fill=MAIN, bold=True, anchor="end")
+    s.line(X(thr), Y(0), X(thr), Y(12), stroke=FOCUS, sw=2.4, dash="6 4")
+    s.circle(X(thr), Y(100 * thr), 7, fill=FOCUS, stroke="#ffffff", sw=2)
+    s.text(X(thr) + 10, Y(100 * thr) - 10, "4.85%", size=16, fill=FOCUS, bold=True)
+    for p_, lab in ((0.04, "4%"), (0.06, "6%")):
+        s.line(X(p_), Y(0), X(p_), Y(0) - 10, stroke=INK, sw=2.4)
+        s.text(X(p_), Y(0) - 16, lab, size=14, anchor="middle", bold=True)
+    xaxis(s, X, 340, [0, 0.02, 0.04, 0.06, 0.08, 0.1, 0.12], lambda v: f"{v:.0%}", "危険確率 p")
+    s.text(24, 44, "期待損失", size=15, fill=SUB)
+    return s
+
+
+def fig25_4():
+    """25-4 合計400件・率4%が同じでも、時間の形はまったく違う。小さな多数 2段 横長 L 720x380。
+
+    x: 時 0..23 → 帯 120 + 24*h（幅 20）。縦軸は2段で共通（360件で 120px）。段の底 y = 170 / 330。
+    """
+    flat = [400 / 24] * 24
+    burst = [40 / 23] * 24
+    burst[9] = 360
+    assert abs(sum(flat) - 400) < 1e-9 and abs(sum(burst) - 400) < 1e-9 and 400 / 10000 == 0.04
+    s = SVG(720, 380, "どちらも一日400件・率4%だが、一時間あたり約17件に均した形と、一時間に360件が束になった形は別の工程")
+    for base, data, title, col in ((170, flat, "全期間へ均すと：毎時 約17件", MUTED),
+                                   (330, burst, "実際：更新直後の一時間に 360件", WARN)):
+        s.text(24, base - 132, title, size=16, bold=True, fill=INK if col == MUTED else WARN)
+        for h, v in enumerate(data):
+            hgt = v / 360 * 120
+            s.rect(120 + 24 * h, base - hgt, 20, hgt, fill=col if col == MUTED or h == 9 else TINT[WARN],
+                   stroke="none")
+        s.line(110, base, 700, base, stroke=MUTED)
+    for h in (0, 6, 12, 18, 23):
+        s.text(130 + 24 * h, 352, f"{h}時", size=13, fill=SUB, anchor="middle")
+    s.text(100, 330 - 120 + 5, "360", size=13, fill=SUB, anchor="end")
+    s.text(100, 170 - 120 + 5, "360", size=13, fill=SUB, anchor="end")
+    s.note(380, 60, "縦軸は上下で同じ")
+    return s
+
+
+def interval_row(s, X, y, lo, hi, est, col, label, sub=None):
+    s.line(X(lo), y, X(hi), y, stroke=col, sw=4)
+    s.circle(X(est), y, 7, fill=col, stroke="#ffffff", sw=1.5)
+    s.text(24, y + 5, label, size=15, bold=True)
+    if sub:
+        s.text(24, y + 25, sub, size=13, fill=SUB)
+
+
+def fig27_5():
+    """27-5 同じ推定値でも幅が違うと片方だけ有意になるが、二つの差の区間は0を含む。横長 M 600x340。
+
+    x: 効果 -16 → 180、12 → 580。行 y 90 / 160 / 250。
+    """
+    est, se_c, se_s = -6.0, 2.3, 4.7
+    d_se = math.sqrt(se_c ** 2 + se_s ** 2)
+    assert est + 1.96 * se_c < 0 < est + 1.96 * se_s and -1.96 * d_se < 0 < 1.96 * d_se
+    s = SVG(600, 340, "大都市と小地域はどちらも効果−6ポイントで、大都市だけ0をまたがないが、二つの差の区間は0を含む")
+    X = lin(180, 580, -16, 12)
+    s.line(X(0), 50, X(0), 280, stroke=INK, sw=1.4, dash="4 4")
+    s.text(X(0), 40, "効果 0", size=14, anchor="middle", fill=SUB)
+    interval_row(s, X, 90, est - 1.96 * se_c, est + 1.96 * se_c, est, MAIN, "大都市", "p = 0.01")
+    interval_row(s, X, 160, est - 1.96 * se_s, est + 1.96 * se_s, est, MUTED, "小地域", "p = 0.20")
+    s.line(24, 205, 576, 205, stroke=MUTED)
+    interval_row(s, X, 250, -1.96 * d_se, 1.96 * d_se, 0, FOCUS, "二つの差", "比べるべきはこれ")
+    xaxis(s, X, 290, [-15, -10, -5, 0, 5, 10], lambda v: f"{v:+g}" if v else "0", "効果（ポイント）")
+    return s
+
+
+def fig27_7():
+    """27-7 有意でないことと、害の上限が十分小さいと示すことは別。横長 M 600x340。
+
+    x: 害の差 -8 → 200、10 → 580。行 y 90 / 150 / 210。上限 4 の線と 0 の線。
+    """
+    margin = 4.0
+    cases = [("2/100 対 0/100", 2.0, -2.0, 7.0, FOCUS, "上限をまたぐ：まだ示せない"),
+             ("追跡を増やした場合", 1.0, -1.4, 3.4, MAIN, "上限未満を示せた"),
+             ("害が大きかった場合", 6.0, 3.1, 8.9, WARN, "害が増えている")]
+    assert cases[0][2] < 0 < cases[0][3] and cases[1][3] < margin
+    s = SVG(600, 340, "0を含む区間でも、上端が害の上限4ポイントをまたげば安全とは言えず、上限未満に収まって初めて示せる")
+    X = lin(200, 580, -8, 10)
+    s.line(X(0), 56, X(0), 250, stroke=INK, sw=1.4, dash="4 4")
+    s.text(X(0), 46, "差 0", size=14, anchor="middle", fill=SUB)
+    s.rect(X(margin), 56, X(10) - X(margin), 194, fill=s.hatch(WARN), stroke="none")
+    s.line(X(margin), 56, X(margin), 250, stroke=WARN, sw=2.4)
+    s.text(X(margin) + 6, 46, "害の許容上限 4", size=14, fill=WARN, bold=True)
+    for k, (name, e, lo, hi, col, verdict) in enumerate(cases):
+        y = 90 + 60 * k
+        interval_row(s, X, y, lo, hi, e, col, name, verdict)
+    xaxis(s, X, 260, [-5, 0, 5, 10], lambda v: f"{v:+g}" if v else "0", "負傷率の差（ポイント、正が害）")
+    return s
+
+
+def fig28_1():
+    """28-1 同じ四つの観測でも、罰し方を替えると釣り合う場所が動く。横長 M 600x340。
+
+    x: θ -4 → 70、110 → 560。各損失は自分の最大値で正規化、底 y=250、高さ 180。
+    """
+    data = [1, 1, 1, 101]
+    sq = lambda t: sum((v - t) ** 2 for v in data)
+    ab = lambda t: sum(abs(v - t) for v in data)
+    assert sum(data) / 4 == 26
+    s = SVG(600, 340, "停止時間1・1・1・101秒では、二乗誤差の谷は平均26秒、絶対誤差の谷は中央値1秒")
+    X = lin(70, 560, -4, 110)
+    ts = [-4 + i * 0.5 for i in range(229)]
+    for f, col, sw in ((sq, MAIN, 3), (ab, FOCUS, 3)):
+        m = max(f(t) for t in ts)
+        s.poly([(X(t), 250 - f(t) / m * 180) for t in ts], stroke=col, sw=sw)
+    s.line(X(26), 70, X(26), 250, stroke=MAIN, sw=1.6, dash="5 4")
+    s.line(X(1), 70, X(1), 250, stroke=FOCUS, sw=1.6, dash="5 4")
+    s.text(X(26) + 8, 84, "二乗誤差の谷：平均 26", size=15, fill=MAIN, bold=True)
+    s.text(X(1) + 8, 108, "絶対誤差の谷：中央値 1", size=15, fill=FOCUS, bold=True)
+    for v, n in ((1, 3), (101, 1)):
+        for k in range(n):
+            s.circle(X(v), 268 - 14 * k, 6, fill=INK, stroke="#ffffff", sw=1.5)
+    xaxis(s, X, 284, [0, 25, 50, 75, 100], str, "停止時間 θ（秒）")
+    s.text(24, 44, "損失（それぞれ最大を1に）", size=14, fill=SUB)
+    return s
+
+
+def fig29_1():
+    """29-1 支配される案を落としてから、重みか最悪かで選び分ける。正方 M 500x480。
+
+    縦横同じ縮尺：状態1の損失 0..10 → 80..420、状態2の損失 0..10 → 400..60。
+    """
+    plans = {"P": (1.0, 9.0), "Q": (4.0, 4.0), "R": (5.0, 7.0)}
+    assert plans["Q"][0] < plans["R"][0] and plans["Q"][1] < plans["R"][1]
+    s = SVG(500, 480, "RはQに支配されて落ち、残るPとQは、重みを置けば平均、置けなければ最悪で勝者が入れ替わる")
+    X = lin(80, 420, 0, 10)
+    Y = lin(400, 60, 0, 10)
+    s.rect(X(4), Y(10), X(10) - X(4), Y(4) - Y(10), fill=s.hatch(WARN), stroke="none")
+    s.text(X(7), Y(9.4), "Qに支配される範囲", size=14, fill=WARN, bold=True, anchor="middle", halo=True)
+    s.line(X(0), Y(8), X(8), Y(0), stroke=MAIN, sw=2, dash="6 4")
+    s.text(X(7.6) + 6, Y(0.8), "同確率：平均が等しい線", size=13, fill=MAIN)
+    s.poly([(X(0), Y(4)), (X(4), Y(4)), (X(4), Y(0))], stroke=FOCUS, sw=2)
+    s.text(X(0.2), Y(4) - 8, "最悪 4 の角", size=13, fill=FOCUS)
+    for k, (x, y) in plans.items():
+        col = WARN if k == "R" else INK
+        s.circle(X(x), Y(y), 9, fill=col, stroke="#ffffff", sw=2)
+        s.text(X(x) + 14, Y(y) + 6, f"{k} ({x:g}, {y:g})", size=16, bold=True, fill=col)
+    s.line(X(0), Y(0), X(10), Y(0), stroke=MUTED)
+    s.line(X(0), Y(0), X(0), Y(10), stroke=MUTED)
+    for v in (0, 5, 10):
+        s.text(X(v), Y(0) + 22, str(v), size=14, fill=SUB, anchor="middle")
+        s.text(X(0) - 8, Y(v) + 5, str(v), size=14, fill=SUB, anchor="end")
+    s.text(X(5), 452, "状態1での損失", size=14, fill=SUB, anchor="middle")
+    s.text(24, 40, "状態2での損失", size=14, fill=SUB)
+    s.text(24, 474, "同確率なら Q（平均4）、状態1が90%なら P（平均1.8）、最悪を守るなら Q", size=13, fill=SUB)
+    return s
+
+
+FIGS3 = {
+    "fig25-1-loss-threshold": fig25_1, "fig25-4-burst": fig25_4, "fig27-5-two-intervals": fig27_5,
+    "fig27-7-equivalence-margin": fig27_7, "fig28-1-m-estimation": fig28_1, "fig29-1-minimax": fig29_1,
+}
+
+
+FIGS = {
+    "fig1-2-same-mean": fig1_2, "fig1-3-same-margins": fig1_3, "fig2-1-weighted-mean": fig2_1,
+    "fig3-2-base-rate": fig3_2, "fig3-3-expected-value": fig3_3, "fig4-1-poisson-observed": fig4_1,
+    "fig5-1-two-levels": fig5_1, "fig6-2-coverage": fig6_2, "fig7-1-two-errors": fig7_1,
+    "fig8-1-leverage": fig8_1, "fig8-2-collinearity": fig8_2, "fig9-2-blocking": fig9_2,
+}
 
 if __name__ == "__main__":
-    sys.exit(main(sys.argv[1:]))
+    sys.exit(build({out(k): v for k, v in {**FIGS, **FIGS2, **FIGS3}.items()}))

@@ -51,9 +51,9 @@ documents:
 
 説明図は `/zuhan` で追加する。選定・手段の使い分け・作図規約・機械検査・本文への埋め込み方まで、すべてスキルが正本（このリポジトリ固有の配置と検査は `.claude/skills/zuhan/references/repo.md`）。
 
-図は手書きしない。決定的に描画できる図は `scripts/figs/{ID}.py` で生成し、画像生成を使う図は最終プロンプト・生成手段・検査メモを `scripts/figs/{ID}.md` に残す。生成物は `docs/books/{ID}/figs/` へ置いてコミットする。再利用できる描画ヘルパと配色は `scripts/figs/svgkit.py`。
+図は自分で描くか、実在する資料を引用する。外部の画像生成サービスへは依頼しない。図は `scripts/figs/{ID}.py` で生成し（SVG を手で編集しない）、選定理由・作画資料と引用写真の出典・検査メモを `scripts/figs/{ID}.md` に残す。生成物は `docs/books/{ID}/figs/` へ置いてコミットする。参考写真は複製せずファイルページの URL を参照して帰属を付ける。再利用できる描画ヘルパと配色は `scripts/figs/svgkit.py`。キャンバスの形・表示幅は図ごとに内容から選ぶ（`.claude/skills/zuhan/references/layout.md`）。
 
-旧スキルで描いた図は作図規約が違うためすべて破棄した。図を戻すときは `/zuhan` の Phase 1（選定）からやり直す。
+2026-09 に全教材の図を現行の作図規約で描き直した。図を足す・直すときは `/zuhan` の Phase 1（選定）から始める。
 
 ## ルビ
 
