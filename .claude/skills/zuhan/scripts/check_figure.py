@@ -9,6 +9,8 @@
   2. 交差  … <line> 同士が内部で交わっている（T字接合は正常なので除外）
   3. はみ出し … 要素が viewBox の外へ出ている
   4. 規模  … <text> の数・色数（1図1論点の目安を超えていないか）
+  5. 文字の実効サイズ … スマホの本文幅（340px）へ縮めたときの最小文字
+  6. 形の一様さ … 複数枚を渡したとき、全部が同じ幅・似た縦横比になっていないか
 必ず PNG も書き出す。最後は人間（またはモデル）が画像を見て確かめること。
 
 ラベルの数え方は「2文字以上の <text> を、同一文字列は1個として数える」。
@@ -24,6 +26,9 @@ FONT_CANDIDATES = [
     "/usr/share/fonts/truetype/fonts-japanese-gothic.ttf",
 ]
 # フォントを読めない環境でも最低限これは弾く（CJKフォントに無いことが多い）
+# スマホで本文幅いっぱいに表示されたときの幅。SVG は viewBox 幅からここまで縮む
+MOBILE_WIDTH = 340
+MIN_EFFECTIVE_PX = 6.0     # これ未満はタップしないと読めない
 FALLBACK_BAD = set("⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻₀₁₂₃₄₅₆₇₈₉✓✔✕✖✗✘➜➔⟶⇒▲▼◀▶")
 
 
@@ -155,6 +160,24 @@ def check(path, charset, png_dir=None, show_labels=False):
         issues.append(f"意味のありそうな色 {len(cols)} 種。3系統までに抑える\n"
                       f"       数えた色: {' '.join(sorted(cols))}")
 
+    # 5. 文字の実効サイズ
+    if len(vb) == 4 and vb[2] > 0:
+        scale = min(1.0, MOBILE_WIDTH / vb[2])
+        sizes = []
+        for e in root.iter(NS + "text"):
+            try:
+                sizes.append((float(e.get("font-size")), (e.text or "").strip()))
+            except (TypeError, ValueError):
+                pass
+        small = sorted({(z, t) for z, t in sizes if z * scale < MIN_EFFECTIVE_PX})
+        if small:
+            need = MIN_EFFECTIVE_PX / scale
+            issues.append(
+                f"スマホ幅 {MOBILE_WIDTH}px で {MIN_EFFECTIVE_PX:g}px 未満になる文字 {len(small)} 個"
+                f"（幅 {vb[2]:g} なら {need:.1f} 以上が要る）: "
+                + " / ".join(f"{t}({z:g})" for z, t in small[:8])
+                + "\n       文字を大きくするか、キャンバスを狭くする（layout.md のサイズ区分）")
+
     png = None
     if png_dir:
         try:
@@ -173,7 +196,8 @@ def check(path, charset, png_dir=None, show_labels=False):
         for m in issues:
             print(f"     - {m}")
     else:
-        print(f"[ok] {name}  ラベル{len(labels)} 色{len(cols)} 線{len(segs)}")
+        shape = f"{vb[2]:g}x{vb[3]:g}" if len(vb) == 4 else "?"
+        print(f"[ok] {name}  {shape} ラベル{len(labels)} 色{len(cols)} 線{len(segs)}")
     for m in notes:
         print(f"     ? {m}")
     if png:
@@ -201,5 +225,20 @@ if __name__ == "__main__":
     if cs is None:
         print("※ フォントを読めないので豆腐検査は簡易版（fontTools 未導入）")
     n = sum(check(f, cs, png_dir, show_labels) for f in files)
+    # 6. 形の一様さ（合否には使わない）
+    shapes = []
+    for f in files:
+        try:
+            v = [float(x) for x in ET.parse(f).getroot().get("viewBox").split()]
+            shapes.append((v[2], v[3] / v[2]))
+        except Exception:
+            pass
+    if len(shapes) >= 4:
+        widths = {w for w, _ in shapes}
+        ratios = [r for _, r in shapes]
+        if len(widths) == 1 and max(ratios) - min(ratios) < 0.3:
+            print(f"\n? {len(shapes)} 枚すべてが幅 {widths.pop():g}、縦横比 "
+                  f"{min(ratios):.2f}〜{max(ratios):.2f}。内容に合わせて形と大きさを選んだか"
+                  " layout.md で見直す")
     print(f"\n{len(files)} 枚中 指摘 {n} 件")
     sys.exit(1 if n else 0)

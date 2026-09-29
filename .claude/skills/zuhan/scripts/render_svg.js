@@ -2,7 +2,7 @@
 /*
  * 教材図版の SVG を PNG 化して目視確認するためのスクリプト。
  *
- *   node .claude/skills/textbook-figures/scripts/render_svg.js <svg-dir> [out-dir]
+ *   node .claude/skills/zuhan/scripts/render_svg.js <svg-dir> [out-dir]
  *
  * 事前に一度だけ:
  *   mkdir -p /tmp/svgshot && cd /tmp/svgshot && npm install @resvg/resvg-js

@@ -1,67 +1,72 @@
 # このリポジトリでの配置と検査
 
-Phase 2 に入ったら読む。作図の判断は `conventions.md` と `recipes.md`、置き場所とビルドはここ。
+Phase 2 に入ったら読む。作図の判断は `conventions.md`・`layout.md`・`recipes.md`、置き場所とビルドはここ。
 
 ## 生成元と生成先
 
 教材IDを `<id>` として固定する。
 
 ```text
-scripts/figs/<id>.py                    # 決定的に描画する図の生成元
-scripts/figs/<id>.md                    # 生成手段・図版選定・検査メモ（プロンプト全文は置かない）
-scripts/figs/<id>-prompt.txt            # ChatGPTへ渡す初回プロンプトの全文
-scripts/figs/<id>-prompt-fix-<連番>.txt  # ChatGPTへ渡す修正プロンプトの全文
-scripts/figs/svgkit.py                  # 共通の描画ヘルパ
-docs/books/<id>/figs/<name>.svg         # 本文が参照する生成物
-docs/books/<id>/figs/<name>.png         # 本文が参照する生成画像
+scripts/figs/<id>.py             # 図の生成元（SVG直書き・自力描画・matplotlib）
+scripts/figs/<id>.md             # 図版選定の記録、作画資料と引用写真の出典、検査メモ
+scripts/figs/svgkit.py           # 共通の描画ヘルパ
+docs/books/<id>/figs/<name>.svg  # 本文が参照する生成物
+docs/books/<id>/figs/<name>.png  # matplotlib などで PNG にした生成物
 ```
 
 決定的な描画コードを作る場合は、**骨格を `scripts/figs/database-design.py` から写す。** 決定的な出力、`--check`、出力先の解決、座標の丸めはそこに実装済みなので、図ごとの関数だけ足す。
 
 決定的な描画コードでは、コードの形そのものではなく次の約束を守る。
 
-- 1教材につき、決定的な描画は1個の `.py`、画像生成の記録は1個の `.md` にまとめる。両方の手段を使う教材では両方あってよい。複数教材で再利用する部品だけ `scripts/figs/` 配下の共通モジュールへ切り出す。ただし `follows` でつながるシリーズは、先頭巻のIDの `.py` 1本で全巻の図を描き、図ごとに該当する巻の `figs/` へ振り分けてよい（例 `scripts/figs/statistics.py` の `fig_out_dir`）。
+- 1教材につき、描画は1個の `.py`、記録は1個の `.md` にまとめる。複数教材で再利用する部品だけ `scripts/figs/` 配下の共通モジュールへ切り出す。ただし `follows` でつながるシリーズは、先頭巻のIDの `.py` 1本で全巻の図を描き、図ごとに該当する巻の `figs/` へ振り分けてよい（例 `scripts/figs/statistics.py` の `fig_out_dir`）。
 - `--check` が差分ゼロで通ること。生成物も一緒にコミットし、**手で編集しない。**
 - 冒頭の docstring で、その教材の色3系統が何を指すかを宣言する（`conventions.md`）。
 - 座標・曲線・尺度・数値は本文の式や入力値から計算する。目分量で結果らしい形を作らない。**本文の数値は `assert` で突き合わせてから描く。** 図と本文がずれたら、どちらが誤りかを検査が教えてくれる（本文側の誤りが見つかることもある）。
 - 各図の関数の docstring に、キャンバス寸法と要素の座標を先に書き出す。書いていない要素を描かない。
 
-外部引用画像は `docs/books/<id>/figs/` へコピーせず、生成対象にも含めない。
+外部引用画像（参考写真）は `docs/books/<id>/figs/` へコピーせず、生成対象にも含めない。ファイルページの表示用 URL を本文から直接参照する。
 
-## 生成画像とZIP受領
+## 記録（`scripts/figs/<id>.md`）
 
-生成画像は `figN-<内容>.png` などの名で生成先へ置き、コミットする。記録用 `.md` には生成手段・期待ファイル名と寸法・選定理由・検査結果を残し、プロンプト全文は上表の `.txt` を参照する。画像生成だけなら `.py` は不要。
+- Phase 1 の採用スロットと却下候補（理由つき）。
+- 色3系統の割り当て（`.py` の docstring と同じもの）。
+- **作画資料**：自力描画で形・比率・配置を確かめるのに見た資料の URL と、そこから取った事実（「スパインの頭は直径約1マイクロメートル、首より太い」など）。本文に表示しない資料もここへ残す。
+- **引用写真**：ファイルページ URL、作者、ライセンス、確認日。
+- 検査結果（下の表でよい）。
 
-ChatGPTへの依頼・不合格時の再生成は [chatgpt-image-prompt.md](chatgpt-image-prompt.md)。受領時は次の順に処理する。
+| ファイル | 形・表示幅 | 機械検査 | 原寸 | 360px | 説明力（layout.md 4） | 本文整合 |
+|---|---|---|---|---|---|---|
+| fig1-….svg | 縦長 480×680・M | pass | pass | pass | pass | pass |
 
-1. ユーザーにZIPをリポジトリルートの `tmp/` へ置いてもらう。原本は変更せず、`docs/` へ直接展開しない。
-2. 下の検査器で `<id>/<filename>.png` の期待一覧、余分なファイル、PNG署名、寸法を確認し、一時ディレクトリへ展開する。総覧画像や追加資料は不可。
-3. 全PNGを原寸と約360px幅で見て、ラベル・経路・方向・本文整合・禁止事項を確認する。ZIP検査は内容の正しさを保証しない。
-4. 合格画像だけを `docs/books/<id>/figs/` へコピーし、判定を記録する。不合格図は再生成を依頼する。
-
-```bash
-python3 .claude/skills/zuhan/scripts/check_image_zip.py tmp/<id>-figures.zip \
-  --id <id> --expect fig1-<内容>.png --expect fig2-<内容>.png \
-  --width 1536 --height 1024 --extract-to /tmp/zuhan-<id>
-```
-
-修正ZIPは `<id>-figures-fix-<連番>.zip`。`--expect` は不合格図だけにし、別の一時ディレクトリで検査する。合格した修正版だけを差分適用する。
+`scripts/figs/memory-engram.md` とその PNG は、外部の画像生成に依頼していた旧方式の記録である。図を作り直すときは Phase 1 からやり直し、この方式に置き換える。
 
 ## SVG の書き出し
 
 `svgkit.SVG.save()` が docsify 向けの処理を済ませてある（理由は svgkit.py の docstring）。図を設計するときに効くのは次の2点だけ。
 
-- 幅は 760 前後が本文幅にほぼ一致する。
+- 幅は表示幅に近づける（S 320〜420、M 480〜600、L 760。`layout.md`）。760 は本文幅いっぱいの L 区分であって既定ではない。
 - KaTeX は SVG 内で動かない。長い数式は本文へ残し、図には計算結果と必要最小限の記号だけを置く。
 
 ## 本文への埋め込み
 
 単独行の画像＋一文のキャプション。代替テキストは「概念図」ではなく図が示す結論を書く。細部を持つ図は画像自身へのリンクで包み、狭い画面からタップして原寸表示できるようにする。
 
+表示幅は docsify の表示指定 `':size=<幅>'` で決める。S・M 区分の図には必ず付け、L（本文幅いっぱい）だけ省く。スマホでは本文幅に収まるよう自動で縮む。
+
 ```markdown
-[![二段階の標本と短い残りを足してrankを求める図](figs/rank-two-level.svg)](figs/rank-two-level.svg)
+[![二段階の標本と短い残りを足してrankを求める図](figs/rank-two-level.svg ':size=560')](figs/rank-two-level.svg)
 
 図2-1：`rank_1(14)=3+2+1=6`。大区画、小区画、残りの実測を足す（タップ／クリックで原寸表示）。
+```
+
+実物＋模式図は、引用写真と自作図を続けて置き、キャプションは1つにまとめて対応関係を書く。
+
+```markdown
+![海馬の錐体細胞の顕微鏡像。細胞体から樹状突起が伸び、表面に多数の突起が並ぶ](https://upload.wikimedia.org/…/file.jpg ':size=420')
+
+[![写真と同じ向きで、細胞体・樹状突起・スパインを描き分けた模式図](figs/fig1-neuron.svg ':size=420')](figs/fig1-neuron.svg)
+
+図1：上が実物、下が同じ向きの模式図。下の図の橙の枠が、上の写真で樹状突起の表面に並ぶ小さな突起（スパイン）にあたる。*出典（上）：作者「資料名」[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:…)。CC BY-SA 4.0。*
 ```
 
 単独行の画像は `yaruo_markdown.py` が非散文領域として扱う。直後の `図N：…` キャプションは表記の検査は受けるが、発言長の集計からは図版ブロックとして除外される（`yaruo_markdown.figure_block_lines`）。
@@ -73,11 +78,8 @@ python3 .claude/skills/zuhan/scripts/check_image_zip.py tmp/<id>-figures.zip \
 ## 検査
 
 ```bash
-# 決定的な描画コードがある場合
 python3 scripts/figs/<id>.py
 python3 scripts/figs/<id>.py --check
-
-# ZIPは上記の受領手順で検査済みとする。次はSVGがある場合だけ。
 python3 .claude/skills/zuhan/scripts/check_figure.py "docs/books/<id>/figs/*.svg" --png-dir /tmp/figpng
 python3 scripts/yaruo_lint.py docs/books/<id>/README.md --check --verbose
 python3 scripts/generate_site.py
@@ -86,13 +88,17 @@ git diff --check
 
 `yaruo_lint.py` は**図を足す前にも一度走らせて warning の数を控えておく**。図の追加で増えていないことを比べられる。
 
-`check_figure.py` のラベル上限（22個）は「2文字以上の `<text>` を、同一文字列は1個として」数える。1文字のラベル（`0` `1` などのセルの中身、目盛の数字）は数えない。設計中に見積もりたいときは `--labels` を付ける。超過したときは自動で一覧が出るので、どれを削るか見て決める。
+`check_figure.py` は、スマホ本文幅（340px）へ縮めたときに実効6px未満になる文字を NG にし、4枚以上を渡して全部が同じ幅・似た縦横比なら「形が一様」と注意を出す（注意は合否に使わないが、`layout.md` で形を選び直すきっかけにする）。
+
+ラベル上限（22個）は「2文字以上の `<text>` を、同一文字列は1個として」数える。1文字のラベル（`0` `1` などのセルの中身、目盛の数字）は数えない。設計中に見積もりたいときは `--labels` を付ける。超過したときは自動で一覧が出るので、どれを削るか見て決める。
 
 依存（`fonttools` / `cairosvg`）の入れ方とビルド環境は [`BUILD.md`](../../../../BUILD.md)。
 
 ## PNG の目視
 
-実画像でラベルの重なり・矢印・図形の配置を確認する。matplotlib のSVGでは文字がパスになり、`check_figure.py` の文字検査が効かないため、文字も目視する。
+実画像でラベルの重なり・矢印・図形の配置を確認し、`layout.md` の「説明力の確認」6項目を順に見る。原寸と約360px幅の2つを見る。matplotlib のSVGでは文字がパスになり、`check_figure.py` の文字検査が効かないため、文字も目視する。
+
+`cairosvg` が無い環境では `scripts/render_svg.js`（resvg）で PNG にする。`SVG_RENDER_WIDTH=360` で縮小版も出せる。
 
 見るのは**デスクトップ幅と約360px幅の2つ**。360px ではタイトル・主経路・結論が分かることを必須とし、細部は原寸リンクへ逃がす。全ての細字を縮小状態で読ませようとして情報を削らない。
 

@@ -12,7 +12,7 @@ docs/                  ← ソースのみ（git 追跡対象）
 └── books/*/
     ├── README.md      ← 各教材本文
     ├── catalog.yml    ← 各教材のカタログ定義
-    └── figs/*.{svg,png} ← 説明図の原本（描画コードまたは画像生成。任意）
+    └── figs/*.{svg,png} ← 説明図の原本（`scripts/figs/{id}.py` の生成物。旧方式の生成画像を含む。任意）
 
 build/                 ← 生成ファイル（git 除外）
 ├── index.html         ← トップページHTML（自動生成）
