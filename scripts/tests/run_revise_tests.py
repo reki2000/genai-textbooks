@@ -134,6 +134,41 @@ def test_locate_errors(root: Path) -> None:
         print("FAIL locate: 見失ったのに例外にならない")
 
 
+def test_light_guards() -> None:
+    """light が前後の行を写し込む・直後が受ける語を消す・数値を作る、への備え。"""
+    lines = [
+        "**やる夫**：\n",
+        "地道に貯めたお。\n",
+        "正確には、賞与と、今月の家賃を\n",
+        "一つに集めたお。\n",
+        "\n",
+        "**やらない夫**：\n",
+        "やれやれ、家賃まで元手に混ぜたのか。\n",
+    ]
+    check("sentence: 文の途中で切れた行を続きまで広げる", R.sentence_bounds(lines, 2, 2), (2, 3))
+    check("sentence: 続きの行から前へ広げる", R.sentence_bounds(lines, 3, 3), (2, 3))
+    check("sentence: 文で終わる行はそのまま", R.sentence_bounds(lines, 1, 1), (1, 1))
+
+    target = R.Target("sample", "sentence", "", [], 2, 3, 0, "".join(lines[2:4]), "")
+    check("keep: 直後の台詞が受ける語", R.following_terms(target, lines), ["家賃"])
+    check("keep: 消えた語", R.lost_terms("正確には賞与を集めたお。", ["家賃"]), ["家賃"])
+
+    before, after = lines[:2], lines[4:]
+    copied = "".join(lines[:2]) + "賞与と家賃を集めたお。\n" + "".join(lines[4:6])
+    trimmed, did = R.trim_context(copied, before, after)
+    check("trim: 写し込まれた前後の行を落とす", (trimmed, did), ("賞与と家賃を集めたお。\n", True))
+    check("trim: 写し込みが無ければそのまま", R.trim_context("家賃を集めたお。\n", before, after),
+          ("家賃を集めたお。\n", False))
+    check("overlap: 一致しない形で残った重複を拒む",
+          R.overlap_problems("家賃を集めたお。\nやれやれ、家賃まで元手に混ぜたのか。\n", target.text, before, after),
+          ["前後の行と重複する"])
+    check("overlap: 話者をまたぐ案を拒む",
+          R.overlap_problems("集めたお。\n\n**やらない夫**：\nふむ。\n", target.text, before, after),
+          ["話者や見出しをまたいでいる"])
+    check("added: 本文に無い数値", R.added_numbers("年2%の利息で100万円", "預けた100万円"), ["2"])
+    check("added: 桁区切りの揺れは同じ数", R.added_numbers("1,000円", "1000円"), [])
+
+
 def test_routing(root: Path) -> None:
     config = R.load_config()
     target, _ = R.locate("sample", "sentence", anchor("前は障害だと言っていたお。"))
@@ -166,7 +201,7 @@ def test_prompts(root: Path) -> None:
                          [{"id": "x", "request": "短く", "before": "元の文", "after": "直した文"}])
     check("user: target を印で囲む", "<target>\n前は障害だと言っていたお。\n</target>" in user, True)
     check("user: 自由指示を添える", "書き手からの指示: 語尾は残す" in user, True)
-    check("user: お手本が窓より前", user.index("お手本") < user.index("# 窓"), True)
+    check("user: お手本が窓より前", user.index("お手本") < user.index("# 前後の本文"), True)
     check("user: 案の数", "案を3個" in user, True)
 
 
@@ -353,6 +388,7 @@ def main() -> int:
         test_parser()
         test_locate_and_validate(root)
         test_locate_errors(root)
+        test_light_guards()
         test_routing(root)
         test_prompts(root)
         test_service_flow(root)

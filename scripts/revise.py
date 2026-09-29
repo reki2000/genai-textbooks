@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import argparse
 import difflib
+import re
 import hashlib
 import json
 import secrets
@@ -48,6 +49,16 @@ FEWSHOT_MAX_CHARS = 600
 # 採用後にこの秒数以内の手直しを「採用後の手直し」として記録する。
 POST_EDIT_WINDOW = 30 * 60
 CONTEXT_CHARS = 80
+
+
+# 直後の台詞が受けている語を探す範囲（空行・話者行を除いた行数）。
+FOLLOWING_LINES = 6
+_TERM_RE = re.compile(
+    r"[0-9０-９][0-9０-９,，.．]*[万億兆千百十]*[円%％倍年月日人個回歳件点]?"
+    r"|[一-龥々〆ヵヶ]{2,}"
+    r"|[ァ-ヴ][ァ-ヴー]+"
+    r"|[A-Za-zＡ-Ｚａ-ｚ][A-Za-zＡ-Ｚａ-ｚ0-9]+"
+)
 
 
 class ReviseError(ValueError):
@@ -186,6 +197,8 @@ def locate(book: str, unit: str, anchor: dict) -> tuple[Target, list[str]]:
     if span is None:
         raise ReviseError("選択範囲を本文から特定できなかった。数式や図の内側を避けて選び直してほしい")
     start, end = span
+    if comment.unit != "section":
+        start, end = sentence_bounds(lines, start, end)
     if end - start + 1 > MAX_TARGET_LINES:
         raise ReviseError(f"範囲が大きすぎる（{end - start + 1}行）。{MAX_TARGET_LINES}行以内で選び直してほしい")
     offset = sum(len(line) for line in lines[:start])
@@ -204,6 +217,46 @@ def locate(book: str, unit: str, anchor: dict) -> tuple[Target, list[str]]:
     return target, lines
 
 
+_SPEAKER_RE = re.compile(r"\*\*[^*]+\*\*(（[^）]*）)?[：:]")
+_SENTENCE_END = ("。", "？", "！", "?", "!", "…", "」", "』", "）", ")", "──", "$$")
+SENTENCE_EXTEND_LIMIT = 6
+
+
+def _is_prose(line: str) -> bool:
+    body = line.strip()
+    if not body or body == "---" or body.startswith(("#", "|", "$$", "![", "```")):
+        return False
+    return not _SPEAKER_RE.fullmatch(body)
+
+
+def _ends_sentence(line: str) -> bool:
+    return line.rstrip().endswith(_SENTENCE_END)
+
+
+def sentence_bounds(lines: list[str], start: int, end: int) -> tuple[int, int]:
+    """行の途中で切れている文を、同じ発言の中で文の切れ目まで広げる。
+
+    行単位の target が文の途中で終わっていると、モデルは続きの行まで書き換えて
+    返し、採用すると本文が重複する。
+    """
+    for _ in range(SENTENCE_EXTEND_LIMIT):
+        if _ends_sentence(lines[end]) or end + 1 >= len(lines) or not _is_prose(lines[end + 1]):
+            break
+        end += 1
+    for _ in range(SENTENCE_EXTEND_LIMIT):
+        if start == 0 or not _is_prose(lines[start - 1]) or _ends_sentence(lines[start - 1]):
+            break
+        start -= 1
+    return start, end
+
+
+def context_lines(target: Target, lines: list[str], window: tuple[int, int]) -> tuple[list[str], list[str]]:
+    """target の直前・直後の窓の行。"""
+    start = min(window[0], target.start)
+    end = max(window[1], target.end + 1)
+    return lines[start : target.start], lines[target.end + 1 : end]
+
+
 def window_of(target: Target, lines: list[str], tier: str, anchor: dict) -> tuple[int, int]:
     comment = _transient_comment(target.book, target.unit, anchor, "substance" if tier == "heavy" else "wording")
     return comments.window_for(comment, lines, (target.start, target.end))
@@ -220,6 +273,67 @@ def choose_tier(requested: str, action: Action, target: Target, instruction: str
     if len(instruction) > config.heavy_instruction_chars:
         return "heavy"
     return action.tier if action.tier in TIERS else "light"
+
+
+def _speech_lines(lines: list[str]) -> list[str]:
+    """空行・区切り・話者行を除いた本文の行。"""
+    kept = []
+    for line in lines:
+        body = line.strip()
+        if not body or body == "---" or body.startswith("#"):
+            continue
+        if re.fullmatch(r"\*\*[^*]+\*\*(（[^）]*）)?[：:]", body):
+            continue
+        kept.append(body)
+    return kept
+
+
+def terms_of(text: str) -> list[str]:
+    """漢字・カタカナの2字以上の連なり、数（単位付き）、英単語。"""
+    seen: list[str] = []
+    for match in _TERM_RE.finditer(comments.normalize(text)):
+        term = match.group(0)
+        if len(term) < 2 and not term[0].isdigit():
+            continue
+        if term not in seen:
+            seen.append(term)
+    return seen
+
+
+def following_terms(target: Target, lines: list[str]) -> list[str]:
+    """target に出て、直後の台詞でも使われている語。
+
+    直後の相手はその語を受けて話しているので、書き換えで消すと会話が
+    つながらなくなる（light が特に落としやすい）。語の同定は決定的に行い、
+    プロンプトで「残す語」として渡すと同時に、候補の検査にも使う。
+    """
+    after = "".join(_speech_lines(lines[target.end + 1 :])[:FOLLOWING_LINES])
+    after_norm = comments.normalize(after)
+    found = []
+    for term in terms_of(target.text):
+        if term in after_norm and not any(term in other and term != other for other in found):
+            found = [other for other in found if other not in term]
+            found.append(term)
+    return found
+
+
+_NUMBER_RE = re.compile(r"[0-9][0-9,.]*")
+
+
+def added_numbers(new: str, known: str) -> list[str]:
+    """候補に出てきた数のうち、target にも前後の本文にも無いもの（作られた数値の疑い）。"""
+    known_numbers = {match.group(0).replace(",", "") for match in _NUMBER_RE.finditer(comments.normalize(known))}
+    added = []
+    for match in _NUMBER_RE.finditer(comments.normalize(new)):
+        number = match.group(0).replace(",", "").rstrip(".")
+        if number and number not in known_numbers and number not in added:
+            added.append(number)
+    return added
+
+
+def lost_terms(new: str, terms: list[str]) -> list[str]:
+    normalized = comments.normalize(new)
+    return [term for term in terms if term not in normalized]
 
 
 # --------------------------------------------------------------------------
@@ -268,12 +382,11 @@ def user_prompt(
     instruction: str,
     count: int,
     examples: list[dict],
+    keep: list[str] | None = None,
 ) -> str:
-    start, end = window
-    start = min(start, target.start)
-    end = max(end, target.end + 1)
-    before = "".join(lines[start : target.start])
-    after = "".join(lines[target.end + 1 : end])
+    before_lines, after_lines = context_lines(target, lines, window)
+    before = "".join(before_lines)
+    after = "".join(after_lines)
     parts: list[str] = []
     if examples:
         shots = []
@@ -282,9 +395,13 @@ def user_prompt(
                 f"依頼: {example['request']}\n元:\n{example['before']}\n採用された形:\n{example['after']}"
             )
         parts.append("# お手本（この教材の書き手が過去に採用した書き換え）\n\n" + "\n\n---\n\n".join(shots))
+    # 前後は参考として別の区画に置き、書き換える部分だけを <target> に入れる。窓の中に
+    # target を埋め込むと、軽いモデルは窓ごと書き直して返しやすい。
     parts.append(
-        "# 窓\n\n<window>\n" + before + "<target>\n" + target.text + "</target>\n" + after + "</window>"
+        "# 前後の本文（参考。書き換えない）\n\n"
+        "<before>\n" + before + "</before>\n\n<after>\n" + after + "</after>"
     )
+    parts.append("# 書き換える部分\n\n<target>\n" + target.text + "</target>")
     request = action.instruction
     if instruction:
         request = (request + "\n" if request else "") + "書き手からの指示: " + instruction
@@ -292,7 +409,8 @@ def user_prompt(
         "# 依頼\n\n"
         f"見出し: {' > '.join(target.heading_path)}\n"
         f"選択箇所（表示上の文字列）: 「{target.quote}」\n"
-        f"依頼: {request}\n"
+        + (f"直後の台詞が受けている語（どの案でも残す）: {'、'.join(keep)}\n" if keep else "")
+        + f"依頼: {request}\n"
         f"案を{count}個、1行1案の JSON で。"
     )
     return "\n\n".join(parts) + "\n"
@@ -347,6 +465,9 @@ class Candidate:
     offset: int  # 生成時点の本文での old の位置（-1 は不明）
     problems: list[str] = field(default_factory=list)
     lint: list[str] = field(default_factory=list)
+    lost: list[str] = field(default_factory=list)
+    added: list[str] = field(default_factory=list)
+    trimmed: bool = False
 
     @property
     def ok(self) -> bool:
@@ -361,6 +482,9 @@ class Candidate:
             "ok": self.ok,
             "problems": self.problems,
             "lint": self.lint,
+            "lost": self.lost,
+            "added": self.added,
+            "trimmed": self.trimmed,
         }
 
 
@@ -379,8 +503,53 @@ def lint_errors(text: str) -> dict[tuple[str, str], int]:
     return counts
 
 
+def _bare(line: str) -> str:
+    return line.rstrip("\n")
+
+
+def trim_context(new: str, before: list[str], after: list[str]) -> tuple[str, bool]:
+    """候補の先頭・末尾に写し込まれた前後の行を落とす。
+
+    先頭が直前の行の末尾側と、末尾が直後の行の先頭側と一字一句一致する分だけ
+    削る。書き換えた行は一致しないので残る。
+    """
+    rows = new.splitlines(keepends=True)
+    head = 0
+    for k in range(min(len(rows) - 1, len(before)), 0, -1):
+        if [_bare(row) for row in rows[:k]] == [_bare(row) for row in before[-k:]]:
+            head = k
+            break
+    rows = rows[head:]
+    tail = 0
+    for m in range(min(len(rows) - 1, len(after)), 0, -1):
+        if [_bare(row) for row in rows[-m:]] == [_bare(row) for row in after[:m]]:
+            tail = m
+            break
+    if tail:
+        rows = rows[:-tail]
+    return "".join(rows), bool(head or tail)
+
+
+def overlap_problems(new: str, target_text: str, before: list[str], after: list[str]) -> list[str]:
+    problems = []
+    context = {comments.normalize(line) for line in before + after}
+    context.discard("")
+    for row in new.splitlines():
+        normalized = comments.normalize(row)
+        if len(normalized) >= 8 and normalized in context and normalized not in comments.normalize(target_text):
+            problems.append("前後の行と重複する")
+            break
+    if not any(_SPEAKER_RE.fullmatch(row.strip()) or row.strip() == "---" or row.startswith("#")
+               for row in target_text.splitlines()):
+        if any(_SPEAKER_RE.fullmatch(row.strip()) or row.strip() == "---" or row.startswith("#")
+               for row in new.splitlines()):
+            problems.append("話者や見出しをまたいでいる")
+    return problems
+
+
 def validate(raw: dict, index: int, source: str, target: Target,
-             baseline: dict[tuple[str, str], int] | None) -> Candidate:
+             baseline: dict[tuple[str, str], int] | None, keep: list[str] | None = None,
+             context: tuple[list[str], list[str]] | None = None) -> Candidate:
     old = raw.get("old")
     new = raw.get("new")
     why = str(raw.get("why", ""))[:200]
@@ -401,10 +570,22 @@ def validate(raw: dict, index: int, source: str, target: Target,
     # 行末の改行の有無は元に合わせる（モデルが落としがち）。
     if old.endswith("\n") and not new.endswith("\n"):
         new += "\n"
-    candidate = Candidate(index, old, new, why, offset)
+    trimmed = False
+    if context is not None and old == target.text:
+        new, trimmed = trim_context(new, *context)
+    candidate = Candidate(index, old, new, why, offset, trimmed=trimmed)
+    if context is not None and old == target.text:
+        candidate.problems.extend(overlap_problems(new, old, *context))
+        if not new.strip():
+            candidate.problems.append("空になった")
+            return candidate
     if new == old:
         candidate.problems.append("変更なし")
         return candidate
+    if keep and old == target.text:
+        candidate.lost = lost_terms(new, keep)
+    known = old + "".join(context[0] + context[1]) if context is not None else old
+    candidate.added = added_numbers(new, known)
     if baseline is not None:
         after = source[:offset] + new + source[offset + len(old) :]
         for (rule, message), count in lint_errors(after).items():
@@ -535,6 +716,8 @@ class RequestRecord:
     tier: str
     backend: str
     target: Target
+    keep: list[str] = field(default_factory=list)
+    context: tuple[list[str], list[str]] = field(default_factory=lambda: ([], []))
     candidates: list[Candidate] = field(default_factory=list)
     shown_at: float = 0.0
     decided: bool = False
@@ -548,6 +731,8 @@ class Service:
         self.lock = threading.Lock()
         self.requests: dict[str, RequestRecord] = {}
         self.applied: dict[str, list[Applied]] = {}
+        # 直後が受ける語をプロンプトで渡すか（評価で渡さない条件と比べるため）。
+        self.keep_hint = True
 
     # -- 設定と待機 ----------------------------------------------------------
 
@@ -603,12 +788,15 @@ class Service:
         examples = examples_for(action.id, book, self.log_dir)
         count = max(1, min(int(payload.get("count") or self.config.candidates), 5))
         system = system_prompt(book)
-        user = user_prompt(target, lines, window, action, instruction, count, examples)
+        keep = following_terms(target, lines)
+        context = context_lines(target, lines, window)
+        user = user_prompt(target, lines, window, action, instruction, count, examples,
+                           keep if self.keep_hint else None)
         source = "".join(lines)
         baseline = lint_errors(source)
 
         request_id = "r" + datetime.now().strftime("%Y%m%d%H%M%S") + secrets.token_hex(2)
-        record = RequestRecord(request_id, book, action.id, tier, backend_name, target)
+        record = RequestRecord(request_id, book, action.id, tier, backend_name, target, keep, context)
         with self.lock:
             self.requests[request_id] = record
             self._prune_requests()
@@ -674,9 +862,11 @@ class Service:
                 "target": target.text,
                 "window": list(window),
                 "fewshot": [example["id"] for example in examples],
+                "keep": keep,
                 "candidates": [
                     {"new": c.new, "old": c.old if c.old != target.text else None, "why": c.why,
-                     "order": c.index, "ok": c.ok, "problems": c.problems, "lint": c.lint}
+                     "order": c.index, "ok": c.ok, "problems": c.problems, "lint": c.lint,
+                     "lost": c.lost, "added": c.added, "trimmed": c.trimmed}
                     for c in record.candidates
                 ],
                 "raw": "".join(raw_text) if not record.candidates else "",
@@ -692,7 +882,8 @@ class Service:
 
     def _add_candidate(self, record: RequestRecord, raw: dict, source: str,
                        baseline: dict[tuple[str, str], int]) -> dict:
-        candidate = validate(raw, len(record.candidates), source, record.target, baseline)
+        candidate = validate(raw, len(record.candidates), source, record.target, baseline, record.keep,
+                             record.context)
         record.candidates.append(candidate)
         return {"event": "candidate", **candidate.to_dict()}
 

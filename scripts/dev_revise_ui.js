@@ -400,6 +400,12 @@
     if (candidate.problems && candidate.problems.length) {
       notes += '<div class="dev-revise-note is-bad">' + escapeHtml(candidate.problems.join('、')) + '</div>'
     }
+    if (candidate.lost && candidate.lost.length) {
+      notes += '<div class="dev-revise-note">直後が受ける語が消えた: ' + escapeHtml(candidate.lost.join('、')) + '</div>'
+    }
+    if (candidate.added && candidate.added.length) {
+      notes += '<div class="dev-revise-note">本文に無い数値: ' + escapeHtml(candidate.added.join('、')) + '</div>'
+    }
     if (candidate.lint && candidate.lint.length) {
       notes += '<div class="dev-revise-note">lint: ' + escapeHtml(candidate.lint.join(' / ')) + '</div>'
     }
