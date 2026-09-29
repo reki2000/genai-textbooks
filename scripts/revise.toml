@@ -35,7 +35,7 @@ thinking = true
 effort = "high"
 
 [tiers.light.codex]
-model = ""
+model = "luna"
 thinking = false
 effort = "minimal"
 
