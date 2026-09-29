@@ -61,7 +61,7 @@ def pick_cases(count: int, seed: int) -> list[tuple[str, dict]]:
 
 
 def run_one(service: revise.Service, book: str, anchor: dict, action: str, backend: str, tier: str) -> dict:
-    candidates, request_id, error = [], "", ""
+    candidates, request_id, error, done = [], "", "", {}
     for event in service.generate({"book": book, "unit": "sentence", "action": action,
                                    "backend": backend, "tier": tier, "anchor": anchor}):
         if event["event"] == "meta":
@@ -70,9 +70,12 @@ def run_one(service: revise.Service, book: str, anchor: dict, action: str, backe
             candidates.append(event)
         elif event["event"] == "error":
             error = event["message"]
+        elif event["event"] == "done":
+            done = event
     record = service.requests[request_id]
     return {"book": book, "action": action, "keep": record.keep, "old": record.target.text,
-            "candidates": candidates, "error": error}
+            "candidates": candidates, "error": error,
+            "ms": done.get("ms"), "ttft_ms": done.get("ttft_ms"), "usage": done.get("usage", {})}
 
 
 def summarize(results: list[dict]) -> dict:
@@ -88,6 +91,11 @@ def summarize(results: list[dict]) -> dict:
             counts["blocked"] += bool(candidate["problems"])
             counts["trimmed"] += bool(candidate["trimmed"])
             counts["clean"] += candidate["ok"] and not candidate["lost"] and not candidate["added"]
+    ms = sorted(result["ms"] for result in results if result.get("ms") is not None)
+    ttft = sorted(result["ttft_ms"] for result in results if result.get("ttft_ms") is not None)
+    counts["median_ms"] = ms[len(ms) // 2] if ms else None
+    counts["median_ttft_ms"] = ttft[len(ttft) // 2] if ttft else None
+    counts["cost_usd"] = round(sum((result.get("usage") or {}).get("cost_usd") or 0 for result in results), 4)
     return counts
 
 
@@ -98,6 +106,8 @@ def main() -> int:
     parser.add_argument("--actions", default="shorten,plain")
     parser.add_argument("--backend", default="claude")
     parser.add_argument("--tier", default="light", choices=["light", "heavy"])
+    parser.add_argument("--model", default="", help="そのティア×バックエンドのモデルを上書きする")
+    parser.add_argument("--thinking", choices=["on", "off"], default="", help="思考の有無を上書きする")
     parser.add_argument("--compare-hint", action="store_true", help="残す語のヒントを渡さない条件とも比べる")
     parser.add_argument("--workers", type=int, default=4)
     parser.add_argument("--out", default="", help="候補を含む結果を JSON で書き出す先")
@@ -109,6 +119,11 @@ def main() -> int:
     for hint in ([False, True] if args.compare_hint else [True]):
         with tempfile.TemporaryDirectory() as log_dir:
             service = revise.Service(log_dir=Path(log_dir))  # 評価の依頼は推敲ログに混ぜない
+            spec = service.config.spec(args.tier, args.backend)
+            if args.model:
+                spec.model = args.model
+            if args.thinking:
+                spec.thinking = args.thinking == "on"
             service.keep_hint = hint
             try:
                 with concurrent.futures.ThreadPoolExecutor(args.workers) as pool:
@@ -117,7 +132,7 @@ def main() -> int:
             finally:
                 service.close()
         counts = summarize(results)
-        label = f"hint={'on' if hint else 'off'}"
+        label = f"{args.backend}:{spec.model or '(既定)'} hint={'on' if hint else 'off'}"
         print(label + " " + " ".join(f"{key}={value}" for key, value in counts.items()), flush=True)
         output[label] = {"counts": counts, "results": results}
     if args.out:

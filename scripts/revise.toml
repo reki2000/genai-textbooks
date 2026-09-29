@@ -20,8 +20,13 @@ heavy_chars = 1200
 # 自由指示がこの字数を超えたら heavy。
 heavy_instruction_chars = 60
 
+[context]
+# target の前後に渡す発言の数（それぞれ）。6 で前後3往復。
+utterances = 6
+
 [tiers.light.claude]
-model = "claude-haiku-4-5-20251001"
+# Haiku 4.5 は直後の台詞が受ける語を消しやすかった（REVISE.md「質の評価」）。
+model = "claude-sonnet-5-5"
 thinking = false
 
 [tiers.heavy.claude]

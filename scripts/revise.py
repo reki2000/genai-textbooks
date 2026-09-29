@@ -88,6 +88,7 @@ class Config:
     heavy_lines: int = 12
     heavy_chars: int = 1200
     heavy_instruction_chars: int = 60
+    context_utterances: int = 6
     tiers: dict[str, dict[str, backends.TierSpec]] = field(default_factory=dict)
     actions: list[Action] = field(default_factory=list)
 
@@ -139,6 +140,7 @@ def load_config(path: Path = CONFIG_PATH) -> Config:
         heavy_lines=int(routing.get("heavy_lines", 12)),
         heavy_chars=int(routing.get("heavy_chars", 1200)),
         heavy_instruction_chars=int(routing.get("heavy_instruction_chars", 60)),
+        context_utterances=int((data.get("context") or {}).get("utterances", 6)),
         tiers=tiers,
         actions=actions,
     )
@@ -230,7 +232,8 @@ def _is_prose(line: str) -> bool:
 
 
 def _ends_sentence(line: str) -> bool:
-    return line.rstrip().endswith(_SENTENCE_END)
+    # 強調やコードの閉じ記号の内側で文が終わっていれば、文の終わりとみなす。
+    return line.rstrip().rstrip("*_`").endswith(_SENTENCE_END)
 
 
 def sentence_bounds(lines: list[str], start: int, end: int) -> tuple[int, int]:
@@ -257,9 +260,45 @@ def context_lines(target: Target, lines: list[str], window: tuple[int, int]) -> 
     return lines[start : target.start], lines[target.end + 1 : end]
 
 
-def window_of(target: Target, lines: list[str], tier: str, anchor: dict) -> tuple[int, int]:
-    comment = _transient_comment(target.book, target.unit, anchor, "substance" if tier == "heavy" else "wording")
-    return comments.window_for(comment, lines, (target.start, target.end))
+CONTEXT_LINE_LIMIT = 120
+
+
+def utterance_window(lines: list[str], start: int, end: int, utterances: int) -> tuple[int, int]:
+    """target の前後に、発言を `utterances` 個ずつ含む範囲。
+
+    文や段落だけでは、誰が何を受けて話しているかが見えず、書き換えで会話の
+    つながりが壊れる。話者行を数えて前後のやり取りごと渡す。
+    """
+    # 前：target を含む発言自身の話者行に加えて、さらに `utterances` 個さかのぼる。
+    window_start, found = start, 0
+    for index in range(start - 1, max(start - CONTEXT_LINE_LIMIT, 0) - 1, -1):
+        window_start = index
+        if _SPEAKER_RE.fullmatch(lines[index].strip()):
+            found += 1
+            if found > utterances:
+                break
+    # 後：`utterances` 個の発言の終わり（次の話者行の手前）まで。
+    window_end, found = end + 1, 0
+    for index in range(end + 1, min(end + 1 + CONTEXT_LINE_LIMIT, len(lines))):
+        if _SPEAKER_RE.fullmatch(lines[index].strip()):
+            found += 1
+            if found > utterances:
+                break
+        window_end = index + 1
+    while window_end > end + 1 and not lines[window_end - 1].strip():
+        window_end -= 1
+    return window_start, window_end
+
+
+def window_of(target: Target, lines: list[str], tier: str, anchor: dict,
+              utterances: int = 6) -> tuple[int, int]:
+    """light は前後のやり取り、heavy は節ぜんぶ（と前後のやり取りの広い方）。"""
+    around = utterance_window(lines, target.start, target.end, utterances)
+    if tier != "heavy":
+        return around
+    comment = _transient_comment(target.book, target.unit, anchor, "substance")
+    section = comments.window_for(comment, lines, (target.start, target.end))
+    return min(section[0], around[0]), max(section[1], around[1])
 
 
 def choose_tier(requested: str, action: Action, target: Target, instruction: str, config: Config) -> str:
@@ -784,7 +823,7 @@ class Service:
         target, lines = locate(book, str(payload.get("unit", "sentence")), anchor)
         tier = choose_tier(str(payload.get("tier", "auto")), action, target, instruction, self.config)
         spec = self.config.spec(tier, backend_name)
-        window = window_of(target, lines, tier, anchor)
+        window = window_of(target, lines, tier, anchor, self.config.context_utterances)
         examples = examples_for(action.id, book, self.log_dir)
         count = max(1, min(int(payload.get("count") or self.config.candidates), 5))
         system = system_prompt(book)

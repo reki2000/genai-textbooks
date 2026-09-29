@@ -148,6 +148,8 @@ def test_light_guards() -> None:
     check("sentence: 文の途中で切れた行を続きまで広げる", R.sentence_bounds(lines, 2, 2), (2, 3))
     check("sentence: 続きの行から前へ広げる", R.sentence_bounds(lines, 3, 3), (2, 3))
     check("sentence: 文で終わる行はそのまま", R.sentence_bounds(lines, 1, 1), (1, 1))
+    check("sentence: 強調の内側で終わる文は区切り",
+          R.sentence_bounds(["**約2週間だお！**\n", "次の文だお。\n"], 1, 1), (1, 1))
 
     target = R.Target("sample", "sentence", "", [], 2, 3, 0, "".join(lines[2:4]), "")
     check("keep: 直後の台詞が受ける語", R.following_terms(target, lines), ["家賃"])
@@ -167,6 +169,18 @@ def test_light_guards() -> None:
           ["話者や見出しをまたいでいる"])
     check("added: 本文に無い数値", R.added_numbers("年2%の利息で100万円", "預けた100万円"), ["2"])
     check("added: 桁区切りの揺れは同じ数", R.added_numbers("1,000円", "1000円"), [])
+
+
+def test_utterance_window() -> None:
+    lines = []
+    for number in range(10):
+        lines += [f"**{'やる夫' if number % 2 == 0 else 'やらない夫'}**：\n", f"発言{number}の一文目。\n",
+                  f"発言{number}の二文目。\n", "\n"]
+    target_line = 5 * 4 + 2  # 発言5の二文目
+    start, end = R.utterance_window(lines, target_line, target_line, 2)
+    check("context: 前は自分の発言に加えて2発言", lines[start], "**やらない夫**：\n")
+    check("context: 前の起点は発言3", lines[start + 1], "発言3の一文目。\n")
+    check("context: 後ろは2発言の終わりまで", lines[end - 1], "発言7の二文目。\n")
 
 
 def test_routing(root: Path) -> None:
@@ -389,6 +403,7 @@ def main() -> int:
         test_locate_and_validate(root)
         test_locate_errors(root)
         test_light_guards()
+        test_utterance_window()
         test_routing(root)
         test_prompts(root)
         test_service_flow(root)
