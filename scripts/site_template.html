@@ -30,6 +30,7 @@
   <link rel="icon" href="@@BASE_PATH@@/assets/favicon.png" type="image/png">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify-darklight-theme@3.2.0/dist/style.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+  <link rel="stylesheet" href="@@BASE_PATH@@/assets/reading-progress.css">
 @@EXTRA_HEAD@@  <style>
     /* Move docsify's sidebar toggle from the bottom-left to the top-left, push
        the sidebar content down so the site name clears it, and render it as a
@@ -338,6 +339,8 @@
       })
     })()
   </script>
+  <script>window.readerProgressBasePath = "@@BASE_PATH@@";</script>
+  <script src="@@BASE_PATH@@/assets/reading-progress.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/docsify@4"></script>
   <script src="https://cdn.jsdelivr.net/npm/docsify-darklight-theme@3.2.0/dist/index.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
