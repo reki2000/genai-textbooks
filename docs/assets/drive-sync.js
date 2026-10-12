@@ -27,6 +27,9 @@
   button.id = 'drive-account-button';
   button.type = 'button';
   shell.appendChild(button);
+  var accountLabel = document.createElement('span');
+  accountLabel.id = 'drive-account-identity';
+  shell.appendChild(accountLabel);
   document.body.appendChild(shell);
   document.body.classList.add('drive-sync-enabled');
 
@@ -62,6 +65,8 @@
       (profile && hasToken() && profile.email ? ' (' + profile.email + ')' : '');
     button.setAttribute('aria-label', button.title);
     button.dataset.status = hasToken() ? 'connected' : saved(loginStateKey) ? 'paused' : 'disconnected';
+    accountLabel.textContent = hasToken() && profile ? (profile.email || profile.name || '') : '';
+    accountLabel.hidden = !accountLabel.textContent;
   }
 
   function element(name, content, parent, className) {
