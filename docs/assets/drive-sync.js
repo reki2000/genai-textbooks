@@ -55,13 +55,13 @@
     return !!token && Date.now() < expiresAt;
   }
   function display() {
-    var label;
-    if (profile && hasToken()) label = (profile.email || profile.name || 'Google') + ' · 同期';
-    else if (profile) label = (profile.email || 'Google') + ' · 再接続';
-    else if (saved(loginStateKey)) label = 'Google Driveに再接続';
-    else label = 'Google Driveに接続';
-    button.textContent = label;
-    button.title = errorText || label;
+    var status = hasToken() ? (busy ? '同期中' : '同期有効') :
+      saved(loginStateKey) ? '再認可が必要' : '未接続';
+    button.textContent = '読書履歴同期';
+    button.title = errorText || '読書履歴同期：' + status +
+      (profile && hasToken() && profile.email ? ' (' + profile.email + ')' : '');
+    button.setAttribute('aria-label', button.title);
+    button.dataset.status = hasToken() ? 'connected' : saved(loginStateKey) ? 'paused' : 'disconnected';
   }
 
   function element(name, content, parent, className) {
@@ -92,22 +92,29 @@
     panel.setAttribute('role', 'dialog');
     panel.setAttribute('aria-modal', 'true');
     panel.setAttribute('aria-labelledby', 'drive-dialog-title');
-    var heading = element('h2', profile ? 'Google Drive 同期' : 'Google Driveで読書記録を同期', panel);
+    var heading = element('h2', '読書履歴同期', panel);
     heading.id = 'drive-dialog-title';
 
     if (!profile || !hasToken()) {
-      element('p', 'Googleアカウントを接続すると、読書位置・読了率を端末間で同期できます。', panel);
+      element('p', 'Google Driveを利用して、読書位置・読了率を端末間で同期できます。', panel);
       element('p', '記録はご自身のGoogle Driveの非公開アプリデータ領域（appDataFolder）に小さなJSONとして保存します。', panel);
       element('p', '権限はこのアプリの専用データ領域のみです。ほかのGoogle Drive文書・写真・スプレッドシートは表示も読み取りもできません。アカウント表示のためメールアドレスも取得します。', panel);
-      element('p', 'アクセストークンはページのメモリ内だけで保持し、保存しません。ページ再読み込みや期限切れでは再接続が必要です。', panel, 'drive-small');
+      element('p', 'アクセストークンはメモリ内にのみ保持します。再読み込みや期限切れ後は「読書履歴同期」を押すと、前回のGoogleアカウントで再認可を試みます。', panel, 'drive-small');
       if (!oauthClientId) element('p', '現在はサイト管理者によるGoogle OAuth設定待ちです。', panel, 'drive-error');
       if (errorText) element('p', errorText, panel, 'drive-error');
       var row = element('div', '', panel, 'drive-actions');
-      action(row, 'Googleで接続', function () {
+      var previouslyAuthorized = !!saved(loginStateKey);
+      action(row, previouslyAuthorized ? '同期を再開' : 'Googleで同期を開始', function () {
         closeDialog();
-        beginAuthorization();
+        beginAuthorization(!previouslyAuthorized);
       }, true, !oauthClientId);
-      if (saved(loginStateKey)) action(row, 'この端末からログアウト', signOut, false);
+      if (previouslyAuthorized) {
+        action(row, 'アカウントを選択して同期', function () {
+          closeDialog();
+          beginAuthorization(true);
+        }, false, !oauthClientId);
+        action(row, 'ログアウト', signOut, false);
+      }
       action(row, '閉じる', closeDialog);
     } else {
       element('p', profile.email || 'Googleアカウント', panel);
@@ -115,6 +122,10 @@
       element('p', '記録はアプリ専用領域にのみ保存されます。', panel, 'drive-small');
       var actions = element('div', '', panel, 'drive-actions');
       action(actions, '今すぐ同期', function () { closeDialog(); syncNow(); }, true, busy);
+      action(actions, 'アカウントを切り替える', function () {
+        closeDialog();
+        beginAuthorization(true);
+      });
       action(actions, 'ログアウト', signOut);
       action(actions, '閉じる', closeDialog);
     }
@@ -130,7 +141,7 @@
     if (firstButton) firstButton.focus();
   }
 
-  function beginAuthorization() {
+  function beginAuthorization(selectAccount) {
     if (!oauthClientId) { dialog(); return; }
     if (!window.google || !google.accounts || !google.accounts.oauth2) {
       errorText = 'Google認証ライブラリが読み込めません。通信状況を確認してください。';
@@ -159,8 +170,12 @@
         }
       });
     }
-    // This call must occur directly from a user click for popup access.
-    tokenClient.requestAccessToken({ prompt: 'select_account' });
+    // The previous Google subject is an account hint, not an access token.
+    // The token request must be called synchronously from a user click.
+    var hint = !selectAccount && saved(loginStateKey);
+    var options = { prompt: hint ? '' : 'select_account' };
+    if (hint) options.login_hint = hint;
+    tokenClient.requestAccessToken(options);
   }
 
   async function api(url, init) {
@@ -312,7 +327,15 @@
     }
   }
 
-  button.addEventListener('click', dialog);
+  button.addEventListener('click', function () {
+    if (!hasToken() && saved(loginStateKey) && oauthClientId) {
+      // Returning reader: skip the explanation and request a fresh token.
+      beginAuthorization(false);
+    } else {
+      // First use: show explanation. Active session: show sync/logout controls.
+      dialog();
+    }
+  });
   window.addEventListener('genai-reading-progress-changed', function () {
     if (hasToken()) { dirty = true; queueSync(); }
   });
