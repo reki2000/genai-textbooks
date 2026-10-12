@@ -3,7 +3,8 @@
   'use strict';
 
   var basePath = window.readerProgressBasePath || '';
-  var storageKey = 'genai-textbooks-reading-progress-v1';
+  var guestStorageKey = 'genai-textbooks-reading-progress-v1';
+  var storageKey = guestStorageKey;
   var entries = loadEntries();
   var active = null;
   var saveTimer = null;
@@ -25,6 +26,7 @@
   function persist() {
     try {
       window.localStorage.setItem(storageKey, JSON.stringify(entries));
+      window.dispatchEvent(new Event('genai-reading-progress-changed'));
     } catch (error) {
       // Storage can be disabled or full. Continue without breaking reading.
     }
@@ -290,6 +292,76 @@
     // The sidebar can finish loading after the article.
     setTimeout(renderSidebar, 100);
   }
+
+
+  // Optional Drive sync adapter; access tokens remain private to drive-sync.js.
+  function mergeEntries(incoming) {
+    if (!incoming || typeof incoming !== 'object' || Array.isArray(incoming)) return;
+    var changed = false;
+    Object.keys(incoming).slice(0, 400).forEach(function (id) {
+      if (!/^[a-z0-9-]{1,100}$/.test(id)) return;
+      var remote = incoming[id];
+      if (!remote || typeof remote !== 'object' || Array.isArray(remote)) return;
+      var current = getEntry(id) || {};
+      var num = function (n, min, max) {
+        n = Number(n);
+        return Number.isFinite(n) ? clamp(n, min, max) : min;
+      };
+      var remoteTime = num(remote.updated, 0, 4102444800000);
+      var localTime = num(current.updated, 0, 4102444800000);
+      var newer = remoteTime > localTime;
+      var next = {
+        title: (newer || !current.title ? remote.title : current.title) || id,
+        position: newer ? num(remote.position, 0, 100) : num(current.position, 0, 100),
+        furthest: Math.max(num(current.furthest, 0, 100), num(remote.furthest, 0, 100)),
+        done: Boolean(current.done || remote.done),
+        updated: Math.max(localTime, remoteTime),
+        anchor: newer ? remote.anchor : current.anchor,
+        section: newer ? num(remote.section, 0, 1) : num(current.section, 0, 1)
+      };
+      next.title = String(next.title).slice(0, 250);
+      next.anchor = typeof next.anchor === 'string' ? next.anchor.slice(0, 500) : null;
+      if (next.done) next.furthest = 100;
+      if (JSON.stringify(current) !== JSON.stringify(next)) {
+        entries[id] = next;
+        changed = true;
+      }
+    });
+    if (changed) {
+      persist();
+      refreshProgressUI();
+    }
+  }
+
+  function refreshProgressUI() {
+    document.querySelectorAll('.reader-progress-top, .reader-book-resume, .reader-sidebar-mark').forEach(function (el) {
+      el.remove();
+    });
+    onPage();
+  }
+
+  function switchAccount(subject) {
+    if (active) savePosition();
+    clearTimeout(saveTimer);
+    var guest = storageKey === guestStorageKey ? entries : null;
+    storageKey = subject ? guestStorageKey + ':google:' + String(subject) : guestStorageKey;
+    entries = loadEntries();
+    if (subject && guest && Object.keys(guest).length) {
+      mergeEntries(guest);
+      try { window.localStorage.removeItem(guestStorageKey); } catch (error) {}
+    }
+    refreshProgressUI();
+  }
+
+  window.genaiReadingProgress = {
+    snapshot: function () { return JSON.parse(JSON.stringify(entries)); },
+    merge: mergeEntries,
+    switchAccount: switchAccount
+  };
+  window.addEventListener('storage', function (event) {
+    if (event.key !== storageKey || !event.newValue) return;
+    try { mergeEntries(JSON.parse(event.newValue)); } catch (error) {}
+  });
 
   document.addEventListener('scroll', scheduleSave, { passive: true });
   window.addEventListener('scroll', scheduleSave, { passive: true });
