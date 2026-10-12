@@ -1,29 +1,9 @@
 /* Reading progress for the docsify catalog and articles. */
-.reader-continue {
-  margin: 24px 0 30px;
-}
-.reader-continue h2 {
-  margin: 0 0 14px;
-}
-.reader-continue-items {
-  display: grid;
-  gap: 12px;
-}
-.reader-continue-item {
-  border: 1px solid rgba(127, 127, 127, 0.25);
-  border-radius: 8px;
-  padding: 13px 16px;
-}
-.reader-continue-top,
 .reader-progress-top {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: 14px;
-}
-.reader-continue-title {
-  min-width: 0;
-  font-weight: 600;
 }
 .reader-progress-label {
   flex-shrink: 0;
@@ -44,16 +24,6 @@
   height: 100%;
   border-radius: inherit;
   background: var(--theme-color, #42b983);
-}
-.reader-resume {
-  color: var(--theme-color, #42b983);
-  font-size: 0.9em;
-  font-weight: 600;
-  cursor: pointer;
-}
-.reader-resume:focus-visible {
-  outline: 2px solid var(--theme-color, #42b983);
-  outline-offset: 3px;
 }
 .reader-book-resume {
   padding: 10px 14px;
@@ -78,9 +48,4 @@
 }
 .reader-sidebar-mark[data-status="in-progress"] {
   font-size: 0.65em;
-}
-@media (max-width: 600px) {
-  .reader-continue-item {
-    padding: 11px 12px;
-  }
 }

@@ -87,14 +87,6 @@
     return label;
   }
 
-  function makeResumeLink(id, label) {
-    var link = document.createElement('a');
-    link.href = bookUrl(id) + '?resume=1';
-    link.className = 'reader-resume';
-    link.textContent = label || '続きから読む →';
-    return link;
-  }
-
   function renderHome(article) {
     var headings = article.querySelectorAll('h2');
     var catalogHeading = null;
@@ -105,43 +97,6 @@
       }
     }
     if (!catalogHeading) return;
-
-    var recent = Object.keys(entries).map(function (id) {
-      return { id: id, entry: getEntry(id) };
-    }).filter(function (item) {
-      return item.entry && !item.entry.done && progressPercent(item.entry) > 0;
-    }).sort(function (a, b) {
-      return (b.entry.updated || 0) - (a.entry.updated || 0);
-    }).slice(0, 3);
-
-    if (recent.length) {
-      var section = document.createElement('section');
-      section.className = 'reader-continue';
-      var title = document.createElement('h2');
-      title.textContent = '読書を再開';
-      section.appendChild(title);
-      var items = document.createElement('div');
-      items.className = 'reader-continue-items';
-
-      recent.forEach(function (item) {
-        var card = document.createElement('div');
-        card.className = 'reader-continue-item';
-        var top = document.createElement('div');
-        top.className = 'reader-continue-top';
-        var name = document.createElement('a');
-        name.className = 'reader-continue-title';
-        name.href = bookUrl(item.id);
-        name.textContent = item.entry.title || item.id;
-        top.appendChild(name);
-        top.appendChild(makeLabel(item.entry));
-        card.appendChild(top);
-        card.appendChild(makeProgress(item.entry));
-        card.appendChild(makeResumeLink(item.id));
-        items.appendChild(card);
-      });
-      section.appendChild(items);
-      catalogHeading.parentNode.insertBefore(section, catalogHeading);
-    }
 
     // A catalog item is a generated h4 with a book link inside.
     article.querySelectorAll('h4').forEach(function (heading) {
