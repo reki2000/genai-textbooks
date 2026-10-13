@@ -14,6 +14,7 @@
   var ownFilename = null;
   var generation = 0;
   var busy = false;
+  var authorizing = false;
   var dirty = false;
   var flushTimer = null;
   var lastSync = 0;
@@ -58,14 +59,32 @@
     return !!token && Date.now() < expiresAt;
   }
   function display() {
-    var status = hasToken() ? (busy ? '同期中' : '同期有効') :
-      saved(loginStateKey) ? '再認可が必要' : '未接続';
-    button.textContent = '読書履歴同期';
-    button.title = errorText || '読書履歴同期：' + status +
-      (profile && hasToken() && profile.email ? ' (' + profile.email + ')' : '');
+    var authorized = hasToken() && !!profile;
+    var status;
+    var visualState;
+    if (!oauthClientId) {
+      status = '設定待ち';
+      visualState = 'unconfigured';
+    } else if (authorizing || (hasToken() && !profile)) {
+      status = '認証中…';
+      visualState = 'authorizing';
+    } else if (authorized) {
+      status = busy ? '認証済み・同期中' :
+        errorText ? '認証済み・同期エラー' : '認証済み';
+      visualState = errorText ? 'error' : 'connected';
+    } else if (saved(loginStateKey)) {
+      status = '要再認証';
+      visualState = 'paused';
+    } else {
+      status = '未認証';
+      visualState = 'disconnected';
+    }
+    button.textContent = '読書履歴同期：' + status;
+    button.title = errorText || button.textContent +
+      (authorized && profile.email ? ' (' + profile.email + ')' : '');
     button.setAttribute('aria-label', button.title);
-    button.dataset.status = hasToken() ? 'connected' : saved(loginStateKey) ? 'paused' : 'disconnected';
-    accountLabel.textContent = hasToken() && profile ? (profile.email || profile.name || '') : '';
+    button.dataset.status = visualState;
+    accountLabel.textContent = authorized ? (profile.email || profile.name || '') : '';
     accountLabel.hidden = !accountLabel.textContent;
   }
 
@@ -160,7 +179,9 @@
         callback: function (response) {
           if (!response || response.error || !response.access_token ||
               !google.accounts.oauth2.hasGrantedAllScopes(response, scope)) {
+            authorizing = false;
             errorText = 'Googleへの接続が許可されませんでした。';
+            display();
             dialog();
             return;
           }
@@ -170,7 +191,9 @@
           connect().catch(handleFailure);
         },
         error_callback: function () {
+          authorizing = false;
           errorText = 'Google認証を完了できませんでした。';
+          display();
           dialog();
         }
       });
@@ -180,7 +203,17 @@
     var hint = !selectAccount && saved(loginStateKey);
     var options = { prompt: hint ? '' : 'select_account' };
     if (hint) options.login_hint = hint;
-    tokenClient.requestAccessToken(options);
+    authorizing = true;
+    errorText = '';
+    display();
+    try {
+      tokenClient.requestAccessToken(options);
+    } catch (error) {
+      authorizing = false;
+      errorText = 'Googleの認証画面を開けませんでした。再試行してください。';
+      display();
+      dialog();
+    }
   }
 
   async function api(url, init) {
@@ -265,6 +298,7 @@
     var epoch = generation;
     busy = true;
     dirty = false;
+    display();
     try {
       await readDriveFiles();
       if (epoch !== generation) return;
@@ -290,6 +324,7 @@
     }, Math.max(5000, 30000 - (Date.now() - lastSync)));
   }
   function handleFailure(error) {
+    authorizing = false;
     errorText = error && error.message ? error.message : '同期に失敗しました。';
     display();
   }
@@ -307,6 +342,7 @@
     ownFilename = deviceFile(info.sub);
     remember(loginStateKey, info.sub); // Account ID only, never a credential.
     errorText = '';
+    authorizing = false;
     display();
     await syncNow();
   }
@@ -317,6 +353,7 @@
     clearTimeout(flushTimer);
     flushTimer = null;
     var oldToken = token;
+    authorizing = false;
     token = null;
     expiresAt = 0;
     profile = null;
@@ -346,9 +383,12 @@
   });
   document.addEventListener('visibilitychange', function () {
     if (document.hidden && hasToken() && dirty && !busy) syncNow();
+    else if (!document.hidden) display();
   });
   window.addEventListener('online', function () { if (hasToken()) syncNow(); });
   setInterval(function () { if (hasToken()) syncNow(); }, 120000);
+  // Update the visible authorization state even when no network request occurs.
+  setInterval(display, 15000);
   var lastSub = saved(loginStateKey);
   if (lastSub && /^[0-9]{1,50}$/.test(lastSub)) progress.switchAccount(lastSub);
   display();

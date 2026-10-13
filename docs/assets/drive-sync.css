@@ -31,3 +31,10 @@
 #drive-account-identity { max-width: 220px; font-size: 11px; opacity: .8; color: var(--text-color-base,#555);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 #drive-account-identity[hidden] { display: none; }
+
+/* Show readable authorization state in the button, not only in its tooltip. */
+#drive-account-button { max-width: min(320px, 82vw); }
+#drive-account-button[data-status="unconfigured"]::before,
+#drive-account-button[data-status="disconnected"]::before { background: #888; }
+#drive-account-button[data-status="authorizing"]::before { background: #5285c5; }
+#drive-account-button[data-status="error"]::before { background: #b34235; }
