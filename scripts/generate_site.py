@@ -73,6 +73,21 @@ DRAFT_TOP_PAGE_NAME = "README.draft.md"
 DRAFT_SIDEBAR_NAME = "_sidebar.draft.md"
 DRAFT_MARKER = "【下書き】"
 
+# Editorial ratings carried in each book's catalog.yml under `ratings:` (see
+# BUILD.md). Keys are stable identifiers; labels are the reader-facing axis
+# names shown in the top-page listing, in display order. `overall` is not an
+# axis: it is the mean of the three axes, and the listing rank is derived
+# from it at build time rather than stored in the catalog. Knowledge amount /
+# retention and domain coverage used to be separate axes; they overlapped
+# enough that they are now a single `knowledge` axis (the mean of the two
+# original scores, so it can land on quarter points such as 4.75).
+RATING_AXES = (
+    ("knowledge", "知識の充実"),
+    ("appeal", "面白さ"),
+    ("structure", "物語の構成"),
+)
+RATING_KEYS = tuple(key for key, _label in RATING_AXES) + ("overall",)
+
 # Generated-image PNGs stay under docs/ as source assets, while the public
 # build serves WebP derivatives. 1600 px covers the roughly 760 px article
 # column at 2x density; 200 KiB leaves room for labels and thin lines.
@@ -134,6 +149,62 @@ def parse_created(value: Any, label: str) -> datetime:
     if created.tzinfo is None:
         fail(f"{label} must include a timezone")
     return created
+
+
+def validate_ratings(value: Any, document_id: str) -> dict[str, float]:
+    """Validate a catalog `ratings` block and return it as plain floats.
+
+    All four keys (the three axes in RATING_AXES plus `overall`) are
+    required, every value must lie within 1.0-5.0, and `overall` must be the
+    mean of the three axes rounded to two decimals, so a catalog cannot
+    drift away from the axis scores it claims to summarise.
+    """
+    label = f"document {document_id}.ratings"
+    ratings = require_mapping(value, label)
+    unknown = sorted(set(ratings) - set(RATING_KEYS))
+    if unknown:
+        fail(f"{label} has unknown fields: {', '.join(unknown)}")
+    require_fields(ratings, RATING_KEYS, label)
+    cleaned: dict[str, float] = {}
+    for key in RATING_KEYS:
+        score = ratings[key]
+        if isinstance(score, bool) or not isinstance(score, (int, float)):
+            fail(f"{label}.{key} must be a number")
+        if not 1.0 <= float(score) <= 5.0:
+            fail(f"{label}.{key} must be between 1.0 and 5.0")
+        cleaned[key] = float(score)
+    mean = sum(cleaned[key] for key, _label in RATING_AXES) / len(RATING_AXES)
+    if abs(cleaned["overall"] - round(mean, 2)) > 0.011:
+        fail(
+            f"{label}.overall must be the mean of the axes "
+            f"({round(mean, 2)}), not {cleaned['overall']}"
+        )
+    return cleaned
+
+
+def assign_rating_ranks(documents: list[dict[str, Any]]) -> None:
+    """Rank every rated document by its overall rating.
+
+    The rank is derived here, over the full document set, instead of being
+    stored in each catalog: adding or re-rating one book must not force an
+    edit to every other book's catalog just to keep the ranks consistent.
+    Ties on `overall` break by the axis scores in display order, then by id,
+    so the ranking is total and stable. Each rated document gains
+    `rating_rank` (1-based) and `rating_count` (how many documents are rated).
+    """
+    rated = [document for document in documents if "ratings" in document]
+
+    def rank_key(document: dict[str, Any]) -> tuple:
+        ratings = document["ratings"]
+        return (
+            -ratings["overall"],
+            *(-ratings[key] for key, _label in RATING_AXES),
+            document["id"],
+        )
+
+    for rank, document in enumerate(sorted(rated, key=rank_key), start=1):
+        document["rating_rank"] = rank
+        document["rating_count"] = len(rated)
 
 
 def title_from_source(source_path: Path, document_id: str) -> str:
@@ -208,7 +279,7 @@ def load_catalog() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
         "question",
         "plot",
     )
-    optional_document_fields = ("draft", "follows")
+    optional_document_fields = ("draft", "follows", "ratings")
     for index, (raw_document, catalog_path) in enumerate(
         zip(documents, document_sources, strict=True)
     ):
@@ -255,6 +326,8 @@ def load_catalog() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
         if not isinstance(draft, bool):
             fail(f"document {document_id}.draft must be true or false")
         document["draft"] = draft
+        if "ratings" in document:
+            document["ratings"] = validate_ratings(document["ratings"], document_id)
         legacy_parts = sorted(
             path.name
             for path in source_path.parent.glob("README.*.md")
@@ -282,6 +355,7 @@ def load_catalog() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
         fail(f"categories without documents: {', '.join(sorted(empty_categories))}")
 
     categories.sort(key=lambda item: item["order"])
+    assign_rating_ranks(documents)
     return categories, order_documents(documents)
 
 
@@ -408,10 +482,42 @@ def render_sidebar(
     return "\n".join(lines).rstrip() + "\n"
 
 
+def format_score(value: float) -> str:
+    """Shortest plain form of a score: 5.0, 4.5 or 4.75 (quarter points
+    occur on the merged knowledge axis)."""
+    text = f"{value:.2f}".rstrip("0")
+    return text + "0" if text.endswith(".") else text
+
+
+def ratings_line(document: dict[str, Any]) -> str | None:
+    """One-line rating summary for a listing entry, or None when unrated."""
+    ratings = document.get("ratings")
+    if not ratings:
+        return None
+    axes = "｜".join(
+        f"{label} {format_score(ratings[key])}" for key, label in RATING_AXES
+    )
+    return (
+        f"評価：総合評価 {ratings['overall']:.2f}"
+        f"（{document['rating_count']}冊中{document['rating_rank']}位）｜{axes}"
+    )
+
+
 def render_top_page_catalog(
     categories: list[dict[str, Any]], documents: list[dict[str, Any]]
 ) -> str:
-    lines = [START_MARKER, "", "## 教材一覧", ""]
+    lines = [
+        START_MARKER,
+        "",
+        "## 教材一覧",
+        "",
+        "各教材には、エンタメ学習コンテンツとしての評価（各5点満点）を付けている。"
+        "**知識の充実**＝具体的な知識の量と、その分野の主要テーマの網羅、定着のしやすさ、"
+        "**面白さ**＝読ませる力、"
+        "**物語の構成**＝プロットと構成。"
+        "**総合評価**は3つの評価の平均で、順位は全教材の総合評価順。",
+        "",
+    ]
     for category, category_documents in documents_by_category(categories, documents):
         lines.append(f"### {category['title']}")
         lines.append("")
@@ -422,9 +528,12 @@ def render_top_page_catalog(
                     f"({nav_href(document)}) ({reading_minutes(document)}分)",
                     f"問い：{document['question']}",
                     f"プロット：{document['plot']}",
-                    "",
                 ]
             )
+            rating = ratings_line(document)
+            if rating is not None:
+                lines.append(rating)
+            lines.append("")
     lines.append(END_MARKER)
     return "\n".join(lines) + "\n"
 
