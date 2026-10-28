@@ -1,0 +1,12 @@
+documents:
+- id: topological-sensor-coverage-muse1
+  category: math-information
+  created: '2026-10-28T16:00:00+09:00'
+  question: センサーの正確な座標や被覆地図がなくても、通信関係だけから監視領域の穴を検出し被覆を証明できるのか。
+  plot: 通信グラフの連結性だけで完全被覆を宣言したやる夫が、磁石の輪と面積・密度の反例を経て座標を捨て、Čech複体とVietoris–Rips複体、境界行列とEuler標数による検算、模型では1台で消える穴が実データでは2台要る二段の失敗、写像で追う幻の穴、夜に開く穴のzigzag、計算量の爆発とコホモロジーへの橋渡しを経て、相対基本類の非零写像による被覆の十分条件へ至る。幕末の問いは次の幕の頭で回収され、道具と現場判断の対応表が初学者を支える。
+  draft: true
+  ratings:
+    knowledge: 4.5
+    appeal: 4.0
+    structure: 5.0
+    overall: 4.50
