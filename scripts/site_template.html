@@ -199,23 +199,20 @@
        no per-chunk labels. Inside a plain line, the characters that
        differ carry a stronger tint of the same family. Formulas are
        whole units and are never wrapped or highlighted inside. */
+    /* No frames and no extra spacing: changed regions flow with the
+       same line spacing as the surrounding text, marked by colour only. */
     .diff-chunk {
-      border: 1px solid rgba(128, 128, 128, 0.4);
-      border-radius: 8px;
-      margin: 1em 0;
-      overflow: hidden;
+      margin: 0;
     }
 
     .diff-old {
       background-color: rgba(255, 90, 80, 0.07);
       color: #c0392b;
-      padding: 1px 14px;
     }
 
     .diff-new {
       background-color: rgba(70, 130, 255, 0.07);
       color: #1d5fd1;
-      padding: 1px 14px;
     }
 
     .diff-hl-old {
@@ -227,7 +224,6 @@
     }
 
     .diff-fold summary {
-      padding: 2px 0;
       font-size: 12.5px;
       cursor: pointer;
     }
