@@ -193,9 +193,12 @@
     }
 
     /* Revision diff pages (books/<id>/diff.md, generated for catalogs with
-       revision_of). Old lines sit above in red, new lines below in blue,
-       and the parts that actually differ carry a stronger tint of the
-       same family. */
+       revision_of). The page is ordinary Markdown, rendered by docsify and
+       KaTeX exactly like a book page; only changed regions are wrapped in
+       coloured containers -- old above in red, new below in blue -- with
+       no per-chunk labels. Inside a plain line, the characters that
+       differ carry a stronger tint of the same family. Formulas are
+       whole units and are never wrapped or highlighted inside. */
     .diff-chunk {
       border: 1px solid rgba(128, 128, 128, 0.4);
       border-radius: 8px;
@@ -203,36 +206,16 @@
       overflow: hidden;
     }
 
-    .diff-meta {
-      padding: 4px 12px;
-      font-size: 13px;
-      opacity: 0.75;
-      border-bottom: 1px solid rgba(128, 128, 128, 0.3);
-    }
-
-    .diff-side-label {
-      padding: 6px 12px 0;
-      font-size: 12px;
-      font-weight: 700;
-    }
-
     .diff-old {
       background-color: rgba(255, 90, 80, 0.07);
       color: #c0392b;
+      padding: 1px 14px;
     }
 
     .diff-new {
       background-color: rgba(70, 130, 255, 0.07);
       color: #1d5fd1;
-    }
-
-    .diff-line {
-      padding: 1px 12px;
-      min-height: 1.5em;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size: 13.5px;
-      white-space: pre-wrap;
-      word-break: break-all;
+      padding: 1px 14px;
     }
 
     .diff-hl-old {
@@ -243,20 +226,8 @@
       background-color: rgba(70, 130, 255, 0.32);
     }
 
-    /* Unchanged stretches of the full text flow like ordinary text
-       between the annotated change blocks. */
-    .diff-same {
-      margin: 0.75em 0;
-    }
-
-    /* Whole-section units get a heavier header so they read as one block,
-       and their folded full text opens inline. */
-    .diff-chunk-section .diff-meta {
-      font-weight: 700;
-    }
-
     .diff-fold summary {
-      padding: 2px 12px;
+      padding: 2px 0;
       font-size: 12.5px;
       cursor: pointer;
     }

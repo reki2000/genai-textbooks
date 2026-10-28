@@ -537,30 +537,73 @@ def ratings_line(document: dict[str, Any]) -> str | None:
 
 
 def _diff_highlight_pair(old_line: str, new_line: str) -> tuple[str, str]:
-    """HTML for one changed line pair: the characters that actually differ
-    are wrapped in a highlight span of the same colour family as the line
-    (light red for the old side, light blue for the new side)."""
+    """Markdown for one changed plain-line pair: the characters that
+    actually differ are wrapped in a highlight span of the same colour
+    family as the side (light red for old, light blue for new). The rest
+    of the line is emitted raw, exactly as on the book page, so Markdown
+    and math in it render through the normal docsify pipeline. Callers
+    must not use this for lines containing math or for block units:
+    a span inside a formula would break KaTeX."""
     matcher = difflib.SequenceMatcher(None, old_line, new_line, autojunk=False)
     old_parts: list[str] = []
     new_parts: list[str] = []
     for tag, i1, i2, j1, j2 in matcher.get_opcodes():
         if tag == "equal":
-            old_parts.append(html.escape(old_line[i1:i2]))
-            new_parts.append(html.escape(new_line[j1:j2]))
+            old_parts.append(old_line[i1:i2])
+            new_parts.append(new_line[j1:j2])
             continue
         if i2 > i1:
             old_parts.append(
-                f'<span class="diff-hl-old">{html.escape(old_line[i1:i2])}</span>'
+                f'<span class="diff-hl-old">{old_line[i1:i2]}</span>'
             )
         if j2 > j1:
             new_parts.append(
-                f'<span class="diff-hl-new">{html.escape(new_line[j1:j2])}</span>'
+                f'<span class="diff-hl-new">{new_line[j1:j2]}</span>'
             )
     return "".join(old_parts), "".join(new_parts)
 
 
-def _diff_line_div(content_html: str) -> str:
-    return f'<div class="diff-line">{content_html or "&nbsp;"}</div>'
+def _diff_units(lines: list[str]) -> list[tuple[str, list[str]]]:
+    """Group lines into indivisible diff units. Display-math blocks
+    ($$ ... $$, possibly multi-line), fenced code blocks and tables
+    (consecutive lines starting with |) are single units: a formula is
+    compared as a whole and is never split, re-wrapped or highlighted
+    inside, so docsify + KaTeX receive it exactly as written. Everything
+    else is a single line."""
+    units: list[tuple[str, list[str]]] = []
+    i = 0
+    while i < len(lines):
+        stripped = lines[i].strip()
+        if stripped.startswith("```"):
+            j = i + 1
+            while j < len(lines) and not lines[j].strip().startswith("```"):
+                j += 1
+            j = min(j + 1, len(lines))
+            units.append(("code", lines[i:j]))
+            i = j
+            continue
+        if "$$" in lines[i]:
+            if lines[i].count("$$") % 2 == 0:
+                units.append(("formula", [lines[i]]))
+                i += 1
+                continue
+            j = i + 1
+            while j < len(lines) and "$$" not in lines[j]:
+                j += 1
+            j = min(j + 1, len(lines))
+            units.append(("formula", lines[i:j]))
+            i = j
+            continue
+        if stripped.startswith("|"):
+            j = i
+            while j < len(lines) and lines[j].strip().startswith("|"):
+                j += 1
+            units.append(("table", lines[i:j]))
+            i = j
+            continue
+        units.append(("line", [lines[i]]))
+        i += 1
+    return units
 
 
 _SECTION_NUMBER_RE = re.compile(r"^第[0-9０-９一二三四五六七八九十百]+幕\s*")
@@ -656,142 +699,148 @@ def _match_sections(
 
 def render_diff_page(document: dict[str, Any], source: dict[str, Any]) -> str:
     """Markdown page comparing this document (the revision) against its
-    `revision_of` source. The revision's full text is shown in order:
-    unchanged lines appear as plain lines, and each changed region is
-    annotated in place -- the old lines above in red, the new lines below
-    in blue, in chunks of at most DIFF_CHUNK_MAX_LINES lines per side,
-    with the characters that actually differ highlighted. Deleted lines
-    are inserted in red where they used to be. Sections are matched by
-    heading first: a section pair that shares almost no lines, and any
-    section that exists on one side only, is shown in place as one
-    whole-section unit instead of line chunks."""
+    `revision_of` source. The page is ordinary Markdown throughout, so
+    docsify and KaTeX render it exactly like a book page: the revision's
+    full text is emitted verbatim, and only changed regions are wrapped
+    in coloured containers (old above in red, new below in blue, in
+    chunks of at most DIFF_CHUNK_MAX_LINES lines per side). No labels or
+    explanations are attached to individual chunks -- the colour carries
+    the meaning. Inside a plain line, the characters that differ are
+    highlighted with a stronger tint of the same family; formulas,
+    tables and code blocks are whole units and are never highlighted
+    inside. Deleted lines appear in red where they used to be. Sections
+    are matched by heading first: a section pair that shares almost no
+    lines, and any section that exists on one side only, is shown in
+    place as one whole-section unit instead of line chunks."""
     old_lines = (BOOKS_DIR / source["id"] / "README.md").read_text(
         encoding="utf-8"
     ).splitlines()
     new_lines = (BOOKS_DIR / document["id"] / "README.md").read_text(
         encoding="utf-8"
     ).splitlines()
-    def section_of(lines: list[str], index: int) -> str:
-        for i in range(min(index, len(lines) - 1), -1, -1):
-            if lines[i].startswith("## "):
-                return lines[i].lstrip("#").strip()
-        return "はじめに"
 
-    chunks: list[str] = []
+    blocks: list[str] = []
     changed_old = 0
     changed_new = 0
     chunk_count = 0
     section_blocks = 0
 
-    def emit_same(segment: list[str]) -> None:
-        """Unchanged lines, shown as plain full text."""
-        if segment:
-            chunks.append(
-                '<div class="diff-same">'
-                + "".join(
-                    _diff_line_div(html.escape(line)) for line in segment
-                )
-                + "</div>"
-            )
+    def side_lines(
+        units: list[tuple[str, list[str]]],
+        paired: list[tuple[str, list[str]] | None],
+        side: str,
+    ) -> list[str]:
+        """Markdown lines for one side of a chunk. Plain lines paired
+        with a plain, math-free counterpart get character highlights;
+        unpaired plain lines are highlighted whole; formulas, tables,
+        code blocks and any line containing math stay verbatim."""
+        rendered: list[str] = []
+        for index, (kind, unit_lines) in enumerate(units):
+            counterpart = paired[index] if index < len(paired) else None
+            if (
+                kind == "line"
+                and counterpart is not None
+                and counterpart[0] == "line"
+                and "$" not in unit_lines[0]
+                and "$" not in counterpart[1][0]
+            ):
+                pair = _diff_highlight_pair(counterpart[1][0], unit_lines[0])
+                rendered.append(pair[0] if side == "old" else pair[1])
+            elif kind == "line" and "$" not in unit_lines[0]:
+                hl = "diff-hl-old" if side == "old" else "diff-hl-new"
+                rendered.append(f'<span class="{hl}">{unit_lines[0]}</span>')
+            else:
+                rendered.extend(unit_lines)
+        return rendered
 
-    def emit(
-        old_segment: list[str],
-        new_segment: list[str],
-        old_start: int,
-        new_start: int,
+    def emit_changed(
+        old_units: list[tuple[str, list[str]]],
+        new_units: list[tuple[str, list[str]]],
     ) -> None:
         nonlocal changed_old, changed_new, chunk_count
-        changed_old += len(old_segment)
-        changed_new += len(new_segment)
-        offset = 0
-        while offset < len(old_segment) or offset < len(new_segment):
+        changed_old += sum(len(unit[1]) for unit in old_units)
+        changed_new += sum(len(unit[1]) for unit in new_units)
+        io = 0
+        inew = 0
+        while io < len(old_units) or inew < len(new_units):
+            old_chunk: list[tuple[str, list[str]]] = []
+            new_chunk: list[tuple[str, list[str]]] = []
+            old_count = 0
+            new_count = 0
+            while io < len(old_units) and (
+                not old_chunk or old_count + len(old_units[io][1]) <= DIFF_CHUNK_MAX_LINES
+            ):
+                old_count += len(old_units[io][1])
+                old_chunk.append(old_units[io])
+                io += 1
+            while inew < len(new_units) and (
+                not new_chunk or new_count + len(new_units[inew][1]) <= DIFF_CHUNK_MAX_LINES
+            ):
+                new_count += len(new_units[inew][1])
+                new_chunk.append(new_units[inew])
+                inew += 1
             chunk_count += 1
-            old_part = old_segment[offset : offset + DIFF_CHUNK_MAX_LINES]
-            new_part = new_segment[offset : offset + DIFF_CHUNK_MAX_LINES]
-            meta = (
-                f"【{section_of(new_lines, new_start + offset)}】"
-                f"比較元 {old_start + offset + 1} 行目あたり"
-                f" ／ こちら {new_start + offset + 1} 行目あたり"
-            )
-            offset += DIFF_CHUNK_MAX_LINES
-            sides: list[str] = []
-            if old_part:
-                paired = [
-                    _diff_highlight_pair(old_part[k], new_part[k])[0]
-                    if k < len(new_part)
-                    else f'<span class="diff-hl-old">{html.escape(old_part[k])}</span>'
-                    for k in range(len(old_part))
-                ]
-                sides.append(
-                    '<div class="diff-side diff-old">'
-                    '<div class="diff-side-label">旧（比較元）</div>'
-                    + "".join(_diff_line_div(part) for part in paired)
-                    + "</div>"
-                )
-            if new_part:
-                paired = [
-                    _diff_highlight_pair(old_part[k], new_part[k])[1]
-                    if k < len(old_part)
-                    else f'<span class="diff-hl-new">{html.escape(new_part[k])}</span>'
-                    for k in range(len(new_part))
-                ]
-                sides.append(
-                    '<div class="diff-side diff-new">'
-                    '<div class="diff-side-label">新（こちら）</div>'
-                    + "".join(_diff_line_div(part) for part in paired)
-                    + "</div>"
-                )
-            chunks.append(
-                '<div class="diff-chunk">'
-                f'<div class="diff-meta">{html.escape(meta)}</div>'
-                + "".join(sides)
-                + "</div>"
-            )
+            parts = ['<div class="diff-chunk">']
+            if old_chunk:
+                parts.append('<div class="diff-old">')
+                parts.append("")
+                parts.extend(side_lines(old_chunk, new_chunk, "old"))
+                parts.append("")
+                parts.append("</div>")
+            if new_chunk:
+                parts.append('<div class="diff-new">')
+                parts.append("")
+                parts.extend(side_lines(new_chunk, old_chunk, "new"))
+                parts.append("")
+                parts.append("</div>")
+            parts.append("</div>")
+            blocks.append("\n".join(parts))
+
+    def emit_same(units: list[tuple[str, list[str]]]) -> None:
+        lines: list[str] = []
+        for _kind, unit_lines in units:
+            lines.extend(unit_lines)
+        if lines:
+            blocks.append("\n".join(lines))
 
     def emit_section(
-        old_segment: list[str], new_segment: list[str], meta: str
+        old_segment: list[str], new_segment: list[str]
     ) -> None:
-        """One whole-section unit: both sections in full, old above in red
-        and new below in blue, with no line pairing or character highlight
-        (the lines do not correspond). Long sides are folded."""
+        """One whole-section unit in place: both sections verbatim in
+        coloured containers, no line pairing. Long sides are folded."""
         nonlocal changed_old, changed_new, section_blocks
         changed_old += len(old_segment)
         changed_new += len(new_segment)
         section_blocks += 1
 
-        def side(segment: list[str], side_class: str, label: str) -> str:
-            body = "".join(
-                _diff_line_div(html.escape(line)) for line in segment
-            )
+        def side(segment: list[str], side_class: str) -> list[str]:
+            parts = [f'<div class="{side_class}">', ""]
             if len(segment) > DIFF_SECTION_FOLD_LINES:
-                body = (
+                parts.append(
                     '<details class="diff-fold">'
                     f"<summary>全文（{len(segment)} 行）を表示</summary>"
-                    f"{body}</details>"
                 )
-            return (
-                f'<div class="diff-side {side_class}">'
-                f'<div class="diff-side-label">{label}</div>{body}</div>'
-            )
+                parts.append("")
+                parts.extend(segment)
+                parts.append("")
+                parts.append("</details>")
+            else:
+                parts.extend(segment)
+            parts.append("")
+            parts.append("</div>")
+            return parts
 
-        sides: list[str] = []
+        parts = ['<div class="diff-chunk diff-chunk-section">']
         if old_segment:
-            sides.append(side(old_segment, "diff-old", "旧（比較元）─ 節の全文"))
+            parts.extend(side(old_segment, "diff-old"))
         if new_segment:
-            sides.append(side(new_segment, "diff-new", "新（こちら）─ 節の全文"))
-        chunks.append(
-            '<div class="diff-chunk diff-chunk-section">'
-            f'<div class="diff-meta">{html.escape(meta)}</div>'
-            + "".join(sides)
-            + "</div>"
-        )
+            parts.extend(side(new_segment, "diff-new"))
+        parts.append("</div>")
+        blocks.append("\n".join(parts))
 
     old_sections = _split_sections(old_lines)
     new_sections = _split_sections(new_lines)
     section_pairs = _match_sections(old_sections, new_sections, old_lines, new_lines)
-    # Sections that exist only in the source are flushed just before the
-    # matched section that follows them in the source, so deleted text
-    # sits near the place it used to occupy.
     old_only = [
         index
         for index in range(len(old_sections))
@@ -804,27 +853,16 @@ def render_diff_page(document: dict[str, Any], source: dict[str, Any]) -> str:
         while old_only_ptr < len(old_only) and old_only[old_only_ptr] < before_old_index:
             old_index = old_only[old_only_ptr]
             old_only_ptr += 1
-            heading, start, end = old_sections[old_index]
-            emit_section(
-                old_lines[start:end],
-                [],
-                f"【節単位】{heading or 'はじめに'}：比較元にのみある節"
-                f"（比較元 {start + 1} 行目から {end - start} 行）",
-            )
+            _heading, start, end = old_sections[old_index]
+            emit_section(old_lines[start:end], [])
 
     for new_index, (heading, start, end) in enumerate(new_sections):
-        label = heading or "はじめに"
         old_index = section_pairs.get(new_index)
         if old_index is None:
-            emit_section(
-                [],
-                new_lines[start:end],
-                f"【節単位】{label}：こちらにのみある節"
-                f"（こちら {start + 1} 行目から {end - start} 行）",
-            )
+            emit_section([], new_lines[start:end])
             continue
         flush_old_only(old_index)
-        old_heading, old_start, old_end = old_sections[old_index]
+        _old_heading, old_start, old_end = old_sections[old_index]
         old_slice = old_lines[old_start:old_end]
         new_slice = new_lines[start:end]
         ratio = (
@@ -833,28 +871,21 @@ def render_diff_page(document: dict[str, Any], source: dict[str, Any]) -> str:
             else 1.0
         )
         if ratio < DIFF_SECTION_REWRITE_RATIO:
-            if old_heading and heading and old_heading != heading:
-                label = f"比較元「{old_heading}」→ こちら「{heading}」"
-            emit_section(
-                old_slice,
-                new_slice,
-                f"【節単位】{label}：節が丸ごと異なります"
-                f"（比較元 {len(old_slice)} 行 → こちら {len(new_slice)} 行）",
-            )
+            emit_section(old_slice, new_slice)
             continue
+        old_units = _diff_units(old_slice)
+        new_units = _diff_units(new_slice)
         matcher = difflib.SequenceMatcher(
-            None, old_slice, new_slice, autojunk=False
+            None,
+            ["\n".join(unit[1]) for unit in old_units],
+            ["\n".join(unit[1]) for unit in new_units],
+            autojunk=False,
         )
         for tag, a1, a2, b1, b2 in matcher.get_opcodes():
             if tag == "equal":
-                emit_same(new_slice[b1:b2])
-                continue
-            emit(
-                old_slice[a1:a2],
-                new_slice[b1:b2],
-                old_start + a1,
-                start + b1,
-            )
+                emit_same(new_units[b1:b2])
+            else:
+                emit_changed(old_units[a1:a2], new_units[b1:b2])
     flush_old_only(len(old_sections))
 
     lines = [
@@ -863,23 +894,19 @@ def render_diff_page(document: dict[str, Any], source: dict[str, Any]) -> str:
         f"こちらは改訂版で、比較元は [{source['title']}](../{source['id']}/README.md) です。"
         f"[こちら（改訂版）の本文](README.md) に戻る。",
         "",
-        "こちら（改訂版）の全文をそのまま表示し、変わった所だけを目立たせています。"
-        "凡例：<span class=\"diff-old\">旧（比較元）</span> は赤、"
-        "<span class=\"diff-new\">新（こちら）</span> は青で示し、"
-        "実際に異なる部分を同系の薄い色でハイライトしています。"
-        "変わっていない行は無色です。異なる行は最大"
-        f"{DIFF_CHUNK_MAX_LINES}行ずつの塊に分けて旧を上・新を下に並べ、"
-        "削除された行は消えた位置に赤で差し込みます。"
-        "節が丸ごと異なる場合は行同士を対応づけず、節単位で全文を並べます"
-        "（長い節は折りたたんであります）。",
+        "こちら（改訂版）の全文をそのまま表示し、変わった所は色で示しています。"
+        "<span class=\"diff-old\">旧（比較元）</span> は赤、"
+        "<span class=\"diff-new\">新（こちら）</span> は青、"
+        "行の中で実際に異なる部分は同系の薄い色でハイライトします。"
+        "式は丸ごと1つの差分単位として扱います。",
         "",
         f"全文 {len(new_lines)} 行（比較元 {len(old_lines)} 行）。"
         f"変更は {chunk_count} 塊（うち節単位 {section_blocks} 件）で、"
         f"比較元 {changed_old} 行 → こちら {changed_new} 行が変わっています。",
         "",
     ]
-    if chunks:
-        lines.extend("\n\n".join(chunks).split("\n"))
+    if blocks:
+        lines.append("\n\n".join(blocks))
     else:
         lines.append("差分はありません。")
     return "\n".join(lines) + "\n"
