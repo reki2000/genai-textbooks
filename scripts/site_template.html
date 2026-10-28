@@ -243,6 +243,18 @@
       background-color: rgba(70, 130, 255, 0.32);
     }
 
+    /* Whole-section units get a heavier header so they read as one block,
+       and their folded full text opens inline. */
+    .diff-chunk-section .diff-meta {
+      font-weight: 700;
+    }
+
+    .diff-fold summary {
+      padding: 2px 12px;
+      font-size: 12.5px;
+      cursor: pointer;
+    }
+
   </style>
 </head>
 
