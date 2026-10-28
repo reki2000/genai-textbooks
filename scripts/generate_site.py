@@ -7,6 +7,8 @@ nothing here is meant to be hand-edited or committed as generated output.
 from __future__ import annotations
 
 import argparse
+import difflib
+import html
 import io
 import json
 import os
@@ -103,6 +105,15 @@ _PNG_REFERENCE_RE = re.compile(
     r"(?P<suffix>[?#][A-Za-z0-9_.~!$&'()*+,;=:@/?%-]*)?",
     re.IGNORECASE,
 )
+
+# Revision comparison: a catalog may carry `revision_of: <id>` naming the
+# earlier version this document revises (see BUILD.md). The build then
+# renders a line diff of the two README.md sources as the document's
+# diff.md, linked from its page and from the top-page listing. Set it only
+# for small revisions; a ground-up rewrite shares too little text for a
+# line diff to mean anything. Differing lines are grouped into chunks of
+# at most DIFF_CHUNK_MAX_LINES lines per side.
+DIFF_CHUNK_MAX_LINES = 5
 
 # Each book is exactly one README.md. The former multi-part layout
 # (README.2.md, README.3.md, ...) is rejected: a series is split into separate
@@ -279,7 +290,7 @@ def load_catalog() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
         "question",
         "plot",
     )
-    optional_document_fields = ("draft", "follows", "ratings")
+    optional_document_fields = ("draft", "follows", "ratings", "revision_of")
     for index, (raw_document, catalog_path) in enumerate(
         zip(documents, document_sources, strict=True)
     ):
@@ -353,6 +364,20 @@ def load_catalog() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     empty_categories = category_ids - populated_categories
     if empty_categories:
         fail(f"categories without documents: {', '.join(sorted(empty_categories))}")
+
+    for document in documents:
+        source_id = document.get("revision_of")
+        if source_id is None:
+            continue
+        if not isinstance(source_id, str) or not source_id:
+            fail(f"document {document['id']}.revision_of must be a document id")
+        if source_id == document["id"]:
+            fail(f"document {document['id']}.revision_of points to itself")
+        if source_id not in document_ids:
+            fail(
+                f"document {document['id']}.revision_of points to "
+                f"unknown document: {source_id}"
+            )
 
     categories.sort(key=lambda item: item["order"])
     assign_rating_ranks(documents)
@@ -503,9 +528,163 @@ def ratings_line(document: dict[str, Any]) -> str | None:
     )
 
 
+def _diff_highlight_pair(old_line: str, new_line: str) -> tuple[str, str]:
+    """HTML for one changed line pair: the characters that actually differ
+    are wrapped in a highlight span of the same colour family as the line
+    (light red for the old side, light blue for the new side)."""
+    matcher = difflib.SequenceMatcher(None, old_line, new_line, autojunk=False)
+    old_parts: list[str] = []
+    new_parts: list[str] = []
+    for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+        if tag == "equal":
+            old_parts.append(html.escape(old_line[i1:i2]))
+            new_parts.append(html.escape(new_line[j1:j2]))
+            continue
+        if i2 > i1:
+            old_parts.append(
+                f'<span class="diff-hl-old">{html.escape(old_line[i1:i2])}</span>'
+            )
+        if j2 > j1:
+            new_parts.append(
+                f'<span class="diff-hl-new">{html.escape(new_line[j1:j2])}</span>'
+            )
+    return "".join(old_parts), "".join(new_parts)
+
+
+def _diff_line_div(content_html: str) -> str:
+    return f'<div class="diff-line">{content_html or "&nbsp;"}</div>'
+
+
+def render_diff_page(document: dict[str, Any], source: dict[str, Any]) -> str:
+    """Markdown page comparing this document (the revision, shown below in
+    blue) against its `revision_of` source (shown above in red). Only the
+    changed lines appear, grouped into chunks of at most
+    DIFF_CHUNK_MAX_LINES lines per side; unchanged text is omitted."""
+    old_lines = (BOOKS_DIR / source["id"] / "README.md").read_text(
+        encoding="utf-8"
+    ).splitlines()
+    new_lines = (BOOKS_DIR / document["id"] / "README.md").read_text(
+        encoding="utf-8"
+    ).splitlines()
+    def section_of(lines: list[str], index: int) -> str:
+        for i in range(min(index, len(lines) - 1), -1, -1):
+            if lines[i].startswith("## "):
+                return lines[i].lstrip("#").strip()
+        return "はじめに"
+
+    chunks: list[str] = []
+    changed_old = 0
+    changed_new = 0
+
+    def emit(
+        old_segment: list[str],
+        new_segment: list[str],
+        old_start: int,
+        new_start: int,
+    ) -> None:
+        nonlocal changed_old, changed_new
+        changed_old += len(old_segment)
+        changed_new += len(new_segment)
+        offset = 0
+        while offset < len(old_segment) or offset < len(new_segment):
+            old_part = old_segment[offset : offset + DIFF_CHUNK_MAX_LINES]
+            new_part = new_segment[offset : offset + DIFF_CHUNK_MAX_LINES]
+            meta = (
+                f"【{section_of(new_lines, new_start + offset)}】"
+                f"比較元 {old_start + offset + 1} 行目あたり"
+                f" ／ こちら {new_start + offset + 1} 行目あたり"
+            )
+            offset += DIFF_CHUNK_MAX_LINES
+            sides: list[str] = []
+            if old_part:
+                paired = [
+                    _diff_highlight_pair(old_part[k], new_part[k])[0]
+                    if k < len(new_part)
+                    else f'<span class="diff-hl-old">{html.escape(old_part[k])}</span>'
+                    for k in range(len(old_part))
+                ]
+                sides.append(
+                    '<div class="diff-side diff-old">'
+                    '<div class="diff-side-label">旧（比較元）</div>'
+                    + "".join(_diff_line_div(part) for part in paired)
+                    + "</div>"
+                )
+            if new_part:
+                paired = [
+                    _diff_highlight_pair(old_part[k], new_part[k])[1]
+                    if k < len(old_part)
+                    else f'<span class="diff-hl-new">{html.escape(new_part[k])}</span>'
+                    for k in range(len(new_part))
+                ]
+                sides.append(
+                    '<div class="diff-side diff-new">'
+                    '<div class="diff-side-label">新（こちら）</div>'
+                    + "".join(_diff_line_div(part) for part in paired)
+                    + "</div>"
+                )
+            chunks.append(
+                '<div class="diff-chunk">'
+                f'<div class="diff-meta">{html.escape(meta)}</div>'
+                + "".join(sides)
+                + "</div>"
+            )
+
+    matcher = difflib.SequenceMatcher(None, old_lines, new_lines, autojunk=False)
+    for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+        if tag == "equal":
+            continue
+        emit(old_lines[i1:i2], new_lines[j1:j2], i1, j1)
+
+    lines = [
+        f"# 差分：{document['title']}",
+        "",
+        f"こちらは改訂版で、比較元は [{source['title']}](../{source['id']}/README.md) です。"
+        f"[こちら（改訂版）の本文](README.md) に戻る。",
+        "",
+        "凡例：<span class=\"diff-old\">旧（比較元）</span> は赤、"
+        "<span class=\"diff-new\">新（こちら）</span> は青で示し、"
+        "実際に異なる部分を同系の薄い色でハイライトしています。"
+        "変わっていない行は表示しません。異なる行は最大"
+        f"{DIFF_CHUNK_MAX_LINES}行ずつの塊に分けて、旧を上・新を下に並べています。",
+        "",
+        f"変更箇所は {len(chunks)} 塊（比較元 {changed_old} 行 → こちら {changed_new} 行）です。",
+        "",
+    ]
+    if chunks:
+        lines.extend("\n\n".join(chunks).split("\n"))
+    else:
+        lines.append("差分はありません。")
+    return "\n".join(lines) + "\n"
+
+
+def write_diff_pages(
+    documents: list[dict[str, Any]], out_docs: Path
+) -> None:
+    """Write diff.md for every document carrying `revision_of`, and add a
+    link to it at the top of the document's built README.md copy (the
+    source README.md itself is left untouched)."""
+    by_id = {document["id"]: document for document in documents}
+    for document in documents:
+        source_id = document.get("revision_of")
+        if not source_id:
+            continue
+        source = by_id[source_id]
+        book_dir = out_docs / "books" / document["id"]
+        write_file(book_dir / "diff.md", render_diff_page(document, source))
+        readme_path = book_dir / "README.md"
+        readme = readme_path.read_text(encoding="utf-8")
+        title, _, rest = readme.partition("\n")
+        link = (
+            f"> こちらは改訂版です。比較元「{source['title']}」との"
+            "[差分を見る](diff.md)"
+        )
+        readme_path.write_text(f"{title}\n\n{link}\n{rest}", encoding="utf-8")
+
+
 def render_top_page_catalog(
     categories: list[dict[str, Any]], documents: list[dict[str, Any]]
 ) -> str:
+    by_id = {document["id"]: document for document in documents}
     lines = [
         START_MARKER,
         "",
@@ -533,6 +712,12 @@ def render_top_page_catalog(
             rating = ratings_line(document)
             if rating is not None:
                 lines.append(rating)
+            if document.get("revision_of"):
+                source = by_id[document["revision_of"]]
+                lines.append(
+                    f"差分：改訂版です。比較元「{source['title']}」との"
+                    f"[差分を見る]({nav_href(document)}diff)"
+                )
             lines.append("")
     lines.append(END_MARKER)
     return "\n".join(lines) + "\n"
@@ -1005,6 +1190,10 @@ def generate(categories: list[dict[str, Any]], documents: list[dict[str, Any]], 
     apply_ruby_conversion(out_docs)
     apply_footnote_backref_guard(out_docs)
 
+    # Diff pages are written last on purpose: they quote both sources raw,
+    # so the ruby and footnote rewrites above must not run over them.
+    write_diff_pages(documents, out_docs)
+
     write_file(out_docs / "sitemap.xml", render_sitemap(published))
 
 
@@ -1033,7 +1222,8 @@ def main() -> int:
     else:
         print("generated: build/_sidebar.md, build/README.md, build/_sidebar.draft.md, "
               "build/README.draft.md, build/index.html, build/404.html, "
-              "build/books/*/index.html, build/books/*/slide.html, build/sitemap.xml")
+              "build/books/*/index.html, build/books/*/slide.html, "
+              "build/books/*/diff.md (only for books with revision_of), build/sitemap.xml")
     return 0
 
 
