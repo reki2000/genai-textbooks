@@ -17,7 +17,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
-from collections import defaultdict
+from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from pathlib import Path
@@ -114,6 +114,14 @@ _PNG_REFERENCE_RE = re.compile(
 # line diff to mean anything. Differing lines are grouped into chunks of
 # at most DIFF_CHUNK_MAX_LINES lines per side.
 DIFF_CHUNK_MAX_LINES = 5
+# A matched section pair whose identical-line ratio falls below this is a
+# whole-section change: it is shown as one section unit (both sections in
+# full, old above / new below) instead of line chunks, because pairing
+# unrelated lines only produces highlight noise. Sections that exist on
+# one side only are section units too. A section-unit side longer than
+# DIFF_SECTION_FOLD_LINES is collapsed behind a <details> element.
+DIFF_SECTION_REWRITE_RATIO = 0.2
+DIFF_SECTION_FOLD_LINES = 50
 
 # Each book is exactly one README.md. The former multi-part layout
 # (README.2.md, README.3.md, ...) is rejected: a series is split into separate
@@ -555,11 +563,105 @@ def _diff_line_div(content_html: str) -> str:
     return f'<div class="diff-line">{content_html or "&nbsp;"}</div>'
 
 
+_SECTION_NUMBER_RE = re.compile(r"^第[0-9０-９一二三四五六七八九十百]+幕\s*")
+
+
+def _split_sections(lines: list[str]) -> list[tuple[str, int, int]]:
+    """Split a book into (heading, start, end) sections at `## ` headings;
+    the text before the first heading is a section with an empty heading."""
+    starts = {i for i, line in enumerate(lines) if line.startswith("## ")}
+    bounds = [0, *sorted(starts), len(lines)]
+    return [
+        (
+            lines[start].lstrip("#").strip() if start in starts else "",
+            start,
+            bounds[k + 1],
+        )
+        for k, start in enumerate(bounds[:-1])
+    ]
+
+
+def _match_sections(
+    old_sections: list[tuple[str, int, int]],
+    new_sections: list[tuple[str, int, int]],
+    old_lines: list[str],
+    new_lines: list[str],
+) -> dict[int, int]:
+    """Map new-section index -> old-section index. Sections pair up so
+    that a section whose content changed completely can be recognised as
+    one unit; whatever stays unpaired exists on one side only. Pairing is
+    by heading first, ignoring the act number (a rewrite may renumber
+    acts): exact, then character similarity at 0.8 or above. Retitled
+    sections are then paired by content: the best remaining pair whose
+    shared-line overlap (common lines over the shorter section) reaches
+    0.25."""
+
+    def normalize(heading: str) -> str:
+        return re.sub(r"\s+", "", _SECTION_NUMBER_RE.sub("", heading))
+
+    pairs: dict[int, int] = {}
+    used_old: set[int] = set()
+    for new_index, (heading, _s, _e) in enumerate(new_sections):
+        for old_index, (old_heading, _os, _oe) in enumerate(old_sections):
+            if old_index not in used_old and normalize(old_heading) == normalize(heading):
+                pairs[new_index] = old_index
+                used_old.add(old_index)
+                break
+    for new_index, (heading, _s, _e) in enumerate(new_sections):
+        if new_index in pairs:
+            continue
+        best_index: int | None = None
+        best_ratio = 0.8
+        for old_index, (old_heading, _os, _oe) in enumerate(old_sections):
+            if old_index in used_old:
+                continue
+            ratio = difflib.SequenceMatcher(
+                None, normalize(old_heading), normalize(heading)
+            ).ratio()
+            if ratio > best_ratio:
+                best_ratio = ratio
+                best_index = old_index
+        if best_index is not None:
+            pairs[new_index] = best_index
+            used_old.add(best_index)
+
+    def overlap(old_index: int, new_index: int) -> float:
+        _h, os_, oe = old_sections[old_index]
+        _h2, ns, ne = new_sections[new_index]
+        old_counter = Counter(old_lines[os_:oe])
+        new_counter = Counter(new_lines[ns:ne])
+        common = sum((old_counter & new_counter).values())
+        shorter = min(oe - os_, ne - ns)
+        return common / shorter if shorter else 0.0
+
+    candidates = sorted(
+        (
+            (overlap(old_index, new_index), new_index, old_index)
+            for new_index in range(len(new_sections))
+            if new_index not in pairs
+            for old_index in range(len(old_sections))
+            if old_index not in used_old
+        ),
+        reverse=True,
+    )
+    for score, new_index, old_index in candidates:
+        if score < 0.25:
+            break
+        if new_index in pairs or old_index in used_old:
+            continue
+        pairs[new_index] = old_index
+        used_old.add(old_index)
+    return pairs
+
+
 def render_diff_page(document: dict[str, Any], source: dict[str, Any]) -> str:
     """Markdown page comparing this document (the revision, shown below in
     blue) against its `revision_of` source (shown above in red). Only the
     changed lines appear, grouped into chunks of at most
-    DIFF_CHUNK_MAX_LINES lines per side; unchanged text is omitted."""
+    DIFF_CHUNK_MAX_LINES lines per side; unchanged text is omitted.
+    Sections are matched by heading first: a section pair that shares
+    almost no lines, and any section that exists on one side only, is
+    shown as one whole-section unit instead of line chunks."""
     old_lines = (BOOKS_DIR / source["id"] / "README.md").read_text(
         encoding="utf-8"
     ).splitlines()
@@ -629,11 +731,101 @@ def render_diff_page(document: dict[str, Any], source: dict[str, Any]) -> str:
                 + "</div>"
             )
 
-    matcher = difflib.SequenceMatcher(None, old_lines, new_lines, autojunk=False)
-    for tag, i1, i2, j1, j2 in matcher.get_opcodes():
-        if tag == "equal":
+    section_blocks = 0
+
+    def emit_section(
+        old_segment: list[str], new_segment: list[str], meta: str
+    ) -> None:
+        """One whole-section unit: both sections in full, old above in red
+        and new below in blue, with no line pairing or character highlight
+        (the lines do not correspond). Long sides are folded."""
+        nonlocal changed_old, changed_new, section_blocks
+        changed_old += len(old_segment)
+        changed_new += len(new_segment)
+        section_blocks += 1
+
+        def side(segment: list[str], side_class: str, label: str) -> str:
+            body = "".join(
+                _diff_line_div(html.escape(line)) for line in segment
+            )
+            if len(segment) > DIFF_SECTION_FOLD_LINES:
+                body = (
+                    '<details class="diff-fold">'
+                    f"<summary>全文（{len(segment)} 行）を表示</summary>"
+                    f"{body}</details>"
+                )
+            return (
+                f'<div class="diff-side {side_class}">'
+                f'<div class="diff-side-label">{label}</div>{body}</div>'
+            )
+
+        sides: list[str] = []
+        if old_segment:
+            sides.append(side(old_segment, "diff-old", "旧（比較元）─ 節の全文"))
+        if new_segment:
+            sides.append(side(new_segment, "diff-new", "新（こちら）─ 節の全文"))
+        chunks.append(
+            '<div class="diff-chunk diff-chunk-section">'
+            f'<div class="diff-meta">{html.escape(meta)}</div>'
+            + "".join(sides)
+            + "</div>"
+        )
+
+    old_sections = _split_sections(old_lines)
+    new_sections = _split_sections(new_lines)
+    section_pairs = _match_sections(old_sections, new_sections, old_lines, new_lines)
+    matched_old: set[int] = set()
+    for new_index, (heading, start, end) in enumerate(new_sections):
+        label = heading or "はじめに"
+        old_index = section_pairs.get(new_index)
+        if old_index is None:
+            emit_section(
+                [],
+                new_lines[start:end],
+                f"【節単位】{label}：こちらにのみある節"
+                f"（こちら {start + 1} 行目から {end - start} 行）",
+            )
             continue
-        emit(old_lines[i1:i2], new_lines[j1:j2], i1, j1)
+        matched_old.add(old_index)
+        old_heading, old_start, old_end = old_sections[old_index]
+        old_slice = old_lines[old_start:old_end]
+        new_slice = new_lines[start:end]
+        ratio = (
+            difflib.SequenceMatcher(None, old_slice, new_slice, autojunk=False).ratio()
+            if old_slice or new_slice
+            else 1.0
+        )
+        if ratio < DIFF_SECTION_REWRITE_RATIO:
+            if old_heading and heading and old_heading != heading:
+                label = f"比較元「{old_heading}」→ こちら「{heading}」"
+            emit_section(
+                old_slice,
+                new_slice,
+                f"【節単位】{label}：節が丸ごと異なります"
+                f"（比較元 {len(old_slice)} 行 → こちら {len(new_slice)} 行）",
+            )
+            continue
+        matcher = difflib.SequenceMatcher(
+            None, old_slice, new_slice, autojunk=False
+        )
+        for tag, a1, a2, b1, b2 in matcher.get_opcodes():
+            if tag == "equal":
+                continue
+            emit(
+                old_slice[a1:a2],
+                new_slice[b1:b2],
+                old_start + a1,
+                start + b1,
+            )
+    for old_index, (heading, start, end) in enumerate(old_sections):
+        if old_index in matched_old:
+            continue
+        emit_section(
+            old_lines[start:end],
+            [],
+            f"【節単位】{heading or 'はじめに'}：比較元にのみある節"
+            f"（比較元 {start + 1} 行目から {end - start} 行）",
+        )
 
     lines = [
         f"# 差分：{document['title']}",
@@ -645,9 +837,12 @@ def render_diff_page(document: dict[str, Any], source: dict[str, Any]) -> str:
         "<span class=\"diff-new\">新（こちら）</span> は青で示し、"
         "実際に異なる部分を同系の薄い色でハイライトしています。"
         "変わっていない行は表示しません。異なる行は最大"
-        f"{DIFF_CHUNK_MAX_LINES}行ずつの塊に分けて、旧を上・新を下に並べています。",
+        f"{DIFF_CHUNK_MAX_LINES}行ずつの塊に分けて、旧を上・新を下に並べています。"
+        "節が丸ごと異なる場合は行同士を対応づけず、節単位で全文を並べます"
+        "（長い節は折りたたんであります）。",
         "",
-        f"変更箇所は {len(chunks)} 塊（比較元 {changed_old} 行 → こちら {changed_new} 行）です。",
+        f"変更箇所は {len(chunks)} 塊（うち節単位 {section_blocks} 件）"
+        f"（比較元 {changed_old} 行 → こちら {changed_new} 行）です。",
         "",
     ]
     if chunks:
