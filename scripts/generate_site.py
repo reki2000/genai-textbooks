@@ -122,6 +122,10 @@ DIFF_CHUNK_MAX_LINES = 5
 # DIFF_SECTION_FOLD_LINES is collapsed behind a <details> element.
 DIFF_SECTION_REWRITE_RATIO = 0.2
 DIFF_SECTION_FOLD_LINES = 50
+# Character highlights inside a chunk are only computed between lines
+# paired by similarity at this ratio or above; positional pairing paints
+# highlights onto text that is not a difference.
+DIFF_PAIR_MIN_RATIO = 0.55
 
 # Each book is exactly one README.md. The former multi-part layout
 # (README.2.md, README.3.md, ...) is rejected: a series is split into separate
@@ -727,31 +731,68 @@ def render_diff_page(document: dict[str, Any], source: dict[str, Any]) -> str:
 
     def side_lines(
         units: list[tuple[str, list[str]]],
-        paired: list[tuple[str, list[str]] | None],
+        counterparts: list[tuple[str, list[str]]],
+        pair_map: dict[int, int],
         side: str,
     ) -> list[str]:
-        """Markdown lines for one side of a chunk. Plain lines paired
-        with a plain, math-free counterpart get character highlights;
-        unpaired plain lines are highlighted whole; formulas, tables,
-        code blocks and any line containing math stay verbatim."""
+        """Markdown lines for one side of a chunk. A line gets character
+        highlights only when pair_map links it to a genuinely similar
+        line on the other side; everything else (unpaired lines,
+        formulas, tables, code blocks, any line containing math) stays
+        verbatim and is marked by the side's colour alone. Highlighting
+        unpaired or merely positional lines would paint parts that are
+        not differences at all."""
         rendered: list[str] = []
         for index, (kind, unit_lines) in enumerate(units):
-            counterpart = paired[index] if index < len(paired) else None
-            if (
-                kind == "line"
-                and counterpart is not None
-                and counterpart[0] == "line"
-                and "$" not in unit_lines[0]
-                and "$" not in counterpart[1][0]
-            ):
-                pair = _diff_highlight_pair(counterpart[1][0], unit_lines[0])
+            partner = pair_map.get(index)
+            if kind == "line" and partner is not None:
+                counterpart_line = counterparts[partner][1][0]
+                old_line = unit_lines[0] if side == "old" else counterpart_line
+                new_line = counterpart_line if side == "old" else unit_lines[0]
+                pair = _diff_highlight_pair(old_line, new_line)
                 rendered.append(pair[0] if side == "old" else pair[1])
-            elif kind == "line" and "$" not in unit_lines[0]:
-                hl = "diff-hl-old" if side == "old" else "diff-hl-new"
-                rendered.append(f'<span class="{hl}">{unit_lines[0]}</span>')
             else:
                 rendered.extend(unit_lines)
         return rendered
+
+    def pair_chunk_lines(
+        old_chunk: list[tuple[str, list[str]]],
+        new_chunk: list[tuple[str, list[str]]],
+    ) -> tuple[dict[int, int], dict[int, int]]:
+        """Pair plain, math-free lines across a chunk by best character
+        similarity (each line used once, best scores first), keeping
+        only pairs at DIFF_PAIR_MIN_RATIO or above. Returns
+        (old index -> new index, new index -> old index)."""
+
+        def eligible(unit: tuple[str, list[str]]) -> bool:
+            return unit[0] == "line" and "$" not in unit[1][0]
+
+        candidates = sorted(
+            (
+                (
+                    difflib.SequenceMatcher(
+                        None, old_chunk[oi][1][0], new_chunk[ni][1][0]
+                    ).ratio(),
+                    oi,
+                    ni,
+                )
+                for oi in range(len(old_chunk))
+                if eligible(old_chunk[oi])
+                for ni in range(len(new_chunk))
+                if eligible(new_chunk[ni])
+            ),
+            reverse=True,
+        )
+        old_to_new: dict[int, int] = {}
+        new_to_old: dict[int, int] = {}
+        for ratio, oi, ni in candidates:
+            if ratio < DIFF_PAIR_MIN_RATIO:
+                break
+            if oi in old_to_new or ni in new_to_old:
+                continue
+            old_to_new[oi] = ni
+            new_to_old[ni] = oi
+        return old_to_new, new_to_old
 
     def emit_changed(
         old_units: list[tuple[str, list[str]]],
@@ -780,17 +821,18 @@ def render_diff_page(document: dict[str, Any], source: dict[str, Any]) -> str:
                 new_chunk.append(new_units[inew])
                 inew += 1
             chunk_count += 1
+            old_to_new, new_to_old = pair_chunk_lines(old_chunk, new_chunk)
             parts = ['<div class="diff-chunk">']
             if old_chunk:
                 parts.append('<div class="diff-old">')
                 parts.append("")
-                parts.extend(side_lines(old_chunk, new_chunk, "old"))
+                parts.extend(side_lines(old_chunk, new_chunk, old_to_new, "old"))
                 parts.append("")
                 parts.append("</div>")
             if new_chunk:
                 parts.append('<div class="diff-new">')
                 parts.append("")
-                parts.extend(side_lines(new_chunk, old_chunk, "new"))
+                parts.extend(side_lines(new_chunk, old_chunk, new_to_old, "new"))
                 parts.append("")
                 parts.append("</div>")
             parts.append("</div>")
