@@ -655,13 +655,16 @@ def _match_sections(
 
 
 def render_diff_page(document: dict[str, Any], source: dict[str, Any]) -> str:
-    """Markdown page comparing this document (the revision, shown below in
-    blue) against its `revision_of` source (shown above in red). Only the
-    changed lines appear, grouped into chunks of at most
-    DIFF_CHUNK_MAX_LINES lines per side; unchanged text is omitted.
-    Sections are matched by heading first: a section pair that shares
-    almost no lines, and any section that exists on one side only, is
-    shown as one whole-section unit instead of line chunks."""
+    """Markdown page comparing this document (the revision) against its
+    `revision_of` source. The revision's full text is shown in order:
+    unchanged lines appear as plain lines, and each changed region is
+    annotated in place -- the old lines above in red, the new lines below
+    in blue, in chunks of at most DIFF_CHUNK_MAX_LINES lines per side,
+    with the characters that actually differ highlighted. Deleted lines
+    are inserted in red where they used to be. Sections are matched by
+    heading first: a section pair that shares almost no lines, and any
+    section that exists on one side only, is shown in place as one
+    whole-section unit instead of line chunks."""
     old_lines = (BOOKS_DIR / source["id"] / "README.md").read_text(
         encoding="utf-8"
     ).splitlines()
@@ -677,6 +680,19 @@ def render_diff_page(document: dict[str, Any], source: dict[str, Any]) -> str:
     chunks: list[str] = []
     changed_old = 0
     changed_new = 0
+    chunk_count = 0
+    section_blocks = 0
+
+    def emit_same(segment: list[str]) -> None:
+        """Unchanged lines, shown as plain full text."""
+        if segment:
+            chunks.append(
+                '<div class="diff-same">'
+                + "".join(
+                    _diff_line_div(html.escape(line)) for line in segment
+                )
+                + "</div>"
+            )
 
     def emit(
         old_segment: list[str],
@@ -684,11 +700,12 @@ def render_diff_page(document: dict[str, Any], source: dict[str, Any]) -> str:
         old_start: int,
         new_start: int,
     ) -> None:
-        nonlocal changed_old, changed_new
+        nonlocal changed_old, changed_new, chunk_count
         changed_old += len(old_segment)
         changed_new += len(new_segment)
         offset = 0
         while offset < len(old_segment) or offset < len(new_segment):
+            chunk_count += 1
             old_part = old_segment[offset : offset + DIFF_CHUNK_MAX_LINES]
             new_part = new_segment[offset : offset + DIFF_CHUNK_MAX_LINES]
             meta = (
@@ -731,8 +748,6 @@ def render_diff_page(document: dict[str, Any], source: dict[str, Any]) -> str:
                 + "</div>"
             )
 
-    section_blocks = 0
-
     def emit_section(
         old_segment: list[str], new_segment: list[str], meta: str
     ) -> None:
@@ -774,7 +789,29 @@ def render_diff_page(document: dict[str, Any], source: dict[str, Any]) -> str:
     old_sections = _split_sections(old_lines)
     new_sections = _split_sections(new_lines)
     section_pairs = _match_sections(old_sections, new_sections, old_lines, new_lines)
-    matched_old: set[int] = set()
+    # Sections that exist only in the source are flushed just before the
+    # matched section that follows them in the source, so deleted text
+    # sits near the place it used to occupy.
+    old_only = [
+        index
+        for index in range(len(old_sections))
+        if index not in set(section_pairs.values())
+    ]
+    old_only_ptr = 0
+
+    def flush_old_only(before_old_index: int) -> None:
+        nonlocal old_only_ptr
+        while old_only_ptr < len(old_only) and old_only[old_only_ptr] < before_old_index:
+            old_index = old_only[old_only_ptr]
+            old_only_ptr += 1
+            heading, start, end = old_sections[old_index]
+            emit_section(
+                old_lines[start:end],
+                [],
+                f"【節単位】{heading or 'はじめに'}：比較元にのみある節"
+                f"（比較元 {start + 1} 行目から {end - start} 行）",
+            )
+
     for new_index, (heading, start, end) in enumerate(new_sections):
         label = heading or "はじめに"
         old_index = section_pairs.get(new_index)
@@ -786,7 +823,7 @@ def render_diff_page(document: dict[str, Any], source: dict[str, Any]) -> str:
                 f"（こちら {start + 1} 行目から {end - start} 行）",
             )
             continue
-        matched_old.add(old_index)
+        flush_old_only(old_index)
         old_heading, old_start, old_end = old_sections[old_index]
         old_slice = old_lines[old_start:old_end]
         new_slice = new_lines[start:end]
@@ -810,6 +847,7 @@ def render_diff_page(document: dict[str, Any], source: dict[str, Any]) -> str:
         )
         for tag, a1, a2, b1, b2 in matcher.get_opcodes():
             if tag == "equal":
+                emit_same(new_slice[b1:b2])
                 continue
             emit(
                 old_slice[a1:a2],
@@ -817,15 +855,7 @@ def render_diff_page(document: dict[str, Any], source: dict[str, Any]) -> str:
                 old_start + a1,
                 start + b1,
             )
-    for old_index, (heading, start, end) in enumerate(old_sections):
-        if old_index in matched_old:
-            continue
-        emit_section(
-            old_lines[start:end],
-            [],
-            f"【節単位】{heading or 'はじめに'}：比較元にのみある節"
-            f"（比較元 {start + 1} 行目から {end - start} 行）",
-        )
+    flush_old_only(len(old_sections))
 
     lines = [
         f"# 差分：{document['title']}",
@@ -833,16 +863,19 @@ def render_diff_page(document: dict[str, Any], source: dict[str, Any]) -> str:
         f"こちらは改訂版で、比較元は [{source['title']}](../{source['id']}/README.md) です。"
         f"[こちら（改訂版）の本文](README.md) に戻る。",
         "",
+        "こちら（改訂版）の全文をそのまま表示し、変わった所だけを目立たせています。"
         "凡例：<span class=\"diff-old\">旧（比較元）</span> は赤、"
         "<span class=\"diff-new\">新（こちら）</span> は青で示し、"
         "実際に異なる部分を同系の薄い色でハイライトしています。"
-        "変わっていない行は表示しません。異なる行は最大"
-        f"{DIFF_CHUNK_MAX_LINES}行ずつの塊に分けて、旧を上・新を下に並べています。"
+        "変わっていない行は無色です。異なる行は最大"
+        f"{DIFF_CHUNK_MAX_LINES}行ずつの塊に分けて旧を上・新を下に並べ、"
+        "削除された行は消えた位置に赤で差し込みます。"
         "節が丸ごと異なる場合は行同士を対応づけず、節単位で全文を並べます"
         "（長い節は折りたたんであります）。",
         "",
-        f"変更箇所は {len(chunks)} 塊（うち節単位 {section_blocks} 件）"
-        f"（比較元 {changed_old} 行 → こちら {changed_new} 行）です。",
+        f"全文 {len(new_lines)} 行（比較元 {len(old_lines)} 行）。"
+        f"変更は {chunk_count} 塊（うち節単位 {section_blocks} 件）で、"
+        f"比較元 {changed_old} 行 → こちら {changed_new} 行が変わっています。",
         "",
     ]
     if chunks:
