@@ -214,6 +214,19 @@
       overflow-x: auto;
     }
 
+    /* No blank bands at the edges of a diff area: the first and last
+       blocks inside a pane lose the vertical margins that would
+       otherwise show as empty coloured strips above and below the
+       pane's text. Margins between blocks inside the pane stay as in
+       the body text. */
+    .diff-pane > :first-child {
+      margin-top: 0;
+    }
+
+    .diff-pane > :last-child {
+      margin-bottom: 0;
+    }
+
     @media (max-width: 640px) {
       .diff-row {
         flex-direction: column;
