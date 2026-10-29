@@ -705,8 +705,8 @@ def render_diff_page(document: dict[str, Any], source: dict[str, Any]) -> str:
     """Markdown page comparing this document (the revision) against its
     `revision_of` source. The page is ordinary Markdown throughout, so
     docsify and KaTeX render it exactly like a book page: the revision's
-    full text is emitted verbatim, and only changed regions are wrapped
-    in coloured containers (old above in red, new below in blue, in
+    full text is emitted verbatim, and only changed regions become
+    two-pane rows (old on the left in red, new on the right in blue, in
     chunks of at most DIFF_CHUNK_MAX_LINES lines per side). No labels or
     explanations are attached to individual chunks -- the colour carries
     the meaning. Inside a plain line, the characters that differ are
@@ -822,19 +822,23 @@ def render_diff_page(document: dict[str, Any], source: dict[str, Any]) -> str:
                 inew += 1
             chunk_count += 1
             old_to_new, new_to_old = pair_chunk_lines(old_chunk, new_chunk)
-            parts = ['<div class="diff-chunk">']
+            parts = ['<div class="diff-row">']
             if old_chunk:
-                parts.append('<div class="diff-old">')
+                parts.append('<div class="diff-pane diff-old">')
                 parts.append("")
                 parts.extend(side_lines(old_chunk, new_chunk, old_to_new, "old"))
                 parts.append("")
                 parts.append("</div>")
+            else:
+                parts.append('<div class="diff-pane diff-old"></div>')
             if new_chunk:
-                parts.append('<div class="diff-new">')
+                parts.append('<div class="diff-pane diff-new">')
                 parts.append("")
                 parts.extend(side_lines(new_chunk, old_chunk, new_to_old, "new"))
                 parts.append("")
                 parts.append("</div>")
+            else:
+                parts.append('<div class="diff-pane diff-new"></div>')
             parts.append("</div>")
             blocks.append("\n".join(parts))
 
@@ -848,15 +852,18 @@ def render_diff_page(document: dict[str, Any], source: dict[str, Any]) -> str:
     def emit_section(
         old_segment: list[str], new_segment: list[str]
     ) -> None:
-        """One whole-section unit in place: both sections verbatim in
-        coloured containers, no line pairing. Long sides are folded."""
+        """One whole-section unit in place, as a two-pane row: both
+        sections verbatim in their panes, no line pairing. Long sides
+        are folded; a side that does not exist stays an empty pane."""
         nonlocal changed_old, changed_new, section_blocks
         changed_old += len(old_segment)
         changed_new += len(new_segment)
         section_blocks += 1
 
         def side(segment: list[str], side_class: str) -> list[str]:
-            parts = [f'<div class="{side_class}">', ""]
+            if not segment:
+                return [f'<div class="diff-pane {side_class}"></div>']
+            parts = [f'<div class="diff-pane {side_class}">', ""]
             if len(segment) > DIFF_SECTION_FOLD_LINES:
                 parts.append(
                     '<details class="diff-fold">'
@@ -872,11 +879,9 @@ def render_diff_page(document: dict[str, Any], source: dict[str, Any]) -> str:
             parts.append("</div>")
             return parts
 
-        parts = ['<div class="diff-chunk diff-chunk-section">']
-        if old_segment:
-            parts.extend(side(old_segment, "diff-old"))
-        if new_segment:
-            parts.extend(side(new_segment, "diff-new"))
+        parts = ['<div class="diff-row diff-row-section">']
+        parts.extend(side(old_segment, "diff-old"))
+        parts.extend(side(new_segment, "diff-new"))
         parts.append("</div>")
         blocks.append("\n".join(parts))
 
@@ -936,9 +941,9 @@ def render_diff_page(document: dict[str, Any], source: dict[str, Any]) -> str:
         f"こちらは改訂版で、比較元は [{source['title']}](../{source['id']}/README.md) です。"
         f"[こちら（改訂版）の本文](README.md) に戻る。",
         "",
-        "こちら（改訂版）の全文をそのまま表示し、変わった所は色で示しています。"
-        "<span class=\"diff-old\">旧（比較元）</span> は赤、"
-        "<span class=\"diff-new\">新（こちら）</span> は青、"
+        "こちら（改訂版）の全文をそのまま表示し、変わった所は左右2ペインで示しています。"
+        "左の<span class=\"diff-old\">旧（比較元）</span> は赤、"
+        "右の<span class=\"diff-new\">新（こちら）</span> は青、"
         "行の中で実際に異なる部分は同系の薄い色でハイライトします。"
         "式は丸ごと1つの差分単位として扱います。",
         "",

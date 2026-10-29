@@ -194,15 +194,31 @@
 
     /* Revision diff pages (books/<id>/diff.md, generated for catalogs with
        revision_of). The page is ordinary Markdown, rendered by docsify and
-       KaTeX exactly like a book page; only changed regions are wrapped in
-       coloured containers -- old above in red, new below in blue -- with
-       no per-chunk labels. Inside a plain line, the characters that
-       differ carry a stronger tint of the same family. Formulas are
-       whole units and are never wrapped or highlighted inside. */
-    /* No frames and no extra spacing: changed regions flow with the
-       same line spacing as the surrounding text, marked by colour only. */
-    .diff-chunk {
+       KaTeX exactly like a book page; changed regions become two-pane
+       rows -- old on the left in red, new on the right in blue -- with
+       no per-chunk labels and no frames or extra spacing, so the panes
+       flow with the same line spacing as the surrounding text. Inside a
+       plain line, the characters that differ carry a stronger tint of
+       the same family. Formulas are whole units and are never wrapped
+       or highlighted inside. On narrow screens the panes stack (old
+       above, new below). */
+    .diff-row {
+      display: flex;
+      gap: 16px;
       margin: 0;
+    }
+
+    .diff-pane {
+      flex: 1 1 0;
+      min-width: 0;
+      overflow-x: auto;
+    }
+
+    @media (max-width: 640px) {
+      .diff-row {
+        flex-direction: column;
+        gap: 0;
+      }
     }
 
     .diff-old {
