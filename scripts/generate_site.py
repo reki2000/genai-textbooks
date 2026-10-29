@@ -611,6 +611,31 @@ def _diff_units(lines: list[str]) -> list[tuple[str, list[str]]]:
 
 
 _SECTION_NUMBER_RE = re.compile(r"^第[0-9０-９一二三四五六七八九十百]+幕\s*")
+_SPEAKER_LABEL_RE = re.compile(r"^\*\*[^*]+\*\*[：:]?\s*$")
+_SPEAKER_PREFIX_RE = re.compile(r"^\*\*[^*]+\*\*[：:]\s*")
+
+
+def _is_weak_line(line: str) -> bool:
+    """Lines that say almost nothing about which passage they belong to:
+    blank lines, speaker labels on their own line (**やる夫**：), and
+    lines whose content past the speaker label is a few characters.
+    These repeat tens of thousands of times across the books, so if a
+    match made only of such lines is allowed to anchor a diff, two
+    completely different conversations get stitched together
+    utterance by utterance just because the same speakers appear in
+    both. A matching block therefore counts only when it contains a
+    strong (non-weak) line, and weak lines never pair for highlights:
+    a passage replaced across utterances stays one replaced span,
+    while weak lines inside a genuinely unchanged stretch still
+    match as part of that stretch's block."""
+    stripped = line.strip()
+    if not stripped or _SPEAKER_LABEL_RE.match(stripped):
+        return True
+    return len(_SPEAKER_PREFIX_RE.sub("", stripped)) <= 4
+
+
+def _content_lines(lines: list[str]) -> list[str]:
+    return [line for line in lines if not _is_weak_line(line)]
 
 
 def _split_sections(lines: list[str]) -> list[tuple[str, int, int]]:
@@ -675,10 +700,12 @@ def _match_sections(
     def overlap(old_index: int, new_index: int) -> float:
         _h, os_, oe = old_sections[old_index]
         _h2, ns, ne = new_sections[new_index]
-        old_counter = Counter(old_lines[os_:oe])
-        new_counter = Counter(new_lines[ns:ne])
+        old_content = _content_lines(old_lines[os_:oe])
+        new_content = _content_lines(new_lines[ns:ne])
+        old_counter = Counter(old_content)
+        new_counter = Counter(new_content)
         common = sum((old_counter & new_counter).values())
-        shorter = min(oe - os_, ne - ns)
+        shorter = min(len(old_content), len(new_content))
         return common / shorter if shorter else 0.0
 
     candidates = sorted(
@@ -765,13 +792,24 @@ def render_diff_page(document: dict[str, Any], source: dict[str, Any]) -> str:
         (old index -> new index, new index -> old index)."""
 
         def eligible(unit: tuple[str, list[str]]) -> bool:
-            return unit[0] == "line" and "$" not in unit[1][0]
+            return (
+                unit[0] == "line"
+                and "$" not in unit[1][0]
+                and not _is_weak_line(unit[1][0])
+            )
+
+        def pair_text(line: str) -> str:
+            # A shared speaker prefix must not inflate the similarity of
+            # two different utterances by the same speaker.
+            return _SPEAKER_PREFIX_RE.sub("", line)
 
         candidates = sorted(
             (
                 (
                     difflib.SequenceMatcher(
-                        None, old_chunk[oi][1][0], new_chunk[ni][1][0]
+                        None,
+                        pair_text(old_chunk[oi][1][0]),
+                        pair_text(new_chunk[ni][1][0]),
                     ).ratio(),
                     oi,
                     ni,
@@ -820,6 +858,16 @@ def render_diff_page(document: dict[str, Any], source: dict[str, Any]) -> str:
                 new_count += len(new_units[inew][1])
                 new_chunk.append(new_units[inew])
                 inew += 1
+            if all(
+                not line.strip()
+                for unit in old_chunk + new_chunk
+                for line in unit[1]
+            ):
+                # A sub-chunk made only of blank lines (an empty line
+                # left over at a chunk boundary) is not a visible
+                # change; showing it would produce an empty diff row.
+                emit_same(new_chunk)
+                continue
             chunk_count += 1
             old_to_new, new_to_old = pair_chunk_lines(old_chunk, new_chunk)
             parts = ['<div class="diff-row">']
@@ -912,9 +960,11 @@ def render_diff_page(document: dict[str, Any], source: dict[str, Any]) -> str:
         _old_heading, old_start, old_end = old_sections[old_index]
         old_slice = old_lines[old_start:old_end]
         new_slice = new_lines[start:end]
+        old_content = _content_lines(old_slice)
+        new_content = _content_lines(new_slice)
         ratio = (
-            difflib.SequenceMatcher(None, old_slice, new_slice, autojunk=False).ratio()
-            if old_slice or new_slice
+            difflib.SequenceMatcher(None, old_content, new_content, autojunk=False).ratio()
+            if old_content or new_content
             else 1.0
         )
         if ratio < DIFF_SECTION_REWRITE_RATIO:
@@ -922,17 +972,49 @@ def render_diff_page(document: dict[str, Any], source: dict[str, Any]) -> str:
             continue
         old_units = _diff_units(old_slice)
         new_units = _diff_units(new_slice)
+
+        def is_strong(unit: tuple[str, list[str]]) -> bool:
+            return unit[0] != "line" or not _is_weak_line(unit[1][0])
+
+        # Match on all units, then keep a matching block only if it
+        # contains at least one strong unit. A block made solely of
+        # weak lines (blanks and speaker labels) is exactly how two
+        # different conversations get stitched together, so it is
+        # dropped and the span stays one replacement; weak lines inside
+        # a genuinely unchanged stretch still match, because their
+        # block contains the surrounding strong lines.
         matcher = difflib.SequenceMatcher(
             None,
             ["\n".join(unit[1]) for unit in old_units],
             ["\n".join(unit[1]) for unit in new_units],
             autojunk=False,
         )
-        for tag, a1, a2, b1, b2 in matcher.get_opcodes():
-            if tag == "equal":
-                emit_same(new_units[b1:b2])
+        kept: list[tuple[int, int]] = []
+        for a, b, size in matcher.get_matching_blocks():
+            if size and any(is_strong(old_units[a + k]) for k in range(size)):
+                kept.extend((a + k, b + k) for k in range(size))
+        kept_set = dict(kept)
+        i = j = 0
+        kept_index = 0
+        while i < len(old_units) or j < len(new_units):
+            if kept_set.get(i) == j and i < len(old_units):
+                a1, b1 = i, j
+                while kept_set.get(i) == j and i < len(old_units):
+                    i += 1
+                    j += 1
+                emit_same(new_units[b1:j])
+                continue
+            a1, b1 = i, j
+            while kept_index < len(kept) and (
+                kept[kept_index][0] < i or kept[kept_index][1] < j
+            ):
+                kept_index += 1
+            if kept_index < len(kept):
+                i, j = kept[kept_index]
             else:
-                emit_changed(old_units[a1:a2], new_units[b1:b2])
+                i, j = len(old_units), len(new_units)
+            if i > a1 or j > b1:
+                emit_changed(old_units[a1:i], new_units[b1:j])
     flush_old_only(len(old_sections))
 
     lines = [
