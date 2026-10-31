@@ -611,6 +611,7 @@ def _diff_units(lines: list[str]) -> list[tuple[str, list[str]]]:
 
 
 _SECTION_NUMBER_RE = re.compile(r"^第[0-9０-９一二三四五六七八九十百]+幕\s*")
+_SUBSECTION_NUMBER_RE = re.compile(r"^[0-9０-９]+[-－―][0-9０-９]+\s*")
 _SPEAKER_LABEL_RE = re.compile(r"^\*\*[^*]+\*\*[：:]?\s*$")
 _SPEAKER_PREFIX_RE = re.compile(r"^\*\*[^*]+\*\*[：:]\s*")
 
@@ -638,14 +639,18 @@ def _content_lines(lines: list[str]) -> list[str]:
     return [line for line in lines if not _is_weak_line(line)]
 
 
-def _split_sections(lines: list[str]) -> list[tuple[str, int, int]]:
-    """Split a book into (heading, start, end) sections at `## ` headings;
-    the text before the first heading is a section with an empty heading."""
-    starts = {i for i, line in enumerate(lines) if line.startswith("## ")}
+def _split_sections(
+    lines: list[str], heading_prefix: str = "## "
+) -> list[tuple[str, int, int]]:
+    """Split text into (heading, start, end) parts at headings of one
+    level (`## ` acts by default, `### ` for the sections inside an
+    act); the text before the first heading is a part with an empty
+    heading."""
+    starts = {i for i, line in enumerate(lines) if line.startswith(heading_prefix)}
     bounds = [0, *sorted(starts), len(lines)]
     return [
         (
-            lines[start].lstrip("#").strip() if start in starts else "",
+            lines[start][len(heading_prefix):].strip() if start in starts else "",
             start,
             bounds[k + 1],
         )
@@ -658,18 +663,23 @@ def _match_sections(
     new_sections: list[tuple[str, int, int]],
     old_lines: list[str],
     new_lines: list[str],
+    number_re: re.Pattern[str] = _SECTION_NUMBER_RE,
+    pair_leftovers: bool = False,
 ) -> dict[int, int]:
     """Map new-section index -> old-section index. Sections pair up so
     that a section whose content changed completely can be recognised as
     one unit; whatever stays unpaired exists on one side only. Pairing is
-    by heading first, ignoring the act number (a rewrite may renumber
-    acts): exact, then character similarity at 0.8 or above. Retitled
-    sections are then paired by content: the best remaining pair whose
-    shared-line overlap (common lines over the shorter section) reaches
-    0.25."""
+    by heading first, ignoring the act/section number (a rewrite may
+    renumber): exact, then character similarity at 0.8 or above.
+    Retitled sections are then paired by content: the best remaining
+    pair whose shared-line overlap (common lines over the shorter
+    section) reaches 0.25. With pair_leftovers, sections still unpaired
+    on both sides are paired in order -- used for the sections inside
+    one act, where a leftover on each side is the same slot rewritten,
+    and pairing them keeps the diff inside the section boundary."""
 
     def normalize(heading: str) -> str:
-        return re.sub(r"\s+", "", _SECTION_NUMBER_RE.sub("", heading))
+        return re.sub(r"\s+", "", number_re.sub("", heading))
 
     pairs: dict[int, int] = {}
     used_old: set[int] = set()
@@ -725,6 +735,16 @@ def _match_sections(
             continue
         pairs[new_index] = old_index
         used_old.add(old_index)
+    if pair_leftovers:
+        remaining_old = [
+            index for index in range(len(old_sections)) if index not in used_old
+        ]
+        remaining_new = [
+            index for index in range(len(new_sections)) if index not in pairs
+        ]
+        for new_index, old_index in zip(remaining_new, remaining_old):
+            pairs[new_index] = old_index
+            used_old.add(old_index)
     return pairs
 
 
@@ -739,10 +759,13 @@ def render_diff_page(document: dict[str, Any], source: dict[str, Any]) -> str:
     the meaning. Inside a plain line, the characters that differ are
     highlighted with a stronger tint of the same family; formulas,
     tables and code blocks are whole units and are never highlighted
-    inside. Deleted lines appear in red where they used to be. Sections
-    are matched by heading first: a section pair that shares almost no
-    lines, and any section that exists on one side only, is shown in
-    place as one whole-section unit instead of line chunks."""
+    inside. Deleted lines appear in red where they used to be. The
+    judgment is partitioned by act (`## ` headings) and, inside an act,
+    by section (`### ` headings): units pair up by heading first within
+    their parent only, line matching never crosses a section or act
+    boundary, and a unit pair that shares almost no lines -- or a unit
+    that exists on one side only -- is shown in place as one
+    whole-section unit instead of line chunks."""
     old_lines = (BOOKS_DIR / source["id"] / "README.md").read_text(
         encoding="utf-8"
     ).splitlines()
@@ -951,15 +974,7 @@ def render_diff_page(document: dict[str, Any], source: dict[str, Any]) -> str:
             _heading, start, end = old_sections[old_index]
             emit_section(old_lines[start:end], [])
 
-    for new_index, (heading, start, end) in enumerate(new_sections):
-        old_index = section_pairs.get(new_index)
-        if old_index is None:
-            emit_section([], new_lines[start:end])
-            continue
-        flush_old_only(old_index)
-        _old_heading, old_start, old_end = old_sections[old_index]
-        old_slice = old_lines[old_start:old_end]
-        new_slice = new_lines[start:end]
+    def process_pair(old_slice: list[str], new_slice: list[str]) -> None:
         old_content = _content_lines(old_slice)
         new_content = _content_lines(new_slice)
         ratio = (
@@ -969,7 +984,7 @@ def render_diff_page(document: dict[str, Any], source: dict[str, Any]) -> str:
         )
         if ratio < DIFF_SECTION_REWRITE_RATIO:
             emit_section(old_slice, new_slice)
-            continue
+            return
         old_units = _diff_units(old_slice)
         new_units = _diff_units(new_slice)
 
@@ -1015,6 +1030,58 @@ def render_diff_page(document: dict[str, Any], source: dict[str, Any]) -> str:
                 i, j = len(old_units), len(new_units)
             if i > a1 or j > b1:
                 emit_changed(old_units[a1:i], new_units[b1:j])
+    def process_act_pair(old_slice: list[str], new_slice: list[str]) -> None:
+        """Diff one paired act. When both versions of the act have
+        `### ` sections, the diff is judged section by section inside
+        the act: sections pair up within the act only, and line matching
+        never crosses a section (or act) boundary. An act that has no
+        sections on either side is judged as a whole."""
+        if not (
+            any(line.startswith("### ") for line in old_slice)
+            and any(line.startswith("### ") for line in new_slice)
+        ):
+            process_pair(old_slice, new_slice)
+            return
+        old_subs = _split_sections(old_slice, "### ")
+        new_subs = _split_sections(new_slice, "### ")
+        sub_pairs = _match_sections(
+            old_subs,
+            new_subs,
+            old_slice,
+            new_slice,
+            number_re=_SUBSECTION_NUMBER_RE,
+            pair_leftovers=True,
+        )
+        sub_old_only = [
+            index
+            for index in range(len(old_subs))
+            if index not in set(sub_pairs.values())
+        ]
+        ptr = 0
+        for new_sub_index, (_h, sub_start, sub_end) in enumerate(new_subs):
+            old_sub_index = sub_pairs.get(new_sub_index)
+            if old_sub_index is None:
+                emit_section([], new_slice[sub_start:sub_end])
+                continue
+            while ptr < len(sub_old_only) and sub_old_only[ptr] < old_sub_index:
+                _oh, o_start, o_end = old_subs[sub_old_only[ptr]]
+                ptr += 1
+                emit_section(old_slice[o_start:o_end], [])
+            _oh, o_start, o_end = old_subs[old_sub_index]
+            process_pair(old_slice[o_start:o_end], new_slice[sub_start:sub_end])
+        while ptr < len(sub_old_only):
+            _oh, o_start, o_end = old_subs[sub_old_only[ptr]]
+            ptr += 1
+            emit_section(old_slice[o_start:o_end], [])
+
+    for new_index, (heading, start, end) in enumerate(new_sections):
+        old_index = section_pairs.get(new_index)
+        if old_index is None:
+            emit_section([], new_lines[start:end])
+            continue
+        flush_old_only(old_index)
+        _old_heading, old_start, old_end = old_sections[old_index]
+        process_act_pair(old_lines[old_start:old_end], new_lines[start:end])
     flush_old_only(len(old_sections))
 
     lines = [
