@@ -1,7 +1,7 @@
 ---
 type: outline
 book: weather-forecasting
-readme_updated: '2026-08-09T07:37:26+00:00'
+readme_updated: '2026-11-01T19:42:11+09:00'
 ---
 
 # やる夫の天気予報 ── 最先端の予報術を再発明する の骨格
