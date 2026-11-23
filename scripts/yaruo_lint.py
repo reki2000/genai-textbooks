@@ -503,6 +503,7 @@ def _is_non_prose_ending(body: str, line_index: int, protected: set[int]) -> boo
         or stripped.startswith(">")
         or re.match(r"^(?:[-+*]|\d+[.)])\s", stripped) is not None
         or stripped.startswith("[^")
+        or BOLD_HEADING_RE.match(stripped.rstrip()) is not None
     )
 
 
@@ -519,12 +520,7 @@ def rule_dialogue_period(lines: list[str], result: Result) -> list[str]:
         stop = start + 1
         while stop < len(lines):
             body = split_eol(lines[stop])[0]
-            if (
-                stop in speakers
-                or SECTION_LINE.match(body)
-                or SCENE_TRANSITION_RE.match(body.strip())
-                or BOLD_HEADING_RE.match(body.strip())
-            ):
+            if stop in speakers or SECTION_LINE.match(body) or SCENE_TRANSITION_RE.match(body.strip()):
                 break
             stop += 1
 
