@@ -473,6 +473,7 @@ def rule_table_delimiter(lines: list[str], result: Result) -> list[str]:
 
 FOOTNOTE_TAIL_RE = re.compile(r"\[\^[^]\n]+\]$")
 SCENE_TRANSITION_RE = re.compile(r"^〜〜\s*\S(?:.*\S)?\s*〜〜$")
+BOLD_HEADING_RE = re.compile(r"^\*\*[^*\n]+\*\*$")
 TERMINAL_CHARS = frozenset("。．.!！?？…")
 CLOSING_CHARS = frozenset("」』）】〕〉》〗〙〛")
 
@@ -518,7 +519,12 @@ def rule_dialogue_period(lines: list[str], result: Result) -> list[str]:
         stop = start + 1
         while stop < len(lines):
             body = split_eol(lines[stop])[0]
-            if stop in speakers or SECTION_LINE.match(body) or SCENE_TRANSITION_RE.match(body.strip()):
+            if (
+                stop in speakers
+                or SECTION_LINE.match(body)
+                or SCENE_TRANSITION_RE.match(body.strip())
+                or BOLD_HEADING_RE.match(body.strip())
+            ):
                 break
             stop += 1
 
