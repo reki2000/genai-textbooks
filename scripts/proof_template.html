@@ -69,7 +69,7 @@ main { max-width: 46rem; margin: 0 auto; padding-block: 1rem 70vh; }
 table { border-collapse: collapse; font-size: 13px; }
 th, td { border: 1px solid var(--rule); padding: .2rem .5rem; }
 code { font-family: var(--font-mono); font-size: .9em; }
-.sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; max-height: 75vh; overflow-y: auto; background: var(--sheet); border-top: 2px solid var(--shu); box-shadow: 0 -8px 24px rgb(0 0 0 / .15); padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px)); }
+.sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; max-height: 55vh; overflow-y: auto; background: var(--sheet); border-top: 2px solid var(--shu); box-shadow: 0 -8px 24px rgb(0 0 0 / .15); padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px)); }
 .sheet-in { max-width: 46rem; margin: 0 auto; padding-block: .7rem; display: grid; gap: .65rem; }
 .sheet-head { display: flex; gap: .5rem; align-items: center; }
 .sheet-head .label { font: 700 13px/1.4 var(--font-head); letter-spacing: .03em; color: var(--shu); flex: 1; min-width: 0; }
@@ -97,6 +97,11 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
 .item { border: 1px solid var(--rule); border-radius: 8px; padding: .5rem .7rem; font-size: 13px; display: grid; gap: .25rem; background: var(--paper); }
 .item .meta { color: var(--muted); font-size: 12px; display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; }
 .progress { font-size: 13px; color: var(--muted); }
+.hint { font-size: 12px; color: var(--muted); }
+.quote.whole { max-height: 4.2rem; }
+.blk .body ::selection, .blk .body::selection { background: color-mix(in srgb, var(--shu) 28%, transparent); }
+.fab { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 15; padding: .7rem 1.1rem; border-radius: 999px; border: 0; background: var(--shu); color: var(--sheet); font-size: 15px; font-weight: 600; box-shadow: 0 4px 14px rgb(0 0 0 / .2); }
+.fab:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 @media (prefers-reduced-motion: no-preference) { .sheet { animation: up .18s ease-out; } @keyframes up { from { transform: translateY(12px); } } }
 </style>
 
@@ -111,6 +116,7 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
 </header>
 <main class="gutter" id="main"></main>
 <div class="sheet gutter" id="sheet" hidden><div class="sheet-in" id="sheet-in"></div></div>
+<button class="fab" id="fab" type="button">幕に指摘</button>
 
 <script src="https://cdn.jsdelivr.net/npm/markdown-it@13.0.2/dist/markdown-it.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
@@ -146,7 +152,6 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
   const overlay = new Map();    // id -> edit doc（DB の edits）
   let feedback = [];            // DB の feedback
   const guessCache = new Map();
-  let ctl = null;
 
   // ---------------------------------------------------------------- Markdown
   const md = window.markdownit ? window.markdownit({ html: true, breaks: true, linkify: false }) : null;
@@ -207,15 +212,15 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
     main.replaceChildren();
     for (const b of currentBlocks(a)) {
       const cls = b.t === "u" ? "blk " + (CLASS[b.speaker] || "other") : "blk raw";
-      const node = el("div", { class: cls + (b.edited ? " edited" : ""), id: b.id, tabindex: "0", role: "button", "aria-label": (b.t === "u" ? b.speaker + "の発言" : "地の文") + "に指摘する" });
+      const node = el("div", { class: cls + (b.edited ? " edited" : ""), id: b.id, tabindex: "0", "aria-label": (b.t === "u" ? b.speaker + "の発言" : "地の文") + "。タップで文節・文・発言を選ぶ" });
       if (b.t === "u") node.append(el("div", { class: "spk" }, b.speaker, b.note ? el("span", { class: "note" }, b.note) : null, b.edited ? el("span", { class: "mark" }, b.inserted ? "追加" : "修正済み") : null));
-      const body = el("div", {});
+      const body = el("div", { class: "body" });
       body.innerHTML = toHtml(b.md);
       body.querySelectorAll("img").forEach((img) => img.setAttribute("loading", "lazy"));
       body.querySelectorAll("a").forEach((x) => x.setAttribute("target", "_blank"));
       node.append(body);
-      node.addEventListener("click", (ev) => { if (ev.target.closest("a")) return; openTarget(b.id); });
-      node.addEventListener("keydown", (ev) => { if (ev.key === "Enter") openTarget(b.id); });
+      node.addEventListener("click", (ev) => onBlockTap(ev, b.id));
+      node.addEventListener("keydown", (ev) => { if (ev.key === "Enter") { selectLevel(b.id, null, 2); } });
       main.append(node);
     }
     renderMath(main);
@@ -230,6 +235,129 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
     return currentBlocks(a).find((b) => b.id === id);
   }
 
+  // ---------------------------------------------------------------- 選択（タップで 文節 → 文 → 発言）
+  const LEVELS = ["文節", "文", "発言"];
+  const wordSeg = window.Intl && Intl.Segmenter ? new Intl.Segmenter("ja", { granularity: "word" }) : null;
+  let pick = null;            // {id, level, anchor, start, end, text}
+  let settingSelection = false;
+
+  function textMap(body) {
+    const nodes = [];
+    let pos = 0;
+    const walker = document.createTreeWalker(body, NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => (n.parentElement && n.parentElement.closest(".math, rt, rp") ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
+    });
+    while (walker.nextNode()) { nodes.push({ n: walker.currentNode, start: pos }); pos += walker.currentNode.data.length; }
+    return { nodes, text: nodes.map((x) => x.n.data).join("") };
+  }
+  function globalOffset(map, node, offset) {
+    const hit = map.nodes.find((x) => x.n === node);
+    return hit ? hit.start + Math.min(offset, node.data.length) : null;
+  }
+  function rangeOf(map, start, end) {
+    const r = document.createRange();
+    const at = (g, isEnd) => {
+      for (const x of map.nodes) {
+        const len = x.n.data.length;
+        if (g < x.start + len || (isEnd && g === x.start + len)) return [x.n, g - x.start];
+      }
+      const last = map.nodes[map.nodes.length - 1];
+      return [last.n, last.n.data.length];
+    };
+    const [sn, so] = at(start, false);
+    const [en, eo] = at(end, true);
+    r.setStart(sn, so); r.setEnd(en, eo);
+    return r;
+  }
+  function caretAt(x, y) {
+    if (document.caretPositionFromPoint) { const p = document.caretPositionFromPoint(x, y); return p && { node: p.offsetNode, offset: p.offset }; }
+    if (document.caretRangeFromPoint) { const r = document.caretRangeFromPoint(x, y); return r && { node: r.startContainer, offset: r.startOffset }; }
+    return null;
+  }
+  const PUNCT = /^[\s、。，．！？!?「」『』（）()…・―─：:；;]+$/;
+  const KANA = /^[ぁ-ゟー]+$/;
+  function bunsetsuSpans(text) {
+    if (!wordSeg) return sentenceSpans(text);
+    const spans = [];
+    let cur = null;
+    for (const w of wordSeg.segment(text)) {
+      const s = w.index, e = s + w.segment.length, t = w.segment;
+      if (t.includes("\n")) { if (cur) spans.push(cur); cur = null; continue; }
+      if (!cur) { if (PUNCT.test(t)) continue; cur = [s, e]; continue; }
+      if (PUNCT.test(t) || KANA.test(t)) {
+        cur[1] = e;
+        if (/[、。！？!?]/.test(t)) { spans.push(cur); cur = null; }
+        continue;
+      }
+      if (/[ぁ-ゟ]$/.test(text.slice(cur[0], cur[1]))) { spans.push(cur); cur = [s, e]; }
+      else cur[1] = e;
+    }
+    if (cur) spans.push(cur);
+    return spans;
+  }
+  function sentenceSpans(text) {
+    const spans = [];
+    const re = /[^。！？!?\n]+[。！？!?」』）]*/g;
+    let m;
+    while ((m = re.exec(text))) { const lead = m[0].length - m[0].trimStart().length; if (m[0].trim()) spans.push([m.index + lead, m.index + m[0].length]); }
+    return spans;
+  }
+  function spanAround(spans, g) {
+    return spans.find(([s, e]) => g >= s && g < e) || spans.find(([s]) => s >= g) || spans[spans.length - 1] || null;
+  }
+
+  function onBlockTap(ev, id) {
+    if (ev.target.closest("a")) return;
+    const sel = window.getSelection();
+    // 指で範囲を伸ばした直後のタップは、その選択を活かす
+    if (sel && !sel.isCollapsed && !settingSelection && pick === null && sel.toString().trim()) { useNativeSelection(); return; }
+    const body = document.getElementById(id)?.querySelector(".body");
+    if (!body) return;
+    const map = textMap(body);
+    const caret = caretAt(ev.clientX, ev.clientY);
+    const g = caret ? globalOffset(map, caret.node, caret.offset) : null;
+    let level = 0;
+    if (pick && pick.id === id && pick.level !== "free" && g !== null && g >= pick.start && g <= pick.end) level = (pick.level + 1) % LEVELS.length;
+    else if (g === null) level = 2;
+    selectLevel(id, g === null ? 0 : g, level);
+  }
+  function selectLevel(id, anchor, level) {
+    const body = document.getElementById(id)?.querySelector(".body");
+    if (!body) return;
+    const map = textMap(body);
+    if (!map.nodes.length) { pick = { id, level: 2, anchor: 0, start: 0, end: 0, text: "" }; openTarget(id); return; }
+    const g = anchor === null ? (pick && pick.id === id ? pick.anchor : 0) : anchor;
+    let span = [0, map.text.length];
+    if (level === 0) span = spanAround(bunsetsuSpans(map.text), g) || span;
+    if (level === 1) span = spanAround(sentenceSpans(map.text), g) || span;
+    pick = { id, level, anchor: g, start: span[0], end: span[1], text: map.text.slice(span[0], span[1]).trim() };
+    settingSelection = true;
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    if (level < 2) sel.addRange(rangeOf(map, span[0], span[1]));
+    setTimeout(() => { settingSelection = false; }, 0);
+    openTarget(id);
+  }
+  function selectionBlock() {
+    const sel = window.getSelection();
+    if (!sel || sel.isCollapsed || !sel.rangeCount) return null;
+    const node = sel.getRangeAt(0).commonAncestorContainer;
+    const blk = (node.nodeType === 1 ? node : node.parentElement)?.closest(".blk");
+    return blk && $("#main").contains(blk) ? blk.id : null;
+  }
+  function useNativeSelection() {
+    const id = selectionBlock();
+    if (!id) return false;
+    const text = window.getSelection().toString().trim();
+    pick = { id, level: "free", anchor: 0, start: 0, end: 0, text };
+    openTarget(id);
+    return true;
+  }
+  function paintFab() {
+    const own = pick && pick.level !== "free";
+    $("#fab").textContent = !own && selectionBlock() ? "選択範囲に指摘" : "幕に指摘";
+  }
+
   // ---------------------------------------------------------------- 文脈
   function outlineFor(section) {
     const text = BOOK.outline || "";
@@ -241,11 +369,17 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
   function historyText(limit) {
     const rows = [];
     for (const f of feedback.slice().sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)))) {
-      const acc = (f.patches || []).filter((p) => p.accepted);
-      const ex = acc.slice(0, 1).map((p) => "  採用例: 「" + clip(p.before || "", 60) + "」→「" + clip(p.final || "", 60) + "」").join("\n");
-      rows.push("- " + f.text + "（範囲: " + (SCOPE[f.scope] || f.scope) + "、採用 " + acc.length + " / 提案 " + (f.patches || []).length + "）" + (ex ? "\n" + ex : ""));
+      const all = (f.patches || []);
+      const acc = all.filter((p) => p.accepted);
+      const where = f.selection ? "、選択「" + clip(f.selection, 24) + "」（" + (f.level || "") + "）" : "";
+      const verdict = all.length && !acc.length ? "、提案は全部不採用" : "、採用 " + (acc.length + (f.propagated || []).length) + "件";
+      const ex = acc.slice(0, 1).map((p) => "\n  採用された直し方: 「" + clip(p.before || "", 50) + "」→「" + clip(p.final || "", 50) + "」" + (p.final !== p.proposed ? "（校正者が手直し）" : "")).join("");
+      rows.push("- " + f.text + "（範囲: " + (SCOPE[f.scope] || f.scope) + where + verdict + "）" + ex);
     }
-    for (const h of BOOK.history || []) rows.push("- " + h.text + "（範囲: " + (SCOPE[h.scope] || h.scope) + (h.book !== BOOK.book ? "、教材 " + h.book : "") + "）");
+    for (const h of BOOK.history || []) {
+      const ex = (h.examples || []).slice(0, 1).map((p) => "\n  採用された直し方: 「" + clip(p.before || "", 50) + "」→「" + clip(p.after || "", 50) + "」").join("");
+      rows.push("- " + h.text + "（範囲: " + (SCOPE[h.scope] || h.scope) + (h.book !== BOOK.book ? "、教材 " + h.book : "") + (h.status === "rejected" ? "、不採用" : "") + "）" + ex);
+    }
     return rows.slice(0, limit).join("\n") || "（まだ無い）";
   }
   const clip = (s, n) => (s.length > n ? s.slice(0, n) + "…" : s).replace(/\n/g, " ");
@@ -254,78 +388,164 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
       "あなたは対話形式の教材『" + BOOK.title + "』の編集者。校正者の指摘に従って本文を直す。",
       full ? "## 人物と書き方の規約\n" + BOOK.rules : null,
       BOOK.editorialRules ? "## 校正で確定した規則\n" + BOOK.editorialRules : null,
-      "## この校正者の過去の指摘（新しい順）\n" + historyText(full ? 40 : 25),
+      "## この校正者の過去の指摘（新しい順）\n" + historyText(full ? 40 : 30),
       "## 登場人物欄\n" + BOOK.roster,
       full ? "## アウトライン（抜粋）\n" + outlineFor(section || "") : null,
     ].filter(Boolean).join("\n\n");
   }
 
   // ---------------------------------------------------------------- シート
+  let sheetFor = null;        // 開いているシートの対象（ブロック ID か "act"）
+  const ctls = {};
   function openSheet(label, ...kids) {
-    $("#sheet-in").replaceChildren(el("div", { class: "sheet-head" }, el("div", { class: "label" }, label), el("button", { class: "btn", type: "button", onclick: closeSheet }, "閉じる")), ...kids);
+    $("#sheet-in").replaceChildren(el("div", { class: "sheet-head" }, el("div", { class: "label", id: "sheet-label" }, label), el("button", { class: "btn", type: "button", onclick: closeSheet }, "閉じる")), ...kids);
     $("#sheet").hidden = false;
+    $("#fab").hidden = true;
   }
   function closeSheet() {
-    ctl?.abort(); ctl = null;
+    for (const k of Object.keys(ctls)) { ctls[k]?.abort(); delete ctls[k]; }
     $("#sheet").hidden = true;
+    $("#fab").hidden = false;
+    sheetFor = null;
+    pick = null;
     document.querySelectorAll(".blk.sel").forEach((n) => n.classList.remove("sel"));
+    try { window.getSelection().removeAllRanges(); } catch {}
+    paintFab();
   }
-  async function ask(input, out, tier, msg) {
+  async function ask(input, out, tier, msg, key) {
+    key = key || "work";
     if (!sample) { out.replaceChildren(el("p", { class: "err" }, "この表示では Claude に問い合わせられない。claude.ai でこのページを開く。")); return null; }
-    ctl?.abort();
-    ctl = new AbortController();
+    ctls[key]?.abort();
+    const ctl = (ctls[key] = new AbortController());
     out.replaceChildren(el("p", { class: "thinking" }, msg || "考えている…"));
     try { return await sample.json(input, { modelTier: tier || "default", signal: ctl.signal }); }
-    catch (e) { out.replaceChildren(el("p", { class: "err" }, errText(e))); return null; }
+    catch (e) { if (ctl.signal.aborted) return null; out.replaceChildren(el("p", { class: "err" }, errText(e))); return null; }
   }
 
   // ---------------------------------------------------------------- 指摘の入口
+  function scopeControl(initial) {
+    const seg = el("div", { class: "seg", role: "group", "aria-label": "範囲" });
+    seg.value = initial;
+    const set = (s) => { seg.value = s; seg.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.s === s))); };
+    for (const s of ["here", "act", "book"]) seg.append(el("button", { type: "button", "data-s": s, onclick: () => set(s) }, SCOPE[s]));
+    set(initial);
+    seg.set = set;
+    return seg;
+  }
+  function targetLabel(b) {
+    const lv = pick && pick.id === b.id ? (pick.level === "free" ? "選択" : LEVELS[pick.level]) : "発言";
+    return (b.t === "u" ? b.speaker : "地の文") + "・" + lv + "　" + b.id;
+  }
+  function selectionNow(b) {
+    if (pick && pick.id === b.id && pick.text && !(pick.level === 2)) return { text: pick.text, level: pick.level === "free" ? "選択" : LEVELS[pick.level] };
+    return { text: "", level: "発言" };
+  }
+
+  let sheetRefs = null;
   function openTarget(id) {
     const b = findCurrent(id);
     if (!b) return;
-    document.querySelectorAll(".blk.sel").forEach((n) => n.classList.remove("sel"));
-    document.getElementById(id)?.classList.add("sel");
+    document.querySelectorAll(".blk.sel").forEach((n) => n.classList.toggle("sel", n.id === id));
+    const sel = selectionNow(b);
+    if (sheetFor === id && sheetRefs) {
+      // 同じブロックで範囲を切り替えた: 引用と候補だけ更新し、入力中の文や作業中の差分は残す
+      $("#sheet-label").textContent = targetLabel(b);
+      sheetRefs.quote.textContent = sel.text || b.md;
+      sheetRefs.quote.classList.toggle("whole", !sel.text);
+      refreshGuesses(b);
+      return;
+    }
+    sheetFor = id;
     const guesses = el("div", { class: "guesses" });
-    let scope = "here";
-    const seg = el("div", { class: "seg", role: "group", "aria-label": "範囲" });
-    const setScope = (s) => { scope = s; seg.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.s === s))); };
-    for (const s of ["here", "act", "book"]) seg.append(el("button", { type: "button", "data-s": s, onclick: () => setScope(s) }, SCOPE[s]));
-    setScope("here");
+    const seg = scopeControl("here");
     const free = el("textarea", { id: "free", rows: "2", placeholder: "自由に指摘する（例: 札の比喩をやめる）" });
     const go = el("button", { class: "btn primary", type: "button" }, "直す");
     const work = el("div", { class: "list" });
-    go.addEventListener("click", () => { const t = free.value.trim(); if (t) fix(b, t, scope, "free", [], work); });
-    openSheet((b.t === "u" ? b.speaker + "の発言" : "地の文") + "　" + id,
-      el("div", { class: "quote" }, b.md), guesses,
-      free, el("div", { class: "row" }, seg, go), work);
-    loadGuesses(b, guesses, (g) => fix(b, g.text, g.scope, "pick", guesses._list || [], work));
+    const quote = el("div", { class: "quote" + (sel.text ? "" : " whole") }, sel.text || b.md);
+    go.addEventListener("click", () => { const t = free.value.trim(); if (t) fix(targetOf(b), t, seg.value, "free", guesses._list || [], work); });
+    openSheet(targetLabel(b), el("div", { class: "hint" }, "同じ所をもう一度タップすると 文節 → 文 → 発言 と範囲が広がる"), quote, guesses, free, el("div", { class: "row" }, seg, go), work);
+    sheetRefs = { quote, guesses, work, seg, free };
+    refreshGuesses(b);
+    const node = document.getElementById(id);
+    if (node) { const r = node.getBoundingClientRect(); if (r.bottom > innerHeight * 0.45) window.scrollBy({ top: r.top - 90, behavior: "smooth" }); }
+  }
+  function targetOf(b) {
+    const sel = selectionNow(b);
+    return { id: b.id, section: b.section, selection: sel.text, level: sel.level, speaker: b.speaker || "" };
   }
 
-  async function loadGuesses(b, box, pick) {
+  let guessTimer = null;
+  function refreshGuesses(b) {
+    clearTimeout(guessTimer);
+    const box = sheetRefs.guesses;
+    const t = targetOf(b);
+    const key = b.id + "\u0000" + b.md + "\u0000" + t.selection;
     const draw = (list) => {
       box._list = list.map((g) => g.text);
-      box.replaceChildren(...list.map((g) => el("button", { class: "chip", type: "button", onclick: () => pick(g) },
+      box.replaceChildren(...list.map((g) => el("button", { class: "chip", type: "button", onclick: () => fix(targetOf(b), g.text, g.scope, "pick", box._list, sheetRefs.work) },
         el("b", {}, g.text), el("span", { class: "scope " + g.scope }, SCOPE[g.scope] || g.scope))));
     };
-    if (guessCache.has(b.id + b.md)) return draw(guessCache.get(b.id + b.md));
+    if (guessCache.has(key)) return draw(guessCache.get(key));
+    box.replaceChildren(el("p", { class: "thinking" }, "指摘を推測している…"));
+    guessTimer = setTimeout(async () => {
+      const a = act();
+      const blocks = currentBlocks(a);
+      const i = blocks.findIndex((x) => x.id === b.id);
+      const near = blocks.slice(Math.max(0, i - 3), i + 3).map((x) => (x.id === b.id ? ">>> " : "") + (x.t === "u" ? x.speaker + "：" : "（地の文・登場人物欄）") + "\n" + x.md).join("\n\n");
+      const prompt = [
+        context(b.section, false),
+        "## 校正者が選んだ箇所\n" + (t.selection ? "選択範囲（" + t.level + "）: 「" + t.selection + "」\n>>> のブロックの中にある。" : ">>> のブロック全体。") + "\n\n" + near,
+        "## 依頼\n校正者がこの箇所を選んだ。言いたそうな指摘を、可能性の高い順に5〜7個推測する。" +
+          "\n- まず過去の指摘を読む。同じ種類の問題がこの選択範囲にもあれば、その指摘を過去と同じ言い回しで先頭に置く。採用されたものほど優先し、提案が全部不採用だった種類は下げる。" +
+          (t.selection ? "\n- 指摘は選択範囲（" + t.level + "）そのものについて書く。文節なら語や言い回し、文なら文の役割・長さ・口調、が主な対象。" : "\n- 指摘はブロック全体（発言なら発言の役割・長さ・人物らしさ・流れ）について書く。") +
+          "\n- この箇所に実際にありそうなものだけを挙げる（人物のぶれ・説明の先取り・台詞の長さ・比喩や言い回し・唐突さ・事実や数値・書式など）。" +
+          "\n- 各指摘は校正者が自分で書くような短い一文（30字以内）。範囲は、この箇所だけなら here、この幕の同種の箇所すべてなら act、教材全体に当てはまる方針なら book。" +
+          "\n返答は JSON だけ: {\"guesses\":[{\"text\":\"指摘\",\"scope\":\"here|act|book\"}]}",
+      ].join("\n\n");
+      const res = await ask(prompt, box, "quick", "指摘を推測している…", "guess");
+      if (!res) return;
+      const list = (Array.isArray(res.guesses) ? res.guesses : []).filter((g) => g && typeof g.text === "string").map((g) => ({ text: g.text.trim(), scope: ["here", "act", "book"].includes(g.scope) ? g.scope : "here" }));
+      guessCache.set(key, list);
+      if (sheetFor === b.id && targetOf(b).selection === t.selection) draw(list);
+    }, 450);
+  }
+
+  // 選択なしで始める（幕への指摘）
+  function openGeneral() {
+    if (useNativeSelection()) return;
     const a = act();
-    const blocks = currentBlocks(a);
-    const i = blocks.findIndex((x) => x.id === b.id);
-    const near = blocks.slice(Math.max(0, i - 3), i + 3).map((x) => (x.id === b.id ? ">>> " : "") + (x.t === "u" ? x.speaker + "：" : "（地の文）") + "\n" + x.md).join("\n\n");
-    const prompt = [
-      context(b.section, false),
-      "## 校正者がタップした箇所（>>> の行）と前後\n" + near,
-      "## 依頼\n校正者がこの箇所をタップした。言いたそうな指摘を、可能性の高い順に5〜7個推測する。" +
-        "過去の指摘と同じ種類の問題がここにもあれば、その指摘を同じ言い回しで最初のほうに入れる。" +
-        "人物のぶれ・説明の先取り・台詞の長さ・比喩や言い回し・唐突さ・事実や数値・書式など、この箇所に実際にありそうなものだけを挙げる。" +
-        "各指摘は校正者が自分で書くような短い一文（30字以内）。範囲は、この箇所だけなら here、この幕の同種の箇所すべてなら act、教材全体に当てはまる方針なら book。" +
-        "\n返答は JSON だけ: {\"guesses\":[{\"text\":\"指摘\",\"scope\":\"here|act|book\"}]}",
-    ].join("\n\n");
-    const res = await ask(prompt, box, "quick", "指摘を推測している…");
-    if (!res) return;
-    const list = (Array.isArray(res.guesses) ? res.guesses : []).filter((g) => g && typeof g.text === "string").map((g) => ({ text: g.text.trim(), scope: ["here", "act", "book"].includes(g.scope) ? g.scope : "here" }));
-    guessCache.set(b.id + b.md, list);
-    draw(list);
+    sheetFor = "act";
+    const guesses = el("div", { class: "guesses" });
+    const seg = scopeControl("act");
+    seg.querySelector('[data-s="here"]').remove();
+    const free = el("textarea", { id: "free-act", rows: "3", placeholder: "この幕・教材全体への指摘（例: できる子が突然出てくる）" });
+    const go = el("button", { class: "btn primary", type: "button" }, "直す");
+    const work = el("div", { class: "list" });
+    const target = { id: null, section: "", selection: "", level: "幕", speaker: "" };
+    go.addEventListener("click", () => { const t = free.value.trim(); if (t) fix(target, t, seg.value, "free", guesses._list || [], work); });
+    openSheet("幕「" + a.heading + "」への指摘", free, el("div", { class: "row" }, seg, go), guesses, work);
+    sheetRefs = null;
+    const key = "act\u0000" + a.name + "\u0000" + feedback.length;
+    const draw = (list) => {
+      guesses._list = list.map((g) => g.text);
+      guesses.replaceChildren(el("div", { class: "hint" }, "この幕で言いそうな指摘"), ...list.map((g) => el("button", { class: "chip", type: "button", onclick: () => fix(target, g.text, g.scope, "pick", guesses._list, work) },
+        el("b", {}, g.text), el("span", { class: "scope " + g.scope }, SCOPE[g.scope] || g.scope))));
+    };
+    if (guessCache.has(key)) return draw(guessCache.get(key));
+    (async () => {
+      const prompt = [
+        context("", false),
+        "## 幕「" + a.heading + "」の本文\n" + actText(a, null),
+        "## 依頼\n校正者がこの幕全体について指摘しようとしている。言いたそうな指摘を、可能性の高い順に5〜7個推測する。" +
+          "過去の指摘のうち、この幕にもまだ当てはまるものを過去と同じ言い回しで先頭に置く。次に、幕全体の構成・人物の出し方・会話の型の繰り返し・台詞の長さなど、幕単位で見える問題を挙げる。各30字以内。範囲は act か book。" +
+          "\n返答は JSON だけ: {\"guesses\":[{\"text\":\"指摘\",\"scope\":\"act|book\"}]}",
+      ].join("\n\n");
+      const res = await ask(prompt, guesses, "quick", "この幕への指摘を推測している…", "guess");
+      if (!res) return;
+      const list = (Array.isArray(res.guesses) ? res.guesses : []).filter((g) => g && typeof g.text === "string").map((g) => ({ text: g.text.trim(), scope: g.scope === "book" ? "book" : "act" }));
+      guessCache.set(key, list);
+      if (sheetFor === "act") draw(list);
+    })();
   }
 
   // ---------------------------------------------------------------- 修正
@@ -335,18 +555,22 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
     "{\"op\":\"insert\",\"after\":\"この ID の直後に\",\"speaker\":\"話者\",\"md\":\"新しい発言\"}]}" +
     "\n直す必要のないブロックは patches に入れない。replace の md はブロックの全文（話者名の行は書かない）。書式は元と同じ Markdown（1文ごとの改行、ルビ ｜基底《よみ》、$数式$）。数値・事実・数式・脚注記号は指摘が求めない限り変えない。";
 
-  async function fix(b, text, scope, source, offered, work) {
+  async function fix(target, text, scope, source, offered, work) {
     const a = act();
+    const where = target.id
+      ? (target.selection ? "校正者が選んだのは [" + target.id + "] の中の「" + target.selection + "」（" + target.level + "）。" : "校正者が選んだのは [" + target.id + "] の全体。")
+      : "校正者は場所を選ばずに指摘した。";
+    const range = scope === "here"
+      ? (target.selection ? "選んだ範囲を中心に [" + target.id + "] だけを直す。選択範囲の外は、つながりに必要な最小限だけ変える。" : "[" + target.id + "] だけを直す。つながりのために直前直後の1ブロックを直すのは可。")
+      : "この幕の中で、この指摘に当てはまる箇所をすべて直す" + (target.id ? "（選んだ箇所に限らない）" : "") + "。";
     const prompt = [
-      context(b.section, true),
-      "## 幕「" + a.heading + "」の本文（各ブロックの先頭に [ID]。>>> は校正者がタップした箇所）\n" + actText(a, b.id),
-      "## 指摘\n「" + text + "」\n範囲: " + (scope === "here" ? "タップした箇所 [" + b.id + "] だけを直す。つながりのために直前直後の1ブロックを直すのは可。" :
-        "この幕の中で、この指摘に当てはまる箇所をすべて直す（タップした箇所に限らない）。") +
-        "\n" + PATCH_FORMAT,
+      context(target.section, true),
+      "## 幕「" + a.heading + "」の本文（各ブロックの先頭に [ID]。>>> は校正者が選んだブロック）\n" + actText(a, target.id),
+      "## 指摘\n「" + text + "」\n" + where + "\n範囲: " + range + "\n" + PATCH_FORMAT,
     ].join("\n\n");
-    const res = await ask(prompt, work, "default", "直している…（数十秒かかる）");
+    const res = await ask(prompt, work, "default", "直している…（数十秒かかる）", "work");
     if (!res) return;
-    reviewPatches(work, a, res, { text, scope, source, offered, target: b.id, act: a.name }, () => fix(b, text, scope, source, offered, work));
+    reviewPatches(work, a, res, { text, scope, source, offered, target: target.id, selection: target.selection, level: target.level, act: a.name }, () => fix(target, text, scope, source, offered, work));
   }
 
   function normalizePatches(a, res) {
@@ -429,6 +653,7 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
   async function record(meta, summary, decided) {
     const doc = {
       book: BOOK.book, act: meta.act, target: meta.target || null, text: meta.text, scope: meta.scope, source: meta.source,
+      selection: meta.selection || "", level: meta.level || "",
       offered: meta.offered || [], summary,
       patches: decided.map((p) => ({ op: p.op, id: p.id, before: p.before, proposed: p.md, final: p.final, accepted: p.accepted })),
       doneActs: [meta.act], skippedActs: [], synced: false, author: me, createdAt: new Date().toISOString(),
@@ -525,8 +750,10 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
     $("#act").addEventListener("change", () => { store.set("act:" + BOOK.book, $("#act").value); closeSheet(); renderAct(); window.scrollTo(0, 0); });
     $("#finish").addEventListener("click", finish);
     $("#open-log").addEventListener("click", openLog);
+    $("#fab").addEventListener("click", openGeneral);
+    document.addEventListener("selectionchange", () => { if (!settingSelection) paintFab(); });
     renderAct();
-    $("#status").textContent = "本文のどこでもタップすると、指摘の候補が出る。範囲を「全体」にした指摘は「幕を終える」で他の幕へ広げる。";
+    $("#status").textContent = "本文をタップすると文節が選ばれ、もう一度で文、発言と広がる。選ばずに指摘するときは右下のボタン。";
 
     const api = window.claude && window.claude.use ? window.claude : null;
     if (!api) { $("#status").textContent = "閲覧のみ（claude.ai の外では校正機能は使えない）。"; return; }
