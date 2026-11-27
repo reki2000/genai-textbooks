@@ -49,6 +49,10 @@ documents:
 
 外部（別モデル・別セッション）で書かれた教材を受け入れるときは、2の前に `/yaruo-review` で品質を検査する。判定基準と手順はスキルの `SKILL.md` を正本とする。
 
+## 台本形式（@形式）
+
+`docs/books/{ID}/script/` がある教材は、幕ごとの `script/NN.txt`（`@<ID> <話者>` 〜 `@end` で発言を囲む形式）が正本で、`README.md` は `python3 scripts/yaruo_script.py render docs/books/{ID}` で生成する。`README.md` を直接直したら `absorb` で `script/` へ戻す（発言 ID を保つ）。両者がずれるとビルドが止まる。スマホ用の校正台（アーティファクト）と提案の反映手順は [`BUILD.md`](./BUILD.md) の「台本形式」を参照。
+
 ## 図版
 
 説明図は `/zuhan` で追加する。選定・手段の使い分け・作図規約・機械検査・本文への埋め込み方まで、すべてスキルが正本（このリポジトリ固有の配置と検査は `.claude/skills/zuhan/references/repo.md`）。

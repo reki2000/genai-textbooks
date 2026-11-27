@@ -130,6 +130,39 @@ documents:
 - 巻の冒頭と末尾には手書きで巻間ナビ（例：`**I部** ／ [II部](../statistics-2/README.md) ／ [III部](../statistics-3/README.md)`）を置く。GitHub上でファイル単体を開いた読者や、途中の巻へ直接来た読者が迷わないようにするため
 - 本文中の相対リンクは docsify の `relativePath: true`（`scripts/site_template.html`）により、現在開いているページのディレクトリを基準に解決される。この設定がないと相対リンクがサイトの basePath を失って404になるため、`docs/**/README.md` 内で他の教材へリンクする際は素の相対パス（`../statistics-2/README.md`）をそのまま使ってよい
 
+### 台本形式（@形式、試行中）
+
+`docs/books/{id}/script/` を持つ教材は、そこにある幕ごとのファイル（`00.txt` が前付け、`01.txt` 以降が `## ` 見出しごとの幕）が正本で、`README.md` はそこから生成する。現在は `statistics` だけ。
+
+```
+@u7f3a やる夫
+任せるお！ どれも二回分だから、…
+@end
+```
+
+- `@<ID> <話者>[注記]` で発言を開き、`@end` で閉じる。発言の始まり・終わり・話者が記法に書かれているので、空行や `$$` 数式・表・図を挟んでも誰の発言かが曖昧にならない。ブロックの外は素通しの Markdown（見出し・区切り・図・参考文献）。`@` で始まる本文行は `@@` と重ねる
+- ID は教材の中で一意の `u` ＋16進4桁。発言を書き直しても変えない。ID を省いた `@ やる夫` は `render` / `fmt` が採番する
+- `generate_site.py` は `script/` から生成した内容と `README.md` が一致しなければビルドを止める。`script/` 自体は `build/` へコピーしない
+- `README.md` を読む既存の道具（lint・字数集計・差分ページ・コメント・docsify）はそのまま使える。`README.md` を直接直したときは `absorb` で `script/` へ戻す。発言は前後の並びと本文の近さで対応づけ、同じ発言の書き換えなら ID を保つ
+
+```bash
+python3 scripts/yaruo_script.py render docs/books/{id}     # script/ → README.md
+python3 scripts/yaruo_script.py absorb docs/books/{id}     # README.md の手直し → script/（ID を保つ）
+python3 scripts/yaruo_script.py check  docs/books/*        # 構文・ID・同期の検査
+python3 scripts/yaruo_script.py roundtrip docs/books/*     # README.md → @ → README.md の往復検査（変換前の確認）
+python3 scripts/yaruo_script.py convert docs/books/{id}    # README.md から script/ を作る（移行）
+```
+
+`script/` を持つ教材には、docsify を使わない静的ページ `books/{id}/static.html` も生成する（`scripts/render_static.py`）。発言は `data-uid` 付きの要素になり、`#u7f3a` で発言へ直接飛べる。一覧からはまだリンクしない。
+
+#### 校正台（アーティファクト）
+
+`python3 scripts/build_proof_page.py docs/books/{id}` が `build/proof/{id}/` に校正台を作る（`index.html` は教材に依存しない `scripts/proof_template.html`、本文・登場人物欄・アウトライン・人物規約は `book.json`）。Claude Code の Artifact ツールで、`book.json` と `figs/` を `files` に付け、capabilities `sample`・`db`・`user` で公開する。
+
+- スマホで発言をタップ → 直す方向の候補 → 方向を選ぶと改訂案3つ → 採用。節の見出しの「節を見直す」はビート表の案まで出し、書き直しの依頼として残す。問い合わせは閲覧者自身の Claude の利用枠で行う
+- 採用した案は共有 DB の `proposals` に溜まる。反映は Claude Code が `ArtifactData` の list（`out_dir` 付き）で書き出し、`python3 scripts/apply_proposals.py <書き出し先>/proposals` を実行する。提案時の本文（before）と今の本文が一致する発言だけを差し替え、ずれていれば `conflict` にする。末尾の `DB_UPDATES` を `ArtifactData` の batch で書き戻す
+- 人物規約は `yaruo-rediscovery` の SKILL.md の「人物と書式」「面白味をつくる」と anti-patterns.md をビルド時に抜き出して渡す（正本はスキル側）
+
 ## 開発時の手順
 
 ### 依存関係のセットアップ

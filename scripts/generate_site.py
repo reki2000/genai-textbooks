@@ -56,6 +56,10 @@ sys.path.insert(0, str(COUNT_SCRIPT_DIR))
 sys.dont_write_bytecode = True
 from count_textbooks import count_document  # noqa: E402
 
+sys.path.insert(0, str(ROOT / "scripts"))
+import render_static  # noqa: E402
+import yaruo_script  # noqa: E402
+
 DOCS_DIR = ROOT / "docs"
 CATALOG_NAME = "catalog.yml"
 TEMPLATE_PATH = ROOT / "scripts" / "site_template.html"
@@ -345,6 +349,12 @@ def load_catalog() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
         source_path = expected_catalog_path.parent / "README.md"
         if not source_path.is_file():
             fail(f"document {document_id} points to missing file: {source_path}")
+        try:
+            script_sync_error = yaruo_script.sync_error(source_path.parent)
+        except yaruo_script.ScriptError as exc:
+            script_sync_error = str(exc)
+        if script_sync_error:
+            fail(f"document {document_id}: {script_sync_error}")
         draft = document.get("draft", False)
         if not isinstance(draft, bool):
             fail(f"document {document_id}.draft must be true or false")
@@ -1600,7 +1610,14 @@ def generate(categories: list[dict[str, Any]], documents: list[dict[str, Any]], 
     # The generated HTML is only the docsify shell. The Markdown sources and
     # static assets must also be present in the deployed directory because
     # docsify fetches them in the browser at runtime.
-    shutil.copytree(ROOT / "docs", out_docs, dirs_exist_ok=True)
+    # script/ holds the @-format source of README.md; only the rendered
+    # Markdown and the static pages below are published.
+    shutil.copytree(
+        ROOT / "docs",
+        out_docs,
+        dirs_exist_ok=True,
+        ignore=shutil.ignore_patterns(yaruo_script.SCRIPT_DIR_NAME),
+    )
     optimize_public_images(out_docs)
 
     # Two listing variants: the public one, and the draft one the browser loads
@@ -1646,6 +1663,16 @@ def generate(categories: list[dict[str, Any]], documents: list[dict[str, Any]], 
     write_diff_pages(documents, out_docs)
 
     write_file(out_docs / "sitemap.xml", render_sitemap(published))
+
+    # Static (docsify-free) pages for books whose source is in @ format. They
+    # are a pilot next to the docsify pages and are not linked from listings.
+    for document in documents:
+        book_dir = BOOKS_DIR / document["id"]
+        if (book_dir / yaruo_script.SCRIPT_DIR_NAME).is_dir():
+            write_file(
+                out_docs / "books" / document["id"] / render_static.STATIC_PAGE_NAME,
+                render_static.render_book_page(book_dir, document["title"], document["question"]),
+            )
 
 
 def main() -> int:

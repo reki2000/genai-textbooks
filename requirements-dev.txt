@@ -24,3 +24,8 @@ Pillow>=10.0,<13
 # cairosvg: 目視用のPNG書き出し。使うのは svg2png のみ
 fonttools>=4.0,<5
 cairosvg>=2.5,<3
+
+# @形式の教材の静的 HTML・校正台（scripts/render_static.py, scripts/build_proof_page.py）
+# 使うのは MarkdownIt と、mdit_py_plugins の footnote / dollarmath / anchors のみ
+markdown-it-py>=3,<5
+mdit-py-plugins>=0.4,<1
