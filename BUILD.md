@@ -157,11 +157,24 @@ python3 scripts/yaruo_script.py convert docs/books/{id}    # README.md から sc
 
 #### 校正台（アーティファクト）
 
-`python3 scripts/build_proof_page.py docs/books/{id}` が `build/proof/{id}/` に校正台を作る（`index.html` は教材に依存しない `scripts/proof_template.html`、本文・登場人物欄・アウトライン・人物規約は `book.json`）。Claude Code の Artifact ツールで、`book.json` と `figs/` を `files` に付け、capabilities `sample`・`db`・`user` で公開する。
+`python3 scripts/build_proof_page.py docs/books/{id}` が `build/proof/{id}/` に校正台を作る（`index.html` は教材に依存しない `scripts/proof_template.html`、本文・登場人物欄・アウトライン・規約・過去の指摘は `book.json`）。Claude Code の Artifact ツールで、`book.json` と `figs/` を `files` に付け、capabilities `sample`・`db`・`user` で公開する。
 
-- スマホで発言をタップ → 直す方向の候補 → 方向を選ぶと改訂案3つ → 採用。節の見出しの「節を見直す」はビート表の案まで出し、書き直しの依頼として残す。問い合わせは閲覧者自身の Claude の利用枠で行う
-- 採用した案は共有 DB の `proposals` に溜まる。反映は Claude Code が `ArtifactData` の list（`out_dir` 付き）で書き出し、`python3 scripts/apply_proposals.py <書き出し先>/proposals` を実行する。提案時の本文（before）と今の本文が一致する発言だけを差し替え、ずれていれば `conflict` にする。末尾の `DB_UPDATES` を `ArtifactData` の batch で書き戻す
-- 人物規約は `yaruo-rediscovery` の SKILL.md の「人物と書式」「面白味をつくる」と anti-patterns.md をビルド時に抜き出して渡す（正本はスキル側）
+- 本文のどこ（発言・地の文・登場人物欄・見出し）をタップしても、その箇所に言いそうな指摘の候補が出る。候補は過去の指摘と規則から推測する。自由入力もできる。範囲は「ここだけ／この幕／全体」
+- 指摘は今開いている幕に即時反映する。Claude が差分（修正・削除・追加）を出し、1件ずつ採否と手直しをして「適用」。範囲を「全体」にした指摘は「幕を終える」で残りの幕へ1幕ずつ広げ、幕ごとに差分を確かめる
+- 修正は共有 DB の `edits`（ブロックごとの上書き。作った時点の本文を `base` に持つ）、指摘は `feedback`（指摘文・出した候補・範囲・提案・最終形・採否・適用済みの幕）に残る。問い合わせは閲覧者自身の Claude の利用枠で行う
+- ブロック ID は、発言は台本の ID、地の文は `r{幕}-{素通し部分の番号}-{段落番号}`
+
+正本への取り込みは Claude Code が行う。
+
+1. `ArtifactData` の list を `out_dir` 付きで `edits` と `feedback` に対して実行し、書き出す
+2. `python3 scripts/sync_proof.py <書き出し先>`。`base` と今の本文が一致するブロックだけを `script/` へ反映して README.md を作り直し、指摘を `editorial/feedback.jsonl` へ追記する。ずれていれば conflict として残す
+3. 末尾の `DB_OPS` を `ArtifactData` の batch で書き戻し（反映した edits の削除、feedback の synced）、校正台を作り直して公開し直す
+
+## 校正で蓄積する規則（editorial/）
+
+- `editorial/feedback.jsonl` … 指摘ログ（追記のみ）。指摘文・範囲・採用数・却下数・手直し数・採用された直し方の例
+- `editorial/rules.md` … 繰り返し効かせる規則。似た指摘がログに溜まったら Claude が規則の案を作り、人が承認してから書き足す。機械で判定できるもの（語・長さ）は `yaruo_lint.py` のルールにもする
+- 校正台は両方を `book.json` に入れて候補の推測と修正に使い、`yaruo-rediscovery`（執筆）と `yaruo-review`（レビュー）は `rules.md` を読む
 
 ## 開発時の手順
 

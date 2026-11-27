@@ -4,13 +4,14 @@
 出力は `build/proof/{ID}/` に置く:
 
 - `index.html` … `scripts/proof_template.html` そのもの（教材に依存しない）
-- `book.json` … 本文（発言 ID・話者・Markdown・描画済み HTML）、登場人物欄、
-  アウトライン、人物と面白味の規約（`yaruo-rediscovery` の SKILL.md から抜粋）
+- `book.json` … 本文（ブロック ID・話者・Markdown）、登場人物欄、アウトライン、
+  規約（`yaruo-rediscovery` の SKILL.md の抜粋と `editorial/rules.md`）、
+  過去の指摘（`editorial/feedback.jsonl`）
 - `figs/` … 本文が参照する図版
 
-ページは発言のタップ → Claude で直す方向の候補 → 方向を選んで改訂案3つ →
-採用、と進み、採用した案をアーティファクトの共有 DB（`proposals`）へ保存する。
-正本への反映は `scripts/apply_proposals.py` が行う。
+ブロック ID は、発言は台本の ID（`u7f3a`）、地の文・見出し・登場人物欄は
+`r{幕}-{幕内の素通し部分の通し番号}-{その中の段落番号}`。ページは修正を共有 DB の `edits` に上書きとして
+持ち、`scripts/sync_proof.py` が正本へ取り込む。
 
     python3 scripts/build_proof_page.py docs/books/statistics
 """
@@ -27,15 +28,33 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-import render_static  # noqa: E402
 import yaruo_script  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 TEMPLATE = ROOT / "scripts" / "proof_template.html"
 SKILL = ROOT / ".claude" / "skills" / "yaruo-rediscovery" / "SKILL.md"
 ANTI_PATTERNS = ROOT / ".claude" / "skills" / "yaruo-rediscovery" / "references" / "anti-patterns.md"
+EDITORIAL = ROOT / "editorial"
 RULE_SECTIONS = ("## 人物と書式", "## 面白味をつくる")
 FIG_REF = re.compile(r"\((figs/[^)\s]+)\)")
+HISTORY_LIMIT = 80
+
+
+def raw_id(act_name: str, index: int, paragraph: int) -> str:
+    return f"r{act_name}-{index}-{paragraph}"
+
+
+def paragraphs(lines: list[str]) -> list[tuple[int, int]]:
+    """空行で区切った段落の [開始, 終了) 行範囲。地の文は段落ごとにタップできるようにする。"""
+    spans: list[tuple[int, int]] = []
+    start = None
+    for index, line in enumerate(lines + [""]):
+        if line.strip() and start is None:
+            start = index
+        elif not line.strip() and start is not None:
+            spans.append((start, index))
+            start = None
+    return spans
 
 
 def skill_rules() -> str:
@@ -46,14 +65,35 @@ def skill_rules() -> str:
         start = text.index(heading)
         end = text.find("\n## ", start + len(heading))
         parts.append(text[start : end if end != -1 else len(text)].strip())
-    anti = ANTI_PATTERNS.read_text(encoding="utf-8").strip()
-    return "\n\n".join(parts + [anti])
+    parts.append(ANTI_PATTERNS.read_text(encoding="utf-8").strip())
+    return "\n\n".join(parts)
 
 
-def _block_markdown() -> object:
-    md = render_static._markdown()
-    md.disable("footnote_ref", ignoreInvalid=True)
-    return md
+def editorial_rules() -> str:
+    path = EDITORIAL / "rules.md"
+    return path.read_text(encoding="utf-8").strip() if path.exists() else ""
+
+
+def history(book: str) -> list[dict]:
+    """過去の指摘。この教材のものを優先し、新しい順に並べる。"""
+    path = EDITORIAL / "feedback.jsonl"
+    if not path.exists():
+        return []
+    rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    rows.sort(key=lambda r: (r.get("book") == book, r.get("createdAt", "")), reverse=True)
+    out = []
+    for row in rows[:HISTORY_LIMIT]:
+        out.append(
+            {
+                "book": row.get("book", ""),
+                "text": row.get("text", ""),
+                "scope": row.get("scope", ""),
+                "speaker": row.get("speaker", ""),
+                "status": row.get("status", ""),
+                "examples": row.get("examples", [])[:2],
+            }
+        )
+    return out
 
 
 def build(book_dir: Path, out_dir: Path) -> Path:
@@ -62,10 +102,6 @@ def build(book_dir: Path, out_dir: Path) -> Path:
     title = readme.split("\n", 1)[0].lstrip("# ").strip()
     outline_path = book_dir / "outline.md"
     outline = outline_path.read_text(encoding="utf-8") if outline_path.exists() else ""
-    md = _block_markdown()
-
-    def to_html(text: str) -> str:
-        return md.render(render_static._ruby(text))
 
     figs: set[str] = set()
     roster = ""
@@ -73,29 +109,26 @@ def build(book_dir: Path, out_dir: Path) -> Path:
     for act in acts:
         blocks = []
         section = ""
+        raw_index = 0
         for item in act.items:
             if isinstance(item, yaruo_script.Raw):
                 text = "\n".join(item.lines)
                 figs.update(FIG_REF.findall(text))
                 if act.name == "00":
                     roster += text + "\n"
-                for line in item.lines:
-                    if line.startswith("### "):
-                        section = line[4:].strip()
-                if text.strip() and text.strip() != "---":
-                    blocks.append({"t": "raw", "html": to_html(text), "section": section})
+                for k, (start, end) in enumerate(paragraphs(item.lines)):
+                    para = item.lines[start:end]
+                    for line in para:
+                        if line.startswith("### "):
+                            section = line[4:].strip()
+                    body = "\n".join(para)
+                    if body.strip() != "---":
+                        blocks.append({"t": "raw", "id": raw_id(act.name, raw_index, k), "md": body, "section": section})
+                raw_index += 1
             else:
                 figs.update(FIG_REF.findall(item.text))
                 blocks.append(
-                    {
-                        "t": "u",
-                        "id": item.id,
-                        "speaker": item.speaker,
-                        "note": item.note,
-                        "md": item.text,
-                        "html": to_html(item.text),
-                        "section": section,
-                    }
+                    {"t": "u", "id": item.id, "speaker": item.speaker, "note": item.note, "md": item.text, "section": section}
                 )
         out_acts.append({"name": act.name, "heading": act.heading or "前付け", "blocks": blocks})
 
@@ -103,6 +136,8 @@ def build(book_dir: Path, out_dir: Path) -> Path:
         "book": book_dir.name,
         "title": title,
         "rules": skill_rules(),
+        "editorialRules": editorial_rules(),
+        "history": history(book_dir.name),
         "roster": roster.strip(),
         "outline": outline,
         "speakers": sorted({u.speaker for u in yaruo_script.all_utterances(acts)}),

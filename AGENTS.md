@@ -51,7 +51,7 @@ documents:
 
 ## 台本形式（@形式）
 
-`docs/books/{ID}/script/` がある教材は、幕ごとの `script/NN.txt`（`@<ID> <話者>` 〜 `@end` で発言を囲む形式）が正本で、`README.md` は `python3 scripts/yaruo_script.py render docs/books/{ID}` で生成する。`README.md` を直接直したら `absorb` で `script/` へ戻す（発言 ID を保つ）。両者がずれるとビルドが止まる。スマホ用の校正台（アーティファクト）と提案の反映手順は [`BUILD.md`](./BUILD.md) の「台本形式」を参照。
+`docs/books/{ID}/script/` がある教材は、幕ごとの `script/NN.txt`（`@<ID> <話者>` 〜 `@end` で発言を囲む形式）が正本で、`README.md` は `python3 scripts/yaruo_script.py render docs/books/{ID}` で生成する。`README.md` を直接直したら `absorb` で `script/` へ戻す（発言 ID を保つ）。両者がずれるとビルドが止まる。スマホ用の校正台（アーティファクト）と、修正・指摘の取り込み手順は [`BUILD.md`](./BUILD.md) の「台本形式」を参照。校正での指摘は `editorial/feedback.jsonl` に溜まり、繰り返し効かせるものは承認を経て `editorial/rules.md` の規則になる（BUILD.md「校正で蓄積する規則」）。
 
 ## 図版
 

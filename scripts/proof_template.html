@@ -10,85 +10,93 @@
   --rule: #dfe3e0;
   --shu: #b4432f;
   --shu-soft: #f6e4df;
+  --new: #2f7a4f;
+  --new-soft: #e3f1e8;
   --yaruo: #2d63c8;
   --yaranai: #2f7a4f;
   --dekiruo: #9a6a12;
   --dekiruko: #a0336f;
   --other: #646d73;
-  --ok: #2f7a4f;
   --font-body: "Hiragino Sans", "Noto Sans JP", "Yu Gothic UI", system-ui, sans-serif;
-  --font-head: "Zen Kaku Gothic New", "Hiragino Sans", "Noto Sans JP", system-ui, sans-serif;
+  --font-head: "Hiragino Sans", "Noto Sans JP", system-ui, sans-serif;
   --font-mono: ui-monospace, "SFMono-Regular", Menlo, monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --paper: #141719; --sheet: #1c2023; --ink: #e5e8e6; --muted: #9aa3a8; --rule: #2d3337;
-    --shu: #ec7b63; --shu-soft: #3a2520; --yaruo: #86aef5; --yaranai: #79c99a;
-    --dekiruo: #e2b55c; --dekiruko: #ee8cc2; --other: #9aa3a8; --ok: #79c99a; color-scheme: dark;
+    --shu: #ec7b63; --shu-soft: #3a2520; --new: #79c99a; --new-soft: #1d3326;
+    --yaruo: #86aef5; --yaranai: #79c99a; --dekiruo: #e2b55c; --dekiruko: #ee8cc2; --other: #9aa3a8; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --paper: #141719; --sheet: #1c2023; --ink: #e5e8e6; --muted: #9aa3a8; --rule: #2d3337;
-  --shu: #ec7b63; --shu-soft: #3a2520; --yaruo: #86aef5; --yaranai: #79c99a;
-  --dekiruo: #e2b55c; --dekiruko: #ee8cc2; --other: #9aa3a8; --ok: #79c99a; color-scheme: dark;
+  --shu: #ec7b63; --shu-soft: #3a2520; --new: #79c99a; --new-soft: #1d3326;
+  --yaruo: #86aef5; --yaranai: #79c99a; --dekiruo: #e2b55c; --dekiruko: #ee8cc2; --other: #9aa3a8; color-scheme: dark;
 }
 * { box-sizing: border-box; }
 body { background: var(--paper); color: var(--ink); font: 16px/1.8 var(--font-body); }
 body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--sheet); }
 .gutter { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 header { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--sheet); border-bottom: 1px solid var(--rule); }
-.bar { max-width: 46rem; margin: 0 auto; padding-block: .6rem; display: flex; gap: .6rem; align-items: center; flex-wrap: wrap; }
-.bar h1 { font: 700 15px/1.3 var(--font-head); margin: 0; flex: 1 1 12rem; min-width: 0; text-wrap: balance; }
-.bar select { font: inherit; font-size: 14px; max-width: 100%; flex: 1 1 14rem; min-width: 0; padding: .35rem .5rem; border: 1px solid var(--rule); border-radius: 6px; background: var(--paper); color: var(--ink); }
+.bar { max-width: 46rem; margin: 0 auto; padding-block: .55rem; display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
+.bar h1 { font: 700 15px/1.3 var(--font-head); margin: 0; flex: 1 1 100%; min-width: 0; }
+.bar select { font: inherit; font-size: 14px; flex: 1 1 10rem; min-width: 0; padding: .35rem .5rem; border: 1px solid var(--rule); border-radius: 6px; background: var(--paper); color: var(--ink); }
 button { font: inherit; cursor: pointer; }
-.btn { font-size: 14px; padding: .4rem .8rem; border-radius: 6px; border: 1px solid var(--rule); background: var(--sheet); color: var(--ink); }
-.btn:focus-visible, select:focus-visible, textarea:focus-visible, .u:focus-visible { outline: 2px solid var(--shu); outline-offset: 2px; }
+.btn { font-size: 14px; padding: .4rem .75rem; border-radius: 6px; border: 1px solid var(--rule); background: var(--sheet); color: var(--ink); white-space: nowrap; }
+.btn:focus-visible, select:focus-visible, textarea:focus-visible, .blk:focus-visible, .chip:focus-visible { outline: 2px solid var(--shu); outline-offset: 2px; }
 .btn.primary { background: var(--shu); border-color: var(--shu); color: var(--sheet); }
+.btn.quiet { border-color: transparent; color: var(--muted); }
 .btn:disabled { opacity: .5; cursor: default; }
-.count { display: inline-block; min-width: 1.4rem; padding: 0 .35rem; border-radius: 9px; background: var(--shu); color: var(--sheet); font-size: 12px; text-align: center; margin-left: .3rem; }
+.count { display: inline-block; min-width: 1.3rem; padding: 0 .35rem; border-radius: 9px; background: var(--shu); color: var(--sheet); font-size: 12px; text-align: center; margin-left: .3rem; }
+.count:empty { display: none; }
 .status { max-width: 46rem; margin: 0 auto; padding-bottom: .4rem; font-size: 12px; color: var(--muted); }
-main { max-width: 46rem; margin: 0 auto; padding-block: 1rem 60vh; }
-main h2 { font: 700 1.25rem/1.4 var(--font-head); margin: 2rem 0 .5rem; text-wrap: balance; }
-main h3 { font: 700 1.05rem/1.5 var(--font-head); margin: 2.2rem 0 .3rem; display: flex; gap: .6rem; align-items: baseline; flex-wrap: wrap; text-wrap: balance; }
-main h3 .btn { font-size: 12px; padding: .1rem .5rem; color: var(--shu); border-color: var(--shu); }
-.raw { color: var(--muted); font-size: 14px; }
-.raw img, .u img { background: #fff; border-radius: 4px; }
-.u { position: relative; margin: .5rem -.6rem; padding: .35rem .6rem .35rem .9rem; border-left: 3px solid var(--c, var(--other)); border-radius: 0 6px 6px 0; cursor: pointer; }
-.u:hover { background: color-mix(in srgb, var(--c, var(--other)) 6%, transparent); }
-.u.sel { background: var(--shu-soft); border-left-color: var(--shu); }
-.u .spk { font: 700 13px/1.4 var(--font-head); color: var(--c, var(--other)); display: flex; gap: .5rem; align-items: center; }
-.u .spk .note { font-weight: 400; color: var(--muted); }
-.u .spk .mark { margin-left: auto; font-size: 11px; font-weight: 700; color: var(--shu); letter-spacing: .04em; }
-.u p { margin: .15rem 0; }
-.u.yaruo { --c: var(--yaruo); } .u.yaranai { --c: var(--yaranai); } .u.dekiruo { --c: var(--dekiruo); } .u.dekiruko { --c: var(--dekiruko); }
-.u .after { margin-top: .4rem; padding: .4rem .6rem; border: 1px dashed var(--shu); border-radius: 6px; font-size: 14px; white-space: pre-wrap; }
+main { max-width: 46rem; margin: 0 auto; padding-block: 1rem 70vh; }
+.blk { position: relative; margin: .45rem -.6rem; padding: .3rem .6rem .3rem .9rem; border-left: 3px solid var(--c, transparent); border-radius: 0 6px 6px 0; cursor: pointer; }
+.blk:hover { background: color-mix(in srgb, var(--c, var(--muted)) 7%, transparent); }
+.blk.sel { background: var(--shu-soft); border-left-color: var(--shu); }
+.blk.edited { box-shadow: inset 3px 0 0 var(--new); }
+.blk.raw { color: var(--muted); font-size: 14px; --c: transparent; }
+.blk.raw h2 { font: 700 1.25rem/1.4 var(--font-head); color: var(--ink); margin: 1.6rem 0 .4rem; }
+.blk.raw h3 { font: 700 1.05rem/1.5 var(--font-head); color: var(--ink); margin: 1.6rem 0 .2rem; }
+.blk.raw hr { display: none; }
+.spk { font: 700 13px/1.4 var(--font-head); color: var(--c, var(--other)); display: flex; gap: .5rem; align-items: center; }
+.spk .note { font-weight: 400; color: var(--muted); }
+.spk .mark { margin-left: auto; font-size: 11px; color: var(--new); }
+.blk p { margin: .15rem 0; }
+.blk.yaruo { --c: var(--yaruo); } .blk.yaranai { --c: var(--yaranai); } .blk.dekiruo { --c: var(--dekiruo); } .blk.dekiruko { --c: var(--dekiruko); } .blk.other { --c: var(--other); }
+.blk img { background: #fff; border-radius: 4px; max-width: 100%; height: auto; }
 .math-block, table, pre { overflow-x: auto; display: block; max-width: 100%; }
 table { border-collapse: collapse; font-size: 13px; }
 th, td { border: 1px solid var(--rule); padding: .2rem .5rem; }
 code { font-family: var(--font-mono); font-size: .9em; }
-.sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; max-height: 72vh; overflow-y: auto; background: var(--sheet); border-top: 2px solid var(--shu); box-shadow: 0 -8px 24px rgb(0 0 0 / .15); padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px)); }
-.sheet-in { max-width: 46rem; margin: 0 auto; padding-block: .8rem; display: grid; gap: .7rem; }
-.sheet-head { display: flex; gap: .6rem; align-items: center; }
-.sheet-head .label { font: 700 13px/1.4 var(--font-head); letter-spacing: .04em; color: var(--shu); flex: 1; min-width: 0; }
-.quote { font-size: 14px; color: var(--muted); border-left: 3px solid var(--rule); padding-left: .6rem; white-space: pre-wrap; max-height: 8.5rem; overflow-y: auto; }
+.sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; max-height: 75vh; overflow-y: auto; background: var(--sheet); border-top: 2px solid var(--shu); box-shadow: 0 -8px 24px rgb(0 0 0 / .15); padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px)); }
+.sheet-in { max-width: 46rem; margin: 0 auto; padding-block: .7rem; display: grid; gap: .65rem; }
+.sheet-head { display: flex; gap: .5rem; align-items: center; }
+.sheet-head .label { font: 700 13px/1.4 var(--font-head); letter-spacing: .03em; color: var(--shu); flex: 1; min-width: 0; }
+.quote { font-size: 13px; color: var(--muted); border-left: 3px solid var(--rule); padding-left: .6rem; white-space: pre-wrap; max-height: 5.5rem; overflow-y: auto; }
 textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 1px solid var(--rule); border-radius: 6px; background: var(--paper); color: var(--ink); resize: vertical; }
 .row { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; }
-.chips { display: grid; gap: .5rem; }
-.chip { text-align: left; padding: .55rem .7rem; border-radius: 8px; border: 1px solid var(--rule); background: var(--paper); color: var(--ink); display: grid; gap: .15rem; }
-.chip b { font-size: 14px; }
-.chip span { font-size: 13px; color: var(--muted); }
-.chip.on { border-color: var(--shu); background: var(--shu-soft); }
-.variant { border: 1px solid var(--rule); border-radius: 8px; padding: .6rem .7rem; display: grid; gap: .5rem; background: var(--paper); }
-.variant .sum { font-size: 12px; color: var(--muted); }
+.guesses { display: grid; gap: .4rem; }
+.chip { text-align: left; padding: .5rem .7rem; border-radius: 8px; border: 1px solid var(--rule); background: var(--paper); color: var(--ink); display: flex; gap: .6rem; align-items: baseline; }
+.chip b { font-weight: 500; font-size: 14px; flex: 1; min-width: 0; }
+.scope { font-size: 11px; color: var(--muted); border: 1px solid var(--rule); border-radius: 8px; padding: 0 .4rem; white-space: nowrap; }
+.scope.book { color: var(--shu); border-color: var(--shu); }
+.seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
+.seg button { border: 0; background: var(--sheet); color: var(--muted); font-size: 13px; padding: .3rem .6rem; }
+.seg button[aria-pressed="true"] { background: var(--shu); color: var(--sheet); }
+.patch { border: 1px solid var(--rule); border-radius: 8px; padding: .5rem .6rem; display: grid; gap: .35rem; background: var(--paper); }
+.patch .ph { display: flex; gap: .5rem; align-items: center; font-size: 12px; color: var(--muted); }
+.patch .ph label { display: flex; gap: .35rem; align-items: center; color: var(--ink); font-weight: 600; }
+.patch .before { font-size: 13px; color: var(--muted); text-decoration: line-through; text-decoration-color: var(--shu); white-space: pre-wrap; max-height: 7rem; overflow-y: auto; }
+.patch.off { opacity: .55; }
+.summary { font-size: 13px; }
 .thinking { font-size: 14px; color: var(--muted); }
 .err { font-size: 14px; color: var(--shu); }
-.list { display: grid; gap: .5rem; }
-.item { border: 1px solid var(--rule); border-radius: 8px; padding: .5rem .7rem; font-size: 13px; display: grid; gap: .3rem; background: var(--paper); }
-.item .meta { color: var(--muted); font-size: 12px; display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; }
-.pill { font-size: 11px; padding: 0 .4rem; border-radius: 8px; border: 1px solid currentColor; }
-.pill.open { color: var(--shu); } .pill.applied { color: var(--ok); } .pill.conflict, .pill.rejected { color: var(--muted); }
-.item .after-text { white-space: pre-wrap; }
 .empty { color: var(--muted); font-size: 14px; }
+.list { display: grid; gap: .5rem; }
+.item { border: 1px solid var(--rule); border-radius: 8px; padding: .5rem .7rem; font-size: 13px; display: grid; gap: .25rem; background: var(--paper); }
+.item .meta { color: var(--muted); font-size: 12px; display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; }
+.progress { font-size: 13px; color: var(--muted); }
 @media (prefers-reduced-motion: no-preference) { .sheet { animation: up .18s ease-out; } @keyframes up { from { transform: translateY(12px); } } }
 </style>
 
@@ -96,13 +104,15 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
   <div class="bar">
     <h1 id="title">{{TITLE}}</h1>
     <select id="act" aria-label="幕"></select>
-    <button class="btn" id="open-list" type="button">提案<span class="count" id="count">0</span></button>
+    <button class="btn" id="finish" type="button" title="全体向けの指摘を他の幕へ広げる">幕を終える<span class="count" id="pending"></span></button>
+    <button class="btn quiet" id="open-log" type="button">履歴<span class="count" id="logcount"></span></button>
   </div>
   <div class="status" id="status">本文を読み込み中…</div>
 </header>
 <main class="gutter" id="main"></main>
 <div class="sheet gutter" id="sheet" hidden><div class="sheet-in" id="sheet-in"></div></div>
 
+<script src="https://cdn.jsdelivr.net/npm/markdown-it@13.0.2/dist/markdown-it.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
 <script>
 (() => {
@@ -111,101 +121,116 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
   const el = (tag, attrs = {}, ...kids) => {
     const n = document.createElement(tag);
     for (const [k, v] of Object.entries(attrs)) {
-      if (k === "class") n.className = v; else if (k.startsWith("on")) n.addEventListener(k.slice(2), v); else if (v !== undefined && v !== null) n.setAttribute(k, v);
+      if (k === "class") n.className = v;
+      else if (k.startsWith("on")) n.addEventListener(k.slice(2), v);
+      else if (v !== undefined && v !== null && v !== false) n.setAttribute(k, v === true ? "" : v);
     }
-    for (const kid of kids) if (kid !== null && kid !== undefined) n.append(kid);
+    for (const kid of kids) if (kid !== null && kid !== undefined && kid !== false) n.append(kid);
     return n;
   };
   const CLASS = { "やる夫": "yaruo", "やらない夫": "yaranai", "できる夫": "dekiruo", "できる子": "dekiruko" };
+  const SCOPE = { here: "ここだけ", act: "この幕", book: "全体" };
   const ERR = {
     not_granted: "Claude への問い合わせが許可されていない。",
     rate_limited: "問い合わせが混んでいる。少し待ってからもう一度押す。",
-    prompt_too_large: "文脈が大きすぎる。",
+    prompt_too_large: "文脈が大きすぎる。範囲を狭める。",
     invalid_json: "返答を読み取れなかった。もう一度押す。",
     refused: "この内容には答えられなかった。",
     cancelled: "止めた。",
   };
-  const errText = (e) => ERR[e && e.code] || "問い合わせに失敗した（" + ((e && e.code) || "不明") + "）。もう一度押す。";
-
-  let BOOK = null, sample = null, db = null, me = null;
-  const byId = new Map();          // uid -> {block, act}
-  let proposals = [];              // db rows
-  let selected = null;             // uid or {section}
-  let ctl = null;
-
+  const errText = (e) => ERR[e && e.code] || "問い合わせに失敗した（" + ((e && e.code) || (e && e.message) || "不明") + "）。もう一度押す。";
   const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
 
-  // ---------------------------------------------------------------- 描画
+  let BOOK = null, sample = null, db = null, me = null;
+  const original = new Map();   // id -> {block, act}
+  const overlay = new Map();    // id -> edit doc（DB の edits）
+  let feedback = [];            // DB の feedback
+  const guessCache = new Map();
+  let ctl = null;
+
+  // ---------------------------------------------------------------- Markdown
+  const md = window.markdownit ? window.markdownit({ html: true, breaks: true, linkify: false }) : null;
+  const esc = (s) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  function toHtml(text) {
+    const maths = [];
+    let src = text.replace(/\$\$([\s\S]+?)\$\$/g, (_, t) => { maths.push([t, true]); return "MATHPH" + (maths.length - 1) + "X"; });
+    src = src.replace(/\$([^$\n]+?)\$/g, (_, t) => { maths.push([t, false]); return "MATHPH" + (maths.length - 1) + "X"; });
+    src = src.replace(/｜([^｜《》\n]{1,40})《([^｜《》\n]{1,40})》/g, (_, b, r) => "<ruby>" + esc(b) + "<rt>" + esc(r) + "</rt></ruby>");
+    let out = md ? md.render(src) : "<p>" + esc(src).replace(/\n/g, "<br>") + "</p>";
+    out = out.replace(/MATHPH(\d+)X/g, (_, i) => {
+      const [t, d] = maths[Number(i)];
+      return '<span class="math' + (d ? " math-block" : "") + '" data-d="' + (d ? 1 : 0) + '">' + esc(t) + "</span>";
+    });
+    return out;
+  }
   function renderMath(root) {
     if (!window.katex) return;
     root.querySelectorAll(".math").forEach((m) => {
-      const t = m.textContent;
-      const display = t.startsWith("\\[");
-      const tex = t.slice(2, -2);
-      try { katex.render(tex, m, { output: "mathml", displayMode: display, throwOnError: false }); } catch {}
-      if (display) m.classList.add("math-block");
+      try { katex.render(m.textContent, m, { output: "mathml", displayMode: m.dataset.d === "1", throwOnError: false }); } catch {}
     });
   }
 
-  function sectionsOf(act) {
+  // ---------------------------------------------------------------- 上書きを重ねた本文
+  function stale(ov, base) { return ov && ov.base !== null && ov.base !== undefined && ov.base !== base; }
+  function currentBlocks(act) {
     const out = [];
-    for (const b of act.blocks) if (b.section && !out.includes(b.section)) out.push(b.section);
+    const pushInserts = (afterId) => {
+      const ins = [...overlay.values()].filter((o) => o.insertAfter === afterId && !o.deleted).sort((a, b) => String(a.createdAt).localeCompare(String(b.createdAt)));
+      for (const o of ins) {
+        out.push({ t: "u", id: o.id, speaker: o.speaker, note: "", md: o.md, section: o.section || "", edited: true, inserted: true });
+        pushInserts(o.id);
+      }
+    };
+    for (const b of act.blocks) {
+      const ov = overlay.get(b.id);
+      if (ov && !stale(ov, b.md)) {
+        if (!ov.deleted) out.push({ ...b, md: ov.md, edited: true });
+      } else {
+        out.push(b);
+      }
+      pushInserts(b.id);
+    }
     return out;
   }
+  function actText(act, markId) {
+    return currentBlocks(act).map((b) => {
+      const head = (b.id === markId ? ">>> " : "") + "[" + b.id + "] " + (b.t === "u" ? b.speaker + (b.note || "") + "：" : "（地の文・見出し・登場人物欄）");
+      return head + "\n" + b.md;
+    }).join("\n\n");
+  }
 
+  // ---------------------------------------------------------------- 描画
+  function act() { return BOOK.acts[Number($("#act").value)]; }
   function renderAct() {
-    const act = BOOK.acts[Number($("#act").value)];
+    const a = act();
     const main = $("#main");
     main.replaceChildren();
-    let lastSection = null;
-    for (const b of act.blocks) {
-      if (b.t === "raw") {
-        const div = el("div", { class: "raw" });
-        div.innerHTML = b.html;
-        div.querySelectorAll("img").forEach((img) => img.setAttribute("loading", "lazy"));
-        div.querySelectorAll("h3").forEach((h) => {
-          const name = h.textContent.trim();
-          h.append(el("button", { class: "btn", type: "button", onclick: (ev) => { ev.stopPropagation(); openSection(act, name); } }, "節を見直す"));
-        });
-        main.append(div);
-        continue;
-      }
-      const cls = CLASS[b.speaker] || "other";
-      const body = el("div", { class: "body" });
-      body.innerHTML = b.html;
-      const node = el("div", { class: "u " + cls, id: b.id, tabindex: "0", role: "button", "aria-label": b.speaker + "の発言を校正する" },
-        el("div", { class: "spk" }, b.speaker, b.note ? el("span", { class: "note" }, b.note) : null, el("span", { class: "mark" })),
-        body);
-      node.addEventListener("click", (ev) => { if (ev.target.closest("a")) return; openUtterance(b.id); });
-      node.addEventListener("keydown", (ev) => { if (ev.key === "Enter") openUtterance(b.id); });
+    for (const b of currentBlocks(a)) {
+      const cls = b.t === "u" ? "blk " + (CLASS[b.speaker] || "other") : "blk raw";
+      const node = el("div", { class: cls + (b.edited ? " edited" : ""), id: b.id, tabindex: "0", role: "button", "aria-label": (b.t === "u" ? b.speaker + "の発言" : "地の文") + "に指摘する" });
+      if (b.t === "u") node.append(el("div", { class: "spk" }, b.speaker, b.note ? el("span", { class: "note" }, b.note) : null, b.edited ? el("span", { class: "mark" }, b.inserted ? "追加" : "修正済み") : null));
+      const body = el("div", {});
+      body.innerHTML = toHtml(b.md);
+      body.querySelectorAll("img").forEach((img) => img.setAttribute("loading", "lazy"));
+      body.querySelectorAll("a").forEach((x) => x.setAttribute("target", "_blank"));
+      node.append(body);
+      node.addEventListener("click", (ev) => { if (ev.target.closest("a")) return; openTarget(b.id); });
+      node.addEventListener("keydown", (ev) => { if (ev.key === "Enter") openTarget(b.id); });
       main.append(node);
     }
     renderMath(main);
-    paintMarks();
+    paintCounts();
   }
-
-  function paintMarks() {
-    document.querySelectorAll(".u").forEach((n) => {
-      const open = proposals.filter((p) => p.kind === "utterance" && p.uid === n.id && p.status === "open");
-      n.querySelector(".mark").textContent = open.length ? "赤字あり" : "";
-      n.querySelector(".after")?.remove();
-      if (open.length) n.append(el("div", { class: "after" }, open[open.length - 1].after));
-    });
-    $("#count").textContent = String(proposals.filter((p) => p.status === "open").length);
+  function paintCounts() {
+    $("#pending").textContent = pendingFor().length ? String(pendingFor().length) : "";
+    $("#logcount").textContent = feedback.length ? String(feedback.length) : "";
+  }
+  function findCurrent(id) {
+    const a = act();
+    return currentBlocks(a).find((b) => b.id === id);
   }
 
   // ---------------------------------------------------------------- 文脈
-  function actOf(uid) { return byId.get(uid).act; }
-  function transcript(act, section, markId) {
-    const lines = [];
-    for (const b of act.blocks) {
-      if (b.section !== section) continue;
-      if (b.t !== "u") continue;
-      const head = (b.id === markId ? ">>> 対象 " : "") + "[" + b.id + "] " + b.speaker + (b.note || "") + "：";
-      lines.push(head + "\n" + b.md);
-    }
-    return lines.join("\n\n");
-  }
   function outlineFor(section) {
     const text = BOOK.outline || "";
     const intro = text.split(/\n## /)[0];
@@ -213,269 +238,316 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
     const hits = num ? text.split("\n").filter((l) => l.startsWith("- " + num)) : [];
     return intro.trim() + (hits.length ? "\n\nこの節の骨格:\n" + hits.join("\n") : "");
   }
-  function common(section) {
+  function historyText(limit) {
+    const rows = [];
+    for (const f of feedback.slice().sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)))) {
+      const acc = (f.patches || []).filter((p) => p.accepted);
+      const ex = acc.slice(0, 1).map((p) => "  採用例: 「" + clip(p.before || "", 60) + "」→「" + clip(p.final || "", 60) + "」").join("\n");
+      rows.push("- " + f.text + "（範囲: " + (SCOPE[f.scope] || f.scope) + "、採用 " + acc.length + " / 提案 " + (f.patches || []).length + "）" + (ex ? "\n" + ex : ""));
+    }
+    for (const h of BOOK.history || []) rows.push("- " + h.text + "（範囲: " + (SCOPE[h.scope] || h.scope) + (h.book !== BOOK.book ? "、教材 " + h.book : "") + "）");
+    return rows.slice(0, limit).join("\n") || "（まだ無い）";
+  }
+  const clip = (s, n) => (s.length > n ? s.slice(0, n) + "…" : s).replace(/\n/g, " ");
+  function context(section, full) {
     return [
-      "あなたは対話形式の教材『" + BOOK.title + "』の編集者。",
-      "## 人物と書き方の規約\n" + BOOK.rules,
-      "## この教材の登場人物欄\n" + BOOK.roster,
-      "## アウトライン（抜粋）\n" + outlineFor(section),
-    ].join("\n\n");
+      "あなたは対話形式の教材『" + BOOK.title + "』の編集者。校正者の指摘に従って本文を直す。",
+      full ? "## 人物と書き方の規約\n" + BOOK.rules : null,
+      BOOK.editorialRules ? "## 校正で確定した規則\n" + BOOK.editorialRules : null,
+      "## この校正者の過去の指摘（新しい順）\n" + historyText(full ? 40 : 25),
+      "## 登場人物欄\n" + BOOK.roster,
+      full ? "## アウトライン（抜粋）\n" + outlineFor(section || "") : null,
+    ].filter(Boolean).join("\n\n");
   }
 
   // ---------------------------------------------------------------- シート
   function openSheet(label, ...kids) {
-    const inner = $("#sheet-in");
-    inner.replaceChildren(el("div", { class: "sheet-head" },
-      el("div", { class: "label" }, label),
-      el("button", { class: "btn", type: "button", onclick: closeSheet }, "閉じる")), ...kids);
+    $("#sheet-in").replaceChildren(el("div", { class: "sheet-head" }, el("div", { class: "label" }, label), el("button", { class: "btn", type: "button", onclick: closeSheet }, "閉じる")), ...kids);
     $("#sheet").hidden = false;
   }
   function closeSheet() {
     ctl?.abort(); ctl = null;
     $("#sheet").hidden = true;
-    document.querySelectorAll(".u.sel").forEach((n) => n.classList.remove("sel"));
-    selected = null;
+    document.querySelectorAll(".blk.sel").forEach((n) => n.classList.remove("sel"));
   }
-  function noSample() { return el("p", { class: "err" }, "この表示では Claude に問い合わせられない。claude.ai でこのページを開く。"); }
-
-  async function ask(input, out, tier) {
+  async function ask(input, out, tier, msg) {
+    if (!sample) { out.replaceChildren(el("p", { class: "err" }, "この表示では Claude に問い合わせられない。claude.ai でこのページを開く。")); return null; }
     ctl?.abort();
     ctl = new AbortController();
-    out.replaceChildren(el("p", { class: "thinking" }, "考えている…（数十秒かかることがある）"));
-    try {
-      return await sample.json(input, { modelTier: tier || "default", signal: ctl.signal });
-    } catch (e) {
-      out.replaceChildren(el("p", { class: "err" }, errText(e)));
-      return null;
-    }
+    out.replaceChildren(el("p", { class: "thinking" }, msg || "考えている…"));
+    try { return await sample.json(input, { modelTier: tier || "default", signal: ctl.signal }); }
+    catch (e) { out.replaceChildren(el("p", { class: "err" }, errText(e))); return null; }
   }
 
-  // 発言 ---------------------------------------------------------------
-  function openUtterance(uid) {
-    const { block } = byId.get(uid);
-    document.querySelectorAll(".u.sel").forEach((n) => n.classList.remove("sel"));
-    document.getElementById(uid)?.classList.add("sel");
-    selected = uid;
-    const memo = el("textarea", { id: "memo", rows: "2", placeholder: "気になる点（任意）例: やる夫が賢すぎる" });
-    const out = el("div", { class: "chips" });
-    const go = el("button", { class: "btn primary", type: "button" }, "直す方向を出す");
-    go.addEventListener("click", () => diagnose(uid, memo.value.trim(), out));
-    openSheet(block.speaker + "の発言　" + uid,
-      el("div", { class: "quote" }, block.md),
-      memo, el("div", { class: "row" }, go), out,
-      sample ? null : noSample());
-    go.disabled = !sample;
+  // ---------------------------------------------------------------- 指摘の入口
+  function openTarget(id) {
+    const b = findCurrent(id);
+    if (!b) return;
+    document.querySelectorAll(".blk.sel").forEach((n) => n.classList.remove("sel"));
+    document.getElementById(id)?.classList.add("sel");
+    const guesses = el("div", { class: "guesses" });
+    let scope = "here";
+    const seg = el("div", { class: "seg", role: "group", "aria-label": "範囲" });
+    const setScope = (s) => { scope = s; seg.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.s === s))); };
+    for (const s of ["here", "act", "book"]) seg.append(el("button", { type: "button", "data-s": s, onclick: () => setScope(s) }, SCOPE[s]));
+    setScope("here");
+    const free = el("textarea", { id: "free", rows: "2", placeholder: "自由に指摘する（例: 札の比喩をやめる）" });
+    const go = el("button", { class: "btn primary", type: "button" }, "直す");
+    const work = el("div", { class: "list" });
+    go.addEventListener("click", () => { const t = free.value.trim(); if (t) fix(b, t, scope, "free", [], work); });
+    openSheet((b.t === "u" ? b.speaker + "の発言" : "地の文") + "　" + id,
+      el("div", { class: "quote" }, b.md), guesses,
+      free, el("div", { class: "row" }, seg, go), work);
+    loadGuesses(b, guesses, (g) => fix(b, g.text, g.scope, "pick", guesses._list || [], work));
   }
 
-  async function diagnose(uid, memo, out) {
-    const { block } = byId.get(uid);
-    const act = actOf(uid);
+  async function loadGuesses(b, box, pick) {
+    const draw = (list) => {
+      box._list = list.map((g) => g.text);
+      box.replaceChildren(...list.map((g) => el("button", { class: "chip", type: "button", onclick: () => pick(g) },
+        el("b", {}, g.text), el("span", { class: "scope " + g.scope }, SCOPE[g.scope] || g.scope))));
+    };
+    if (guessCache.has(b.id + b.md)) return draw(guessCache.get(b.id + b.md));
+    const a = act();
+    const blocks = currentBlocks(a);
+    const i = blocks.findIndex((x) => x.id === b.id);
+    const near = blocks.slice(Math.max(0, i - 3), i + 3).map((x) => (x.id === b.id ? ">>> " : "") + (x.t === "u" ? x.speaker + "：" : "（地の文）") + "\n" + x.md).join("\n\n");
     const prompt = [
-      common(block.section),
-      "## 節「" + block.section + "」の会話（>>> が対象の発言）\n" + transcript(act, block.section, uid),
-      "## 依頼\n対象の発言 [" + uid + "] を、規約と前後の流れに照らして読む。" +
-        (memo ? "校正者のメモ: 「" + memo + "」。これを最優先で検討する。" : "") +
-        "\n直す方向の候補を2〜4個挙げる。人物のぶれ（知りすぎ・命令の連続・口調）、会話の流れ、学びの足場、笑いの効き方から、この発言に本当にある問題だけを選ぶ。問題が無ければ label を「このままでよい」とした1件だけにする。" +
-        "\n返答は JSON だけ: {\"issues\":[{\"label\":\"見出し（15字以内）\",\"why\":\"本文の具体に触れた根拠（70字以内）\",\"direction\":\"直し方の方向（50字以内）\"}]}",
+      context(b.section, false),
+      "## 校正者がタップした箇所（>>> の行）と前後\n" + near,
+      "## 依頼\n校正者がこの箇所をタップした。言いたそうな指摘を、可能性の高い順に5〜7個推測する。" +
+        "過去の指摘と同じ種類の問題がここにもあれば、その指摘を同じ言い回しで最初のほうに入れる。" +
+        "人物のぶれ・説明の先取り・台詞の長さ・比喩や言い回し・唐突さ・事実や数値・書式など、この箇所に実際にありそうなものだけを挙げる。" +
+        "各指摘は校正者が自分で書くような短い一文（30字以内）。範囲は、この箇所だけなら here、この幕の同種の箇所すべてなら act、教材全体に当てはまる方針なら book。" +
+        "\n返答は JSON だけ: {\"guesses\":[{\"text\":\"指摘\",\"scope\":\"here|act|book\"}]}",
     ].join("\n\n");
-    const res = await ask(prompt, out);
+    const res = await ask(prompt, box, "quick", "指摘を推測している…");
     if (!res) return;
-    const issues = Array.isArray(res.issues) ? res.issues : [];
-    if (!issues.length) { out.replaceChildren(el("p", { class: "empty" }, "候補が出なかった。メモを足してもう一度。")); return; }
-    out.replaceChildren(...issues.map((it) => {
-      const chip = el("button", { class: "chip", type: "button" }, el("b", {}, String(it.label || "")), el("span", {}, String(it.why || "")), el("span", {}, "→ " + String(it.direction || "")));
-      chip.addEventListener("click", () => {
-        out.querySelectorAll(".chip").forEach((c) => c.classList.remove("on"));
-        chip.classList.add("on");
-        const vbox = el("div", { class: "chips" });
-        chip.after(vbox);
-        out.querySelectorAll(".chips .chips").forEach((v) => { if (v !== vbox) v.remove(); });
-        rewrite(uid, it, memo, vbox);
-      });
-      return chip;
-    }));
+    const list = (Array.isArray(res.guesses) ? res.guesses : []).filter((g) => g && typeof g.text === "string").map((g) => ({ text: g.text.trim(), scope: ["here", "act", "book"].includes(g.scope) ? g.scope : "here" }));
+    guessCache.set(b.id + b.md, list);
+    draw(list);
   }
 
-  async function rewrite(uid, issue, memo, out) {
-    const { block } = byId.get(uid);
-    const act = actOf(uid);
+  // ---------------------------------------------------------------- 修正
+  const PATCH_FORMAT = "返答は JSON だけ: {\"summary\":\"何をどう直したか（60字以内）\",\"patches\":[" +
+    "{\"op\":\"replace\",\"id\":\"ブロックID\",\"md\":\"直した後の全文\"}," +
+    "{\"op\":\"delete\",\"id\":\"ブロックID\"}," +
+    "{\"op\":\"insert\",\"after\":\"この ID の直後に\",\"speaker\":\"話者\",\"md\":\"新しい発言\"}]}" +
+    "\n直す必要のないブロックは patches に入れない。replace の md はブロックの全文（話者名の行は書かない）。書式は元と同じ Markdown（1文ごとの改行、ルビ ｜基底《よみ》、$数式$）。数値・事実・数式・脚注記号は指摘が求めない限り変えない。";
+
+  async function fix(b, text, scope, source, offered, work) {
+    const a = act();
     const prompt = [
-      common(block.section),
-      "## 節「" + block.section + "」の会話（>>> が対象の発言）\n" + transcript(act, block.section, uid),
-      "## 依頼\n対象の発言 [" + uid + "]（話者: " + block.speaker + "）を、次の方向で書き直す案を3つ作る。\n方向: " + issue.label + " — " + issue.direction + "\n根拠: " + issue.why +
-        (memo ? "\n校正者のメモ: " + memo : "") +
-        "\n条件: 話者は変えない。前後の発言とそのままつながること。数値・事実・数式・脚注記号は方向が求めない限り変えない。書式は元と同じ Markdown（1文ごとの改行、ルビ ｜基底《よみ》、$数式$）。話者名の行は書かない。3案は互いに違う手で直す。" +
-        "\n返答は JSON だけ: {\"variants\":[{\"text\":\"発言の本文\",\"summary\":\"何をどう変えたか（35字以内）\"}]}",
+      context(b.section, true),
+      "## 幕「" + a.heading + "」の本文（各ブロックの先頭に [ID]。>>> は校正者がタップした箇所）\n" + actText(a, b.id),
+      "## 指摘\n「" + text + "」\n範囲: " + (scope === "here" ? "タップした箇所 [" + b.id + "] だけを直す。つながりのために直前直後の1ブロックを直すのは可。" :
+        "この幕の中で、この指摘に当てはまる箇所をすべて直す（タップした箇所に限らない）。") +
+        "\n" + PATCH_FORMAT,
     ].join("\n\n");
-    const res = await ask(prompt, out);
+    const res = await ask(prompt, work, "default", "直している…（数十秒かかる）");
     if (!res) return;
-    const variants = (Array.isArray(res.variants) ? res.variants : []).filter((v) => typeof v.text === "string" && v.text.trim());
-    if (!variants.length) { out.replaceChildren(el("p", { class: "empty" }, "案が出なかった。もう一度押す。")); return; }
-    out.replaceChildren(...variants.map((v, i) => {
-      const ta = el("textarea", { id: "v-" + uid + "-" + i, rows: String(Math.min(10, v.text.split("\n").length + 1)) });
-      ta.value = v.text.trim();
-      const save = el("button", { class: "btn primary", type: "button" }, "この案を採用");
-      save.addEventListener("click", () => adoptUtterance(uid, issue, ta.value, save));
-      return el("div", { class: "variant" }, el("div", { class: "sum" }, "案" + (i + 1) + "　" + String(v.summary || "")), ta, el("div", { class: "row" }, save));
-    }));
+    reviewPatches(work, a, res, { text, scope, source, offered, target: b.id, act: a.name }, () => fix(b, text, scope, source, offered, work));
   }
 
-  async function adoptUtterance(uid, issue, text, btn) {
-    const { block, act } = byId.get(uid);
-    if (!db) { btn.replaceWith(el("p", { class: "err" }, "保存先に接続できない。claude.ai にサインインして開く。")); return; }
-    btn.disabled = true;
-    try {
-      await db.collection("proposals").add({
-        kind: "utterance", book: BOOK.book, act: act.name, section: block.section, uid, speaker: block.speaker,
-        before: block.md, after: text.trim(), label: String(issue.label || ""), direction: String(issue.direction || ""),
-        status: "open", author: me, createdAt: new Date().toISOString(),
-      });
-      btn.replaceWith(el("p", { class: "empty" }, "採用した。正本への反映を待つ。"));
-    } catch (e) {
-      btn.disabled = false;
-      btn.after(el("p", { class: "err" }, "保存できなかった（" + ((e && e.code) || "不明") + "）。"));
-    }
-  }
-
-  // 節 -----------------------------------------------------------------
-  function openSection(act, section) {
-    closeSheet();
-    selected = { section };
-    const memo = el("textarea", { id: "memo-sec", rows: "2", placeholder: "気になる点（任意）例: 問う→正答→総括の繰り返しが単調" });
-    const out = el("div", { class: "chips" });
-    const go = el("button", { class: "btn primary", type: "button" }, "節の問題を出す");
-    go.disabled = !sample;
-    go.addEventListener("click", () => diagnoseSection(act, section, memo.value.trim(), out));
-    openSheet("節を見直す　" + section, memo, el("div", { class: "row" }, go), out, sample ? null : noSample());
-  }
-
-  async function diagnoseSection(act, section, memo, out) {
-    const prompt = [
-      common(section),
-      "## 節「" + section + "」の会話\n" + transcript(act, section, null),
-      "## 依頼\nこの節を、ドラマと学びの構成として読む。" + (memo ? "校正者のメモ: 「" + memo + "」。最優先で検討する。" : "") +
-        "\n構成上の問題を2〜4個挙げる（会話の同型反復、講義化、主導権の固定、やる夫の先取り、山の欠如、前後の節とのつながりなど）。" +
-        "\n返答は JSON だけ: {\"issues\":[{\"label\":\"見出し（15字以内）\",\"why\":\"本文の具体に触れた根拠（80字以内）\",\"direction\":\"組み直しの方向（50字以内）\"}]}",
-    ].join("\n\n");
-    const res = await ask(prompt, out);
-    if (!res) return;
-    const issues = Array.isArray(res.issues) ? res.issues : [];
-    out.replaceChildren(...issues.map((it) => {
-      const chip = el("button", { class: "chip", type: "button" }, el("b", {}, String(it.label || "")), el("span", {}, String(it.why || "")), el("span", {}, "→ " + String(it.direction || "")));
-      chip.addEventListener("click", () => {
-        out.querySelectorAll(".chip").forEach((c) => c.classList.remove("on"));
-        chip.classList.add("on");
-        const vbox = el("div", { class: "chips" });
-        chip.after(vbox);
-        out.querySelectorAll(".chips .chips").forEach((v) => { if (v !== vbox) v.remove(); });
-        planSection(act, section, it, memo, vbox);
-      });
-      return chip;
-    }));
-  }
-
-  async function planSection(act, section, issue, memo, out) {
-    const prompt = [
-      common(section),
-      "## 節「" + section + "」の会話\n" + transcript(act, section, null),
-      "## 依頼\nこの節を次の方向で組み直すビート表を2〜3案作る。本文はまだ書かない。\n方向: " + issue.label + " — " + issue.direction + "\n根拠: " + issue.why + (memo ? "\n校正者のメモ: " + memo : "") +
-        "\n各案は、この節で読者が得る理解と、前後の節との入口・出口を保つ。案ごとに違う手を使う。" +
-        "\n返答は JSON だけ: {\"plans\":[{\"title\":\"案の名前（20字以内）\",\"beats\":[\"誰が何をして何が分かるか（1ビート60字以内、5〜9個）\"],\"keeps\":\"元の節から残す具体（60字以内）\",\"risk\":\"他の節に及ぶ影響（60字以内）\"}]}",
-    ].join("\n\n");
-    const res = await ask(prompt, out);
-    if (!res) return;
-    const plans = (Array.isArray(res.plans) ? res.plans : []).filter((p) => Array.isArray(p.beats));
-    out.replaceChildren(...plans.map((p) => {
-      const save = el("button", { class: "btn primary", type: "button" }, "この案で書き直しを依頼");
-      save.addEventListener("click", () => adoptSection(act, section, issue, p, save));
-      return el("div", { class: "variant" },
-        el("b", {}, String(p.title || "")),
-        el("ol", {}, ...p.beats.map((b) => el("li", {}, String(b)))),
-        el("div", { class: "sum" }, "残す: " + String(p.keeps || "")),
-        el("div", { class: "sum" }, "影響: " + String(p.risk || "")),
-        el("div", { class: "row" }, save));
-    }));
-  }
-
-  async function adoptSection(act, section, issue, plan, btn) {
-    if (!db) { btn.replaceWith(el("p", { class: "err" }, "保存先に接続できない。")); return; }
-    btn.disabled = true;
-    try {
-      await db.collection("proposals").add({
-        kind: "section", book: BOOK.book, act: act.name, section, label: String(issue.label || ""), direction: String(issue.direction || ""),
-        plan: { title: String(plan.title || ""), beats: plan.beats.map(String), keeps: String(plan.keeps || ""), risk: String(plan.risk || "") },
-        status: "open", author: me, createdAt: new Date().toISOString(),
-      });
-      btn.replaceWith(el("p", { class: "empty" }, "依頼した。Claude Code が本文を書き直す。"));
-    } catch (e) {
-      btn.disabled = false;
-      btn.after(el("p", { class: "err" }, "保存できなかった（" + ((e && e.code) || "不明") + "）。"));
-    }
-  }
-
-  // 提案一覧 -------------------------------------------------------------
-  function openList() {
-    closeSheet();
-    const rows = proposals.slice().sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
-    const STATUS = { open: "反映待ち", applied: "反映済み", conflict: "競合", rejected: "見送り" };
-    const list = el("div", { class: "list" }, ...rows.map((p) => {
-      const jump = el("button", { class: "btn", type: "button" }, "本文へ");
-      jump.addEventListener("click", () => {
-        const idx = BOOK.acts.findIndex((a) => a.name === p.act);
-        if (idx >= 0) { $("#act").value = String(idx); store.set("act:" + BOOK.book, String(idx)); renderAct(); }
-        closeSheet();
-        const target = p.uid ? document.getElementById(p.uid) : null;
-        (target || $("#main")).scrollIntoView({ block: "center" });
-      });
-      const kids = [el("div", { class: "meta" }, el("span", { class: "pill " + p.status }, STATUS[p.status] || p.status), p.kind === "section" ? "節 " + p.section : (p.speaker || "") + " " + (p.uid || ""), p.label || "", jump)];
-      if (p.kind === "utterance") kids.push(el("div", { class: "after-text" }, p.after || ""));
-      else if (p.plan) kids.push(el("ol", {}, ...(p.plan.beats || []).map((b) => el("li", {}, String(b)))));
-      if (p.status === "open") {
-        const withdraw = el("button", { class: "btn", type: "button" }, "取り下げる");
-        withdraw.addEventListener("click", async () => { withdraw.disabled = true; try { await db.collection("proposals").doc(p._id).delete(); } catch { withdraw.disabled = false; } });
-        kids.push(el("div", { class: "row" }, withdraw));
+  function normalizePatches(a, res) {
+    const ids = new Set(currentBlocks(a).map((x) => x.id));
+    const out = [];
+    for (const p of Array.isArray(res.patches) ? res.patches : []) {
+      if (!p || typeof p !== "object") continue;
+      if (p.op === "replace" && ids.has(p.id) && typeof p.md === "string") {
+        const cur = currentBlocks(a).find((x) => x.id === p.id);
+        if (cur.md.trim() !== p.md.trim()) out.push({ op: "replace", id: p.id, before: cur.md, md: p.md.replace(/^\n+|\n+$/g, ""), speaker: cur.speaker || "", t: cur.t });
+      } else if (p.op === "delete" && ids.has(p.id)) {
+        const cur = currentBlocks(a).find((x) => x.id === p.id);
+        out.push({ op: "delete", id: p.id, before: cur.md, md: "", speaker: cur.speaker || "", t: cur.t });
+      } else if (p.op === "insert" && ids.has(p.after) && typeof p.md === "string" && BOOK.speakers.includes(p.speaker)) {
+        out.push({ op: "insert", after: p.after, id: newId(), before: "", md: p.md.trim(), speaker: p.speaker, t: "u" });
       }
-      if (p.note) kids.push(el("div", { class: "meta" }, String(p.note)));
-      return el("div", { class: "item" }, ...kids);
+    }
+    return out;
+  }
+  function newId() {
+    const used = new Set([...original.keys(), ...overlay.keys()]);
+    for (;;) { const id = "u" + Math.floor(Math.random() * 0x10000).toString(16).padStart(4, "0"); if (!used.has(id)) return id; }
+  }
+
+  function reviewPatches(work, a, res, meta, retry, onDone) {
+    const patches = normalizePatches(a, res);
+    if (!patches.length) {
+      work.replaceChildren(el("p", { class: "empty" }, "直す箇所は見つからなかった。" + (res.summary ? "（" + res.summary + "）" : "")),
+        el("div", { class: "row" }, el("button", { class: "btn", type: "button", onclick: retry }, "もう一度"), onDone ? el("button", { class: "btn", type: "button", onclick: () => onDone(null) }, "次へ") : null));
+      return;
+    }
+    const cards = patches.map((p, i) => {
+      const cb = el("input", { type: "checkbox", id: "pc-" + i, checked: true });
+      const ta = p.op === "delete" ? null : el("textarea", { id: "pt-" + i, rows: String(Math.min(9, p.md.split("\n").length + 1)) });
+      if (ta) ta.value = p.md;
+      const card = el("div", { class: "patch" },
+        el("div", { class: "ph" }, el("label", { for: "pc-" + i }, cb, { replace: "修正", delete: "削除", insert: "追加" }[p.op]),
+          (p.t === "u" ? p.speaker : "地の文") + "　" + (p.op === "insert" ? "← " + p.after + " の後" : p.id)),
+        p.before ? el("div", { class: "before" }, p.before) : null, ta);
+      cb.addEventListener("change", () => card.classList.toggle("off", !cb.checked));
+      return { p, cb, ta, card };
+    });
+    const apply = el("button", { class: "btn primary", type: "button" }, "適用");
+    apply.addEventListener("click", async () => {
+      apply.disabled = true;
+      const decided = cards.map(({ p, cb, ta }) => ({ ...p, accepted: cb.checked, final: ta ? ta.value.replace(/^\n+|\n+$/g, "") : "" }));
+      try {
+        await applyPatches(a, decided.filter((p) => p.accepted));
+        await record(meta, res.summary || "", decided);
+        work.replaceChildren(el("p", { class: "empty" }, decided.filter((p) => p.accepted).length + "件を反映した。" + (meta.scope === "book" ? "「幕を終える」で他の幕にも広げる。" : "")));
+        renderAct();
+        if (onDone) onDone(decided);
+      } catch (e) {
+        apply.disabled = false;
+        work.append(el("p", { class: "err" }, "保存できなかった（" + ((e && e.code) || (e && e.message) || "不明") + "）。"));
+      }
+    });
+    work.replaceChildren(el("p", { class: "summary" }, String(res.summary || "")), ...cards.map((c) => c.card),
+      el("div", { class: "row" }, apply, el("button", { class: "btn", type: "button", onclick: retry }, "作り直す"),
+        onDone ? el("button", { class: "btn quiet", type: "button", onclick: () => onDone([]) }, "この幕は見送る") : null));
+  }
+
+  async function applyPatches(a, accepted) {
+    for (const p of accepted) {
+      const orig = original.get(p.id);
+      const prev = overlay.get(p.id);
+      const base = prev ? prev.base : orig ? orig.block.md : null;
+      const doc = {
+        book: BOOK.book, id: p.id, act: a.name, kind: p.t, base,
+        md: p.op === "delete" ? "" : p.final, deleted: p.op === "delete",
+        insertAfter: p.op === "insert" ? p.after : (prev && prev.insertAfter) || null,
+        speaker: p.speaker || (prev && prev.speaker) || "", section: (orig && orig.block.section) || (prev && prev.section) || "",
+        createdAt: (prev && prev.createdAt) || new Date().toISOString(), updatedAt: new Date().toISOString(), author: me,
+      };
+      overlay.set(p.id, doc);
+      if (db) await db.collection("edits").doc(p.id).set(doc);
+    }
+  }
+
+  async function record(meta, summary, decided) {
+    const doc = {
+      book: BOOK.book, act: meta.act, target: meta.target || null, text: meta.text, scope: meta.scope, source: meta.source,
+      offered: meta.offered || [], summary,
+      patches: decided.map((p) => ({ op: p.op, id: p.id, before: p.before, proposed: p.md, final: p.final, accepted: p.accepted })),
+      doneActs: [meta.act], skippedActs: [], synced: false, author: me, createdAt: new Date().toISOString(),
+    };
+    if (meta.feedbackId) return; // 展開の記録は呼び出し側が持つ
+    // DB があれば購読が feedback を差し替えるので、手元の配列へは足さない
+    if (db) { await db.collection("feedback").add(doc); return; }
+    doc._id = "local-" + Date.now();
+    feedback.push(doc);
+    paintCounts();
+  }
+
+  // ---------------------------------------------------------------- 幕を終える（全体向けの指摘を他の幕へ）
+  function pendingFor() {
+    const names = BOOK.acts.map((a) => a.name);
+    return feedback.filter((f) => f.scope === "book" && names.some((n) => !(f.doneActs || []).includes(n) && !(f.skippedActs || []).includes(n)));
+  }
+  function finish() {
+    const pend = pendingFor();
+    if (!pend.length) { openSheet("幕を終える", el("p", { class: "empty" }, "他の幕へ広げる指摘は無い。範囲を「全体」にした指摘がここに溜まる。")); return; }
+    const work = el("div", { class: "list" });
+    const start = el("button", { class: "btn primary", type: "button" }, "他の幕へ広げる");
+    openSheet("幕を終える",
+      el("p", { class: "summary" }, "次の指摘を、まだ適用していない幕へ1幕ずつ適用する。幕ごとに差分を確かめて適用する。"),
+      el("ul", {}, ...pend.map((f) => el("li", {}, f.text))), el("div", { class: "row" }, start), work);
+    start.addEventListener("click", () => { start.disabled = true; propagate(work); });
+  }
+  async function propagate(work) {
+    for (const a of BOOK.acts) {
+      const items = pendingFor().filter((f) => !(f.doneActs || []).includes(a.name) && !(f.skippedActs || []).includes(a.name));
+      if (!items.length) continue;
+      const box = el("div", { class: "list" });
+      work.replaceChildren(el("p", { class: "progress" }, "幕「" + a.heading + "」"), box);
+      const examples = items.map((f) => {
+        const acc = (f.patches || []).filter((p) => p.accepted).slice(0, 2);
+        return "- 「" + f.text + "」" + acc.map((p) => "\n  採用された直し方の例: 「" + clip(p.before || "", 80) + "」→「" + clip(p.final || "", 80) + "」").join("");
+      }).join("\n");
+      const prompt = [
+        context("", true),
+        "## 幕「" + a.heading + "」の本文（各ブロックの先頭に [ID]）\n" + actText(a, null),
+        "## 依頼\n校正者が別の幕で出し、教材全体に当てはめると決めた次の指摘を、この幕にも適用する。採用された直し方の例に合わせる。当てはまる箇所が無ければ patches は空にする。\n" + examples + "\n" + PATCH_FORMAT,
+      ].join("\n\n");
+      $("#act").value = String(BOOK.acts.indexOf(a));
+      renderAct();
+      const decided = await new Promise(async (resolve) => {
+        const res = await ask(prompt, box, "default", "幕「" + a.heading + "」に適用している…");
+        if (!res) { box.append(el("div", { class: "row" }, el("button", { class: "btn", type: "button", onclick: () => resolve(undefined) }, "中断する"))); return; }
+        reviewPatches(box, a, res, { feedbackId: true, act: a.name }, () => resolve("retry"), resolve);
+      });
+      if (decided === undefined) { work.append(el("p", { class: "empty" }, "中断した。もう一度「幕を終える」を押すと続きから広げる。")); return; }
+      if (decided === "retry") { return propagate(work); }
+      for (const f of items) {
+        // null: 当てはまる箇所が無かった（適用済みとみなす）／[]: 見送った
+        const field = decided === null || (decided && decided.length) ? "doneActs" : "skippedActs";
+        const next = Array.from(new Set([...(f[field] || []), a.name]));
+        const extra = decided ? decided.filter((p) => p.accepted).map((p) => ({ op: p.op, id: p.id, before: p.before, proposed: p.md, final: p.final, accepted: true, act: a.name })) : [];
+        f[field] = next;
+        if (field === "doneActs") f.propagated = [...(f.propagated || []), ...extra];
+        if (db && f._id && !String(f._id).startsWith("local-")) {
+          try { await db.collection("feedback").doc(f._id).update(field === "doneActs" ? { doneActs: next, propagated: f.propagated } : { skippedActs: next }); } catch {}
+        }
+      }
+      paintCounts();
+    }
+    work.replaceChildren(el("p", { class: "empty" }, "すべての幕へ広げた。"));
+    renderAct();
+  }
+
+  // ---------------------------------------------------------------- 履歴
+  function openLog() {
+    const rows = feedback.slice().sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+    const list = el("div", { class: "list" }, ...rows.map((f) => {
+      const acc = (f.patches || []).filter((p) => p.accepted).length + (f.propagated || []).length;
+      return el("div", { class: "item" },
+        el("div", {}, f.text),
+        el("div", { class: "meta" }, el("span", { class: "scope " + f.scope }, SCOPE[f.scope] || f.scope), f.source === "pick" ? "候補から" : "自由入力",
+          "反映 " + acc + "件", f.scope === "book" ? "適用済みの幕 " + (f.doneActs || []).length + " / " + BOOK.acts.length : null, f.synced ? "正本に取り込み済み" : null));
     }));
-    openSheet("提案　" + rows.length + "件", rows.length ? list : el("p", { class: "empty" }, "まだ無い。発言をタップして直す方向を出し、案を採用するとここに並ぶ。"));
+    openSheet("指摘の履歴　" + rows.length + "件", rows.length ? list : el("p", { class: "empty" }, "まだ無い。本文をタップして指摘を選ぶか、自由に書く。"));
   }
 
   // ---------------------------------------------------------------- 起動
   async function boot() {
-    try {
-      const res = await fetch("book.json");
-      BOOK = await res.json();
-    } catch {
-      $("#status").textContent = "本文を読み込めなかった。ページを開き直す。";
-      return;
-    }
+    try { BOOK = await (await fetch("book.json")).json(); }
+    catch { $("#status").textContent = "本文を読み込めなかった。ページを開き直す。"; return; }
     $("#title").textContent = BOOK.title.split(" ── ")[0];
     BOOK.acts.forEach((a, i) => {
-      for (const b of a.blocks) if (b.t === "u") byId.set(b.id, { block: b, act: a });
+      for (const b of a.blocks) original.set(b.id, { block: b, act: a });
       $("#act").append(el("option", { value: String(i) }, a.heading));
     });
     const raw = store.get("act:" + BOOK.book);
     const saved = raw === null ? NaN : Number(raw);
     $("#act").value = String(Number.isInteger(saved) && saved >= 0 && saved < BOOK.acts.length ? saved : Math.min(1, BOOK.acts.length - 1));
     $("#act").addEventListener("change", () => { store.set("act:" + BOOK.book, $("#act").value); closeSheet(); renderAct(); window.scrollTo(0, 0); });
-    $("#open-list").addEventListener("click", openList);
+    $("#finish").addEventListener("click", finish);
+    $("#open-log").addEventListener("click", openLog);
     renderAct();
-    $("#status").textContent = "発言をタップすると直す方向を出せる。節の見出しの「節を見直す」で構成を組み直せる。";
+    $("#status").textContent = "本文のどこでもタップすると、指摘の候補が出る。範囲を「全体」にした指摘は「幕を終える」で他の幕へ広げる。";
 
     const api = window.claude && window.claude.use ? window.claude : null;
     if (!api) { $("#status").textContent = "閲覧のみ（claude.ai の外では校正機能は使えない）。"; return; }
-    api.use("sample").then((s) => { sample = s; if (!selected) return; }).catch(() => {});
+    api.use("sample").then((s) => { sample = s; }).catch(() => {});
     api.use("user").then(async (u) => { try { me = u ? await u.id() : null; } catch { me = null; } }).catch(() => {});
     api.use("db").then((d) => {
       db = d;
-      if (!db) return;
-      const timer = setTimeout(() => { $("#status").textContent = "提案の保存先にまだつながらない。"; }, 10000);
-      db.collection("proposals").where("book", "==", BOOK.book).onSnapshot((snap) => {
+      if (!db) { $("#status").textContent = "保存先につながらない。修正はこの画面を閉じると消える。"; return; }
+      const timer = setTimeout(() => { $("#status").textContent = "保存先にまだつながらない。"; }, 10000);
+      let first = true;
+      db.collection("edits").where("book", "==", BOOK.book).onSnapshot((snap) => {
         if (!snap.metadata || !snap.metadata.fromCache) clearTimeout(timer);
-        proposals = snap.docs.map((d) => ({ _id: d.id, ...d.data() }));
-        paintMarks();
-      }, () => { clearTimeout(timer); $("#status").textContent = "提案の保存先が使えない。"; });
+        overlay.clear();
+        for (const d of snap.docs) overlay.set(d.id, { ...d.data(), id: d.id });
+        if (first || $("#sheet").hidden) renderAct();
+        first = false;
+      }, () => { clearTimeout(timer); $("#status").textContent = "修正の保存先が使えない。"; });
+      db.collection("feedback").where("book", "==", BOOK.book).onSnapshot((snap) => {
+        feedback = snap.docs.map((d) => ({ _id: d.id, ...d.data() }));
+        paintCounts();
+      }, () => {});
     }).catch(() => {});
   }
   boot();
