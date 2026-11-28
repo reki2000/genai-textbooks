@@ -799,9 +799,9 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
     $("#logcount").textContent = feedback.filter((f) => isGlobal(f) && remainingActs(f).length).length ? "!" : "";
   }
 
-  async function spread(items, auto) {
+  async function spread(items, extra, onlyActs) {
     setMode("working");
-    const acts = spreadActs().filter((a) => items.some((f) => remainingActs(f).includes(a)));
+    const acts = onlyActs || spreadActs().filter((a) => items.some((f) => remainingActs(f).includes(a)));
     const collected = [];   // {a, p}
     const doneByItem = new Map(items.map((f) => [f, []]));
     let stopped = false;
@@ -809,11 +809,11 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
     const status = el("div", { class: "big" }, el("span", { class: "spinner" }), el("span", {}, "準備中…"));
     const count = el("div", { class: "hint" }, "");
     const stop = el("button", { class: "btn", type: "button", onclick: () => { stopped = true; cancel("spread"); } }, "ここまでで止める");
-    sheet("他の幕へ広げる" + (auto ? "（お任せ）" : ""),
-      el("div", { class: "working" }, status, count, el("ul", { class: "asked" }, ...items.map((f) => el("li", {}, f.text))), el("div", { class: "row" }, stop)));
+    sheet("他の幕へ広げる",
+      el("div", { class: "working" }, status, count, el("ul", { class: "asked" }, ...items.map((f) => el("li", {}, f.text)), ...(extra ? [el("li", {}, "追加の指示: " + extra)] : [])), el("div", { class: "row" }, stop)));
     for (let k = 0; k < acts.length && !stopped; k++) {
       const a = acts[k];
-      const here = items.filter((f) => remainingActs(f).includes(a));
+      const here = onlyActs ? items : items.filter((f) => remainingActs(f).includes(a));
       status.lastChild.textContent = "幕 " + (k + 1) + " / " + acts.length + "「" + a.heading + "」";
       count.textContent = "修正案 " + collected.length + "件　" + Math.floor((Date.now() - started) / 1000) + "秒";
       const examples = here.map((f) => {
@@ -823,7 +823,8 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
       const prompt = [
         context("", true),
         "## 幕「" + a.heading + "」の本文（各ブロックの先頭に [ID]）\n" + actText(a, null),
-        "## 依頼\n校正者が別の幕で出し、教材全体に当てはめると決めた次の指摘を、この幕にも適用する。採用された直し方の例に合わせる。当てはまる箇所が無ければ patches は空にする。\n" + examples + "\n" + PATCH_FORMAT,
+        "## 依頼\n校正者が別の幕で出し、教材全体に当てはめると決めた次の指摘を、この幕にも適用する。採用された直し方の例に合わせる。当てはまる箇所が無ければ patches は空にする。\n" + examples +
+          (extra ? "\n\n## 校正者の追加の指示（前回の案を見て出たもの。最優先で守る）\n" + extra : "") + "\n" + PATCH_FORMAT,
       ].join("\n\n");
       try {
         const res = await ask("spread", prompt, "default");
@@ -843,11 +844,12 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
         const acts2 = doneByItem.get(f);
         if (!acts2.length) continue;
         const next = Array.from(new Set([...(f.doneActs || []), ...acts2]));
-        const extra = accepted.filter((c) => acts2.includes(c.a.name)).map((c) => ({ op: c.p.op, id: c.p.id, before: c.p.before, proposed: c.p.md, final: c.p.final, accepted: true, act: c.a.name }));
+        const extraPatches = accepted.filter((c) => acts2.includes(c.a.name)).map((c) => ({ op: c.p.op, id: c.p.id, before: c.p.before, proposed: c.p.md, final: c.p.final, accepted: true, act: c.a.name }));
         f.doneActs = next;
-        f.propagated = [...(f.propagated || []), ...extra];
+        f.propagated = [...(f.propagated || []), ...extraPatches];
+        if (extra) f.comment = [f.comment, "展開時の指示: " + extra].filter(Boolean).join(" ／ ");
         if (db && f._id && !String(f._id).startsWith("local-")) {
-          try { await db.collection("feedback").doc(f._id).update({ doneActs: next, propagated: f.propagated }); } catch {}
+          try { await db.collection("feedback").doc(f._id).update({ doneActs: next, propagated: f.propagated, comment: f.comment || "" }); } catch {}
         }
       }
       renderAct();
@@ -855,11 +857,11 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
       toast(accepted.length + "件を" + byAct.size + "幕に反映した" + (stopped ? "（途中で止めた）" : ""));
       endFlow();
     };
-    if (auto) { await finishSpread(collected); return; }
-    reviewSpread(collected, finishSpread);
+    const doneActs = acts.filter((a) => [...doneByItem.values()].some((names) => names.includes(a.name)));
+    reviewSpread(collected, finishSpread, (more) => spread(items, [extra, more].filter(Boolean).join(" ／ "), doneActs));
   }
 
-  function reviewSpread(collected, finishSpread) {
+  function reviewSpread(collected, finishSpread, redo) {
     setMode("review");
     if (!collected.length) {
       sheet("他の幕へ広げる", el("p", { class: "empty" }, "当てはまる箇所は無かった。"), el("div", { class: "row" }, el("button", { class: "btn primary", type: "button", onclick: () => finishSpread([]) }, "閉じる")));
@@ -878,14 +880,18 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
     });
     const acts = new Set(collected.map((c) => c.a.name)).size;
     const apply = el("button", { class: "btn primary", type: "button" }, "");
-    const paintApply = () => { const n = cards.filter((x) => x.cb.checked).length; apply.textContent = "一括で適用（" + n + "件）"; apply.disabled = !n; };
+    const paintApply = () => { const n = cards.filter((x) => x.cb.checked).length; apply.textContent = "すべて承認して適用（" + n + "件）"; apply.disabled = !n; };
     paintApply();
     apply.addEventListener("click", () => { apply.disabled = true; finishSpread(cards.filter((x) => x.cb.checked).map((x) => x.c)); });
     const more = collected.length > SAMPLE ? el("button", { class: "btn", type: "button" }, "残り" + (collected.length - SAMPLE) + "件もすべて見る") : null;
     if (more) more.addEventListener("click", () => { cards.forEach((x) => (x.card.hidden = false)); more.remove(); });
+    const note = el("textarea", { id: "spread-note", rows: "2", placeholder: "追加の指示（例: やる夫の儲け話は削らない）" });
+    const again = el("button", { class: "btn", type: "button" }, "この指示で作り直す");
+    again.addEventListener("click", () => { const v = note.value.trim(); if (v) redo(v); });
     sheet("他の幕へ広げる　修正案 " + collected.length + "件（" + acts + "幕）",
       el("div", { class: "row" }, apply, el("span", { class: "grow" }), el("button", { class: "btn quiet", type: "button", onclick: endFlow }, "破棄")),
-      el("div", { class: "hint" }, "最初の" + Math.min(SAMPLE, collected.length) + "件だけ見本として出す。気になる案はチェックを外す。左が今の本文、右が修正案。"),
+      note, el("div", { class: "row" }, again),
+      el("div", { class: "hint" }, "最初の" + Math.min(SAMPLE, collected.length) + "件だけ見本として出す。方針が違えば上に追加の指示を書いて作り直す。左が今の本文、右が修正案。"),
       ...cards.map((x) => x.card),
       more);
   }
@@ -896,11 +902,9 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
     const rank = (f) => (isGlobal(f) && remainingActs(f).length ? 0 : remainingActs(f).length && !f.synced ? 1 : 2);
     const rows = feedback.slice().sort((x, y) => rank(x) - rank(y) || String(y.createdAt).localeCompare(String(x.createdAt)));
     const chosen = new Set();
-    const go = el("button", { class: "btn primary", type: "button", disabled: true }, "まとめて確認して広げる");
-    const auto = el("button", { class: "btn", type: "button", disabled: true }, "お任せで広げる");
-    const paint = () => { go.disabled = auto.disabled = !chosen.size; go.textContent = "まとめて確認して広げる" + (chosen.size ? "（" + chosen.size + "件）" : ""); };
-    go.addEventListener("click", () => spread([...chosen], false));
-    auto.addEventListener("click", () => spread([...chosen], true));
+    const go = el("button", { class: "btn primary", type: "button", disabled: true }, "他の幕へ広げる");
+    const paint = () => { go.disabled = !chosen.size; go.textContent = "他の幕へ広げる" + (chosen.size ? "（" + chosen.size + "件）" : ""); };
+    go.addEventListener("click", () => spread([...chosen], ""));
     const total = spreadActs().length;
     const item = (f, i) => {
       const rest = remainingActs(f).length;
@@ -923,7 +927,7 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
     const closedBox = el("div", { class: "list", hidden: true }, ...closed.map((f, i) => item(f, open.length + i)));
     const toggle = closed.length ? el("button", { class: "btn quiet", type: "button", onclick: () => { closedBox.hidden = !closedBox.hidden; } }, "広げ終えた・取り込み済みの " + closed.length + "件") : null;
     sheet("指摘の履歴　" + rows.length + "件",
-      rows.length ? el("div", { class: "row" }, go, auto) : null,
+      rows.length ? el("div", { class: "row" }, go) : null,
       rows.length ? el("div", { class: "hint" }, "チェックした指摘を、まだ当てていない幕へまとめて広げる。「全体向き」は Claude が方針についての指摘と判定したもの。") : el("p", { class: "empty" }, "まだ無い。本文をタップして範囲を選ぶところから始める。"),
       el("div", { class: "list" }, ...open.map(item)),
       toggle, closedBox);
