@@ -1,0 +1,14 @@
+## 参考文献
+
+1. [統計検定「統計検定準1級 出題範囲表」](https://www.toukei-kentei.jp/hubfs/files/20.grade/grade_range/grade1semi_hani_20270101.pdf). II部の範囲設計では、確率分布、推測、回帰・多変量解析、時系列、標本調査、欠測、Bayes法などの公式範囲を照合した。
+2. George Casella and Roger L. Berger, *Statistical Inference*, 2nd ed., Duxbury, 2002.
+3. Larry Wasserman, *All of Statistics*, Springer, 2004.
+4. Trevor Hastie, Robert Tibshirani, and Jerome Friedman, *The Elements of Statistical Learning*, 2nd ed., Springer, 2009.
+5. Peter McCullagh and John A. Nelder, *Generalized Linear Models*, 2nd ed., Chapman & Hall, 1989.
+6. Richard A. Johnson and Dean W. Wichern, *Applied Multivariate Statistical Analysis*, 6th ed., Pearson, 2007.
+7. Robert H. Shumway and David S. Stoffer, *Time Series Analysis and Its Applications*, 4th ed., Springer, 2017.
+8. Roderick J. A. Little and Donald B. Rubin, *Statistical Analysis with Missing Data*, 3rd ed., Wiley, 2019.
+9. Andrew Gelman et al., *Bayesian Data Analysis*, 3rd ed., Chapman & Hall/CRC, 2013.
+10. Bradley Efron and Trevor Hastie, *Computer Age Statistical Inference*, Cambridge University Press, 2016.
+11. Judea Pearl, *Causality*, 2nd ed., Cambridge University Press, 2009.
+12. Miguel A. Hernán and James M. Robins, *Causal Inference: What If*, Chapman & Hall/CRC, 2020.

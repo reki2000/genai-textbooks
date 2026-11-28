@@ -132,7 +132,7 @@ documents:
 
 ### 台本形式（@形式、試行中）
 
-`docs/books/{id}/script/` を持つ教材は、そこにある幕ごとのファイル（`00.txt` が前付け、`01.txt` 以降が `## ` 見出しごとの幕）が正本で、`README.md` はそこから生成する。現在は `statistics` だけ。
+`docs/books/{id}/script/` を持つ教材は、そこにある幕ごとのファイル（`00.txt` が前付け、`01.txt` 以降が `## ` 見出しごとの幕）が正本で、`README.md` はそこから生成する。現在は `statistics` と `statistics-2`。
 
 ```
 @u7f3a やる夫
@@ -157,7 +157,7 @@ python3 scripts/yaruo_script.py convert docs/books/{id}    # README.md から sc
 
 #### 校正台（アーティファクト）
 
-`python3 scripts/build_proof_page.py docs/books/{id}` が `build/proof/{id}/` に校正台を作る（`index.html` は教材に依存しない `scripts/proof_template.html`、本文・登場人物欄・アウトライン・規約・過去の指摘は `book.json`）。Claude Code の Artifact ツールで、`book.json` と `figs/` を `files` に付け、capabilities `sample`・`db`・`user` で公開する。
+`python3 scripts/build_proof_page.py docs/books/{id}` が `build/proof/{id}/` に校正台を作る（教材ごとに別のアーティファクト。`outline.md` が無い巻は `follows` をたどって前の巻の骨格を使う）（`index.html` は教材に依存しない `scripts/proof_template.html`、本文・登場人物欄・アウトライン・規約・過去の指摘は `book.json`）。Claude Code の Artifact ツールで、`book.json` と `figs/` を `files` に付け、capabilities `sample`・`db`・`user` で公開する。
 
 - 右下の「修正」から始める。①範囲を選ぶ: タップで文節、同じ所をもう一度で 文 → 発言（地の文なら段落）。指で選んでもよい。この段階では下に小さな帯が出るだけで、候補は裏で推測しておく。「範囲なしで指摘」で幕全体への指摘にもできる。②指摘を決める: 上に自由記述・範囲（ここだけ／この幕／全体）・「回答開始」、下に候補。候補は複数選べ、自由記述と組み合わせられる。候補は選んだ範囲と過去の指摘（採否・直し方・案へのコメント）から推測する。③修正案を確かめる: 回答開始で処理中の表示に切り替わり、終わると差分を左右2ペイン（左=今の本文、右=修正案）で出す。空白だけの違いは差分にしない。案ごとに採否・手直し・コメント、全体へのコメントを付けられ、「コメントして作り直す」で作り直させられる。「適用」で今の幕に即時反映する
 - ヘッダーに AI の処理状態（何をしていて何秒経ったか）と、料金の目安（今回／累計）を常に出す。料金は送受信した文字数から推定した API 換算（quick=Haiku 5.5、default=Sonnet 5.5 の単価、1ドル150円）で、思考に使った分は含まない。実際には閲覧者の Claude の利用枠から引かれる

@@ -28,6 +28,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+import yaml  # noqa: E402
 import yaruo_script  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -96,12 +97,32 @@ def history(book: str) -> list[dict]:
     return out
 
 
+def series_outline(book_dir: Path) -> str:
+    """教材の outline.md。無ければ catalog.yml の follows をたどり、前の巻の骨格を使う
+    （シリーズの骨格は先頭巻にまとめて置く慣例。BUILD.md「シリーズ」）。"""
+    seen = set()
+    current = book_dir
+    while current.name not in seen:
+        seen.add(current.name)
+        path = current / "outline.md"
+        if path.exists():
+            return path.read_text(encoding="utf-8")
+        catalog = current / "catalog.yml"
+        if not catalog.exists():
+            break
+        documents = (yaml.safe_load(catalog.read_text(encoding="utf-8")) or {}).get("documents", [])
+        previous = next((d.get("follows") for d in documents if d.get("id") == current.name and d.get("follows")), None)
+        if not previous:
+            break
+        current = current.parent / previous
+    return ""
+
+
 def build(book_dir: Path, out_dir: Path) -> Path:
     acts = yaruo_script.load_script(book_dir)
     readme = (book_dir / "README.md").read_text(encoding="utf-8")
     title = readme.split("\n", 1)[0].lstrip("# ").strip()
-    outline_path = book_dir / "outline.md"
-    outline = outline_path.read_text(encoding="utf-8") if outline_path.exists() else ""
+    outline = series_outline(book_dir)
 
     figs: set[str] = set()
     roster = ""
