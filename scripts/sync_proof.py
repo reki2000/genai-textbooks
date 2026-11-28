@@ -189,6 +189,8 @@ def main() -> int:
                 "target": row.get("target"),
                 "text": row.get("text"),
                 "scope": row.get("scope"),
+                "global": bool(row.get("global") or row.get("scope") == "book"),
+                "ruleCandidate": bool(row.get("ruleCandidate")),
                 "source": row.get("source"),
                 "offered": row.get("offered", []),
                 "summary": row.get("summary", ""),

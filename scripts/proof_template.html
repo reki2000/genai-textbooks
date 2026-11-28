@@ -126,7 +126,7 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
 .list { display: grid; gap: .5rem; }
 .item { border: 1px solid var(--rule); border-radius: 8px; padding: .5rem .7rem; font-size: 13px; display: grid; gap: .25rem; background: var(--paper); }
 .item .meta { color: var(--muted); font-size: 12px; display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; }
-.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(80px + env(safe-area-inset-bottom, 0px)); z-index: 30; background: var(--ink); color: var(--sheet); padding: .5rem 1rem; border-radius: 8px; font-size: 14px; }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); top: calc(84px + env(safe-area-inset-top, 0px)); max-width: calc(100% - 32px); z-index: 30; background: var(--ink); color: var(--sheet); padding: .5rem 1rem; border-radius: 8px; font-size: 14px; }
 </style>
 
 <header class="gutter">
@@ -138,7 +138,6 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
   <div class="bar">
     <select id="book" aria-label="教材"></select>
     <select id="act" aria-label="幕"></select>
-    <button class="btn" id="finish" type="button" title="全体向けの指摘を他の幕へ広げる">幕を終える<span class="count" id="pending"></span></button>
     <button class="btn quiet" id="open-log" type="button">履歴<span class="count" id="logcount"></span></button>
   </div>
 </header>
@@ -335,10 +334,6 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
     renderMath(main);
     paintCounts();
     if (pick && document.getElementById(pick.id)) document.getElementById(pick.id).classList.add("sel");
-  }
-  function paintCounts() {
-    $("#pending").textContent = pendingFor().length ? String(pendingFor().length) : "";
-    $("#logcount").textContent = feedback.length ? String(feedback.length) : "";
   }
   function findCurrent(id) { return currentBlocks(act()).find((b) => b.id === id); }
   function toast(text) { const t = $("#toast"); t.textContent = text; t.hidden = false; clearTimeout(toast.timer); toast.timer = setTimeout(() => (t.hidden = true), 2600); }
@@ -582,7 +577,7 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
   function paintCompose() {
     const t = targetNow();
     if (!draft) draft = { picked: new Set(), free: "", scope: t.id ? "here" : "act" };
-    if (!t.id && draft.scope === "here") draft.scope = "act";
+    if ((!t.id && draft.scope === "here") || draft.scope === "book") draft.scope = "act";
     const free = el("textarea", { id: "free", rows: "2", placeholder: "自由に書く（候補と組み合わせてよい）" });
     free.value = draft.free;
     const start = el("button", { class: "btn primary", type: "button", onclick: startWork }, "回答開始");
@@ -590,7 +585,7 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
     free.addEventListener("input", () => { draft.free = free.value; refresh(); });
     const seg = el("div", { class: "seg", role: "group", "aria-label": "直す範囲" });
     const paintSeg = () => seg.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.s === draft.scope)));
-    for (const s of t.id ? ["here", "act", "book"] : ["act", "book"]) seg.append(el("button", { type: "button", "data-s": s, onclick: () => { draft.scope = s; paintSeg(); } }, SCOPE[s]));
+    for (const s of t.id ? ["here", "act"] : ["act"]) seg.append(el("button", { type: "button", "data-s": s, onclick: () => { draft.scope = s; paintSeg(); } }, SCOPE[s]));
     paintSeg();
     refresh();
     let opts;
@@ -599,12 +594,11 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
     else opts = el("div", { class: "opts" }, ...guessState.list.map((g, i) => {
       const cb = el("input", { type: "checkbox", id: "g-" + i });
       cb.checked = draft.picked.has(g.text);
-      const row = el("label", { class: "opt" + (cb.checked ? " on" : ""), for: "g-" + i }, cb, el("span", { class: "t" }, g.text), el("span", { class: "scope " + g.scope }, SCOPE[g.scope]));
+      const row = el("label", { class: "opt" + (cb.checked ? " on" : ""), for: "g-" + i }, cb, el("span", { class: "t" }, g.text), el("span", { class: "scope " + g.scope }, g.scope === "book" ? "全体向き" : SCOPE[g.scope]));
       cb.addEventListener("change", () => {
         if (cb.checked) {
           draft.picked.add(g.text);
-          const order = ["here", "act", "book"];
-          if (order.indexOf(g.scope) > order.indexOf(draft.scope)) { draft.scope = g.scope; paintSeg(); }
+          if (g.scope !== "here" && draft.scope === "here") { draft.scope = "act"; paintSeg(); }
         } else draft.picked.delete(g.text);
         row.classList.toggle("on", cb.checked);
         refresh();
@@ -620,11 +614,11 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
   }
 
   // 3. 修正案を作る → 確かめる
-  const PATCH_FORMAT = "返答は JSON だけ: {\"summary\":\"何をどう直したか（60字以内）\",\"patches\":[" +
+  const PATCH_FORMAT = "返答は JSON だけ: {\"summary\":\"何をどう直したか（60字以内）\",\"global\":false,\"patches\":[" +
     "{\"op\":\"replace\",\"id\":\"ブロックID\",\"md\":\"直した後の全文\"}," +
     "{\"op\":\"delete\",\"id\":\"ブロックID\"}," +
     "{\"op\":\"insert\",\"after\":\"この ID の直後に\",\"speaker\":\"話者\",\"md\":\"新しい発言\"}]}" +
-    "\n直す必要のないブロックは patches に入れない。空白や改行だけの変更はしない。replace の md はブロックの全文（話者名の行は書かない）。書式は元と同じ Markdown（1文ごとの改行、ルビ ｜基底《よみ》、$数式$）。数値・事実・数式・脚注記号は指摘が求めない限り変えない。";
+    "\n直す必要のないブロックは patches に入れない。空白や改行だけの変更はしない。replace の md はブロックの全文（話者名の行は書かない）。書式は元と同じ Markdown（1文ごとの改行、ルビ ｜基底《よみ》、$数式$）。数値・事実・数式・脚注記号は指摘が求めない限り変えない。global は、この指摘が特定の箇所の問題でなく、教材全体に効く方針（人物の口調、台詞の長さ、比喩の使い方、説明の仕方など）なら true。";
 
   function startWork() {
     const t = targetNow();
@@ -693,6 +687,7 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
 
   function showReview(a, res, meta, onDone) {
     const patches = normalizePatches(a, res);
+    if (res && typeof res.global === "boolean") meta.global = meta.global || res.global;
     review = { meta, rounds: review && review.meta === meta ? review.rounds + 1 : 1 };
     setMode("review");
     const head = (onDone ? "幕「" + a.heading + "」" : "3 / 3") + "　修正案を確かめる" + (review.rounds > 1 ? "（" + review.rounds + "回目）" : "");
@@ -732,7 +727,7 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
         await record(meta, res.summary || "", decided, overall.value.trim(), review.rounds);
         renderAct();
         if (onDone) onDone(decided);
-        else { toast(decided.filter((p) => p.accepted).length + "件を反映した" + (meta.scope === "book" ? "。「幕を終える」で他の幕にも広げる" : "")); endFlow(); }
+        else { toast(decided.filter((p) => p.accepted).length + "件を反映した" + (meta.global ? "。全体向きの指摘なので、履歴から他の幕へ広げられる" : "")); endFlow(); }
       } catch (e) {
         apply.disabled = false;
         apply.after(el("p", { class: "err" }, "保存できなかった（" + ((e && e.code) || (e && e.message) || "不明") + "）。"));
@@ -784,7 +779,7 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
     if (meta.feedbackId) return; // 他の幕への展開は、元の指摘の記録へ追記する
     const doc = {
       book: BOOK.book, act: meta.act, target: meta.target || null, text: meta.text, picked: meta.picked || [], free: meta.free || "",
-      scope: meta.scope, source: (meta.picked || []).length ? (meta.free ? "pick+free" : "pick") : "free",
+      scope: meta.scope, global: !!meta.global, source: (meta.picked || []).length ? (meta.free ? "pick+free" : "pick") : "free",
       selection: meta.selection || "", level: meta.level || "", offered: meta.offered || [], summary,
       comment: [meta.comment, overallComment].filter(Boolean).join(" ／ "), rounds: rounds || 1,
       patches: decided.map((p) => ({ op: p.op, id: p.id, before: p.before, proposed: p.md, final: p.final, accepted: p.accepted, comment: p.comment || "" })),
@@ -796,26 +791,33 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
     paintCounts();
   }
 
-  // ---------------------------------------------------------------- 幕を終える（全体向けの指摘を他の幕へ）
-  function pendingFor() {
-    const names = BOOK.acts.map((a) => a.name);
-    return feedback.filter((f) => f.scope === "book" && names.some((n) => !(f.doneActs || []).includes(n) && !(f.skippedActs || []).includes(n)));
+  // ---------------------------------------------------------------- 他の幕へ広げる（履歴から選ぶ。差分は最後にまとめて確かめるか、お任せ）
+  const isGlobal = (f) => !!f.global || f.scope === "book";
+  const spreadActs = () => BOOK.acts.filter((a) => a.blocks.some((b) => b.t === "u"));
+  const remainingActs = (f) => spreadActs().filter((a) => !(f.doneActs || []).includes(a.name) && !(f.skippedActs || []).includes(a.name));
+  function paintCounts() {
+    $("#logcount").textContent = feedback.filter((f) => isGlobal(f) && remainingActs(f).length).length ? "!" : "";
   }
-  function finish() {
-    const pend = pendingFor();
-    setMode("review");
-    if (!pend.length) { sheet("幕を終える", el("p", { class: "empty" }, "他の幕へ広げる指摘は無い。範囲を「全体」にした指摘がここに溜まる。")); return; }
-    sheet("幕を終える",
-      el("div", { class: "row" }, el("button", { class: "btn primary", type: "button", onclick: () => propagate() }, "他の幕へ広げる")),
-      el("p", { class: "summary" }, "次の指摘を、まだ適用していない幕へ1幕ずつ当てる。幕ごとに差分を確かめて適用する。"),
-      el("ul", { class: "asked" }, ...pend.map((f) => el("li", {}, f.text))));
-  }
-  async function propagate() {
-    for (const a of BOOK.acts) {
-      const items = pendingFor().filter((f) => !(f.doneActs || []).includes(a.name) && !(f.skippedActs || []).includes(a.name));
-      if (!items.length) continue;
-      const examples = items.map((f) => {
-        const acc = (f.patches || []).filter((p) => p.accepted).slice(0, 2);
+
+  async function spread(items, auto) {
+    setMode("working");
+    const acts = spreadActs().filter((a) => items.some((f) => remainingActs(f).includes(a)));
+    const collected = [];   // {a, p}
+    const doneByItem = new Map(items.map((f) => [f, []]));
+    let stopped = false;
+    const started = Date.now();
+    const status = el("div", { class: "big" }, el("span", { class: "spinner" }), el("span", {}, "準備中…"));
+    const count = el("div", { class: "hint" }, "");
+    const stop = el("button", { class: "btn", type: "button", onclick: () => { stopped = true; cancel("spread"); } }, "ここまでで止める");
+    sheet("他の幕へ広げる" + (auto ? "（お任せ）" : ""),
+      el("div", { class: "working" }, status, count, el("ul", { class: "asked" }, ...items.map((f) => el("li", {}, f.text))), el("div", { class: "row" }, stop)));
+    for (let k = 0; k < acts.length && !stopped; k++) {
+      const a = acts[k];
+      const here = items.filter((f) => remainingActs(f).includes(a));
+      status.lastChild.textContent = "幕 " + (k + 1) + " / " + acts.length + "「" + a.heading + "」";
+      count.textContent = "修正案 " + collected.length + "件　" + Math.floor((Date.now() - started) / 1000) + "秒";
+      const examples = here.map((f) => {
+        const acc = [...(f.patches || []).filter((p) => p.accepted), ...(f.propagated || [])].slice(0, 2);
         return "- 「" + f.text + "」" + acc.map((p) => "\n  採用された直し方の例: 「" + clip(p.before || "", 80) + "」→「" + clip(p.final || "", 80) + "」").join("") + (f.comment ? "\n  校正者のコメント: " + clip(f.comment, 80) : "");
       }).join("\n");
       const prompt = [
@@ -823,40 +825,108 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
         "## 幕「" + a.heading + "」の本文（各ブロックの先頭に [ID]）\n" + actText(a, null),
         "## 依頼\n校正者が別の幕で出し、教材全体に当てはめると決めた次の指摘を、この幕にも適用する。採用された直し方の例に合わせる。当てはまる箇所が無ければ patches は空にする。\n" + examples + "\n" + PATCH_FORMAT,
       ].join("\n\n");
-      $("#act").value = String(BOOK.acts.indexOf(a));
-      renderAct();
-      const meta = { feedbackId: true, act: a.name, text: items.map((f) => f.text).join(" ／ "), picked: items.map((f) => f.text), scope: "book", target: null };
-      const decided = await new Promise((resolve) => runWork("spread", prompt, "default", a, meta, resolve, () => resolve(undefined)));
-      if (decided === undefined) { endFlow(); toast("中断した。もう一度「幕を終える」で続きから"); return; }
+      try {
+        const res = await ask("spread", prompt, "default");
+        for (const p of normalizePatches(a, res)) collected.push({ a, p: { ...p, final: p.md, accepted: true } });
+        for (const f of here) doneByItem.get(f).push(a.name);
+      } catch (e) {
+        if (stopped || (e && (e.name === "AbortError" || e.code === "cancelled"))) break;
+        count.textContent = "幕「" + a.heading + "」で失敗した（" + errText(e) + "）。続ける";
+      }
+    }
+    count.textContent = "修正案 " + collected.length + "件";
+    const finishSpread = async (accepted) => {
+      const byAct = new Map();
+      for (const c of accepted) { if (!byAct.has(c.a)) byAct.set(c.a, []); byAct.get(c.a).push(c.p); }
+      for (const [a, ps] of byAct) await applyPatches(a, ps);
       for (const f of items) {
-        const field = decided === null || decided.length ? "doneActs" : "skippedActs";
-        const next = Array.from(new Set([...(f[field] || []), a.name]));
-        const extra = decided ? decided.filter((p) => p.accepted).map((p) => ({ op: p.op, id: p.id, before: p.before, proposed: p.md, final: p.final, accepted: true, comment: p.comment || "", act: a.name })) : [];
-        f[field] = next;
-        if (field === "doneActs") f.propagated = [...(f.propagated || []), ...extra];
+        const acts2 = doneByItem.get(f);
+        if (!acts2.length) continue;
+        const next = Array.from(new Set([...(f.doneActs || []), ...acts2]));
+        const extra = accepted.filter((c) => acts2.includes(c.a.name)).map((c) => ({ op: c.p.op, id: c.p.id, before: c.p.before, proposed: c.p.md, final: c.p.final, accepted: true, act: c.a.name }));
+        f.doneActs = next;
+        f.propagated = [...(f.propagated || []), ...extra];
         if (db && f._id && !String(f._id).startsWith("local-")) {
-          try { await db.collection("feedback").doc(f._id).update(field === "doneActs" ? { doneActs: next, propagated: f.propagated } : { skippedActs: next }); } catch {}
+          try { await db.collection("feedback").doc(f._id).update({ doneActs: next, propagated: f.propagated }); } catch {}
         }
       }
+      renderAct();
       paintCounts();
-    }
-    endFlow();
-    renderAct();
-    toast("すべての幕へ広げた");
+      toast(accepted.length + "件を" + byAct.size + "幕に反映した" + (stopped ? "（途中で止めた）" : ""));
+      endFlow();
+    };
+    if (auto) { await finishSpread(collected); return; }
+    reviewSpread(collected, finishSpread);
   }
 
-  // ---------------------------------------------------------------- 履歴
+  function reviewSpread(collected, finishSpread) {
+    setMode("review");
+    if (!collected.length) {
+      sheet("他の幕へ広げる", el("p", { class: "empty" }, "当てはまる箇所は無かった。"), el("div", { class: "row" }, el("button", { class: "btn primary", type: "button", onclick: () => finishSpread([]) }, "閉じる")));
+      return;
+    }
+    const SAMPLE = 3;
+    const cards = collected.map((c, i) => {
+      const cb = el("input", { type: "checkbox", id: "sp-" + i, checked: true });
+      const card = el("div", { class: "patch" },
+        el("div", { class: "ph" }, el("label", { for: "sp-" + i }, cb, { replace: "修正", delete: "削除", insert: "追加" }[c.p.op]),
+          el("span", { class: "grow" }, c.a.heading.slice(0, 14) + "　" + (c.p.t === "u" ? c.p.speaker : "地の文"))),
+        diffView(c.p.before, c.p.md, c.p.op));
+      cb.addEventListener("change", () => { card.classList.toggle("off", !cb.checked); paintApply(); });
+      if (i >= SAMPLE) card.hidden = true;
+      return { c, cb, card };
+    });
+    const acts = new Set(collected.map((c) => c.a.name)).size;
+    const apply = el("button", { class: "btn primary", type: "button" }, "");
+    const paintApply = () => { const n = cards.filter((x) => x.cb.checked).length; apply.textContent = "一括で適用（" + n + "件）"; apply.disabled = !n; };
+    paintApply();
+    apply.addEventListener("click", () => { apply.disabled = true; finishSpread(cards.filter((x) => x.cb.checked).map((x) => x.c)); });
+    const more = collected.length > SAMPLE ? el("button", { class: "btn", type: "button" }, "残り" + (collected.length - SAMPLE) + "件もすべて見る") : null;
+    if (more) more.addEventListener("click", () => { cards.forEach((x) => (x.card.hidden = false)); more.remove(); });
+    sheet("他の幕へ広げる　修正案 " + collected.length + "件（" + acts + "幕）",
+      el("div", { class: "row" }, apply, el("span", { class: "grow" }), el("button", { class: "btn quiet", type: "button", onclick: endFlow }, "破棄")),
+      el("div", { class: "hint" }, "最初の" + Math.min(SAMPLE, collected.length) + "件だけ見本として出す。気になる案はチェックを外す。左が今の本文、右が修正案。"),
+      ...cards.map((x) => x.card),
+      more);
+  }
+
+  // ---------------------------------------------------------------- 履歴（全体向きの指摘を選んで他の幕へ広げる・規則の候補にする）
   function openLog() {
     setMode("review");
-    const rows = feedback.slice().sort((x, y) => String(y.createdAt).localeCompare(String(x.createdAt)));
-    const list = el("div", { class: "list" }, ...rows.map((f) => {
+    const rank = (f) => (isGlobal(f) && remainingActs(f).length ? 0 : remainingActs(f).length && !f.synced ? 1 : 2);
+    const rows = feedback.slice().sort((x, y) => rank(x) - rank(y) || String(y.createdAt).localeCompare(String(x.createdAt)));
+    const chosen = new Set();
+    const go = el("button", { class: "btn primary", type: "button", disabled: true }, "まとめて確認して広げる");
+    const auto = el("button", { class: "btn", type: "button", disabled: true }, "お任せで広げる");
+    const paint = () => { go.disabled = auto.disabled = !chosen.size; go.textContent = "まとめて確認して広げる" + (chosen.size ? "（" + chosen.size + "件）" : ""); };
+    go.addEventListener("click", () => spread([...chosen], false));
+    auto.addEventListener("click", () => spread([...chosen], true));
+    const total = spreadActs().length;
+    const item = (f, i) => {
+      const rest = remainingActs(f).length;
       const acc = (f.patches || []).filter((p) => p.accepted).length + (f.propagated || []).length;
-      return el("div", { class: "item" }, el("div", {}, f.text),
-        el("div", { class: "meta" }, el("span", { class: "scope " + f.scope }, SCOPE[f.scope] || f.scope), "反映 " + acc + "件", (f.rounds || 1) > 1 ? "作り直し " + (f.rounds - 1) + "回" : null,
-          f.scope === "book" ? "適用済みの幕 " + (f.doneActs || []).length + " / " + BOOK.acts.length : null, f.synced ? "正本に取り込み済み" : null),
+      const cb = rest ? el("input", { type: "checkbox", id: "lg-" + i }) : null;
+      if (cb) cb.addEventListener("change", () => { cb.checked ? chosen.add(f) : chosen.delete(f); paint(); });
+      const rule = el("button", { class: "btn quiet", type: "button" }, f.ruleCandidate ? "規則の候補（取り消す）" : "規則にする");
+      rule.addEventListener("click", async () => {
+        f.ruleCandidate = !f.ruleCandidate;
+        rule.textContent = f.ruleCandidate ? "規則の候補（取り消す）" : "規則にする";
+        if (db && f._id && !String(f._id).startsWith("local-")) { try { await db.collection("feedback").doc(f._id).update({ ruleCandidate: f.ruleCandidate }); } catch {} }
+      });
+      return el("div", { class: "item" },
+        el("label", { class: "row", for: cb ? "lg-" + i : null }, cb, el("span", { class: "grow" }, f.text)),
+        el("div", { class: "meta" }, isGlobal(f) ? el("span", { class: "scope book" }, "全体向き") : null,
+          "適用済み " + (total - rest) + " / " + total + "幕", "反映 " + acc + "件", (f.rounds || 1) > 1 ? "作り直し " + (f.rounds - 1) + "回" : null, f.synced ? "取り込み済み" : null, el("span", { class: "grow" }), rule),
         f.comment ? el("div", { class: "meta" }, "コメント: " + f.comment) : null);
-    }));
-    sheet("指摘の履歴　" + rows.length + "件", rows.length ? list : el("p", { class: "empty" }, "まだ無い。本文をタップして範囲を選ぶところから始める。"));
+    };
+    const open = rows.filter((f) => rank(f) < 2), closed = rows.filter((f) => rank(f) === 2);
+    const closedBox = el("div", { class: "list", hidden: true }, ...closed.map((f, i) => item(f, open.length + i)));
+    const toggle = closed.length ? el("button", { class: "btn quiet", type: "button", onclick: () => { closedBox.hidden = !closedBox.hidden; } }, "広げ終えた・取り込み済みの " + closed.length + "件") : null;
+    sheet("指摘の履歴　" + rows.length + "件",
+      rows.length ? el("div", { class: "row" }, go, auto) : null,
+      rows.length ? el("div", { class: "hint" }, "チェックした指摘を、まだ当てていない幕へまとめて広げる。「全体向き」は Claude が方針についての指摘と判定したもの。") : el("p", { class: "empty" }, "まだ無い。本文をタップして範囲を選ぶところから始める。"),
+      el("div", { class: "list" }, ...open.map(item)),
+      toggle, closedBox);
   }
 
   // ---------------------------------------------------------------- 起動
@@ -908,7 +978,6 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
     for (const b of BOOKS) $("#book").append(el("option", { value: b.id }, b.title.split(" ── ")[0].replace(/^やる夫で学ぶ\s*/, "")));
     $("#book").addEventListener("change", () => loadBook($("#book").value));
     $("#act").addEventListener("change", () => { store.set("act:" + BOOK.book, $("#act").value); endFlow(); renderAct(); window.scrollTo(0, 0); });
-    $("#finish").addEventListener("click", () => { if (!BOOK) return; endFlow(); finish(); });
     $("#open-log").addEventListener("click", () => { if (!BOOK) return; endFlow(); openLog(); });
     let selTimer = null;
     document.addEventListener("selectionchange", () => {
