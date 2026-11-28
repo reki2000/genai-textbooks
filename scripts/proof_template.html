@@ -40,16 +40,17 @@ body { background: var(--paper); color: var(--ink); font: 16px/1.8 var(--font-bo
 body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--sheet); }
 .gutter { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 header { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--sheet); border-bottom: 1px solid var(--rule); }
-.bar { max-width: 46rem; margin: 0 auto; padding-block: .45rem; display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
-.bar h1 { font-size: 15px; line-height: 1.3; margin: 0; flex: 1 1 100%; min-width: 0; }
-.bar select { font: inherit; font-size: 14px; flex: 1 1 8rem; min-width: 0; padding: .3rem .45rem; border: 1px solid var(--rule); border-radius: 6px; background: var(--paper); color: var(--ink); }
-.meter { max-width: 46rem; margin: 0 auto; padding-bottom: .35rem; display: flex; gap: .8rem; align-items: center; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; flex-wrap: wrap; }
-.ai { display: inline-flex; gap: .4rem; align-items: center; color: var(--muted); }
+.top { max-width: 46rem; margin: 0 auto; padding-top: .35rem; display: flex; gap: .7rem; align-items: center; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; min-width: 0; }
+.top h1 { font-size: 14px; line-height: 1.3; margin: 0; color: var(--ink); white-space: nowrap; }
+.bar { max-width: 46rem; margin: 0 auto; padding-block: .3rem .4rem; display: flex; gap: .4rem; align-items: center; }
+.bar select { font: inherit; font-size: 13px; flex: 1 1 0; min-width: 0; padding: .25rem .35rem; border: 1px solid var(--rule); border-radius: 6px; background: var(--paper); color: var(--ink); }
+.bar .btn { font-size: 13px; padding: .25rem .5rem; flex: none; }
+.ai { display: inline-flex; gap: .35rem; align-items: center; color: var(--muted); min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .ai.busy { color: var(--shu); font-weight: 600; }
 .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--rule); }
 .ai.busy .dot { background: var(--shu); }
 @media (prefers-reduced-motion: no-preference) { .ai.busy .dot { animation: pulse 1s ease-in-out infinite; } @keyframes pulse { 50% { opacity: .25; } } }
-.cost { margin-left: auto; }
+.cost { margin-left: auto; white-space: nowrap; }
 button { font: inherit; cursor: pointer; }
 .btn { font-size: 14px; padding: .4rem .75rem; border-radius: 6px; border: 1px solid var(--rule); background: var(--sheet); color: var(--ink); white-space: nowrap; }
 .btn:focus-visible, select:focus-visible, textarea:focus-visible, .blk:focus-visible, .opt:focus-within { outline: 2px solid var(--shu); outline-offset: 2px; }
@@ -129,16 +130,16 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
 </style>
 
 <header class="gutter">
+  <div class="top">
+    <h1 id="title">校正台</h1>
+    <span class="ai" id="ai"><span class="dot"></span><span id="ai-text">待機中</span></span>
+    <span class="cost" id="cost" title="送受信した文字数から推定した API 換算の目安（今回／累計）。思考に使った分は含まない。実際には閲覧者の Claude の利用枠から引かれる。">¥0</span>
+  </div>
   <div class="bar">
-    <h1 id="title">やる夫教材 校正台</h1>
     <select id="book" aria-label="教材"></select>
     <select id="act" aria-label="幕"></select>
     <button class="btn" id="finish" type="button" title="全体向けの指摘を他の幕へ広げる">幕を終える<span class="count" id="pending"></span></button>
     <button class="btn quiet" id="open-log" type="button">履歴<span class="count" id="logcount"></span></button>
-  </div>
-  <div class="meter">
-    <span class="ai" id="ai"><span class="dot"></span><span id="ai-text">AI 待機中</span></span>
-    <span class="cost" id="cost" title="送受信した文字数から推定した API 換算の目安。思考に使った分は含まない。実際には閲覧者の Claude の利用枠から引かれる。">推定 ¥0</span>
   </div>
 </header>
 <main class="gutter" id="main"></main>
@@ -202,12 +203,12 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
       const [, f] = [...inflight.entries()].sort((x, y) => x[1].started - y[1].started)[0];
       const sec = Math.floor((Date.now() - f.started) / 1000);
       ai.classList.add("busy");
-      $("#ai-text").textContent = "AI " + f.label + "… " + sec + "秒" + (inflight.size > 1 ? "（ほか" + (inflight.size - 1) + "件）" : "");
+      $("#ai-text").textContent = f.label + " " + sec + "秒" + (inflight.size > 1 ? " ほか" + (inflight.size - 1) : "");
     } else {
       ai.classList.remove("busy");
-      $("#ai-text").textContent = "AI 待機中";
+      $("#ai-text").textContent = "待機中";
     }
-    $("#cost").textContent = "推定 今回 " + yen(costSession) + " ／ 累計 " + yen(costTotal);
+    $("#cost").textContent = yen(costSession) + "／累計" + yen(costTotal);
   }
   setInterval(() => { if (inflight.size) paintMeter(); }, 1000);
 
@@ -904,7 +905,7 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
     paintMeter();
     try { BOOKS = await (await fetch("books.json")).json(); }
     catch { $("#main").textContent = "教材の一覧を読み込めなかった。ページを開き直す。"; return; }
-    for (const b of BOOKS) $("#book").append(el("option", { value: b.id }, b.title.split(" ── ")[0]));
+    for (const b of BOOKS) $("#book").append(el("option", { value: b.id }, b.title.split(" ── ")[0].replace(/^やる夫で学ぶ\s*/, "")));
     $("#book").addEventListener("change", () => loadBook($("#book").value));
     $("#act").addEventListener("change", () => { store.set("act:" + BOOK.book, $("#act").value); endFlow(); renderAct(); window.scrollTo(0, 0); });
     $("#finish").addEventListener("click", () => { if (!BOOK) return; endFlow(); finish(); });
