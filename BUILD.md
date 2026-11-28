@@ -132,7 +132,7 @@ documents:
 
 ### 台本形式（@形式、試行中）
 
-`docs/books/{id}/script/` を持つ教材は、そこにある幕ごとのファイル（`00.txt` が前付け、`01.txt` 以降が `## ` 見出しごとの幕）が正本で、`README.md` はそこから生成する。現在は `statistics` と `statistics-2`。
+`docs/books/{id}/script/` を持つ教材は、そこにある幕ごとのファイル（`00.txt` が前付け、`01.txt` 以降が `## ` 見出しごとの幕）が正本で、`README.md` はそこから生成する。現在は `statistics`・`statistics-2`・`statistics-3`・`fluid-mechanics`。
 
 ```
 @u7f3a やる夫
