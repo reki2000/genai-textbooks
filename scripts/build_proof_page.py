@@ -1,25 +1,27 @@
 #!/usr/bin/env python3
 """@形式の教材から、スマホで校正するためのページ（Claude のアーティファクト）を作る。
 
-出力は `build/proof/{ID}/` に置く:
+一つの校正台で複数の教材を扱う。出力は `build/proof/all/` に置く:
 
 - `index.html` … `scripts/proof_template.html` そのもの（教材に依存しない）
-- `book.json` … 本文（ブロック ID・話者・Markdown）、登場人物欄、アウトライン、
+- `books.json` … 教材の一覧（ID・題名・本文ファイル）
+- `books/{ID}.json` … 本文（ブロック ID・話者・Markdown）、登場人物欄、アウトライン、
   規約（`yaruo-rediscovery` の SKILL.md の抜粋と `editorial/rules.md`）、
   過去の指摘（`editorial/feedback.jsonl`）
-- `figs/` … 本文が参照する図版
+- `books/{ID}/figs/` … 本文が参照する図版
 
 ブロック ID は、発言は台本の ID（`u7f3a`）、地の文・見出し・登場人物欄は
 `r{幕}-{幕内の素通し部分の通し番号}-{その中の段落番号}`。ページは修正を共有 DB の `edits` に上書きとして
 持ち、`scripts/sync_proof.py` が正本へ取り込む。
 
-    python3 scripts/build_proof_page.py docs/books/statistics
+    python3 scripts/build_proof_page.py                  # script/ を持つ全教材
+    python3 scripts/build_proof_page.py docs/books/statistics docs/books/statistics-2
 """
 
 from __future__ import annotations
 
 import argparse
-import html
+
 import json
 import re
 import shutil
@@ -118,7 +120,7 @@ def series_outline(book_dir: Path) -> str:
     return ""
 
 
-def build(book_dir: Path, out_dir: Path) -> Path:
+def book_data(book_dir: Path) -> tuple[dict, set[str]]:
     acts = yaruo_script.load_script(book_dir)
     readme = (book_dir / "README.md").read_text(encoding="utf-8")
     title = readme.split("\n", 1)[0].lstrip("# ").strip()
@@ -164,28 +166,45 @@ def build(book_dir: Path, out_dir: Path) -> Path:
         "speakers": sorted({u.speaker for u in yaruo_script.all_utterances(acts)}),
         "acts": out_acts,
     }
-    target = out_dir / book_dir.name
-    if target.exists():
-        shutil.rmtree(target)
-    (target / "figs").mkdir(parents=True)
-    (target / "book.json").write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
-    page = TEMPLATE.read_text(encoding="utf-8").replace("{{TITLE}}", html.escape(title.split(" ── ")[0]))
-    (target / "index.html").write_text(page, encoding="utf-8")
-    for fig in sorted(figs):
-        source = book_dir / fig
-        if source.exists():
-            shutil.copy2(source, target / fig)
-    return target
+    return data, figs
+
+
+def build(book_dirs: list[Path], out_dir: Path) -> Path:
+    """複数の教材を一つの校正台にまとめる。本文は教材ごとの JSON に分け、選んだときに読む。"""
+    if out_dir.exists():
+        shutil.rmtree(out_dir)
+    (out_dir / "books").mkdir(parents=True)
+    index = []
+    for book_dir in book_dirs:
+        data, figs = book_data(book_dir)
+        book_id = book_dir.name
+        (out_dir / "books" / f"{book_id}.json").write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+        index.append({"id": book_id, "title": data["title"], "file": f"books/{book_id}.json"})
+        for fig in sorted(figs):
+            source = book_dir / fig
+            if source.exists():
+                target = out_dir / "books" / book_id / fig
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(source, target)
+    (out_dir / "books.json").write_text(json.dumps(index, ensure_ascii=False), encoding="utf-8")
+    (out_dir / "index.html").write_text(TEMPLATE.read_text(encoding="utf-8"), encoding="utf-8")
+    return out_dir
+
+
+def script_books() -> list[Path]:
+    """@形式（script/）を持つ教材を、カタログの並びに近い ID 順で返す。"""
+    return sorted(p.parent for p in (ROOT / "docs" / "books").glob(f"*/{yaruo_script.SCRIPT_DIR_NAME}"))
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("book")
-    parser.add_argument("--out", default=str(ROOT / "build" / "proof"))
+    parser.add_argument("books", nargs="*", help="教材ディレクトリ。省略すると script/ を持つ全教材")
+    parser.add_argument("--out", default=str(ROOT / "build" / "proof" / "all"))
     args = parser.parse_args()
-    target = build(Path(args.book), Path(args.out))
+    books = [Path(b) for b in args.books] or script_books()
+    target = build(books, Path(args.out))
     files = sorted(p.relative_to(target).as_posix() for p in target.rglob("*") if p.is_file())
-    print(f"built {target}: {', '.join(files)}")
+    print(json.dumps({"out": str(target), "books": [b.name for b in books], "files": files}, ensure_ascii=False))
     return 0
 
 

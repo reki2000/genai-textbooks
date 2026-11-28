@@ -43,6 +43,11 @@ def read_docs(directory: Path) -> list[dict]:
     return rows
 
 
+def block_of(edit: dict) -> str:
+    """上書きが当てるブロックの ID。DB の文書 ID は「教材ID__ブロックID」なので、本体の id を優先する。"""
+    return str(edit.get("id") or edit["_id"].split("__", 1)[-1])
+
+
 def locate(acts: list[yaruo_script.Act], block_id: str):
     """ブロック ID から (幕, 幕内の位置, 項目, 段落の行範囲) を返す。発言の段落範囲は None。"""
     for act in acts:
@@ -73,7 +78,7 @@ def apply_edits(book: str, edits: list[dict]) -> tuple[list[yaruo_script.Act], d
     for edit in edits:
         if edit.get("insertAfter") and edit.get("base") is None:
             continue
-        found = locate(acts, edit["_id"])
+        found = locate(acts, block_of(edit))
         if found is None:
             result[edit["_id"]] = "conflict: ブロックが見つからない"
             continue
@@ -110,7 +115,7 @@ def apply_edits(book: str, edits: list[dict]) -> tuple[list[yaruo_script.Act], d
             if edit.get("deleted"):
                 result[edit["_id"]] = "applied"
                 continue
-            new = yaruo_script.Utterance(edit["_id"], edit.get("speaker", ""), "", str(edit.get("md", "")).split("\n"))
+            new = yaruo_script.Utterance(block_of(edit), edit.get("speaker", ""), "", str(edit.get("md", "")).split("\n"))
             act.items[position + 1 : position + 1] = [yaruo_script.Raw([""]), new]
             result[edit["_id"]] = "applied"
     for edit in pending:

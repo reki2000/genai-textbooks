@@ -1,4 +1,4 @@
-<title>{{TITLE}} 校正台</title>
+<title>やる夫教材 校正台</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
 /* 校正台: 本文は一段の縦流し、操作は下から出るシート。赤字（朱）が唯一のアクセント。差分は左=旧・右=新。 */
@@ -42,7 +42,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 header { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--sheet); border-bottom: 1px solid var(--rule); }
 .bar { max-width: 46rem; margin: 0 auto; padding-block: .45rem; display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
 .bar h1 { font-size: 15px; line-height: 1.3; margin: 0; flex: 1 1 100%; min-width: 0; }
-.bar select { font: inherit; font-size: 14px; flex: 1 1 9rem; min-width: 0; padding: .3rem .45rem; border: 1px solid var(--rule); border-radius: 6px; background: var(--paper); color: var(--ink); }
+.bar select { font: inherit; font-size: 14px; flex: 1 1 8rem; min-width: 0; padding: .3rem .45rem; border: 1px solid var(--rule); border-radius: 6px; background: var(--paper); color: var(--ink); }
 .meter { max-width: 46rem; margin: 0 auto; padding-bottom: .35rem; display: flex; gap: .8rem; align-items: center; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; flex-wrap: wrap; }
 .ai { display: inline-flex; gap: .4rem; align-items: center; color: var(--muted); }
 .ai.busy { color: var(--shu); font-weight: 600; }
@@ -131,7 +131,8 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
 
 <header class="gutter">
   <div class="bar">
-    <h1 id="title">{{TITLE}}</h1>
+    <h1 id="title">やる夫教材 校正台</h1>
+    <select id="book" aria-label="教材"></select>
     <select id="act" aria-label="幕"></select>
     <button class="btn" id="finish" type="button" title="全体向けの指摘を他の幕へ広げる">幕を終える<span class="count" id="pending"></span></button>
     <button class="btn quiet" id="open-log" type="button">履歴<span class="count" id="logcount"></span></button>
@@ -239,6 +240,7 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
     const maths = [];
     let src = text.replace(/\$\$([\s\S]+?)\$\$/g, (_, t) => { maths.push([t, true]); return "MATHPH" + (maths.length - 1) + "X"; });
     src = src.replace(/\$([^$\n]+?)\$/g, (_, t) => { maths.push([t, false]); return "MATHPH" + (maths.length - 1) + "X"; });
+    if (BOOK) src = src.replace(/\]\(figs\//g, "](books/" + BOOK.book + "/figs/");
     src = src.replace(/｜([^｜《》\n]{1,40})《([^｜《》\n]{1,40})》/g, (_, b, r) => "<ruby>" + esc(b) + "<rt>" + esc(r) + "</rt></ruby>");
     const out = md ? md.render(src) : "<p>" + esc(src).replace(/\n/g, "<br>") + "</p>";
     return out.replace(/MATHPH(\d+)X/g, (_, i) => {
@@ -775,7 +777,7 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
         createdAt: (prev && prev.createdAt) || new Date().toISOString(), updatedAt: new Date().toISOString(), author: me,
       };
       overlay.set(p.id, doc);
-      if (db) await db.collection("edits").doc(p.id).set(doc);
+      if (db) await db.collection("edits").doc(BOOK.book + "__" + p.id).set(doc);
     }
   }
 
@@ -859,19 +861,56 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
   }
 
   // ---------------------------------------------------------------- 起動
-  async function boot() {
-    paintMeter();
-    try { BOOK = await (await fetch("book.json")).json(); }
-    catch { $("#main").textContent = "本文を読み込めなかった。ページを開き直す。"; return; }
-    $("#title").textContent = BOOK.title.split(" ── ")[0];
+  let BOOKS = [];
+  let unsubs = [];
+  async function loadBook(id) {
+    const entry = BOOKS.find((b) => b.id === id) || BOOKS[0];
+    endFlow();
+    $("#main").replaceChildren(el("p", { class: "empty" }, "本文を読み込み中…"));
+    try { BOOK = await (await fetch(entry.file)).json(); }
+    catch { $("#main").replaceChildren(el("p", { class: "err" }, "本文を読み込めなかった。ページを開き直す。")); return; }
+    store.set("book", BOOK.book);
+    $("#book").value = BOOK.book;
+    original.clear(); overlay.clear(); feedback = []; guessCache.clear();
+    $("#act").replaceChildren();
     BOOK.acts.forEach((a, i) => { for (const b of a.blocks) original.set(b.id, { block: b, act: a }); $("#act").append(el("option", { value: String(i) }, a.heading)); });
     const raw = store.get("act:" + BOOK.book);
     const saved = raw === null ? NaN : Number(raw);
     $("#act").value = String(Number.isInteger(saved) && saved >= 0 && saved < BOOK.acts.length ? saved : Math.min(1, BOOK.acts.length - 1));
+    renderAct();
+    window.scrollTo(0, 0);
+    subscribe();
+  }
+  function subscribe() {
+    unsubs.forEach((u) => { try { u(); } catch {} });
+    unsubs = [];
+    if (!db || !BOOK) return;
+    const book = BOOK.book;
+    let first = true;
+    unsubs.push(db.collection("edits").where("book", "==", book).onSnapshot((snap) => {
+      if (!BOOK || BOOK.book !== book) return;
+      overlay.clear();
+      for (const x of snap.docs) { const d = x.data(); overlay.set(d.id || x.id, { ...d, id: d.id || x.id }); }
+      if (first || mode === "idle") renderAct();
+      first = false;
+    }, () => {}));
+    unsubs.push(db.collection("feedback").where("book", "==", book).onSnapshot((snap) => {
+      if (!BOOK || BOOK.book !== book) return;
+      feedback = snap.docs.map((x) => ({ _id: x.id, ...x.data() }));
+      paintCounts();
+    }, () => {}));
+  }
+
+  async function boot() {
+    paintMeter();
+    try { BOOKS = await (await fetch("books.json")).json(); }
+    catch { $("#main").textContent = "教材の一覧を読み込めなかった。ページを開き直す。"; return; }
+    for (const b of BOOKS) $("#book").append(el("option", { value: b.id }, b.title.split(" ── ")[0]));
+    $("#book").addEventListener("change", () => loadBook($("#book").value));
     $("#act").addEventListener("change", () => { store.set("act:" + BOOK.book, $("#act").value); endFlow(); renderAct(); window.scrollTo(0, 0); });
-    $("#finish").addEventListener("click", () => { endFlow(); finish(); });
-    $("#open-log").addEventListener("click", () => { endFlow(); openLog(); });
-    $("#fab").addEventListener("click", startSelect);
+    $("#finish").addEventListener("click", () => { if (!BOOK) return; endFlow(); finish(); });
+    $("#open-log").addEventListener("click", () => { if (!BOOK) return; endFlow(); openLog(); });
+    $("#fab").addEventListener("click", () => { if (BOOK) startSelect(); });
     let selTimer = null;
     document.addEventListener("selectionchange", () => {
       if (settingSelection || (mode !== "select" && mode !== "compose")) return;
@@ -882,28 +921,15 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
         selTimer = setTimeout(() => { if (!settingSelection) useNativeSelection(); }, 600);
       }
     });
-    renderAct();
     setMode("idle");
+    const saved = store.get("book");
+    await loadBook(BOOKS.some((b) => b.id === saved) ? saved : BOOKS[0].id);
 
     const api = window.claude && window.claude.use ? window.claude : null;
     if (!api) return;
     api.use("sample").then((s) => { sample = s; }).catch(() => {});
     api.use("user").then(async (u) => { try { me = u ? await u.id() : null; } catch { me = null; } }).catch(() => {});
-    api.use("db").then((d) => {
-      db = d;
-      if (!db) return;
-      let first = true;
-      db.collection("edits").where("book", "==", BOOK.book).onSnapshot((snap) => {
-        overlay.clear();
-        for (const x of snap.docs) overlay.set(x.id, { ...x.data(), id: x.id });
-        if (first || mode === "idle") renderAct();
-        first = false;
-      }, () => {});
-      db.collection("feedback").where("book", "==", BOOK.book).onSnapshot((snap) => {
-        feedback = snap.docs.map((x) => ({ _id: x.id, ...x.data() }));
-        paintCounts();
-      }, () => {});
-    }).catch(() => {});
+    api.use("db").then((d) => { db = d; subscribe(); }).catch(() => {});
   }
   boot();
 })();
