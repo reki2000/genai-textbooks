@@ -79,7 +79,6 @@ body.picking .blk:hover { background: color-mix(in srgb, var(--c, var(--muted)) 
 table { border-collapse: collapse; font-size: 13px; }
 th, td { border: 1px solid var(--rule); padding: .2rem .5rem; }
 code { font-family: var(--font-mono); font-size: .9em; }
-.fab { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 15; padding: .75rem 1.4rem; border-radius: 999px; border: 0; background: var(--shu); color: var(--sheet); font-size: 16px; font-weight: 700; box-shadow: 0 4px 14px rgb(0 0 0 / .22); }
 .sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; max-height: 62vh; overflow-y: auto; background: var(--sheet); border-top: 2px solid var(--shu); box-shadow: 0 -8px 24px rgb(0 0 0 / .15); padding-bottom: calc(.8rem + env(safe-area-inset-bottom, 0px)); }
 .sheet.compact { max-height: 40vh; }
 .sheet-in { max-width: 46rem; margin: 0 auto; padding-block: .6rem; display: grid; gap: .6rem; }
@@ -144,7 +143,6 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
 </header>
 <main class="gutter" id="main"></main>
 <div class="sheet gutter" id="sheet" hidden><div class="sheet-in" id="sheet-in"></div></div>
-<button class="fab" id="fab" type="button">修正</button>
 <div class="toast" id="toast" hidden></div>
 
 <script src="https://cdn.jsdelivr.net/npm/markdown-it@13.0.2/dist/markdown-it.min.js"></script>
@@ -474,29 +472,29 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
     ].filter(Boolean).join("\n\n");
   }
 
-  // ---------------------------------------------------------------- 工程: idle → select → compose → working → review
-  let mode = "idle";
+  // ---------------------------------------------------------------- 工程: select → compose → working → review
+  let mode = "select";
   let draft = null;           // compose の入力: {picked:Set, free, scope}
   let guessState = null;      // {key, status:"loading"|"ready"|"error", list, error}
   let review = null;          // {meta, rounds}
 
+  // 常に指摘の工程の中にいる。何もしていないときは「1. 範囲を選ぶ」の小さな帯が出ている
   function setMode(m) {
     mode = m;
-    document.body.classList.toggle("picking", m === "select" || m === "compose");
-    $("#fab").hidden = m !== "idle";
-    $("#sheet").hidden = m === "idle";
+    document.body.classList.add("picking");
+    $("#sheet").hidden = false;
     $("#sheet").classList.toggle("compact", m === "select");
   }
   function sheet(step, ...kids) {
-    const close = el("button", { class: "btn quiet", type: "button", onclick: endFlow }, "やめる");
-    $("#sheet-in").replaceChildren(el("div", { class: "sheet-head" }, el("div", { class: "step" }, step), close), ...kids);
+    const reset = mode !== "select" || pick ? el("button", { class: "btn quiet", type: "button", onclick: endFlow }, "やり直す") : null;
+    $("#sheet-in").replaceChildren(el("div", { class: "sheet-head" }, el("div", { class: "step" }, step), reset), ...kids.filter((k) => k !== null && k !== undefined && k !== false));
   }
   function endFlow() {
     for (const k of ["guess", "work", "refine", "spread"]) cancel(k);
     pick = null; draft = null; guessState = null; review = null;
     try { window.getSelection().removeAllRanges(); } catch {}
     document.querySelectorAll(".blk.sel").forEach((n) => n.classList.remove("sel"));
-    setMode("idle");
+    startSelect();
   }
 
   function targetNow() {
@@ -510,7 +508,7 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
   function startSelect() {
     pick = null; guessState = null; review = null; draft = { picked: new Set(), free: "", scope: "here" };
     setMode("select");
-    paintSelect();
+    if (BOOK) paintSelect();
   }
   function paintSelect() {
     const t = targetNow();
@@ -518,7 +516,7 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
     const noRange = el("button", { class: "btn", type: "button", onclick: () => { pick = null; document.querySelectorAll(".blk.sel").forEach((n) => n.classList.remove("sel")); try { window.getSelection().removeAllRanges(); } catch {} guessState = null; draft.scope = "act"; toCompose(); } }, "範囲なしで指摘");
     sheet("1 / 3　範囲を選ぶ",
       el("div", { class: "hint" }, "本文をタップすると文節を選ぶ。同じ所をもう一度タップで 文 → 発言。指で範囲を選んでもよい。"),
-      pick ? el("div", { class: "quote" }, t.selection || (findCurrent(pick.id)?.md || "")) : el("div", { class: "quote empty" }, "まだ選んでいない"),
+      pick ? el("div", { class: "quote" }, t.selection || (findCurrent(pick.id)?.md || "")) : null,
       el("div", { class: "row" }, el("span", { class: "hint grow" }, pick ? t.label + "　" + status : ""), noRange,
         pick ? el("button", { class: "btn primary", type: "button", onclick: toCompose }, "候補を見る") : null));
   }
@@ -857,7 +855,7 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
           f.scope === "book" ? "適用済みの幕 " + (f.doneActs || []).length + " / " + BOOK.acts.length : null, f.synced ? "正本に取り込み済み" : null),
         f.comment ? el("div", { class: "meta" }, "コメント: " + f.comment) : null);
     }));
-    sheet("指摘の履歴　" + rows.length + "件", rows.length ? list : el("p", { class: "empty" }, "まだ無い。右下の「修正」から始める。"));
+    sheet("指摘の履歴　" + rows.length + "件", rows.length ? list : el("p", { class: "empty" }, "まだ無い。本文をタップして範囲を選ぶところから始める。"));
   }
 
   // ---------------------------------------------------------------- 起動
@@ -879,6 +877,7 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
     $("#act").value = String(Number.isInteger(saved) && saved >= 0 && saved < BOOK.acts.length ? saved : Math.min(1, BOOK.acts.length - 1));
     renderAct();
     window.scrollTo(0, 0);
+    startSelect();
     subscribe();
   }
   function subscribe() {
@@ -891,7 +890,7 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
       if (!BOOK || BOOK.book !== book) return;
       overlay.clear();
       for (const x of snap.docs) { const d = x.data(); overlay.set(d.id || x.id, { ...d, id: d.id || x.id }); }
-      if (first || mode === "idle") renderAct();
+      if (first || (mode === "select" && !pick)) renderAct();
       first = false;
     }, () => {}));
     unsubs.push(db.collection("feedback").where("book", "==", book).onSnapshot((snap) => {
@@ -910,7 +909,6 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
     $("#act").addEventListener("change", () => { store.set("act:" + BOOK.book, $("#act").value); endFlow(); renderAct(); window.scrollTo(0, 0); });
     $("#finish").addEventListener("click", () => { if (!BOOK) return; endFlow(); finish(); });
     $("#open-log").addEventListener("click", () => { if (!BOOK) return; endFlow(); openLog(); });
-    $("#fab").addEventListener("click", () => { if (BOOK) startSelect(); });
     let selTimer = null;
     document.addEventListener("selectionchange", () => {
       if (settingSelection || (mode !== "select" && mode !== "compose")) return;
@@ -921,7 +919,7 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
         selTimer = setTimeout(() => { if (!settingSelection) useNativeSelection(); }, 600);
       }
     });
-    setMode("idle");
+    setMode("select");
     const saved = store.get("book");
     await loadBook(BOOKS.some((b) => b.id === saved) ? saved : BOOKS[0].id);
 
