@@ -1,7 +1,7 @@
 <title>{{TITLE}} 校正台</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
-/* 校正台: 本文は一段の縦流し、操作は下から出るシート。赤字（朱）が唯一のアクセント。 */
+/* 校正台: 本文は一段の縦流し、操作は下から出るシート。赤字（朱）が唯一のアクセント。差分は左=旧・右=新。 */
 :root {
   --paper: #f5f6f4;
   --sheet: #ffffff;
@@ -10,27 +10,29 @@
   --rule: #dfe3e0;
   --shu: #b4432f;
   --shu-soft: #f6e4df;
+  --del: #fbe3e1;
+  --del-strong: #f2b8b2;
+  --ins: #e2f3e7;
+  --ins-strong: #a9dcb8;
   --new: #2f7a4f;
-  --new-soft: #e3f1e8;
   --yaruo: #2d63c8;
   --yaranai: #2f7a4f;
   --dekiruo: #9a6a12;
   --dekiruko: #a0336f;
   --other: #646d73;
   --font-body: "Hiragino Sans", "Noto Sans JP", "Yu Gothic UI", system-ui, sans-serif;
-  --font-head: "Hiragino Sans", "Noto Sans JP", system-ui, sans-serif;
   --font-mono: ui-monospace, "SFMono-Regular", Menlo, monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --paper: #141719; --sheet: #1c2023; --ink: #e5e8e6; --muted: #9aa3a8; --rule: #2d3337;
-    --shu: #ec7b63; --shu-soft: #3a2520; --new: #79c99a; --new-soft: #1d3326;
+    --shu: #ec7b63; --shu-soft: #3a2520; --del: #3a2220; --del-strong: #6e3029; --ins: #1b3224; --ins-strong: #2c5c3c; --new: #79c99a;
     --yaruo: #86aef5; --yaranai: #79c99a; --dekiruo: #e2b55c; --dekiruko: #ee8cc2; --other: #9aa3a8; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --paper: #141719; --sheet: #1c2023; --ink: #e5e8e6; --muted: #9aa3a8; --rule: #2d3337;
-  --shu: #ec7b63; --shu-soft: #3a2520; --new: #79c99a; --new-soft: #1d3326;
+  --shu: #ec7b63; --shu-soft: #3a2520; --del: #3a2220; --del-strong: #6e3029; --ins: #1b3224; --ins-strong: #2c5c3c; --new: #79c99a;
   --yaruo: #86aef5; --yaranai: #79c99a; --dekiruo: #e2b55c; --dekiruko: #ee8cc2; --other: #9aa3a8; color-scheme: dark;
 }
 * { box-sizing: border-box; }
@@ -38,71 +40,93 @@ body { background: var(--paper); color: var(--ink); font: 16px/1.8 var(--font-bo
 body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--sheet); }
 .gutter { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 header { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--sheet); border-bottom: 1px solid var(--rule); }
-.bar { max-width: 46rem; margin: 0 auto; padding-block: .55rem; display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
-.bar h1 { font: 700 15px/1.3 var(--font-head); margin: 0; flex: 1 1 100%; min-width: 0; }
-.bar select { font: inherit; font-size: 14px; flex: 1 1 10rem; min-width: 0; padding: .35rem .5rem; border: 1px solid var(--rule); border-radius: 6px; background: var(--paper); color: var(--ink); }
+.bar { max-width: 46rem; margin: 0 auto; padding-block: .45rem; display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
+.bar h1 { font-size: 15px; line-height: 1.3; margin: 0; flex: 1 1 100%; min-width: 0; }
+.bar select { font: inherit; font-size: 14px; flex: 1 1 9rem; min-width: 0; padding: .3rem .45rem; border: 1px solid var(--rule); border-radius: 6px; background: var(--paper); color: var(--ink); }
+.meter { max-width: 46rem; margin: 0 auto; padding-bottom: .35rem; display: flex; gap: .8rem; align-items: center; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; flex-wrap: wrap; }
+.ai { display: inline-flex; gap: .4rem; align-items: center; color: var(--muted); }
+.ai.busy { color: var(--shu); font-weight: 600; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--rule); }
+.ai.busy .dot { background: var(--shu); }
+@media (prefers-reduced-motion: no-preference) { .ai.busy .dot { animation: pulse 1s ease-in-out infinite; } @keyframes pulse { 50% { opacity: .25; } } }
+.cost { margin-left: auto; }
 button { font: inherit; cursor: pointer; }
 .btn { font-size: 14px; padding: .4rem .75rem; border-radius: 6px; border: 1px solid var(--rule); background: var(--sheet); color: var(--ink); white-space: nowrap; }
-.btn:focus-visible, select:focus-visible, textarea:focus-visible, .blk:focus-visible, .chip:focus-visible { outline: 2px solid var(--shu); outline-offset: 2px; }
-.btn.primary { background: var(--shu); border-color: var(--shu); color: var(--sheet); }
-.btn.quiet { border-color: transparent; color: var(--muted); }
-.btn:disabled { opacity: .5; cursor: default; }
+.btn:focus-visible, select:focus-visible, textarea:focus-visible, .blk:focus-visible, .opt:focus-within { outline: 2px solid var(--shu); outline-offset: 2px; }
+.btn.primary { background: var(--shu); border-color: var(--shu); color: var(--sheet); font-weight: 600; }
+.btn.quiet { border-color: transparent; color: var(--muted); background: transparent; }
+.btn:disabled { opacity: .45; cursor: default; }
 .count { display: inline-block; min-width: 1.3rem; padding: 0 .35rem; border-radius: 9px; background: var(--shu); color: var(--sheet); font-size: 12px; text-align: center; margin-left: .3rem; }
 .count:empty { display: none; }
-.status { max-width: 46rem; margin: 0 auto; padding-bottom: .4rem; font-size: 12px; color: var(--muted); }
 main { max-width: 46rem; margin: 0 auto; padding-block: 1rem 70vh; }
-.blk { position: relative; margin: .45rem -.6rem; padding: .3rem .6rem .3rem .9rem; border-left: 3px solid var(--c, transparent); border-radius: 0 6px 6px 0; cursor: pointer; }
-.blk:hover { background: color-mix(in srgb, var(--c, var(--muted)) 7%, transparent); }
+.blk { position: relative; margin: .45rem -.6rem; padding: .3rem .6rem .3rem .9rem; border-left: 3px solid var(--c, transparent); border-radius: 0 6px 6px 0; }
+body.picking .blk { cursor: pointer; }
+body.picking .blk:hover { background: color-mix(in srgb, var(--c, var(--muted)) 7%, transparent); }
 .blk.sel { background: var(--shu-soft); border-left-color: var(--shu); }
 .blk.edited { box-shadow: inset 3px 0 0 var(--new); }
 .blk.raw { color: var(--muted); font-size: 14px; --c: transparent; }
-.blk.raw h2 { font: 700 1.25rem/1.4 var(--font-head); color: var(--ink); margin: 1.6rem 0 .4rem; }
-.blk.raw h3 { font: 700 1.05rem/1.5 var(--font-head); color: var(--ink); margin: 1.6rem 0 .2rem; }
+.blk.raw h2 { font-size: 1.25rem; color: var(--ink); margin: 1.6rem 0 .4rem; }
+.blk.raw h3 { font-size: 1.05rem; color: var(--ink); margin: 1.6rem 0 .2rem; }
 .blk.raw hr { display: none; }
-.spk { font: 700 13px/1.4 var(--font-head); color: var(--c, var(--other)); display: flex; gap: .5rem; align-items: center; }
+.spk { font-weight: 700; font-size: 13px; line-height: 1.4; color: var(--c, var(--other)); display: flex; gap: .5rem; align-items: center; }
 .spk .note { font-weight: 400; color: var(--muted); }
 .spk .mark { margin-left: auto; font-size: 11px; color: var(--new); }
 .blk p { margin: .15rem 0; }
 .blk.yaruo { --c: var(--yaruo); } .blk.yaranai { --c: var(--yaranai); } .blk.dekiruo { --c: var(--dekiruo); } .blk.dekiruko { --c: var(--dekiruko); } .blk.other { --c: var(--other); }
 .blk img { background: #fff; border-radius: 4px; max-width: 100%; height: auto; }
+.blk .body ::selection, .blk .body::selection { background: color-mix(in srgb, var(--shu) 30%, transparent); }
 .math-block, table, pre { overflow-x: auto; display: block; max-width: 100%; }
 table { border-collapse: collapse; font-size: 13px; }
 th, td { border: 1px solid var(--rule); padding: .2rem .5rem; }
 code { font-family: var(--font-mono); font-size: .9em; }
-.sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; max-height: 55vh; overflow-y: auto; background: var(--sheet); border-top: 2px solid var(--shu); box-shadow: 0 -8px 24px rgb(0 0 0 / .15); padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px)); }
-.sheet-in { max-width: 46rem; margin: 0 auto; padding-block: .7rem; display: grid; gap: .65rem; }
+.fab { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 15; padding: .75rem 1.4rem; border-radius: 999px; border: 0; background: var(--shu); color: var(--sheet); font-size: 16px; font-weight: 700; box-shadow: 0 4px 14px rgb(0 0 0 / .22); }
+.sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; max-height: 62vh; overflow-y: auto; background: var(--sheet); border-top: 2px solid var(--shu); box-shadow: 0 -8px 24px rgb(0 0 0 / .15); padding-bottom: calc(.8rem + env(safe-area-inset-bottom, 0px)); }
+.sheet.compact { max-height: 40vh; }
+.sheet-in { max-width: 46rem; margin: 0 auto; padding-block: .6rem; display: grid; gap: .6rem; }
 .sheet-head { display: flex; gap: .5rem; align-items: center; }
-.sheet-head .label { font: 700 13px/1.4 var(--font-head); letter-spacing: .03em; color: var(--shu); flex: 1; min-width: 0; }
-.quote { font-size: 13px; color: var(--muted); border-left: 3px solid var(--rule); padding-left: .6rem; white-space: pre-wrap; max-height: 5.5rem; overflow-y: auto; }
+.step { font-size: 12px; font-weight: 700; letter-spacing: .04em; color: var(--shu); flex: 1; min-width: 0; }
+.hint { font-size: 13px; color: var(--muted); }
+.quote { font-size: 13px; color: var(--ink); background: var(--paper); border-left: 3px solid var(--shu); padding: .3rem .6rem; white-space: pre-wrap; max-height: 4.6rem; overflow-y: auto; border-radius: 0 6px 6px 0; }
+.quote.empty { color: var(--muted); border-left-color: var(--rule); }
 textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 1px solid var(--rule); border-radius: 6px; background: var(--paper); color: var(--ink); resize: vertical; }
 .row { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; }
-.guesses { display: grid; gap: .4rem; }
-.chip { text-align: left; padding: .5rem .7rem; border-radius: 8px; border: 1px solid var(--rule); background: var(--paper); color: var(--ink); display: flex; gap: .6rem; align-items: baseline; }
-.chip b { font-weight: 500; font-size: 14px; flex: 1; min-width: 0; }
-.scope { font-size: 11px; color: var(--muted); border: 1px solid var(--rule); border-radius: 8px; padding: 0 .4rem; white-space: nowrap; }
-.scope.book { color: var(--shu); border-color: var(--shu); }
+.row .grow { flex: 1; }
 .seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
 .seg button { border: 0; background: var(--sheet); color: var(--muted); font-size: 13px; padding: .3rem .6rem; }
-.seg button[aria-pressed="true"] { background: var(--shu); color: var(--sheet); }
-.patch { border: 1px solid var(--rule); border-radius: 8px; padding: .5rem .6rem; display: grid; gap: .35rem; background: var(--paper); }
-.patch .ph { display: flex; gap: .5rem; align-items: center; font-size: 12px; color: var(--muted); }
-.patch .ph label { display: flex; gap: .35rem; align-items: center; color: var(--ink); font-weight: 600; }
-.patch .before { font-size: 13px; color: var(--muted); text-decoration: line-through; text-decoration-color: var(--shu); white-space: pre-wrap; max-height: 7rem; overflow-y: auto; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--sheet); }
+.opts { display: grid; gap: .35rem; }
+.opt { display: flex; gap: .6rem; align-items: flex-start; padding: .45rem .6rem; border: 1px solid var(--rule); border-radius: 8px; background: var(--paper); cursor: pointer; }
+.opt input { margin-top: .3rem; accent-color: var(--shu); }
+.opt span.t { flex: 1; min-width: 0; font-size: 14px; }
+.opt.on { border-color: var(--shu); background: var(--shu-soft); }
+.scope { font-size: 11px; color: var(--muted); border: 1px solid var(--rule); border-radius: 8px; padding: 0 .4rem; white-space: nowrap; }
+.scope.book { color: var(--shu); border-color: var(--shu); }
+.working { display: grid; gap: .5rem; padding: .4rem 0; }
+.working .big { display: flex; gap: .6rem; align-items: center; font-size: 15px; font-weight: 600; color: var(--shu); font-variant-numeric: tabular-nums; }
+.spinner { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--shu-soft); border-top-color: var(--shu); }
+@media (prefers-reduced-motion: no-preference) { .spinner { animation: spin .8s linear infinite; } @keyframes spin { to { transform: rotate(360deg); } } }
+.asked { font-size: 13px; color: var(--muted); margin: 0; padding-left: 1.1rem; }
+.patch { border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; background: var(--sheet); }
 .patch.off { opacity: .55; }
-.summary { font-size: 13px; }
-.thinking { font-size: 14px; color: var(--muted); }
-.err { font-size: 14px; color: var(--shu); }
-.empty { color: var(--muted); font-size: 14px; }
+.ph { display: flex; gap: .5rem; align-items: center; padding: .3rem .5rem; background: var(--paper); border-bottom: 1px solid var(--rule); font-size: 12px; color: var(--muted); }
+.ph label { display: flex; gap: .35rem; align-items: center; color: var(--ink); font-weight: 600; }
+.ph .grow { flex: 1; }
+.diff { display: grid; grid-template-columns: 1fr 1fr; font-size: 12.5px; line-height: 1.65; }
+.diff > div { min-width: 0; padding: .35rem .5rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+.diff .old { background: var(--del); border-right: 1px solid var(--rule); }
+.diff .new { background: var(--ins); }
+.diff .none { color: var(--muted); font-style: italic; }
+.diff del { background: var(--del-strong); text-decoration: none; border-radius: 2px; }
+.diff ins { background: var(--ins-strong); text-decoration: none; border-radius: 2px; }
+.pfoot { display: grid; gap: .35rem; padding: .35rem .5rem; border-top: 1px solid var(--rule); }
+.pfoot textarea { font-size: 13px; padding: .35rem .45rem; }
+.summary { font-size: 13px; margin: 0; }
+.err { font-size: 14px; color: var(--shu); margin: 0; }
+.empty { color: var(--muted); font-size: 14px; margin: 0; }
 .list { display: grid; gap: .5rem; }
 .item { border: 1px solid var(--rule); border-radius: 8px; padding: .5rem .7rem; font-size: 13px; display: grid; gap: .25rem; background: var(--paper); }
 .item .meta { color: var(--muted); font-size: 12px; display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; }
-.progress { font-size: 13px; color: var(--muted); }
-.hint { font-size: 12px; color: var(--muted); }
-.quote.whole { max-height: 4.2rem; }
-.blk .body ::selection, .blk .body::selection { background: color-mix(in srgb, var(--shu) 28%, transparent); }
-.fab { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 15; padding: .7rem 1.1rem; border-radius: 999px; border: 0; background: var(--shu); color: var(--sheet); font-size: 15px; font-weight: 600; box-shadow: 0 4px 14px rgb(0 0 0 / .2); }
-.fab:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
-@media (prefers-reduced-motion: no-preference) { .sheet { animation: up .18s ease-out; } @keyframes up { from { transform: translateY(12px); } } }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(80px + env(safe-area-inset-bottom, 0px)); z-index: 30; background: var(--ink); color: var(--sheet); padding: .5rem 1rem; border-radius: 8px; font-size: 14px; }
 </style>
 
 <header class="gutter">
@@ -112,11 +136,15 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
     <button class="btn" id="finish" type="button" title="全体向けの指摘を他の幕へ広げる">幕を終える<span class="count" id="pending"></span></button>
     <button class="btn quiet" id="open-log" type="button">履歴<span class="count" id="logcount"></span></button>
   </div>
-  <div class="status" id="status">本文を読み込み中…</div>
+  <div class="meter">
+    <span class="ai" id="ai"><span class="dot"></span><span id="ai-text">AI 待機中</span></span>
+    <span class="cost" id="cost" title="送受信した文字数から推定した API 換算の目安。思考に使った分は含まない。実際には閲覧者の Claude の利用枠から引かれる。">推定 ¥0</span>
+  </div>
 </header>
 <main class="gutter" id="main"></main>
 <div class="sheet gutter" id="sheet" hidden><div class="sheet-in" id="sheet-in"></div></div>
-<button class="fab" id="fab" type="button">幕に指摘</button>
+<button class="fab" id="fab" type="button">修正</button>
+<div class="toast" id="toast" hidden></div>
 
 <script src="https://cdn.jsdelivr.net/npm/markdown-it@13.0.2/dist/markdown-it.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
@@ -138,20 +166,71 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
   const SCOPE = { here: "ここだけ", act: "この幕", book: "全体" };
   const ERR = {
     not_granted: "Claude への問い合わせが許可されていない。",
-    rate_limited: "問い合わせが混んでいる。少し待ってからもう一度押す。",
+    rate_limited: "問い合わせが混んでいる。少し待ってからもう一度。",
     prompt_too_large: "文脈が大きすぎる。範囲を狭める。",
-    invalid_json: "返答を読み取れなかった。もう一度押す。",
+    invalid_json: "返答を読み取れなかった。もう一度。",
     refused: "この内容には答えられなかった。",
-    cancelled: "止めた。",
   };
-  const errText = (e) => ERR[e && e.code] || "問い合わせに失敗した（" + ((e && e.code) || (e && e.message) || "不明") + "）。もう一度押す。";
+  const errText = (e) => ERR[e && e.code] || "問い合わせに失敗した（" + ((e && e.code) || (e && e.message) || "不明") + "）。";
   const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
+  const clip = (s, n) => (s.length > n ? s.slice(0, n) + "…" : s).replace(/\n/g, " ");
 
   let BOOK = null, sample = null, db = null, me = null;
   const original = new Map();   // id -> {block, act}
   const overlay = new Map();    // id -> edit doc（DB の edits）
   let feedback = [];            // DB の feedback
-  const guessCache = new Map();
+
+  // ---------------------------------------------------------------- AI の状態と料金の目安
+  // 単価（100万トークンあたりの米ドル）: quick=Haiku 5.5、default=Sonnet 5.5、complex=Opus 5.5
+  const PRICE = { quick: [0.10, 0.50], default: [2, 10], complex: [4, 20] };
+  const YEN_PER_USD = 150;
+  const LABEL = { guess: "候補を推測中", work: "修正案を作成中", refine: "コメントを反映中", spread: "他の幕へ適用中" };
+  const inflight = new Map();   // key -> {label, started}
+  let costSession = 0;
+  let costTotal = Number(store.get("cost-total")) || 0;
+  function estTokens(s) { let t = 0; for (const ch of s) t += ch.charCodeAt(0) > 0x2fff ? 1 : 0.28; return Math.ceil(t); }
+  function addCost(tier, input, output) {
+    const [pi, po] = PRICE[tier] || PRICE.default;
+    const v = (estTokens(input) * pi + estTokens(output) * po) / 1e6 * YEN_PER_USD;
+    costSession += v; costTotal += v;
+    store.set("cost-total", String(costTotal));
+    paintMeter();
+  }
+  const yen = (v) => "¥" + (v < 10 ? v.toFixed(2) : v.toFixed(0));
+  function paintMeter() {
+    const ai = $("#ai");
+    if (inflight.size) {
+      const [, f] = [...inflight.entries()].sort((x, y) => x[1].started - y[1].started)[0];
+      const sec = Math.floor((Date.now() - f.started) / 1000);
+      ai.classList.add("busy");
+      $("#ai-text").textContent = "AI " + f.label + "… " + sec + "秒" + (inflight.size > 1 ? "（ほか" + (inflight.size - 1) + "件）" : "");
+    } else {
+      ai.classList.remove("busy");
+      $("#ai-text").textContent = "AI 待機中";
+    }
+    $("#cost").textContent = "推定 今回 " + yen(costSession) + " ／ 累計 " + yen(costTotal);
+  }
+  setInterval(() => { if (inflight.size) paintMeter(); }, 1000);
+
+  const ctls = {};
+  async function ask(key, input, tier) {
+    if (!sample) throw { code: "no_sample", message: "この表示では Claude に問い合わせられない。claude.ai でこのページを開く。" };
+    ctls[key]?.abort();
+    const ctl = (ctls[key] = new AbortController());
+    inflight.set(key, { label: LABEL[key] || "処理中", started: Date.now() });
+    paintMeter();
+    try {
+      const res = await sample.json(input, { modelTier: tier, signal: ctl.signal });
+      addCost(tier, input, JSON.stringify(res));
+      return res;
+    } catch (e) {
+      if (e && e.text) addCost(tier, input, e.text);
+      throw e;
+    } finally {
+      if (ctls[key] === ctl) { delete ctls[key]; inflight.delete(key); paintMeter(); }
+    }
+  }
+  function cancel(key) { ctls[key]?.abort(); delete ctls[key]; inflight.delete(key); paintMeter(); }
 
   // ---------------------------------------------------------------- Markdown
   const md = window.markdownit ? window.markdownit({ html: true, breaks: true, linkify: false }) : null;
@@ -161,18 +240,57 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
     let src = text.replace(/\$\$([\s\S]+?)\$\$/g, (_, t) => { maths.push([t, true]); return "MATHPH" + (maths.length - 1) + "X"; });
     src = src.replace(/\$([^$\n]+?)\$/g, (_, t) => { maths.push([t, false]); return "MATHPH" + (maths.length - 1) + "X"; });
     src = src.replace(/｜([^｜《》\n]{1,40})《([^｜《》\n]{1,40})》/g, (_, b, r) => "<ruby>" + esc(b) + "<rt>" + esc(r) + "</rt></ruby>");
-    let out = md ? md.render(src) : "<p>" + esc(src).replace(/\n/g, "<br>") + "</p>";
-    out = out.replace(/MATHPH(\d+)X/g, (_, i) => {
+    const out = md ? md.render(src) : "<p>" + esc(src).replace(/\n/g, "<br>") + "</p>";
+    return out.replace(/MATHPH(\d+)X/g, (_, i) => {
       const [t, d] = maths[Number(i)];
       return '<span class="math' + (d ? " math-block" : "") + '" data-d="' + (d ? 1 : 0) + '">' + esc(t) + "</span>";
     });
-    return out;
   }
   function renderMath(root) {
     if (!window.katex) return;
-    root.querySelectorAll(".math").forEach((m) => {
-      try { katex.render(m.textContent, m, { output: "mathml", displayMode: m.dataset.d === "1", throwOnError: false }); } catch {}
-    });
+    root.querySelectorAll(".math").forEach((m) => { try { katex.render(m.textContent, m, { output: "mathml", displayMode: m.dataset.d === "1", throwOnError: false }); } catch {} });
+  }
+
+  // ---------------------------------------------------------------- 差分（空白だけの違いは無視する）
+  function charDiff(a, b) {
+    const A = [], B = [];
+    for (let i = 0; i < a.length; i++) if (!/\s/.test(a[i])) A.push(i);
+    for (let j = 0; j < b.length; j++) if (!/\s/.test(b[j])) B.push(j);
+    const delA = new Uint8Array(a.length), insB = new Uint8Array(b.length);
+    const n = A.length, m = B.length;
+    if (n * m > 2e6) { A.forEach((i) => (delA[i] = 1)); B.forEach((j) => (insB[j] = 1)); return { delA, insB }; }
+    const w = m + 1, dp = new Uint16Array((n + 1) * w);
+    for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--)
+      dp[i * w + j] = a[A[i]] === b[B[j]] ? dp[(i + 1) * w + j + 1] + 1 : Math.max(dp[(i + 1) * w + j], dp[i * w + j + 1]);
+    let i = 0, j = 0;
+    while (i < n && j < m) {
+      if (a[A[i]] === b[B[j]]) { i++; j++; }
+      else if (dp[(i + 1) * w + j] >= dp[i * w + j + 1]) delA[A[i++]] = 1;
+      else insB[B[j++]] = 1;
+    }
+    while (i < n) delA[A[i++]] = 1;
+    while (j < m) insB[B[j++]] = 1;
+    return { delA, insB };
+  }
+  function marked(text, marks, tag) {
+    const frag = document.createDocumentFragment();
+    let buf = "", on = false;
+    const flush = () => { if (!buf) return; frag.append(on ? el(tag, {}, buf) : document.createTextNode(buf)); buf = ""; };
+    for (let k = 0; k < text.length; k++) {
+      const isMark = marks[k] === 1;
+      if (isMark !== on) { flush(); on = isMark; }
+      buf += text[k];
+    }
+    flush();
+    return frag;
+  }
+  const sameIgnoringSpace = (a, b) => a.replace(/\s+/g, "") === b.replace(/\s+/g, "");
+  function diffView(before, after, op) {
+    const old = el("div", { class: "old" }), neu = el("div", { class: "new" });
+    if (op === "insert") { old.append(el("span", { class: "none" }, "（なし）")); neu.append(after); }
+    else if (op === "delete") { old.append(el("del", {}, before)); neu.append(el("span", { class: "none" }, "（削除）")); }
+    else { const { delA, insB } = charDiff(before, after); old.append(marked(before, delA, "del")); neu.append(marked(after, insB, "ins")); }
+    return el("div", { class: "diff" }, old, neu);
   }
 
   // ---------------------------------------------------------------- 上書きを重ねた本文
@@ -180,28 +298,19 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
   function currentBlocks(act) {
     const out = [];
     const pushInserts = (afterId) => {
-      const ins = [...overlay.values()].filter((o) => o.insertAfter === afterId && !o.deleted).sort((a, b) => String(a.createdAt).localeCompare(String(b.createdAt)));
-      for (const o of ins) {
-        out.push({ t: "u", id: o.id, speaker: o.speaker, note: "", md: o.md, section: o.section || "", edited: true, inserted: true });
-        pushInserts(o.id);
-      }
+      const ins = [...overlay.values()].filter((o) => o.insertAfter === afterId && !o.deleted).sort((x, y) => String(x.createdAt).localeCompare(String(y.createdAt)));
+      for (const o of ins) { out.push({ t: "u", id: o.id, speaker: o.speaker, note: "", md: o.md, section: o.section || "", edited: true, inserted: true }); pushInserts(o.id); }
     };
     for (const b of act.blocks) {
       const ov = overlay.get(b.id);
-      if (ov && !stale(ov, b.md)) {
-        if (!ov.deleted) out.push({ ...b, md: ov.md, edited: true });
-      } else {
-        out.push(b);
-      }
+      if (ov && !stale(ov, b.md)) { if (!ov.deleted) out.push({ ...b, md: ov.md, edited: true }); }
+      else out.push(b);
       pushInserts(b.id);
     }
     return out;
   }
   function actText(act, markId) {
-    return currentBlocks(act).map((b) => {
-      const head = (b.id === markId ? ">>> " : "") + "[" + b.id + "] " + (b.t === "u" ? b.speaker + (b.note || "") + "：" : "（地の文・見出し・登場人物欄）");
-      return head + "\n" + b.md;
-    }).join("\n\n");
+    return currentBlocks(act).map((b) => (b.id === markId ? ">>> " : "") + "[" + b.id + "] " + (b.t === "u" ? b.speaker + (b.note || "") + "：" : "（地の文・見出し・登場人物欄）") + "\n" + b.md).join("\n\n");
   }
 
   // ---------------------------------------------------------------- 描画
@@ -212,7 +321,7 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
     main.replaceChildren();
     for (const b of currentBlocks(a)) {
       const cls = b.t === "u" ? "blk " + (CLASS[b.speaker] || "other") : "blk raw";
-      const node = el("div", { class: cls + (b.edited ? " edited" : ""), id: b.id, tabindex: "0", "aria-label": (b.t === "u" ? b.speaker + "の発言" : "地の文") + "。タップで文節・文・発言を選ぶ" });
+      const node = el("div", { class: cls + (b.edited ? " edited" : ""), id: b.id });
       if (b.t === "u") node.append(el("div", { class: "spk" }, b.speaker, b.note ? el("span", { class: "note" }, b.note) : null, b.edited ? el("span", { class: "mark" }, b.inserted ? "追加" : "修正済み") : null));
       const body = el("div", { class: "body" });
       body.innerHTML = toHtml(b.md);
@@ -220,52 +329,38 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
       body.querySelectorAll("a").forEach((x) => x.setAttribute("target", "_blank"));
       node.append(body);
       node.addEventListener("click", (ev) => onBlockTap(ev, b.id));
-      node.addEventListener("keydown", (ev) => { if (ev.key === "Enter") { selectLevel(b.id, null, 2); } });
       main.append(node);
     }
     renderMath(main);
     paintCounts();
+    if (pick && document.getElementById(pick.id)) document.getElementById(pick.id).classList.add("sel");
   }
   function paintCounts() {
     $("#pending").textContent = pendingFor().length ? String(pendingFor().length) : "";
     $("#logcount").textContent = feedback.length ? String(feedback.length) : "";
   }
-  function findCurrent(id) {
-    const a = act();
-    return currentBlocks(a).find((b) => b.id === id);
-  }
+  function findCurrent(id) { return currentBlocks(act()).find((b) => b.id === id); }
+  function toast(text) { const t = $("#toast"); t.textContent = text; t.hidden = false; clearTimeout(toast.timer); toast.timer = setTimeout(() => (t.hidden = true), 2600); }
 
-  // ---------------------------------------------------------------- 選択（タップで 文節 → 文 → 発言）
+  // ---------------------------------------------------------------- 範囲（タップで 文節 → 文 → 発言、指で選んでもよい）
   const LEVELS = ["文節", "文", "発言"];
   const wordSeg = window.Intl && Intl.Segmenter ? new Intl.Segmenter("ja", { granularity: "word" }) : null;
-  let pick = null;            // {id, level, anchor, start, end, text}
+  let pick = null;            // {id, level(0-2 | "free"), anchor, start, end, text}
   let settingSelection = false;
-
   function textMap(body) {
-    const nodes = [];
-    let pos = 0;
-    const walker = document.createTreeWalker(body, NodeFilter.SHOW_TEXT, {
-      acceptNode: (n) => (n.parentElement && n.parentElement.closest(".math, rt, rp") ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
-    });
+    const nodes = []; let pos = 0;
+    const walker = document.createTreeWalker(body, NodeFilter.SHOW_TEXT, { acceptNode: (n) => (n.parentElement && n.parentElement.closest(".math, rt, rp") ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) });
     while (walker.nextNode()) { nodes.push({ n: walker.currentNode, start: pos }); pos += walker.currentNode.data.length; }
     return { nodes, text: nodes.map((x) => x.n.data).join("") };
   }
-  function globalOffset(map, node, offset) {
-    const hit = map.nodes.find((x) => x.n === node);
-    return hit ? hit.start + Math.min(offset, node.data.length) : null;
-  }
+  function globalOffset(map, node, offset) { const hit = map.nodes.find((x) => x.n === node); return hit ? hit.start + Math.min(offset, node.data.length) : null; }
   function rangeOf(map, start, end) {
     const r = document.createRange();
     const at = (g, isEnd) => {
-      for (const x of map.nodes) {
-        const len = x.n.data.length;
-        if (g < x.start + len || (isEnd && g === x.start + len)) return [x.n, g - x.start];
-      }
-      const last = map.nodes[map.nodes.length - 1];
-      return [last.n, last.n.data.length];
+      for (const x of map.nodes) { const len = x.n.data.length; if (g < x.start + len || (isEnd && g === x.start + len)) return [x.n, g - x.start]; }
+      const last = map.nodes[map.nodes.length - 1]; return [last.n, last.n.data.length];
     };
-    const [sn, so] = at(start, false);
-    const [en, eo] = at(end, true);
+    const [sn, so] = at(start, false), [en, eo] = at(end, true);
     r.setStart(sn, so); r.setEnd(en, eo);
     return r;
   }
@@ -278,39 +373,26 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
   const KANA = /^[ぁ-ゟー]+$/;
   function bunsetsuSpans(text) {
     if (!wordSeg) return sentenceSpans(text);
-    const spans = [];
-    let cur = null;
+    const spans = []; let cur = null;
     for (const w of wordSeg.segment(text)) {
       const s = w.index, e = s + w.segment.length, t = w.segment;
       if (t.includes("\n")) { if (cur) spans.push(cur); cur = null; continue; }
       if (!cur) { if (PUNCT.test(t)) continue; cur = [s, e]; continue; }
-      if (PUNCT.test(t) || KANA.test(t)) {
-        cur[1] = e;
-        if (/[、。！？!?]/.test(t)) { spans.push(cur); cur = null; }
-        continue;
-      }
-      if (/[ぁ-ゟ]$/.test(text.slice(cur[0], cur[1]))) { spans.push(cur); cur = [s, e]; }
-      else cur[1] = e;
+      if (PUNCT.test(t) || KANA.test(t)) { cur[1] = e; if (/[、。！？!?]/.test(t)) { spans.push(cur); cur = null; } continue; }
+      if (/[ぁ-ゟ]$/.test(text.slice(cur[0], cur[1]))) { spans.push(cur); cur = [s, e]; } else cur[1] = e;
     }
     if (cur) spans.push(cur);
     return spans;
   }
   function sentenceSpans(text) {
-    const spans = [];
-    const re = /[^。！？!?\n]+[。！？!?」』）]*/g;
-    let m;
+    const spans = []; const re = /[^。！？!?\n]+[。！？!?」』）]*/g; let m;
     while ((m = re.exec(text))) { const lead = m[0].length - m[0].trimStart().length; if (m[0].trim()) spans.push([m.index + lead, m.index + m[0].length]); }
     return spans;
   }
-  function spanAround(spans, g) {
-    return spans.find(([s, e]) => g >= s && g < e) || spans.find(([s]) => s >= g) || spans[spans.length - 1] || null;
-  }
+  const spanAround = (spans, g) => spans.find(([s, e]) => g >= s && g < e) || spans.find(([s]) => s >= g) || spans[spans.length - 1] || null;
 
   function onBlockTap(ev, id) {
-    if (ev.target.closest("a")) return;
-    const sel = window.getSelection();
-    // 指で範囲を伸ばした直後のタップは、その選択を活かす
-    if (sel && !sel.isCollapsed && !settingSelection && pick === null && sel.toString().trim()) { useNativeSelection(); return; }
+    if ((mode !== "select" && mode !== "compose") || ev.target.closest("a")) return;
     const body = document.getElementById(id)?.querySelector(".body");
     if (!body) return;
     const map = textMap(body);
@@ -325,18 +407,17 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
     const body = document.getElementById(id)?.querySelector(".body");
     if (!body) return;
     const map = textMap(body);
-    if (!map.nodes.length) { pick = { id, level: 2, anchor: 0, start: 0, end: 0, text: "" }; openTarget(id); return; }
-    const g = anchor === null ? (pick && pick.id === id ? pick.anchor : 0) : anchor;
     let span = [0, map.text.length];
-    if (level === 0) span = spanAround(bunsetsuSpans(map.text), g) || span;
-    if (level === 1) span = spanAround(sentenceSpans(map.text), g) || span;
-    pick = { id, level, anchor: g, start: span[0], end: span[1], text: map.text.slice(span[0], span[1]).trim() };
+    if (map.nodes.length && level === 0) span = spanAround(bunsetsuSpans(map.text), anchor) || span;
+    if (map.nodes.length && level === 1) span = spanAround(sentenceSpans(map.text), anchor) || span;
+    pick = { id, level, anchor, start: span[0], end: span[1], text: level === 2 ? "" : map.text.slice(span[0], span[1]).trim() };
     settingSelection = true;
     const sel = window.getSelection();
     sel.removeAllRanges();
-    if (level < 2) sel.addRange(rangeOf(map, span[0], span[1]));
+    if (level < 2 && map.nodes.length) sel.addRange(rangeOf(map, span[0], span[1]));
     setTimeout(() => { settingSelection = false; }, 0);
-    openTarget(id);
+    document.querySelectorAll(".blk.sel").forEach((n) => n.classList.toggle("sel", n.id === id));
+    onPickChanged();
   }
   function selectionBlock() {
     const sel = window.getSelection();
@@ -349,13 +430,11 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
     const id = selectionBlock();
     if (!id) return false;
     const text = window.getSelection().toString().trim();
+    if (pick && pick.id === id && pick.text === text) return true;
     pick = { id, level: "free", anchor: 0, start: 0, end: 0, text };
-    openTarget(id);
+    document.querySelectorAll(".blk.sel").forEach((n) => n.classList.toggle("sel", n.id === id));
+    onPickChanged();
     return true;
-  }
-  function paintFab() {
-    const own = pick && pick.level !== "free";
-    $("#fab").textContent = !own && selectionBlock() ? "選択範囲に指摘" : "幕に指摘";
   }
 
   // ---------------------------------------------------------------- 文脈
@@ -368,13 +447,13 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
   }
   function historyText(limit) {
     const rows = [];
-    for (const f of feedback.slice().sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)))) {
-      const all = (f.patches || []);
-      const acc = all.filter((p) => p.accepted);
+    for (const f of feedback.slice().sort((x, y) => String(y.createdAt).localeCompare(String(x.createdAt)))) {
+      const all = f.patches || [], acc = all.filter((p) => p.accepted);
       const where = f.selection ? "、選択「" + clip(f.selection, 24) + "」（" + (f.level || "") + "）" : "";
       const verdict = all.length && !acc.length ? "、提案は全部不採用" : "、採用 " + (acc.length + (f.propagated || []).length) + "件";
+      const notes = all.filter((p) => p.comment).slice(0, 2).map((p) => "\n  案へのコメント: 「" + clip(p.comment, 50) + "」").join("") + (f.comment ? "\n  全体へのコメント: 「" + clip(f.comment, 60) + "」" : "");
       const ex = acc.slice(0, 1).map((p) => "\n  採用された直し方: 「" + clip(p.before || "", 50) + "」→「" + clip(p.final || "", 50) + "」" + (p.final !== p.proposed ? "（校正者が手直し）" : "")).join("");
-      rows.push("- " + f.text + "（範囲: " + (SCOPE[f.scope] || f.scope) + where + verdict + "）" + ex);
+      rows.push("- " + f.text + "（範囲: " + (SCOPE[f.scope] || f.scope) + where + verdict + "）" + notes + ex);
     }
     for (const h of BOOK.history || []) {
       const ex = (h.examples || []).slice(0, 1).map((p) => "\n  採用された直し方: 「" + clip(p.before || "", 50) + "」→「" + clip(p.after || "", 50) + "」").join("");
@@ -382,7 +461,6 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
     }
     return rows.slice(0, limit).join("\n") || "（まだ無い）";
   }
-  const clip = (s, n) => (s.length > n ? s.slice(0, n) + "…" : s).replace(/\n/g, " ");
   function context(section, full) {
     return [
       "あなたは対話形式の教材『" + BOOK.title + "』の編集者。校正者の指摘に従って本文を直す。",
@@ -394,197 +472,214 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
     ].filter(Boolean).join("\n\n");
   }
 
-  // ---------------------------------------------------------------- シート
-  let sheetFor = null;        // 開いているシートの対象（ブロック ID か "act"）
-  const ctls = {};
-  function openSheet(label, ...kids) {
-    $("#sheet-in").replaceChildren(el("div", { class: "sheet-head" }, el("div", { class: "label", id: "sheet-label" }, label), el("button", { class: "btn", type: "button", onclick: closeSheet }, "閉じる")), ...kids);
-    $("#sheet").hidden = false;
-    $("#fab").hidden = true;
+  // ---------------------------------------------------------------- 工程: idle → select → compose → working → review
+  let mode = "idle";
+  let draft = null;           // compose の入力: {picked:Set, free, scope}
+  let guessState = null;      // {key, status:"loading"|"ready"|"error", list, error}
+  let review = null;          // {meta, rounds}
+
+  function setMode(m) {
+    mode = m;
+    document.body.classList.toggle("picking", m === "select" || m === "compose");
+    $("#fab").hidden = m !== "idle";
+    $("#sheet").hidden = m === "idle";
+    $("#sheet").classList.toggle("compact", m === "select");
   }
-  function closeSheet() {
-    for (const k of Object.keys(ctls)) { ctls[k]?.abort(); delete ctls[k]; }
-    $("#sheet").hidden = true;
-    $("#fab").hidden = false;
-    sheetFor = null;
-    pick = null;
-    document.querySelectorAll(".blk.sel").forEach((n) => n.classList.remove("sel"));
+  function sheet(step, ...kids) {
+    const close = el("button", { class: "btn quiet", type: "button", onclick: endFlow }, "やめる");
+    $("#sheet-in").replaceChildren(el("div", { class: "sheet-head" }, el("div", { class: "step" }, step), close), ...kids);
+  }
+  function endFlow() {
+    for (const k of ["guess", "work", "refine", "spread"]) cancel(k);
+    pick = null; draft = null; guessState = null; review = null;
     try { window.getSelection().removeAllRanges(); } catch {}
-    paintFab();
-  }
-  async function ask(input, out, tier, msg, key) {
-    key = key || "work";
-    if (!sample) { out.replaceChildren(el("p", { class: "err" }, "この表示では Claude に問い合わせられない。claude.ai でこのページを開く。")); return null; }
-    ctls[key]?.abort();
-    const ctl = (ctls[key] = new AbortController());
-    out.replaceChildren(el("p", { class: "thinking" }, msg || "考えている…"));
-    try { return await sample.json(input, { modelTier: tier || "default", signal: ctl.signal }); }
-    catch (e) { if (ctl.signal.aborted) return null; out.replaceChildren(el("p", { class: "err" }, errText(e))); return null; }
+    document.querySelectorAll(".blk.sel").forEach((n) => n.classList.remove("sel"));
+    setMode("idle");
   }
 
-  // ---------------------------------------------------------------- 指摘の入口
-  function scopeControl(initial) {
-    const seg = el("div", { class: "seg", role: "group", "aria-label": "範囲" });
-    seg.value = initial;
-    const set = (s) => { seg.value = s; seg.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.s === s))); };
-    for (const s of ["here", "act", "book"]) seg.append(el("button", { type: "button", "data-s": s, onclick: () => set(s) }, SCOPE[s]));
-    set(initial);
-    seg.set = set;
-    return seg;
-  }
-  function targetLabel(b) {
-    const lv = pick && pick.id === b.id ? (pick.level === "free" ? "選択" : LEVELS[pick.level]) : "発言";
-    return (b.t === "u" ? b.speaker : "地の文") + "・" + lv + "　" + b.id;
-  }
-  function selectionNow(b) {
-    if (pick && pick.id === b.id && pick.text && !(pick.level === 2)) return { text: pick.text, level: pick.level === "free" ? "選択" : LEVELS[pick.level] };
-    return { text: "", level: "発言" };
+  function targetNow() {
+    if (!pick) return { id: null, section: "", selection: "", level: "幕", speaker: "", label: "幕「" + act().heading + "」全体" };
+    const b = findCurrent(pick.id);
+    const lv = pick.level === "free" ? "選択" : LEVELS[pick.level];
+    return { id: pick.id, section: b ? b.section : "", selection: pick.text, level: lv, speaker: b ? b.speaker || "" : "", label: (b && b.t === "u" ? b.speaker : "地の文") + "・" + lv };
   }
 
-  let sheetRefs = null;
-  function openTarget(id) {
-    const b = findCurrent(id);
-    if (!b) return;
-    document.querySelectorAll(".blk.sel").forEach((n) => n.classList.toggle("sel", n.id === id));
-    const sel = selectionNow(b);
-    if (sheetFor === id && sheetRefs) {
-      // 同じブロックで範囲を切り替えた: 引用と候補だけ更新し、入力中の文や作業中の差分は残す
-      $("#sheet-label").textContent = targetLabel(b);
-      sheetRefs.quote.textContent = sel.text || b.md;
-      sheetRefs.quote.classList.toggle("whole", !sel.text);
-      refreshGuesses(b);
-      return;
-    }
-    sheetFor = id;
-    const guesses = el("div", { class: "guesses" });
-    const seg = scopeControl("here");
-    const free = el("textarea", { id: "free", rows: "2", placeholder: "自由に指摘する（例: 札の比喩をやめる）" });
-    const go = el("button", { class: "btn primary", type: "button" }, "直す");
-    const work = el("div", { class: "list" });
-    const quote = el("div", { class: "quote" + (sel.text ? "" : " whole") }, sel.text || b.md);
-    go.addEventListener("click", () => { const t = free.value.trim(); if (t) fix(targetOf(b), t, seg.value, "free", guesses._list || [], work); });
-    openSheet(targetLabel(b), el("div", { class: "hint" }, "同じ所をもう一度タップすると 文節 → 文 → 発言 と範囲が広がる"), quote, guesses, free, el("div", { class: "row" }, seg, go), work);
-    sheetRefs = { quote, guesses, work, seg, free };
-    refreshGuesses(b);
-    const node = document.getElementById(id);
-    if (node) { const r = node.getBoundingClientRect(); if (r.bottom > innerHeight * 0.45) window.scrollBy({ top: r.top - 90, behavior: "smooth" }); }
+  // 1. 範囲を選ぶ（下は小さな帯。候補は裏で推測しておく）
+  function startSelect() {
+    pick = null; guessState = null; review = null; draft = { picked: new Set(), free: "", scope: "here" };
+    setMode("select");
+    paintSelect();
   }
-  function targetOf(b) {
-    const sel = selectionNow(b);
-    return { id: b.id, section: b.section, selection: sel.text, level: sel.level, speaker: b.speaker || "" };
+  function paintSelect() {
+    const t = targetNow();
+    const status = !pick ? "" : guessState && guessState.status === "ready" ? "候補 " + guessState.list.length + "件 用意できた" : guessState && guessState.status === "error" ? "候補を出せなかった（次へ進んで自由に書ける）" : "候補を推測中…";
+    const noRange = el("button", { class: "btn", type: "button", onclick: () => { pick = null; document.querySelectorAll(".blk.sel").forEach((n) => n.classList.remove("sel")); try { window.getSelection().removeAllRanges(); } catch {} guessState = null; draft.scope = "act"; toCompose(); } }, "範囲なしで指摘");
+    sheet("1 / 3　範囲を選ぶ",
+      el("div", { class: "hint" }, "本文をタップすると文節を選ぶ。同じ所をもう一度タップで 文 → 発言。指で範囲を選んでもよい。"),
+      pick ? el("div", { class: "quote" }, t.selection || (findCurrent(pick.id)?.md || "")) : el("div", { class: "quote empty" }, "まだ選んでいない"),
+      el("div", { class: "row" }, el("span", { class: "hint grow" }, pick ? t.label + "　" + status : ""), noRange,
+        pick ? el("button", { class: "btn primary", type: "button", onclick: toCompose }, "候補を見る") : null));
+  }
+  let pickTimer = null;
+  function onPickChanged() {
+    if (mode === "select") paintSelect();
+    clearTimeout(pickTimer);
+    pickTimer = setTimeout(() => { loadGuesses(); if (mode === "compose") { draft.picked.clear(); paintCompose(); } }, mode === "select" ? 700 : 300);
   }
 
-  let guessTimer = null;
-  function refreshGuesses(b) {
-    clearTimeout(guessTimer);
-    const box = sheetRefs.guesses;
-    const t = targetOf(b);
-    const key = b.id + "\u0000" + b.md + "\u0000" + t.selection;
-    const draw = (list) => {
-      box._list = list.map((g) => g.text);
-      box.replaceChildren(...list.map((g) => el("button", { class: "chip", type: "button", onclick: () => fix(targetOf(b), g.text, g.scope, "pick", box._list, sheetRefs.work) },
-        el("b", {}, g.text), el("span", { class: "scope " + g.scope }, SCOPE[g.scope] || g.scope))));
-    };
-    if (guessCache.has(key)) return draw(guessCache.get(key));
-    box.replaceChildren(el("p", { class: "thinking" }, "指摘を推測している…"));
-    guessTimer = setTimeout(async () => {
-      const a = act();
+  // 候補の推測（範囲と過去の指摘から）
+  const guessCache = new Map();
+  function loadGuesses() {
+    const t = targetNow();
+    const a = act();
+    const key = (t.id || "act:" + a.name) + "\u0000" + t.selection + "\u0000" + (t.id ? findCurrent(t.id)?.md : feedback.length);
+    if (guessState && guessState.key === key && guessState.status !== "error") return;
+    if (guessCache.has(key)) { guessState = { key, status: "ready", list: guessCache.get(key) }; repaint(); return; }
+    guessState = { key, status: "loading", list: [] };
+    repaint();
+    let prompt;
+    if (t.id) {
       const blocks = currentBlocks(a);
-      const i = blocks.findIndex((x) => x.id === b.id);
-      const near = blocks.slice(Math.max(0, i - 3), i + 3).map((x) => (x.id === b.id ? ">>> " : "") + (x.t === "u" ? x.speaker + "：" : "（地の文・登場人物欄）") + "\n" + x.md).join("\n\n");
-      const prompt = [
-        context(b.section, false),
+      const i = blocks.findIndex((x) => x.id === t.id);
+      const near = blocks.slice(Math.max(0, i - 3), i + 3).map((x) => (x.id === t.id ? ">>> " : "") + (x.t === "u" ? x.speaker + "：" : "（地の文・登場人物欄）") + "\n" + x.md).join("\n\n");
+      prompt = [
+        context(t.section, false),
         "## 校正者が選んだ箇所\n" + (t.selection ? "選択範囲（" + t.level + "）: 「" + t.selection + "」\n>>> のブロックの中にある。" : ">>> のブロック全体。") + "\n\n" + near,
         "## 依頼\n校正者がこの箇所を選んだ。言いたそうな指摘を、可能性の高い順に5〜7個推測する。" +
-          "\n- まず過去の指摘を読む。同じ種類の問題がこの選択範囲にもあれば、その指摘を過去と同じ言い回しで先頭に置く。採用されたものほど優先し、提案が全部不採用だった種類は下げる。" +
-          (t.selection ? "\n- 指摘は選択範囲（" + t.level + "）そのものについて書く。文節なら語や言い回し、文なら文の役割・長さ・口調、が主な対象。" : "\n- 指摘はブロック全体（発言なら発言の役割・長さ・人物らしさ・流れ）について書く。") +
-          "\n- この箇所に実際にありそうなものだけを挙げる（人物のぶれ・説明の先取り・台詞の長さ・比喩や言い回し・唐突さ・事実や数値・書式など）。" +
-          "\n- 各指摘は校正者が自分で書くような短い一文（30字以内）。範囲は、この箇所だけなら here、この幕の同種の箇所すべてなら act、教材全体に当てはまる方針なら book。" +
+          "\n- まず過去の指摘を読む。同じ種類の問題がこの選択範囲にもあれば、その指摘を過去と同じ言い回しで先頭に置く。採用されたものほど優先し、提案が全部不採用だった種類は下げる。案へのコメントに表れた好みも汲む。" +
+          (t.selection ? "\n- 指摘は選択範囲（" + t.level + "）そのものについて書く。文節なら語や言い回し、文なら文の役割・長さ・口調、が主な対象。" : "\n- 指摘はブロック全体（発言なら役割・長さ・人物らしさ・流れ）について書く。") +
+          "\n- この箇所に実際にありそうなものだけを挙げる。各指摘は校正者が自分で書くような短い一文（30字以内）。範囲は、この箇所だけなら here、この幕の同種の箇所すべてなら act、教材全体の方針なら book。" +
           "\n返答は JSON だけ: {\"guesses\":[{\"text\":\"指摘\",\"scope\":\"here|act|book\"}]}",
       ].join("\n\n");
-      const res = await ask(prompt, box, "quick", "指摘を推測している…", "guess");
-      if (!res) return;
-      const list = (Array.isArray(res.guesses) ? res.guesses : []).filter((g) => g && typeof g.text === "string").map((g) => ({ text: g.text.trim(), scope: ["here", "act", "book"].includes(g.scope) ? g.scope : "here" }));
-      guessCache.set(key, list);
-      if (sheetFor === b.id && targetOf(b).selection === t.selection) draw(list);
-    }, 450);
-  }
-
-  // 選択なしで始める（幕への指摘）
-  function openGeneral() {
-    if (useNativeSelection()) return;
-    const a = act();
-    sheetFor = "act";
-    const guesses = el("div", { class: "guesses" });
-    const seg = scopeControl("act");
-    seg.querySelector('[data-s="here"]').remove();
-    const free = el("textarea", { id: "free-act", rows: "3", placeholder: "この幕・教材全体への指摘（例: できる子が突然出てくる）" });
-    const go = el("button", { class: "btn primary", type: "button" }, "直す");
-    const work = el("div", { class: "list" });
-    const target = { id: null, section: "", selection: "", level: "幕", speaker: "" };
-    go.addEventListener("click", () => { const t = free.value.trim(); if (t) fix(target, t, seg.value, "free", guesses._list || [], work); });
-    openSheet("幕「" + a.heading + "」への指摘", free, el("div", { class: "row" }, seg, go), guesses, work);
-    sheetRefs = null;
-    const key = "act\u0000" + a.name + "\u0000" + feedback.length;
-    const draw = (list) => {
-      guesses._list = list.map((g) => g.text);
-      guesses.replaceChildren(el("div", { class: "hint" }, "この幕で言いそうな指摘"), ...list.map((g) => el("button", { class: "chip", type: "button", onclick: () => fix(target, g.text, g.scope, "pick", guesses._list, work) },
-        el("b", {}, g.text), el("span", { class: "scope " + g.scope }, SCOPE[g.scope] || g.scope))));
-    };
-    if (guessCache.has(key)) return draw(guessCache.get(key));
-    (async () => {
-      const prompt = [
+    } else {
+      prompt = [
         context("", false),
         "## 幕「" + a.heading + "」の本文\n" + actText(a, null),
-        "## 依頼\n校正者がこの幕全体について指摘しようとしている。言いたそうな指摘を、可能性の高い順に5〜7個推測する。" +
-          "過去の指摘のうち、この幕にもまだ当てはまるものを過去と同じ言い回しで先頭に置く。次に、幕全体の構成・人物の出し方・会話の型の繰り返し・台詞の長さなど、幕単位で見える問題を挙げる。各30字以内。範囲は act か book。" +
+        "## 依頼\n校正者がこの幕全体について指摘しようとしている。言いたそうな指摘を可能性の高い順に5〜7個推測する。過去の指摘のうち、この幕にもまだ当てはまるものを過去と同じ言い回しで先頭に置く。次に、幕全体の構成・人物の出し方・会話の型の繰り返し・台詞の長さなど幕単位で見える問題を挙げる。各30字以内。範囲は act か book。" +
           "\n返答は JSON だけ: {\"guesses\":[{\"text\":\"指摘\",\"scope\":\"act|book\"}]}",
       ].join("\n\n");
-      const res = await ask(prompt, guesses, "quick", "この幕への指摘を推測している…", "guess");
-      if (!res) return;
-      const list = (Array.isArray(res.guesses) ? res.guesses : []).filter((g) => g && typeof g.text === "string").map((g) => ({ text: g.text.trim(), scope: g.scope === "book" ? "book" : "act" }));
+    }
+    const my = guessState;
+    ask("guess", prompt, "quick").then((res) => {
+      const list = (Array.isArray(res.guesses) ? res.guesses : []).filter((g) => g && typeof g.text === "string").map((g) => ({ text: g.text.trim(), scope: ["here", "act", "book"].includes(g.scope) ? g.scope : t.id ? "here" : "act" }));
       guessCache.set(key, list);
-      if (sheetFor === "act") draw(list);
-    })();
+      if (guessState === my) { guessState = { key, status: "ready", list }; repaint(); }
+    }).catch((e) => {
+      if (guessState !== my || (e && (e.name === "AbortError" || e.code === "cancelled"))) return;
+      guessState = { key, status: "error", list: [], error: e?.code === "no_sample" ? e.message : errText(e) };
+      repaint();
+    });
+  }
+  function repaint() { if (mode === "select") paintSelect(); else if (mode === "compose") paintCompose(); }
+
+  // 2. 指摘を決める（上に自由記述と開始ボタン、下に候補。候補は複数選べる）
+  function toCompose() {
+    setMode("compose");
+    if (!guessState) loadGuesses();
+    paintCompose();
+  }
+  function paintCompose() {
+    const t = targetNow();
+    if (!draft) draft = { picked: new Set(), free: "", scope: t.id ? "here" : "act" };
+    if (!t.id && draft.scope === "here") draft.scope = "act";
+    const free = el("textarea", { id: "free", rows: "2", placeholder: "自由に書く（候補と組み合わせてよい）" });
+    free.value = draft.free;
+    const start = el("button", { class: "btn primary", type: "button", onclick: startWork }, "回答開始");
+    const refresh = () => { start.disabled = !draft.free.trim() && !draft.picked.size; start.textContent = "回答開始" + (draft.picked.size ? "（候補" + draft.picked.size + "件" + (draft.free.trim() ? "＋自由記述" : "") + "）" : ""); };
+    free.addEventListener("input", () => { draft.free = free.value; refresh(); });
+    const seg = el("div", { class: "seg", role: "group", "aria-label": "直す範囲" });
+    const paintSeg = () => seg.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.s === draft.scope)));
+    for (const s of t.id ? ["here", "act", "book"] : ["act", "book"]) seg.append(el("button", { type: "button", "data-s": s, onclick: () => { draft.scope = s; paintSeg(); } }, SCOPE[s]));
+    paintSeg();
+    refresh();
+    let opts;
+    if (!guessState || guessState.status === "loading") opts = el("p", { class: "empty" }, "候補を推測している…（上の欄に書いて先に始めてもよい）");
+    else if (guessState.status === "error") opts = el("p", { class: "err" }, guessState.error);
+    else opts = el("div", { class: "opts" }, ...guessState.list.map((g, i) => {
+      const cb = el("input", { type: "checkbox", id: "g-" + i });
+      cb.checked = draft.picked.has(g.text);
+      const row = el("label", { class: "opt" + (cb.checked ? " on" : ""), for: "g-" + i }, cb, el("span", { class: "t" }, g.text), el("span", { class: "scope " + g.scope }, SCOPE[g.scope]));
+      cb.addEventListener("change", () => {
+        if (cb.checked) {
+          draft.picked.add(g.text);
+          const order = ["here", "act", "book"];
+          if (order.indexOf(g.scope) > order.indexOf(draft.scope)) { draft.scope = g.scope; paintSeg(); }
+        } else draft.picked.delete(g.text);
+        row.classList.toggle("on", cb.checked);
+        refresh();
+      });
+      return row;
+    }));
+    sheet("2 / 3　指摘を決める　" + t.label,
+      el("div", { class: "quote" + (t.id ? "" : " empty") }, t.selection || (t.id ? findCurrent(t.id)?.md || "" : "範囲なし（この幕への指摘）")),
+      free,
+      el("div", { class: "row" }, seg, el("span", { class: "grow" }), start),
+      el("div", { class: "hint" }, "候補（複数選べる）" + (t.id ? "。本文をタップし直すと範囲が変わり、候補も出し直す" : "")),
+      opts);
   }
 
-  // ---------------------------------------------------------------- 修正
+  // 3. 修正案を作る → 確かめる
   const PATCH_FORMAT = "返答は JSON だけ: {\"summary\":\"何をどう直したか（60字以内）\",\"patches\":[" +
     "{\"op\":\"replace\",\"id\":\"ブロックID\",\"md\":\"直した後の全文\"}," +
     "{\"op\":\"delete\",\"id\":\"ブロックID\"}," +
     "{\"op\":\"insert\",\"after\":\"この ID の直後に\",\"speaker\":\"話者\",\"md\":\"新しい発言\"}]}" +
-    "\n直す必要のないブロックは patches に入れない。replace の md はブロックの全文（話者名の行は書かない）。書式は元と同じ Markdown（1文ごとの改行、ルビ ｜基底《よみ》、$数式$）。数値・事実・数式・脚注記号は指摘が求めない限り変えない。";
+    "\n直す必要のないブロックは patches に入れない。空白や改行だけの変更はしない。replace の md はブロックの全文（話者名の行は書かない）。書式は元と同じ Markdown（1文ごとの改行、ルビ ｜基底《よみ》、$数式$）。数値・事実・数式・脚注記号は指摘が求めない限り変えない。";
 
-  async function fix(target, text, scope, source, offered, work) {
+  function startWork() {
+    const t = targetNow();
     const a = act();
-    const where = target.id
-      ? (target.selection ? "校正者が選んだのは [" + target.id + "] の中の「" + target.selection + "」（" + target.level + "）。" : "校正者が選んだのは [" + target.id + "] の全体。")
-      : "校正者は場所を選ばずに指摘した。";
-    const range = scope === "here"
-      ? (target.selection ? "選んだ範囲を中心に [" + target.id + "] だけを直す。選択範囲の外は、つながりに必要な最小限だけ変える。" : "[" + target.id + "] だけを直す。つながりのために直前直後の1ブロックを直すのは可。")
-      : "この幕の中で、この指摘に当てはまる箇所をすべて直す" + (target.id ? "（選んだ箇所に限らない）" : "") + "。";
+    const picked = [...draft.picked], free = draft.free.trim();
+    const meta = { text: [...picked, ...(free ? [free] : [])].join(" ／ "), picked, free, scope: draft.scope, offered: guessState ? guessState.list.map((g) => g.text) : [], target: t.id, selection: t.selection, level: t.level, act: a.name, section: t.section };
+    cancel("guess");
+    const where = t.id ? (t.selection ? "校正者が選んだのは [" + t.id + "] の中の「" + t.selection + "」（" + t.level + "）。" : "校正者が選んだのは [" + t.id + "] の全体。") : "校正者は場所を選ばずに指摘した。";
+    const range = meta.scope === "here"
+      ? (t.selection ? "選んだ範囲を中心に [" + t.id + "] だけを直す。選択範囲の外は、つながりに必要な最小限だけ変える。" : "[" + t.id + "] だけを直す。つながりのために直前直後の1ブロックを直すのは可。")
+      : "この幕の中で、この指摘に当てはまる箇所をすべて直す" + (t.id ? "（選んだ箇所に限らない）" : "") + "。";
     const prompt = [
-      context(target.section, true),
-      "## 幕「" + a.heading + "」の本文（各ブロックの先頭に [ID]。>>> は校正者が選んだブロック）\n" + actText(a, target.id),
-      "## 指摘\n「" + text + "」\n" + where + "\n範囲: " + range + "\n" + PATCH_FORMAT,
+      context(t.section, true),
+      "## 幕「" + a.heading + "」の本文（各ブロックの先頭に [ID]。>>> は校正者が選んだブロック）\n" + actText(a, t.id),
+      "## 指摘\n" + [...picked, ...(free ? [free] : [])].map((x) => "- " + x).join("\n") + "\n" + where + "\n範囲: " + range + "\n" + PATCH_FORMAT,
     ].join("\n\n");
-    const res = await ask(prompt, work, "default", "直している…（数十秒かかる）", "work");
-    if (!res) return;
-    reviewPatches(work, a, res, { text, scope, source, offered, target: target.id, selection: target.selection, level: target.level, act: a.name }, () => fix(target, text, scope, source, offered, work));
+    runWork("work", prompt, "default", a, meta, null, () => { setMode("compose"); paintCompose(); });
+  }
+
+  function runWork(key, prompt, tier, a, meta, onDone, onCancel) {
+    setMode("working");
+    const started = Date.now();
+    const clock = el("span", {}, "0秒");
+    const timer = setInterval(() => { clock.textContent = Math.floor((Date.now() - started) / 1000) + "秒"; }, 500);
+    const stop = el("button", { class: "btn", type: "button", onclick: () => { clearInterval(timer); cancel(key); onCancel(); } }, "中止");
+    const asked = [...(meta.picked || []), ...(meta.free ? [meta.free] : [])];
+    sheet((key === "spread" ? "幕「" + a.heading + "」" : "3 / 3") + "　修正案を作っている",
+      el("div", { class: "working" },
+        el("div", { class: "big" }, el("span", { class: "spinner" }), el("span", {}, (LABEL[key] || "処理中") + "… "), clock),
+        el("div", { class: "hint" }, "差分ができたら、ここに左右に並べて出す。数十秒かかることがある。"),
+        asked.length ? el("ul", { class: "asked" }, ...asked.map((x) => el("li", {}, x))) : null,
+        el("div", { class: "row" }, stop)));
+    ask(key, prompt, tier).then((res) => {
+      clearInterval(timer);
+      showReview(a, res, meta, onDone);
+    }).catch((e) => {
+      clearInterval(timer);
+      if (e && (e.name === "AbortError" || e.code === "cancelled")) return;
+      sheet("失敗した", el("p", { class: "err" }, e?.code === "no_sample" ? e.message : errText(e)),
+        el("div", { class: "row" }, el("button", { class: "btn primary", type: "button", onclick: () => runWork(key, prompt, tier, a, meta, onDone, onCancel) }, "もう一度"), el("button", { class: "btn", type: "button", onclick: onCancel }, "戻る")));
+    });
   }
 
   function normalizePatches(a, res) {
-    const ids = new Set(currentBlocks(a).map((x) => x.id));
+    const byId = new Map(currentBlocks(a).map((x) => [x.id, x]));
     const out = [];
     for (const p of Array.isArray(res.patches) ? res.patches : []) {
       if (!p || typeof p !== "object") continue;
-      if (p.op === "replace" && ids.has(p.id) && typeof p.md === "string") {
-        const cur = currentBlocks(a).find((x) => x.id === p.id);
-        if (cur.md.trim() !== p.md.trim()) out.push({ op: "replace", id: p.id, before: cur.md, md: p.md.replace(/^\n+|\n+$/g, ""), speaker: cur.speaker || "", t: cur.t });
-      } else if (p.op === "delete" && ids.has(p.id)) {
-        const cur = currentBlocks(a).find((x) => x.id === p.id);
+      if (p.op === "replace" && byId.has(p.id) && typeof p.md === "string") {
+        const cur = byId.get(p.id);
+        const next = p.md.replace(/^\n+|\n+$/g, "");
+        if (!sameIgnoringSpace(cur.md, next)) out.push({ op: "replace", id: p.id, before: cur.md, md: next, speaker: cur.speaker || "", t: cur.t });
+      } else if (p.op === "delete" && byId.has(p.id)) {
+        const cur = byId.get(p.id);
         out.push({ op: "delete", id: p.id, before: cur.md, md: "", speaker: cur.speaker || "", t: cur.t });
-      } else if (p.op === "insert" && ids.has(p.after) && typeof p.md === "string" && BOOK.speakers.includes(p.speaker)) {
+      } else if (p.op === "insert" && byId.has(p.after) && typeof p.md === "string" && p.md.trim() && BOOK.speakers.includes(p.speaker)) {
         out.push({ op: "insert", after: p.after, id: newId(), before: "", md: p.md.trim(), speaker: p.speaker, t: "u" });
       }
     }
@@ -595,42 +690,76 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
     for (;;) { const id = "u" + Math.floor(Math.random() * 0x10000).toString(16).padStart(4, "0"); if (!used.has(id)) return id; }
   }
 
-  function reviewPatches(work, a, res, meta, retry, onDone) {
+  function showReview(a, res, meta, onDone) {
     const patches = normalizePatches(a, res);
+    review = { meta, rounds: review && review.meta === meta ? review.rounds + 1 : 1 };
+    setMode("review");
+    const head = (onDone ? "幕「" + a.heading + "」" : "3 / 3") + "　修正案を確かめる" + (review.rounds > 1 ? "（" + review.rounds + "回目）" : "");
     if (!patches.length) {
-      work.replaceChildren(el("p", { class: "empty" }, "直す箇所は見つからなかった。" + (res.summary ? "（" + res.summary + "）" : "")),
-        el("div", { class: "row" }, el("button", { class: "btn", type: "button", onclick: retry }, "もう一度"), onDone ? el("button", { class: "btn", type: "button", onclick: () => onDone(null) }, "次へ") : null));
+      sheet(head, el("p", { class: "empty" }, "直す箇所は無かった。" + (res.summary ? "（" + res.summary + "）" : "")),
+        el("div", { class: "row" },
+          onDone ? el("button", { class: "btn primary", type: "button", onclick: () => onDone(null) }, "次の幕へ") : el("button", { class: "btn primary", type: "button", onclick: () => { setMode("compose"); paintCompose(); } }, "指摘を変える"),
+          onDone ? null : el("button", { class: "btn", type: "button", onclick: endFlow }, "終える")));
       return;
     }
     const cards = patches.map((p, i) => {
       const cb = el("input", { type: "checkbox", id: "pc-" + i, checked: true });
-      const ta = p.op === "delete" ? null : el("textarea", { id: "pt-" + i, rows: String(Math.min(9, p.md.split("\n").length + 1)) });
-      if (ta) ta.value = p.md;
+      const note = el("textarea", { id: "pn-" + i, rows: "1", placeholder: "この案へのコメント（作り直すときに渡す）" });
+      const edit = p.op === "delete" ? null : el("textarea", { id: "pe-" + i, rows: String(Math.min(9, p.md.split("\n").length + 1)), hidden: true });
+      if (edit) edit.value = p.md;
+      const editBtn = edit ? el("button", { class: "btn quiet", type: "button" }, "手直し") : null;
+      if (editBtn) editBtn.addEventListener("click", () => { edit.hidden = !edit.hidden; editBtn.textContent = edit.hidden ? "手直し" : "手直しを閉じる"; });
       const card = el("div", { class: "patch" },
         el("div", { class: "ph" }, el("label", { for: "pc-" + i }, cb, { replace: "修正", delete: "削除", insert: "追加" }[p.op]),
-          (p.t === "u" ? p.speaker : "地の文") + "　" + (p.op === "insert" ? "← " + p.after + " の後" : p.id)),
-        p.before ? el("div", { class: "before" }, p.before) : null, ta);
-      cb.addEventListener("change", () => card.classList.toggle("off", !cb.checked));
-      return { p, cb, ta, card };
+          el("span", { class: "grow" }, (p.t === "u" ? p.speaker : "地の文") + "　" + (p.op === "insert" ? p.after + " の後" : p.id)), editBtn),
+        diffView(p.before, p.md, p.op),
+        el("div", { class: "pfoot" }, edit, note));
+      if (edit) edit.addEventListener("input", () => card.querySelector(".diff").replaceWith(diffView(p.before, edit.value, p.op)));
+      cb.addEventListener("change", () => { card.classList.toggle("off", !cb.checked); paintApply(); });
+      return { p, cb, note, edit, card };
     });
+    const overall = el("textarea", { id: "overall", rows: "1", placeholder: "全体へのコメント（作り直すときに渡す）" });
     const apply = el("button", { class: "btn primary", type: "button" }, "適用");
+    const paintApply = () => { const n = cards.filter((c) => c.cb.checked).length; apply.textContent = "適用（" + n + "件）"; apply.disabled = !n; };
+    paintApply();
+    const decide = () => cards.map(({ p, cb, note, edit }) => ({ ...p, accepted: cb.checked, final: edit ? edit.value.replace(/^\n+|\n+$/g, "") : "", comment: note.value.trim() }));
     apply.addEventListener("click", async () => {
       apply.disabled = true;
-      const decided = cards.map(({ p, cb, ta }) => ({ ...p, accepted: cb.checked, final: ta ? ta.value.replace(/^\n+|\n+$/g, "") : "" }));
+      const decided = decide();
       try {
         await applyPatches(a, decided.filter((p) => p.accepted));
-        await record(meta, res.summary || "", decided);
-        work.replaceChildren(el("p", { class: "empty" }, decided.filter((p) => p.accepted).length + "件を反映した。" + (meta.scope === "book" ? "「幕を終える」で他の幕にも広げる。" : "")));
+        await record(meta, res.summary || "", decided, overall.value.trim(), review.rounds);
         renderAct();
         if (onDone) onDone(decided);
+        else { toast(decided.filter((p) => p.accepted).length + "件を反映した" + (meta.scope === "book" ? "。「幕を終える」で他の幕にも広げる" : "")); endFlow(); }
       } catch (e) {
         apply.disabled = false;
-        work.append(el("p", { class: "err" }, "保存できなかった（" + ((e && e.code) || (e && e.message) || "不明") + "）。"));
+        apply.after(el("p", { class: "err" }, "保存できなかった（" + ((e && e.code) || (e && e.message) || "不明") + "）。"));
       }
     });
-    work.replaceChildren(el("p", { class: "summary" }, String(res.summary || "")), ...cards.map((c) => c.card),
-      el("div", { class: "row" }, apply, el("button", { class: "btn", type: "button", onclick: retry }, "作り直す"),
-        onDone ? el("button", { class: "btn quiet", type: "button", onclick: () => onDone([]) }, "この幕は見送る") : null));
+    const redo = el("button", { class: "btn", type: "button" }, "コメントして作り直す");
+    redo.addEventListener("click", () => {
+      const decided = decide();
+      const opName = { replace: "修正", delete: "削除", insert: "追加" };
+      const notes = decided.map((p) => "- [" + p.id + "]（" + opName[p.op] + "）" + (p.accepted ? "" : "【不採用】") + "\n  案: " + clip(p.final || p.md || "", 400) + (p.comment ? "\n  コメント: " + p.comment : "")).join("\n");
+      const prompt = [
+        context(meta.section || "", true),
+        "## 幕「" + a.heading + "」の本文（各ブロックの先頭に [ID]）\n" + actText(a, meta.target),
+        "## 最初の指摘\n" + meta.text + "\n範囲: " + SCOPE[meta.scope],
+        "## あなたの前回の修正案と、校正者のコメント\n" + notes + (overall.value.trim() ? "\n全体へのコメント: " + overall.value.trim() : ""),
+        "## 依頼\nコメントに従って修正案を作り直す。コメントの無い採用案はそのまま残してよい。【不採用】の案は、コメントがあればその方向で作り直し、無ければ外す。\n" + PATCH_FORMAT,
+      ].join("\n\n");
+      meta.comment = [meta.comment, overall.value.trim()].filter(Boolean).join(" ／ ");
+      meta.patchComments = [...(meta.patchComments || []), ...decided.filter((p) => p.comment).map((p) => ({ id: p.id, comment: p.comment }))];
+      runWork("refine", prompt, "default", a, meta, onDone, () => showReview(a, res, meta, onDone));
+    });
+    const skip = onDone ? el("button", { class: "btn quiet", type: "button", onclick: () => onDone([]) }, "この幕は見送る") : el("button", { class: "btn quiet", type: "button", onclick: endFlow }, "破棄");
+    sheet(head,
+      el("div", { class: "row" }, apply, redo, el("span", { class: "grow" }), skip),
+      overall,
+      res.summary ? el("p", { class: "summary" }, String(res.summary)) : null,
+      el("div", { class: "hint" }, "左が今の本文、右が修正案。空白だけの違いは差分にしない。"),
+      ...cards.map((c) => c.card));
   }
 
   async function applyPatches(a, accepted) {
@@ -650,16 +779,16 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
     }
   }
 
-  async function record(meta, summary, decided) {
+  async function record(meta, summary, decided, overallComment, rounds) {
+    if (meta.feedbackId) return; // 他の幕への展開は、元の指摘の記録へ追記する
     const doc = {
-      book: BOOK.book, act: meta.act, target: meta.target || null, text: meta.text, scope: meta.scope, source: meta.source,
-      selection: meta.selection || "", level: meta.level || "",
-      offered: meta.offered || [], summary,
-      patches: decided.map((p) => ({ op: p.op, id: p.id, before: p.before, proposed: p.md, final: p.final, accepted: p.accepted })),
+      book: BOOK.book, act: meta.act, target: meta.target || null, text: meta.text, picked: meta.picked || [], free: meta.free || "",
+      scope: meta.scope, source: (meta.picked || []).length ? (meta.free ? "pick+free" : "pick") : "free",
+      selection: meta.selection || "", level: meta.level || "", offered: meta.offered || [], summary,
+      comment: [meta.comment, overallComment].filter(Boolean).join(" ／ "), rounds: rounds || 1,
+      patches: decided.map((p) => ({ op: p.op, id: p.id, before: p.before, proposed: p.md, final: p.final, accepted: p.accepted, comment: p.comment || "" })),
       doneActs: [meta.act], skippedActs: [], synced: false, author: me, createdAt: new Date().toISOString(),
     };
-    if (meta.feedbackId) return; // 展開の記録は呼び出し側が持つ
-    // DB があれば購読が feedback を差し替えるので、手元の配列へは足さない
     if (db) { await db.collection("feedback").add(doc); return; }
     doc._id = "local-" + Date.now();
     feedback.push(doc);
@@ -673,23 +802,20 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
   }
   function finish() {
     const pend = pendingFor();
-    if (!pend.length) { openSheet("幕を終える", el("p", { class: "empty" }, "他の幕へ広げる指摘は無い。範囲を「全体」にした指摘がここに溜まる。")); return; }
-    const work = el("div", { class: "list" });
-    const start = el("button", { class: "btn primary", type: "button" }, "他の幕へ広げる");
-    openSheet("幕を終える",
-      el("p", { class: "summary" }, "次の指摘を、まだ適用していない幕へ1幕ずつ適用する。幕ごとに差分を確かめて適用する。"),
-      el("ul", {}, ...pend.map((f) => el("li", {}, f.text))), el("div", { class: "row" }, start), work);
-    start.addEventListener("click", () => { start.disabled = true; propagate(work); });
+    setMode("review");
+    if (!pend.length) { sheet("幕を終える", el("p", { class: "empty" }, "他の幕へ広げる指摘は無い。範囲を「全体」にした指摘がここに溜まる。")); return; }
+    sheet("幕を終える",
+      el("div", { class: "row" }, el("button", { class: "btn primary", type: "button", onclick: () => propagate() }, "他の幕へ広げる")),
+      el("p", { class: "summary" }, "次の指摘を、まだ適用していない幕へ1幕ずつ当てる。幕ごとに差分を確かめて適用する。"),
+      el("ul", { class: "asked" }, ...pend.map((f) => el("li", {}, f.text))));
   }
-  async function propagate(work) {
+  async function propagate() {
     for (const a of BOOK.acts) {
       const items = pendingFor().filter((f) => !(f.doneActs || []).includes(a.name) && !(f.skippedActs || []).includes(a.name));
       if (!items.length) continue;
-      const box = el("div", { class: "list" });
-      work.replaceChildren(el("p", { class: "progress" }, "幕「" + a.heading + "」"), box);
       const examples = items.map((f) => {
         const acc = (f.patches || []).filter((p) => p.accepted).slice(0, 2);
-        return "- 「" + f.text + "」" + acc.map((p) => "\n  採用された直し方の例: 「" + clip(p.before || "", 80) + "」→「" + clip(p.final || "", 80) + "」").join("");
+        return "- 「" + f.text + "」" + acc.map((p) => "\n  採用された直し方の例: 「" + clip(p.before || "", 80) + "」→「" + clip(p.final || "", 80) + "」").join("") + (f.comment ? "\n  校正者のコメント: " + clip(f.comment, 80) : "");
       }).join("\n");
       const prompt = [
         context("", true),
@@ -698,18 +824,13 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
       ].join("\n\n");
       $("#act").value = String(BOOK.acts.indexOf(a));
       renderAct();
-      const decided = await new Promise(async (resolve) => {
-        const res = await ask(prompt, box, "default", "幕「" + a.heading + "」に適用している…");
-        if (!res) { box.append(el("div", { class: "row" }, el("button", { class: "btn", type: "button", onclick: () => resolve(undefined) }, "中断する"))); return; }
-        reviewPatches(box, a, res, { feedbackId: true, act: a.name }, () => resolve("retry"), resolve);
-      });
-      if (decided === undefined) { work.append(el("p", { class: "empty" }, "中断した。もう一度「幕を終える」を押すと続きから広げる。")); return; }
-      if (decided === "retry") { return propagate(work); }
+      const meta = { feedbackId: true, act: a.name, text: items.map((f) => f.text).join(" ／ "), picked: items.map((f) => f.text), scope: "book", target: null };
+      const decided = await new Promise((resolve) => runWork("spread", prompt, "default", a, meta, resolve, () => resolve(undefined)));
+      if (decided === undefined) { endFlow(); toast("中断した。もう一度「幕を終える」で続きから"); return; }
       for (const f of items) {
-        // null: 当てはまる箇所が無かった（適用済みとみなす）／[]: 見送った
-        const field = decided === null || (decided && decided.length) ? "doneActs" : "skippedActs";
+        const field = decided === null || decided.length ? "doneActs" : "skippedActs";
         const next = Array.from(new Set([...(f[field] || []), a.name]));
-        const extra = decided ? decided.filter((p) => p.accepted).map((p) => ({ op: p.op, id: p.id, before: p.before, proposed: p.md, final: p.final, accepted: true, act: a.name })) : [];
+        const extra = decided ? decided.filter((p) => p.accepted).map((p) => ({ op: p.op, id: p.id, before: p.before, proposed: p.md, final: p.final, accepted: true, comment: p.comment || "", act: a.name })) : [];
         f[field] = next;
         if (field === "doneActs") f.propagated = [...(f.propagated || []), ...extra];
         if (db && f._id && !String(f._id).startsWith("local-")) {
@@ -718,61 +839,68 @@ textarea { width: 100%; font: inherit; font-size: 14px; padding: .5rem; border: 
       }
       paintCounts();
     }
-    work.replaceChildren(el("p", { class: "empty" }, "すべての幕へ広げた。"));
+    endFlow();
     renderAct();
+    toast("すべての幕へ広げた");
   }
 
   // ---------------------------------------------------------------- 履歴
   function openLog() {
-    const rows = feedback.slice().sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+    setMode("review");
+    const rows = feedback.slice().sort((x, y) => String(y.createdAt).localeCompare(String(x.createdAt)));
     const list = el("div", { class: "list" }, ...rows.map((f) => {
       const acc = (f.patches || []).filter((p) => p.accepted).length + (f.propagated || []).length;
-      return el("div", { class: "item" },
-        el("div", {}, f.text),
-        el("div", { class: "meta" }, el("span", { class: "scope " + f.scope }, SCOPE[f.scope] || f.scope), f.source === "pick" ? "候補から" : "自由入力",
-          "反映 " + acc + "件", f.scope === "book" ? "適用済みの幕 " + (f.doneActs || []).length + " / " + BOOK.acts.length : null, f.synced ? "正本に取り込み済み" : null));
+      return el("div", { class: "item" }, el("div", {}, f.text),
+        el("div", { class: "meta" }, el("span", { class: "scope " + f.scope }, SCOPE[f.scope] || f.scope), "反映 " + acc + "件", (f.rounds || 1) > 1 ? "作り直し " + (f.rounds - 1) + "回" : null,
+          f.scope === "book" ? "適用済みの幕 " + (f.doneActs || []).length + " / " + BOOK.acts.length : null, f.synced ? "正本に取り込み済み" : null),
+        f.comment ? el("div", { class: "meta" }, "コメント: " + f.comment) : null);
     }));
-    openSheet("指摘の履歴　" + rows.length + "件", rows.length ? list : el("p", { class: "empty" }, "まだ無い。本文をタップして指摘を選ぶか、自由に書く。"));
+    sheet("指摘の履歴　" + rows.length + "件", rows.length ? list : el("p", { class: "empty" }, "まだ無い。右下の「修正」から始める。"));
   }
 
   // ---------------------------------------------------------------- 起動
   async function boot() {
+    paintMeter();
     try { BOOK = await (await fetch("book.json")).json(); }
-    catch { $("#status").textContent = "本文を読み込めなかった。ページを開き直す。"; return; }
+    catch { $("#main").textContent = "本文を読み込めなかった。ページを開き直す。"; return; }
     $("#title").textContent = BOOK.title.split(" ── ")[0];
-    BOOK.acts.forEach((a, i) => {
-      for (const b of a.blocks) original.set(b.id, { block: b, act: a });
-      $("#act").append(el("option", { value: String(i) }, a.heading));
-    });
+    BOOK.acts.forEach((a, i) => { for (const b of a.blocks) original.set(b.id, { block: b, act: a }); $("#act").append(el("option", { value: String(i) }, a.heading)); });
     const raw = store.get("act:" + BOOK.book);
     const saved = raw === null ? NaN : Number(raw);
     $("#act").value = String(Number.isInteger(saved) && saved >= 0 && saved < BOOK.acts.length ? saved : Math.min(1, BOOK.acts.length - 1));
-    $("#act").addEventListener("change", () => { store.set("act:" + BOOK.book, $("#act").value); closeSheet(); renderAct(); window.scrollTo(0, 0); });
-    $("#finish").addEventListener("click", finish);
-    $("#open-log").addEventListener("click", openLog);
-    $("#fab").addEventListener("click", openGeneral);
-    document.addEventListener("selectionchange", () => { if (!settingSelection) paintFab(); });
+    $("#act").addEventListener("change", () => { store.set("act:" + BOOK.book, $("#act").value); endFlow(); renderAct(); window.scrollTo(0, 0); });
+    $("#finish").addEventListener("click", () => { endFlow(); finish(); });
+    $("#open-log").addEventListener("click", () => { endFlow(); openLog(); });
+    $("#fab").addEventListener("click", startSelect);
+    let selTimer = null;
+    document.addEventListener("selectionchange", () => {
+      if (settingSelection || (mode !== "select" && mode !== "compose")) return;
+      const sel = window.getSelection();
+      if (sel && !sel.isCollapsed && sel.toString().trim() && selectionBlock()) {
+        // 指で範囲を伸ばしている間は待ち、止まってから拾う
+        clearTimeout(selTimer);
+        selTimer = setTimeout(() => { if (!settingSelection) useNativeSelection(); }, 600);
+      }
+    });
     renderAct();
-    $("#status").textContent = "本文をタップすると文節が選ばれ、もう一度で文、発言と広がる。選ばずに指摘するときは右下のボタン。";
+    setMode("idle");
 
     const api = window.claude && window.claude.use ? window.claude : null;
-    if (!api) { $("#status").textContent = "閲覧のみ（claude.ai の外では校正機能は使えない）。"; return; }
+    if (!api) return;
     api.use("sample").then((s) => { sample = s; }).catch(() => {});
     api.use("user").then(async (u) => { try { me = u ? await u.id() : null; } catch { me = null; } }).catch(() => {});
     api.use("db").then((d) => {
       db = d;
-      if (!db) { $("#status").textContent = "保存先につながらない。修正はこの画面を閉じると消える。"; return; }
-      const timer = setTimeout(() => { $("#status").textContent = "保存先にまだつながらない。"; }, 10000);
+      if (!db) return;
       let first = true;
       db.collection("edits").where("book", "==", BOOK.book).onSnapshot((snap) => {
-        if (!snap.metadata || !snap.metadata.fromCache) clearTimeout(timer);
         overlay.clear();
-        for (const d of snap.docs) overlay.set(d.id, { ...d.data(), id: d.id });
-        if (first || $("#sheet").hidden) renderAct();
+        for (const x of snap.docs) overlay.set(x.id, { ...x.data(), id: x.id });
+        if (first || mode === "idle") renderAct();
         first = false;
-      }, () => { clearTimeout(timer); $("#status").textContent = "修正の保存先が使えない。"; });
+      }, () => {});
       db.collection("feedback").where("book", "==", BOOK.book).onSnapshot((snap) => {
-        feedback = snap.docs.map((d) => ({ _id: d.id, ...d.data() }));
+        feedback = snap.docs.map((x) => ({ _id: x.id, ...x.data() }));
         paintCounts();
       }, () => {});
     }).catch(() => {});
