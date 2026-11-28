@@ -116,7 +116,7 @@ def apply_edits(book: str, edits: list[dict]) -> tuple[list[yaruo_script.Act], d
                 result[edit["_id"]] = "applied"
                 continue
             new = yaruo_script.Utterance(block_of(edit), edit.get("speaker", ""), "", str(edit.get("md", "")).split("\n"))
-            act.items[position + 1 : position + 1] = [yaruo_script.Raw([""]), new]
+            act.items[position + 1 : position + 1] = [yaruo_script.Raw([""]), new, yaruo_script.Raw([""])]
             result[edit["_id"]] = "applied"
     for edit in pending:
         result[edit["_id"]] = "conflict: 追加先のブロックが見つからない"
@@ -136,8 +136,13 @@ def apply_edits(book: str, edits: list[dict]) -> tuple[list[yaruo_script.Act], d
                 and isinstance(cleaned[-1], yaruo_script.Raw)
             ):
                 merged = cleaned[-1].lines + item.lines
-                while len(merged) >= 2 and merged[-1] == "" and merged[-2] == "":
-                    merged.pop()
+                # 追加した発言の前後に入れた空行が、既存の空行と重なったら1つにする
+                collapsed: list[str] = []
+                for line in merged:
+                    if line == "" and collapsed and collapsed[-1] == "":
+                        continue
+                    collapsed.append(line)
+                merged = collapsed
                 cleaned[-1] = yaruo_script.Raw(merged)
             else:
                 cleaned.append(item)
