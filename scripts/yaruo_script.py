@@ -3,7 +3,7 @@
 
 教材の正本を `docs/books/{ID}/script/NN.txt`（幕ごとの@形式）に置き、
 `README.md` はそこから生成する。`README.md` を読む既存の道具（lint・字数集計・
-差分ページ・コメント・docsify）はそのまま動き、`generate_site.py` は両者が
+docsify）はそのまま動き、`generate_site.py` は両者が
 食い違えばビルドを止める。
 
 @形式の文法:
