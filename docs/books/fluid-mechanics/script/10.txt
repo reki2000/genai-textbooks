@@ -1,0 +1,25 @@
+## 参考文献
+
+[^1]: G. K. Batchelor, *An Introduction to Fluid Dynamics*, Cambridge University Press, 1967. 連続体記述、物質微分、渦度、非粘性流れ、粘性流れを統一的に扱う古典的教科書。本文第1幕で分子追跡から場の記述へ移り、第7幕で保存則から運動方程式を組み立てる流れの基礎に対応する。
+
+[^2]: F. M. White, *Fluid Mechanics*, McGraw-Hill, multiple editions. 静水圧、検査体積による質量・運動量・エネルギー収支、管路損失、次元解析、圧縮性流れまでを工学的事例とともに整理した標準的教科書。本文第2幕から第5幕、および最終実演の装置収支に対応する。
+
+[^3]: P. K. Kundu, I. M. Cohen and D. R. Dowling, *Fluid Mechanics*, Academic Press, multiple editions. 連続体力学、応力テンソル、ナビエ–ストークス方程式、渦度、境界層、波、圧縮性流れを数学的に導出する。本文7-1および7-2のコーシー運動方程式とニュートン流体構成式の分離に対応する。
+
+[^4]: L. D. Landau and E. M. Lifshitz, *Fluid Mechanics*, Course of Theoretical Physics, Vol. 6, Pergamon Press, 1959 and later editions. 保存則、粘性応力、音波、衝撃波、乱流などを理論物理の視点から扱う。本文7-2の応力テンソル、9-4の音速と衝撃波の説明に対応する。
+
+[^5]: O. Reynolds, “An Experimental Investigation of the Circumstances Which Determine Whether the Motion of Water Shall Be Direct or Sinuous, and of the Law of Resistance in Parallel Channels,” *Philosophical Transactions of the Royal Society of London*, 174, 935–982, 1883. 染料線を用いた管内流れの遷移実験と、後にレイノルズ数として整理される相似則を示した。本文8-1および8-2で、速度だけでは層流・乱流を決められないことを再発見する場面に対応する。
+
+[^6]: L. Prandtl, “Über Flüssigkeitsbewegung bei sehr kleiner Reibung,” Proceedings of the Third International Congress of Mathematicians, Heidelberg, 1904. 小さな粘性を持つ高レイノルズ数流れを、外部の非粘性領域と壁近傍の境界層に分ける考え方を提示した。本文9-1で、粘度が小さくても壁近くでは粘性項を無視できないことを扱う場面に対応する。
+
+[^7]: H. Schlichting and K. Gersten, *Boundary-Layer Theory*, Springer, multiple editions. 境界層方程式、遷移、剥離、後流、自由せん断流れを体系的に扱う。本文9-1と9-2の境界層厚さ、逆圧力勾配、剥離と失速の説明に対応する。
+
+[^8]: S. B. Pope, *Turbulent Flows*, Cambridge University Press, 2000. レイノルズ平均、レイノルズ応力、乱流輸送、RANS、確率的記述を詳しく扱う。本文8-3で、平均速度を代入するだけでは非線形項が閉じず、乱流モデルが必要になることを示す場面に対応する。
+
+[^9]: J. D. Anderson, Jr., *Fundamentals of Aerodynamics*, McGraw-Hill, multiple editions. 翼まわりの流れ、循環、クッタ条件、境界層、揚力、抗力、圧縮性効果を工学的に説明する。本文9-2および9-3で、等時間通過説を退け、圧力分布・運動量偏向・循環を同じ流れの異なる記述として結ぶ場面に対応する。
+
+[^10]: J. D. Anderson, Jr., *Modern Compressible Flow: With Historical Perspective*, McGraw-Hill, multiple editions. 音速、マッハ数、準1次元ノズル、チョーク、衝撃波を体系的に扱う。本文9-4で、亜音速と超音速で面積変化への応答が逆転することを導く場面に対応する。
+
+[^11]: J. H. Ferziger, M. Perić and R. L. Street, *Computational Methods for Fluid Dynamics*, Springer, multiple editions. 有限差分法、有限体積法、圧力速度連成、離散化誤差、計算格子などを扱う。本文9-5で、CFDを方程式・モデル・境界条件の数値的近似として位置づける場面に対応する。
+
+[^12]: P. J. Roache, *Verification and Validation in Computational Science and Engineering*, Hermosa Publishers, 1998. 数値解法の検証、格子収束、現実モデルとしての妥当性確認を区別する枠組みを論じる。本文9-5で、細かい格子と現実への一致を混同しないための検査項目に対応する。

@@ -1,0 +1,16 @@
+## 参考文献
+
+1. [統計検定「統計検定1級」](https://www.toukei-kentei.jp/grade/grade1/). 1級が「統計数理」と「統計応用」から成り、統計応用が人文科学・社会科学・理工学・医薬生物学の四分野に分かれることを、III部のA〜D構成と照合した。本書は各分野の具体的な試験対策ではなく、問いと前提の違いを見渡す導入に範囲を限定している。
+2. James O. Berger, *Statistical Decision Theory and Bayesian Analysis*, 2nd ed., Springer, 1985.
+3. E. L. Lehmann and George Casella, *Theory of Point Estimation*, 2nd ed., Springer, 1998.
+4. E. L. Lehmann and Joseph P. Romano, *Testing Statistical Hypotheses*, 3rd ed., Springer, 2005.
+5. A. W. van der Vaart, *Asymptotic Statistics*, Cambridge University Press, 1998.
+6. Peter J. Huber and Elvezio M. Ronchetti, *Robust Statistics*, 2nd ed., Wiley, 2009.
+7. Trevor Hastie, Robert Tibshirani, and Jerome Friedman, *The Elements of Statistical Learning*, 2nd ed., Springer, 2009.
+8. Peter Bühlmann and Sara van de Geer, *Statistics for High-Dimensional Data*, Springer, 2011.
+9. Abraham Wald, *Sequential Analysis*, Wiley, 1947.
+10. Kenneth A. Bollen, *Structural Equations with Latent Variables*, Wiley, 1989.
+11. Andrew Gelman and Jennifer Hill, *Data Analysis Using Regression and Multilevel/Hierarchical Models*, Cambridge University Press, 2007.
+12. Douglas C. Montgomery, *Introduction to Statistical Quality Control*, 7th ed., Wiley, 2012.
+13. Christopher Jennison and Bruce W. Turnbull, *Group Sequential Methods with Applications to Clinical Trials*, Chapman & Hall/CRC, 2000.
+14. Miguel A. Hernán and James M. Robins, *Causal Inference: What If*, Chapman & Hall/CRC, 2020.

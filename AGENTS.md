@@ -34,8 +34,6 @@ documents:
 
 `created` には、旧 `docs/books/{ID}.md` と現行の本文パスを含む Git 履歴上の初出コミット日時を設定する。教材はカテゴリ内で `created` の昇順に表示し、同一日時の場合は `id` の昇順。
 
-改訂版の教材には `revision_of: <比較元のID>` を付けると、ビルド時に比較元との差分ページ（`books/{id}/diff.md`、改訂版の全文を表示したうえで、異なる行を最大5行の塊で左右2ペイン（旧=赤・左／新=青・右）に表示し、差分判定は幕（##）→節（###）の単位で区切って行の対応づけは節をまたがず、単位が丸ごと異なる場合はその単位で表示）が生成される。小改訂のときだけ付け、全面書き直しには付けない。仕様は [`BUILD.md`](./BUILD.md) の「改訂比較（revision_of）」を参照。
-
 続きものは巻ごとに別の教材（`statistics` → `statistics-2` → `statistics-3`）として書き、後の巻のエントリに `follows: <前の巻のID>` を付ける。`follows` は並び順だけを変え、その巻を前の巻の直後に置く。1教材の中で本文を `README.2.md` などに分ける分冊は廃止した（ビルドエラーになる）。仕様は [`BUILD.md`](./BUILD.md) の「シリーズ（連続する教材）」を参照。
 
 ## 教材追加手順
@@ -48,6 +46,10 @@ documents:
 まだ読み返していない教材は、2で `draft: true` を付けて登録する。main にマージしてデプロイしても一覧には出ないので、`?draft=1` を付けたサイトで実際の表示のまま確認でき、よければ `draft: true` の1行を消して公開する。
 
 外部（別モデル・別セッション）で書かれた教材を受け入れるときは、2の前に `/yaruo-review` で品質を検査する。判定基準と手順はスキルの `SKILL.md` を正本とする。
+
+## 台本形式（@形式）
+
+`docs/books/{ID}/script/` がある教材は、幕ごとの `script/NN.txt`（`@<ID> <話者>` 〜 `@end` で発言を囲む形式）が正本で、`README.md` は `python3 scripts/yaruo_script.py render docs/books/{ID}` で生成する。`README.md` を直接直したら `absorb` で `script/` へ戻す（発言 ID を保つ）。両者がずれるとビルドが止まる。スマホ用の校正台（アーティファクト）と、修正・指摘の取り込み手順は [`BUILD.md`](./BUILD.md) の「台本形式」を参照。校正での指摘は `editorial/feedback.jsonl` に溜まり、繰り返し効かせるものは承認を経て `editorial/rules.md` の規則になる（BUILD.md「校正で蓄積する規則」）。
 
 ## 図版
 
@@ -76,10 +78,6 @@ python3 scripts/yaruo_lint.py docs/books/{ID}/README.md --check --verbose
 - ルールを変えたら `python3 scripts/tests/run_lint_tests.py` を実行する（fixture は `scripts/tests/fixtures/<ルールID>/`）。
 
 会話の同型反復は `scripts/yaruo_beat_repetition.py`（`--show` / `--beats` / `--units`）。lint とは別系統で、**合否ではなくレビュー時の候補区間の絞り込み**に使う。ラベル体系と指標の正本は `.claude/skills/yaruo-review/references/beat-labels.md`。
-
-## プレビュー上のコメント
-
-開発サーバのプレビューで本文にコメントを付け、常駐したエージェント（`/comment-eater`）がその場で直す経路がある。ファイル形式・アンカー解決・状態遷移の詳細は [`COMMENTS.md`](./COMMENTS.md) を参照。
 
 ## ビルドシステム
 

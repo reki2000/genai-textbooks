@@ -1,0 +1,10 @@
+## 参考文献
+
+[^1]: [NIST/SEMATECH『Comparisons based on data from one process』](https://www.itl.nist.gov/div898/handbook/prc/section2/prc2.htm), 2026年7月28日参照. 名義・順序・間隔・比という尺度の違いにより、適用できる統計的方法が異なることを説明している。摂氏と比尺度の違いは[NIST『Coefficient of Variation』](https://www.itl.nist.gov/div898/software/dataplot/refman2/auxillar/coefvari.htm)も参照。
+[^2]: [NIST/SEMATECH『Histogram』](https://www.itl.nist.gov/div898/handbook/eda/section3/histogra.htm), 2026年7月28日参照. ヒストグラムが一変量データの中心、散らばり、歪み、外れ値、複数の山を可視化することを示している。
+[^3]: [NIST/SEMATECH『Scatter Plot』](https://itl.nist.gov/div898/handbook/eda/section3/eda33q.htm), 2026年7月28日参照. 散布図は二変量の線形・非線形な関連や外れ値を調べる道具であり、関連だけでは因果を証明しない。
+[^4]: [Australian Education Research Organisation『Spacing and retrieval practice guide』](https://www.edresearch.edu.au/guides-resources/practice-guides/spacing-and-retrieval-practice-guide-full-publication), 2026年7月28日参照. 学習内容を時間を空けて能動的に取り出し、異なる課題へ移す練習が長期保持に役立つことを、研究レビューと実践方法から整理している。
+[^5]: [Centers for Disease Control and Prevention『Guidance, Examples and Tools for Probability Sampling When Designing a Population-Based Biomonitoring Study』](https://www.cdc.gov/environmental-health-tracking/media/pdfs/BiomonitoringStudyGuidance_07242023.pdf), 2026年7月28日参照. 確率標本、抽出枠、カバレッジ不足、自己選択、無回答、重み付けの役割と限界を整理している。
+[^6]: [NCBI Bookshelf『Methods to Apply Results from Randomized Trials to Patients in Clinical Practice』](https://www.ncbi.nlm.nih.gov/books/NBK596277/), 2026年7月28日参照. 試験内の無作為割付による比較と、その結果を別の対象母集団へ一般化・移送するための条件を区別している。
+[^7]: [NCBI Bookshelf『The Prevention and Treatment of Missing Data in Clinical Trials: Introduction and Background』](https://www.ncbi.nlm.nih.gov/books/NBK209902/), 2026年7月28日参照. 無作為割付が比較を公平にする一方、割付後の欠測や脱落が処置効果の推定を偏らせ得ることを説明している。
+[^8]: [統計質保証推進協会「統計検定2級」](https://www.toukei-kentei.jp/grade/grade2/), 2026年7月28日参照. 公式の出題範囲表にある記述統計、データ収集、確率、確率分布、標本分布、推定、仮説検定、回帰、実験計画を、I部では「データを見る→生成を確かめる→偶然を模型化する→母集団へ戻す→比較を設計する」の順へ組み替えた。

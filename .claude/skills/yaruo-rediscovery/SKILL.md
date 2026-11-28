@@ -37,6 +37,7 @@ description: やる夫とやらない夫の対話で、読者が根拠をたど�
 
 構成をつくるとき、大幅に改訂するとき、単調さを直すときは [面白味と起伏の手札](references/anti-patterns.md) を読む。各手札は選択肢であり、毎節の義務や採点項目ではない。
 
+- 校正で確定した規則は [editorial/rules.md](../../../editorial/rules.md)。執筆・改訂の前に読み、ここの規則を人物と書式の規約と同じ重さで守る。元になった指摘と採用された直し方は `editorial/feedback.jsonl`。
 - 本文の書式・英語併記は [format.md](references/format.md)。
 - 脚注を扱うときは [citation.md](references/citation.md)。
 - 数式の導出は出発式・操作・結果を残し、記号・単位・条件を定義する。要所で数値・次元・極限を検算し、厳密式と近似式を分ける。

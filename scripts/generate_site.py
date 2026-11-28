@@ -7,7 +7,6 @@ nothing here is meant to be hand-edited or committed as generated output.
 from __future__ import annotations
 
 import argparse
-import difflib
 import html
 import io
 import json
@@ -55,6 +54,10 @@ COUNT_SCRIPT_DIR = ROOT / ".claude" / "skills" / "yaruo-count" / "scripts"
 sys.path.insert(0, str(COUNT_SCRIPT_DIR))
 sys.dont_write_bytecode = True
 from count_textbooks import count_document  # noqa: E402
+
+sys.path.insert(0, str(ROOT / "scripts"))
+import render_static  # noqa: E402
+import yaruo_script  # noqa: E402
 
 DOCS_DIR = ROOT / "docs"
 CATALOG_NAME = "catalog.yml"
@@ -105,27 +108,6 @@ _PNG_REFERENCE_RE = re.compile(
     r"(?P<suffix>[?#][A-Za-z0-9_.~!$&'()*+,;=:@/?%-]*)?",
     re.IGNORECASE,
 )
-
-# Revision comparison: a catalog may carry `revision_of: <id>` naming the
-# earlier version this document revises (see BUILD.md). The build then
-# renders a line diff of the two README.md sources as the document's
-# diff.md, linked from its page and from the top-page listing. Set it only
-# for small revisions; a ground-up rewrite shares too little text for a
-# line diff to mean anything. Differing lines are grouped into chunks of
-# at most DIFF_CHUNK_MAX_LINES lines per side.
-DIFF_CHUNK_MAX_LINES = 5
-# A matched section pair whose identical-line ratio falls below this is a
-# whole-section change: it is shown as one section unit (both sections in
-# full, old above / new below) instead of line chunks, because pairing
-# unrelated lines only produces highlight noise. Sections that exist on
-# one side only are section units too. A section-unit side longer than
-# DIFF_SECTION_FOLD_LINES is collapsed behind a <details> element.
-DIFF_SECTION_REWRITE_RATIO = 0.2
-DIFF_SECTION_FOLD_LINES = 50
-# Character highlights inside a chunk are only computed between lines
-# paired by similarity at this ratio or above; positional pairing paints
-# highlights onto text that is not a difference.
-DIFF_PAIR_MIN_RATIO = 0.55
 
 # Each book is exactly one README.md. The former multi-part layout
 # (README.2.md, README.3.md, ...) is rejected: a series is split into separate
@@ -302,7 +284,7 @@ def load_catalog() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
         "question",
         "plot",
     )
-    optional_document_fields = ("draft", "follows", "ratings", "revision_of")
+    optional_document_fields = ("draft", "follows", "ratings")
     for index, (raw_document, catalog_path) in enumerate(
         zip(documents, document_sources, strict=True)
     ):
@@ -345,6 +327,12 @@ def load_catalog() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
         source_path = expected_catalog_path.parent / "README.md"
         if not source_path.is_file():
             fail(f"document {document_id} points to missing file: {source_path}")
+        try:
+            script_sync_error = yaruo_script.sync_error(source_path.parent)
+        except yaruo_script.ScriptError as exc:
+            script_sync_error = str(exc)
+        if script_sync_error:
+            fail(f"document {document_id}: {script_sync_error}")
         draft = document.get("draft", False)
         if not isinstance(draft, bool):
             fail(f"document {document_id}.draft must be true or false")
@@ -376,20 +364,6 @@ def load_catalog() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     empty_categories = category_ids - populated_categories
     if empty_categories:
         fail(f"categories without documents: {', '.join(sorted(empty_categories))}")
-
-    for document in documents:
-        source_id = document.get("revision_of")
-        if source_id is None:
-            continue
-        if not isinstance(source_id, str) or not source_id:
-            fail(f"document {document['id']}.revision_of must be a document id")
-        if source_id == document["id"]:
-            fail(f"document {document['id']}.revision_of points to itself")
-        if source_id not in document_ids:
-            fail(
-                f"document {document['id']}.revision_of points to "
-                f"unknown document: {source_id}"
-            )
 
     categories.sort(key=lambda item: item["order"])
     assign_rating_ranks(documents)
@@ -540,602 +514,9 @@ def ratings_line(document: dict[str, Any]) -> str | None:
     )
 
 
-def _diff_highlight_pair(old_line: str, new_line: str) -> tuple[str, str]:
-    """Markdown for one changed plain-line pair: the characters that
-    actually differ are wrapped in a highlight span of the same colour
-    family as the side (light red for old, light blue for new). The rest
-    of the line is emitted raw, exactly as on the book page, so Markdown
-    and math in it render through the normal docsify pipeline. Callers
-    must not use this for lines containing math or for block units:
-    a span inside a formula would break KaTeX."""
-    matcher = difflib.SequenceMatcher(None, old_line, new_line, autojunk=False)
-    old_parts: list[str] = []
-    new_parts: list[str] = []
-    for tag, i1, i2, j1, j2 in matcher.get_opcodes():
-        if tag == "equal":
-            old_parts.append(old_line[i1:i2])
-            new_parts.append(new_line[j1:j2])
-            continue
-        if i2 > i1:
-            old_parts.append(
-                f'<span class="diff-hl-old">{old_line[i1:i2]}</span>'
-            )
-        if j2 > j1:
-            new_parts.append(
-                f'<span class="diff-hl-new">{new_line[j1:j2]}</span>'
-            )
-    return "".join(old_parts), "".join(new_parts)
-
-
-def _diff_units(lines: list[str]) -> list[tuple[str, list[str]]]:
-    """Group lines into indivisible diff units. Display-math blocks
-    ($$ ... $$, possibly multi-line), fenced code blocks and tables
-    (consecutive lines starting with |) are single units: a formula is
-    compared as a whole and is never split, re-wrapped or highlighted
-    inside, so docsify + KaTeX receive it exactly as written. Everything
-    else is a single line."""
-    units: list[tuple[str, list[str]]] = []
-    i = 0
-    while i < len(lines):
-        stripped = lines[i].strip()
-        if stripped.startswith("```"):
-            j = i + 1
-            while j < len(lines) and not lines[j].strip().startswith("```"):
-                j += 1
-            j = min(j + 1, len(lines))
-            units.append(("code", lines[i:j]))
-            i = j
-            continue
-        if "$$" in lines[i]:
-            if lines[i].count("$$") % 2 == 0:
-                units.append(("formula", [lines[i]]))
-                i += 1
-                continue
-            j = i + 1
-            while j < len(lines) and "$$" not in lines[j]:
-                j += 1
-            j = min(j + 1, len(lines))
-            units.append(("formula", lines[i:j]))
-            i = j
-            continue
-        if stripped.startswith("|"):
-            j = i
-            while j < len(lines) and lines[j].strip().startswith("|"):
-                j += 1
-            units.append(("table", lines[i:j]))
-            i = j
-            continue
-        units.append(("line", [lines[i]]))
-        i += 1
-    return units
-
-
-_SECTION_NUMBER_RE = re.compile(r"^第[0-9０-９一二三四五六七八九十百]+幕\s*")
-_SUBSECTION_NUMBER_RE = re.compile(r"^[0-9０-９]+[-－―][0-9０-９]+\s*")
-_SPEAKER_LABEL_RE = re.compile(r"^\*\*[^*]+\*\*[：:]?\s*$")
-_SPEAKER_PREFIX_RE = re.compile(r"^\*\*[^*]+\*\*[：:]\s*")
-
-
-def _is_weak_line(line: str) -> bool:
-    """Lines that say almost nothing about which passage they belong to:
-    blank lines, speaker labels on their own line (**やる夫**：), and
-    lines whose content past the speaker label is a few characters.
-    These repeat tens of thousands of times across the books, so if a
-    match made only of such lines is allowed to anchor a diff, two
-    completely different conversations get stitched together
-    utterance by utterance just because the same speakers appear in
-    both. A matching block therefore counts only when it contains a
-    strong (non-weak) line, and weak lines never pair for highlights:
-    a passage replaced across utterances stays one replaced span,
-    while weak lines inside a genuinely unchanged stretch still
-    match as part of that stretch's block."""
-    stripped = line.strip()
-    if not stripped or _SPEAKER_LABEL_RE.match(stripped):
-        return True
-    return len(_SPEAKER_PREFIX_RE.sub("", stripped)) <= 4
-
-
-def _content_lines(lines: list[str]) -> list[str]:
-    return [line for line in lines if not _is_weak_line(line)]
-
-
-def _split_sections(
-    lines: list[str], heading_prefix: str = "## "
-) -> list[tuple[str, int, int]]:
-    """Split text into (heading, start, end) parts at headings of one
-    level (`## ` acts by default, `### ` for the sections inside an
-    act); the text before the first heading is a part with an empty
-    heading."""
-    starts = {i for i, line in enumerate(lines) if line.startswith(heading_prefix)}
-    bounds = [0, *sorted(starts), len(lines)]
-    return [
-        (
-            lines[start][len(heading_prefix):].strip() if start in starts else "",
-            start,
-            bounds[k + 1],
-        )
-        for k, start in enumerate(bounds[:-1])
-    ]
-
-
-def _match_sections(
-    old_sections: list[tuple[str, int, int]],
-    new_sections: list[tuple[str, int, int]],
-    old_lines: list[str],
-    new_lines: list[str],
-    number_re: re.Pattern[str] = _SECTION_NUMBER_RE,
-    pair_leftovers: bool = False,
-) -> dict[int, int]:
-    """Map new-section index -> old-section index. Sections pair up so
-    that a section whose content changed completely can be recognised as
-    one unit; whatever stays unpaired exists on one side only. Pairing is
-    by heading first, ignoring the act/section number (a rewrite may
-    renumber): exact, then character similarity at 0.8 or above.
-    Retitled sections are then paired by content: the best remaining
-    pair whose shared-line overlap (common lines over the shorter
-    section) reaches 0.25. With pair_leftovers, sections still unpaired
-    on both sides are paired in order -- used for the sections inside
-    one act, where a leftover on each side is the same slot rewritten,
-    and pairing them keeps the diff inside the section boundary."""
-
-    def normalize(heading: str) -> str:
-        return re.sub(r"\s+", "", number_re.sub("", heading))
-
-    pairs: dict[int, int] = {}
-    used_old: set[int] = set()
-    for new_index, (heading, _s, _e) in enumerate(new_sections):
-        for old_index, (old_heading, _os, _oe) in enumerate(old_sections):
-            if old_index not in used_old and normalize(old_heading) == normalize(heading):
-                pairs[new_index] = old_index
-                used_old.add(old_index)
-                break
-    for new_index, (heading, _s, _e) in enumerate(new_sections):
-        if new_index in pairs:
-            continue
-        best_index: int | None = None
-        best_ratio = 0.8
-        for old_index, (old_heading, _os, _oe) in enumerate(old_sections):
-            if old_index in used_old:
-                continue
-            ratio = difflib.SequenceMatcher(
-                None, normalize(old_heading), normalize(heading)
-            ).ratio()
-            if ratio > best_ratio:
-                best_ratio = ratio
-                best_index = old_index
-        if best_index is not None:
-            pairs[new_index] = best_index
-            used_old.add(best_index)
-
-    def overlap(old_index: int, new_index: int) -> float:
-        _h, os_, oe = old_sections[old_index]
-        _h2, ns, ne = new_sections[new_index]
-        old_content = _content_lines(old_lines[os_:oe])
-        new_content = _content_lines(new_lines[ns:ne])
-        old_counter = Counter(old_content)
-        new_counter = Counter(new_content)
-        common = sum((old_counter & new_counter).values())
-        shorter = min(len(old_content), len(new_content))
-        return common / shorter if shorter else 0.0
-
-    candidates = sorted(
-        (
-            (overlap(old_index, new_index), new_index, old_index)
-            for new_index in range(len(new_sections))
-            if new_index not in pairs
-            for old_index in range(len(old_sections))
-            if old_index not in used_old
-        ),
-        reverse=True,
-    )
-    for score, new_index, old_index in candidates:
-        if score < 0.25:
-            break
-        if new_index in pairs or old_index in used_old:
-            continue
-        pairs[new_index] = old_index
-        used_old.add(old_index)
-    if pair_leftovers:
-        remaining_old = [
-            index for index in range(len(old_sections)) if index not in used_old
-        ]
-        remaining_new = [
-            index for index in range(len(new_sections)) if index not in pairs
-        ]
-        for new_index, old_index in zip(remaining_new, remaining_old):
-            pairs[new_index] = old_index
-            used_old.add(old_index)
-    return pairs
-
-
-def render_diff_page(document: dict[str, Any], source: dict[str, Any]) -> str:
-    """Markdown page comparing this document (the revision) against its
-    `revision_of` source. The page is ordinary Markdown throughout, so
-    docsify and KaTeX render it exactly like a book page: the revision's
-    full text is emitted verbatim, and only changed regions become
-    two-pane rows (old on the left in red, new on the right in blue, in
-    chunks of at most DIFF_CHUNK_MAX_LINES lines per side). No labels or
-    explanations are attached to individual chunks -- the colour carries
-    the meaning. Inside a plain line, the characters that differ are
-    highlighted with a stronger tint of the same family; formulas,
-    tables and code blocks are whole units and are never highlighted
-    inside. Deleted lines appear in red where they used to be. The
-    judgment is partitioned by act (`## ` headings) and, inside an act,
-    by section (`### ` headings): units pair up by heading first within
-    their parent only, line matching never crosses a section or act
-    boundary, and a unit pair that shares almost no lines -- or a unit
-    that exists on one side only -- is shown in place as one
-    whole-section unit instead of line chunks."""
-    old_lines = (BOOKS_DIR / source["id"] / "README.md").read_text(
-        encoding="utf-8"
-    ).splitlines()
-    new_lines = (BOOKS_DIR / document["id"] / "README.md").read_text(
-        encoding="utf-8"
-    ).splitlines()
-
-    blocks: list[str] = []
-    changed_old = 0
-    changed_new = 0
-    chunk_count = 0
-    section_blocks = 0
-
-    def side_lines(
-        units: list[tuple[str, list[str]]],
-        counterparts: list[tuple[str, list[str]]],
-        pair_map: dict[int, int],
-        side: str,
-    ) -> list[str]:
-        """Markdown lines for one side of a chunk. A line gets character
-        highlights only when pair_map links it to a genuinely similar
-        line on the other side; everything else (unpaired lines,
-        formulas, tables, code blocks, any line containing math) stays
-        verbatim and is marked by the side's colour alone. Highlighting
-        unpaired or merely positional lines would paint parts that are
-        not differences at all."""
-        rendered: list[str] = []
-        for index, (kind, unit_lines) in enumerate(units):
-            partner = pair_map.get(index)
-            if kind == "line" and partner is not None:
-                counterpart_line = counterparts[partner][1][0]
-                old_line = unit_lines[0] if side == "old" else counterpart_line
-                new_line = counterpart_line if side == "old" else unit_lines[0]
-                pair = _diff_highlight_pair(old_line, new_line)
-                rendered.append(pair[0] if side == "old" else pair[1])
-            else:
-                rendered.extend(unit_lines)
-        return rendered
-
-    def pair_chunk_lines(
-        old_chunk: list[tuple[str, list[str]]],
-        new_chunk: list[tuple[str, list[str]]],
-    ) -> tuple[dict[int, int], dict[int, int]]:
-        """Pair plain, math-free lines across a chunk by best character
-        similarity (each line used once, best scores first), keeping
-        only pairs at DIFF_PAIR_MIN_RATIO or above. Returns
-        (old index -> new index, new index -> old index)."""
-
-        def eligible(unit: tuple[str, list[str]]) -> bool:
-            return (
-                unit[0] == "line"
-                and "$" not in unit[1][0]
-                and not _is_weak_line(unit[1][0])
-            )
-
-        def pair_text(line: str) -> str:
-            # A shared speaker prefix must not inflate the similarity of
-            # two different utterances by the same speaker.
-            return _SPEAKER_PREFIX_RE.sub("", line)
-
-        candidates = sorted(
-            (
-                (
-                    difflib.SequenceMatcher(
-                        None,
-                        pair_text(old_chunk[oi][1][0]),
-                        pair_text(new_chunk[ni][1][0]),
-                    ).ratio(),
-                    oi,
-                    ni,
-                )
-                for oi in range(len(old_chunk))
-                if eligible(old_chunk[oi])
-                for ni in range(len(new_chunk))
-                if eligible(new_chunk[ni])
-            ),
-            reverse=True,
-        )
-        old_to_new: dict[int, int] = {}
-        new_to_old: dict[int, int] = {}
-        for ratio, oi, ni in candidates:
-            if ratio < DIFF_PAIR_MIN_RATIO:
-                break
-            if oi in old_to_new or ni in new_to_old:
-                continue
-            old_to_new[oi] = ni
-            new_to_old[ni] = oi
-        return old_to_new, new_to_old
-
-    def emit_changed(
-        old_units: list[tuple[str, list[str]]],
-        new_units: list[tuple[str, list[str]]],
-    ) -> None:
-        nonlocal changed_old, changed_new, chunk_count
-        changed_old += sum(len(unit[1]) for unit in old_units)
-        changed_new += sum(len(unit[1]) for unit in new_units)
-        io = 0
-        inew = 0
-        while io < len(old_units) or inew < len(new_units):
-            old_chunk: list[tuple[str, list[str]]] = []
-            new_chunk: list[tuple[str, list[str]]] = []
-            old_count = 0
-            new_count = 0
-            while io < len(old_units) and (
-                not old_chunk or old_count + len(old_units[io][1]) <= DIFF_CHUNK_MAX_LINES
-            ):
-                old_count += len(old_units[io][1])
-                old_chunk.append(old_units[io])
-                io += 1
-            while inew < len(new_units) and (
-                not new_chunk or new_count + len(new_units[inew][1]) <= DIFF_CHUNK_MAX_LINES
-            ):
-                new_count += len(new_units[inew][1])
-                new_chunk.append(new_units[inew])
-                inew += 1
-            if all(
-                not line.strip()
-                for unit in old_chunk + new_chunk
-                for line in unit[1]
-            ):
-                # A sub-chunk made only of blank lines (an empty line
-                # left over at a chunk boundary) is not a visible
-                # change; showing it would produce an empty diff row.
-                emit_same(new_chunk)
-                continue
-            chunk_count += 1
-            old_to_new, new_to_old = pair_chunk_lines(old_chunk, new_chunk)
-            parts = ['<div class="diff-row">']
-            if old_chunk:
-                parts.append('<div class="diff-pane diff-old">')
-                parts.append("")
-                parts.extend(side_lines(old_chunk, new_chunk, old_to_new, "old"))
-                parts.append("")
-                parts.append("</div>")
-            else:
-                parts.append('<div class="diff-pane diff-old"></div>')
-            if new_chunk:
-                parts.append('<div class="diff-pane diff-new">')
-                parts.append("")
-                parts.extend(side_lines(new_chunk, old_chunk, new_to_old, "new"))
-                parts.append("")
-                parts.append("</div>")
-            else:
-                parts.append('<div class="diff-pane diff-new"></div>')
-            parts.append("</div>")
-            blocks.append("\n".join(parts))
-
-    def emit_same(units: list[tuple[str, list[str]]]) -> None:
-        lines: list[str] = []
-        for _kind, unit_lines in units:
-            lines.extend(unit_lines)
-        if lines:
-            blocks.append("\n".join(lines))
-
-    def emit_section(
-        old_segment: list[str], new_segment: list[str]
-    ) -> None:
-        """One whole-section unit in place, as a two-pane row: both
-        sections verbatim in their panes, no line pairing. Long sides
-        are folded; a side that does not exist stays an empty pane."""
-        nonlocal changed_old, changed_new, section_blocks
-        changed_old += len(old_segment)
-        changed_new += len(new_segment)
-        section_blocks += 1
-
-        def side(segment: list[str], side_class: str) -> list[str]:
-            if not segment:
-                return [f'<div class="diff-pane {side_class}"></div>']
-            parts = [f'<div class="diff-pane {side_class}">', ""]
-            if len(segment) > DIFF_SECTION_FOLD_LINES:
-                parts.append(
-                    '<details class="diff-fold">'
-                    f"<summary>全文（{len(segment)} 行）を表示</summary>"
-                )
-                parts.append("")
-                parts.extend(segment)
-                parts.append("")
-                parts.append("</details>")
-            else:
-                parts.extend(segment)
-            parts.append("")
-            parts.append("</div>")
-            return parts
-
-        parts = ['<div class="diff-row diff-row-section">']
-        parts.extend(side(old_segment, "diff-old"))
-        parts.extend(side(new_segment, "diff-new"))
-        parts.append("</div>")
-        blocks.append("\n".join(parts))
-
-    old_sections = _split_sections(old_lines)
-    new_sections = _split_sections(new_lines)
-    section_pairs = _match_sections(old_sections, new_sections, old_lines, new_lines)
-    old_only = [
-        index
-        for index in range(len(old_sections))
-        if index not in set(section_pairs.values())
-    ]
-    old_only_ptr = 0
-
-    def flush_old_only(before_old_index: int) -> None:
-        nonlocal old_only_ptr
-        while old_only_ptr < len(old_only) and old_only[old_only_ptr] < before_old_index:
-            old_index = old_only[old_only_ptr]
-            old_only_ptr += 1
-            _heading, start, end = old_sections[old_index]
-            emit_section(old_lines[start:end], [])
-
-    def process_pair(old_slice: list[str], new_slice: list[str]) -> None:
-        old_content = _content_lines(old_slice)
-        new_content = _content_lines(new_slice)
-        ratio = (
-            difflib.SequenceMatcher(None, old_content, new_content, autojunk=False).ratio()
-            if old_content or new_content
-            else 1.0
-        )
-        if ratio < DIFF_SECTION_REWRITE_RATIO:
-            emit_section(old_slice, new_slice)
-            return
-        old_units = _diff_units(old_slice)
-        new_units = _diff_units(new_slice)
-
-        def is_strong(unit: tuple[str, list[str]]) -> bool:
-            return unit[0] != "line" or not _is_weak_line(unit[1][0])
-
-        # Match on all units, then keep a matching block only if it
-        # contains at least one strong unit. A block made solely of
-        # weak lines (blanks and speaker labels) is exactly how two
-        # different conversations get stitched together, so it is
-        # dropped and the span stays one replacement; weak lines inside
-        # a genuinely unchanged stretch still match, because their
-        # block contains the surrounding strong lines.
-        matcher = difflib.SequenceMatcher(
-            None,
-            ["\n".join(unit[1]) for unit in old_units],
-            ["\n".join(unit[1]) for unit in new_units],
-            autojunk=False,
-        )
-        kept: list[tuple[int, int]] = []
-        for a, b, size in matcher.get_matching_blocks():
-            if size and any(is_strong(old_units[a + k]) for k in range(size)):
-                kept.extend((a + k, b + k) for k in range(size))
-        kept_set = dict(kept)
-        i = j = 0
-        kept_index = 0
-        while i < len(old_units) or j < len(new_units):
-            if kept_set.get(i) == j and i < len(old_units):
-                a1, b1 = i, j
-                while kept_set.get(i) == j and i < len(old_units):
-                    i += 1
-                    j += 1
-                emit_same(new_units[b1:j])
-                continue
-            a1, b1 = i, j
-            while kept_index < len(kept) and (
-                kept[kept_index][0] < i or kept[kept_index][1] < j
-            ):
-                kept_index += 1
-            if kept_index < len(kept):
-                i, j = kept[kept_index]
-            else:
-                i, j = len(old_units), len(new_units)
-            if i > a1 or j > b1:
-                emit_changed(old_units[a1:i], new_units[b1:j])
-    def process_act_pair(old_slice: list[str], new_slice: list[str]) -> None:
-        """Diff one paired act. When both versions of the act have
-        `### ` sections, the diff is judged section by section inside
-        the act: sections pair up within the act only, and line matching
-        never crosses a section (or act) boundary. An act that has no
-        sections on either side is judged as a whole."""
-        if not (
-            any(line.startswith("### ") for line in old_slice)
-            and any(line.startswith("### ") for line in new_slice)
-        ):
-            process_pair(old_slice, new_slice)
-            return
-        old_subs = _split_sections(old_slice, "### ")
-        new_subs = _split_sections(new_slice, "### ")
-        sub_pairs = _match_sections(
-            old_subs,
-            new_subs,
-            old_slice,
-            new_slice,
-            number_re=_SUBSECTION_NUMBER_RE,
-            pair_leftovers=True,
-        )
-        sub_old_only = [
-            index
-            for index in range(len(old_subs))
-            if index not in set(sub_pairs.values())
-        ]
-        ptr = 0
-        for new_sub_index, (_h, sub_start, sub_end) in enumerate(new_subs):
-            old_sub_index = sub_pairs.get(new_sub_index)
-            if old_sub_index is None:
-                emit_section([], new_slice[sub_start:sub_end])
-                continue
-            while ptr < len(sub_old_only) and sub_old_only[ptr] < old_sub_index:
-                _oh, o_start, o_end = old_subs[sub_old_only[ptr]]
-                ptr += 1
-                emit_section(old_slice[o_start:o_end], [])
-            _oh, o_start, o_end = old_subs[old_sub_index]
-            process_pair(old_slice[o_start:o_end], new_slice[sub_start:sub_end])
-        while ptr < len(sub_old_only):
-            _oh, o_start, o_end = old_subs[sub_old_only[ptr]]
-            ptr += 1
-            emit_section(old_slice[o_start:o_end], [])
-
-    for new_index, (heading, start, end) in enumerate(new_sections):
-        old_index = section_pairs.get(new_index)
-        if old_index is None:
-            emit_section([], new_lines[start:end])
-            continue
-        flush_old_only(old_index)
-        _old_heading, old_start, old_end = old_sections[old_index]
-        process_act_pair(old_lines[old_start:old_end], new_lines[start:end])
-    flush_old_only(len(old_sections))
-
-    lines = [
-        f"# 差分：{document['title']}",
-        "",
-        f"こちらは改訂版で、比較元は [{source['title']}](../{source['id']}/README.md) です。"
-        f"[こちら（改訂版）の本文](README.md) に戻る。",
-        "",
-        "こちら（改訂版）の全文をそのまま表示し、変わった所は左右2ペインで示しています。"
-        "左の<span class=\"diff-old\">旧（比較元）</span> は赤、"
-        "右の<span class=\"diff-new\">新（こちら）</span> は青、"
-        "行の中で実際に異なる部分は同系の薄い色でハイライトします。"
-        "式は丸ごと1つの差分単位として扱います。",
-        "",
-        f"全文 {len(new_lines)} 行（比較元 {len(old_lines)} 行）。"
-        f"変更は {chunk_count} 塊（うち節単位 {section_blocks} 件）で、"
-        f"比較元 {changed_old} 行 → こちら {changed_new} 行が変わっています。",
-        "",
-    ]
-    if blocks:
-        lines.append("\n\n".join(blocks))
-    else:
-        lines.append("差分はありません。")
-    return "\n".join(lines) + "\n"
-
-
-def write_diff_pages(
-    documents: list[dict[str, Any]], out_docs: Path
-) -> None:
-    """Write diff.md for every document carrying `revision_of`, and add a
-    link to it at the top of the document's built README.md copy (the
-    source README.md itself is left untouched)."""
-    by_id = {document["id"]: document for document in documents}
-    for document in documents:
-        source_id = document.get("revision_of")
-        if not source_id:
-            continue
-        source = by_id[source_id]
-        book_dir = out_docs / "books" / document["id"]
-        write_file(book_dir / "diff.md", render_diff_page(document, source))
-        readme_path = book_dir / "README.md"
-        readme = readme_path.read_text(encoding="utf-8")
-        title, _, rest = readme.partition("\n")
-        link = (
-            f"> こちらは改訂版です。比較元「{source['title']}」との"
-            "[差分を見る](diff.md)"
-        )
-        readme_path.write_text(f"{title}\n\n{link}\n{rest}", encoding="utf-8")
-
-
 def render_top_page_catalog(
     categories: list[dict[str, Any]], documents: list[dict[str, Any]]
 ) -> str:
-    by_id = {document["id"]: document for document in documents}
     lines = [
         START_MARKER,
         "",
@@ -1163,12 +544,6 @@ def render_top_page_catalog(
             rating = ratings_line(document)
             if rating is not None:
                 lines.append(rating)
-            if document.get("revision_of"):
-                source = by_id[document["revision_of"]]
-                lines.append(
-                    f"差分：改訂版です。比較元「{source['title']}」との"
-                    f"[差分を見る]({nav_href(document)}diff)"
-                )
             lines.append("")
     lines.append(END_MARKER)
     return "\n".join(lines) + "\n"
@@ -1600,7 +975,14 @@ def generate(categories: list[dict[str, Any]], documents: list[dict[str, Any]], 
     # The generated HTML is only the docsify shell. The Markdown sources and
     # static assets must also be present in the deployed directory because
     # docsify fetches them in the browser at runtime.
-    shutil.copytree(ROOT / "docs", out_docs, dirs_exist_ok=True)
+    # script/ holds the @-format source of README.md; only the rendered
+    # Markdown and the static pages below are published.
+    shutil.copytree(
+        ROOT / "docs",
+        out_docs,
+        dirs_exist_ok=True,
+        ignore=shutil.ignore_patterns(yaruo_script.SCRIPT_DIR_NAME),
+    )
     optimize_public_images(out_docs)
 
     # Two listing variants: the public one, and the draft one the browser loads
@@ -1641,11 +1023,17 @@ def generate(categories: list[dict[str, Any]], documents: list[dict[str, Any]], 
     apply_ruby_conversion(out_docs)
     apply_footnote_backref_guard(out_docs)
 
-    # Diff pages are written last on purpose: they quote both sources raw,
-    # so the ruby and footnote rewrites above must not run over them.
-    write_diff_pages(documents, out_docs)
-
     write_file(out_docs / "sitemap.xml", render_sitemap(published))
+
+    # Static (docsify-free) pages for books whose source is in @ format. They
+    # are a pilot next to the docsify pages and are not linked from listings.
+    for document in documents:
+        book_dir = BOOKS_DIR / document["id"]
+        if (book_dir / yaruo_script.SCRIPT_DIR_NAME).is_dir():
+            write_file(
+                out_docs / "books" / document["id"] / render_static.STATIC_PAGE_NAME,
+                render_static.render_book_page(book_dir, document["title"], document["question"]),
+            )
 
 
 def main() -> int:
@@ -1674,7 +1062,7 @@ def main() -> int:
         print("generated: build/_sidebar.md, build/README.md, build/_sidebar.draft.md, "
               "build/README.draft.md, build/index.html, build/404.html, "
               "build/books/*/index.html, build/books/*/slide.html, "
-              "build/books/*/diff.md (only for books with revision_of), build/sitemap.xml")
+              "build/sitemap.xml")
     return 0
 
 
