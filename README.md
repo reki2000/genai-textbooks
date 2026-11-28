@@ -20,7 +20,6 @@ AI-Generated Japanese Short Textbooks: "Yaruo"-Style Dialogue Collection and AI 
 | `yaruo-count` | 教材の文字数、行数、数式量、推定読了時間を統一ルールで正確に集計する | 正確な文字数／行数／読了時間 |
 | `zuhan` | 教材本文へ説明図を追加。図が要る箇所を選び、SVG直書き・グラフ・外部引用を使い分け、作図規約と機械検査で仕上げる | 図を追加／図解／模式図／ダイアグラム |
 | `yaruo-slide` | 教材から物語を除き学習内容だけを圧縮した marp スライド `slide.md` を作成・更新する | スライド／marp／要約スライド／発表資料 |
-| `comment-eater` | 開発サーバのプレビューに投稿されたコメントを1件ずつ拾い、該当箇所だけを読んで直す | コメント対応／コメントを待って／プレビューのコメント |
 
 ## この執筆環境の使い方
 
@@ -49,11 +48,10 @@ Pillow は本文だけの改訂でもサイト全体のビルドに必要。
    python3 scripts/yaruo_lint.py docs/books/{ID}/README.md --check --verbose
    ```
 
-4. サイトをビルドして確認する。継続して編集する場合は、自動再ビルドされる開発サーバーが便利。
+4. サイトをビルドして確認する。ローカルで見るときは `build/` を静的サーバで開く（BUILD.md「手動でのローカル確認」）。
 
    ```bash
    python3 scripts/generate_site.py
-   python3 scripts/dev_server.py
    ```
 
 5. ソースである `docs/` だけをステージする。生成先の `build/` はコミットしない。
@@ -62,4 +60,4 @@ Pillow は本文だけの改訂でもサイト全体のビルドに必要。
    git add docs/
    ```
 
-外部のモデルや別セッションが書いた教材は、カタログ登録前に `yaruo-review` で検査する。詳しいカタログ仕様、シリーズ（`follows`）、プレビュー、デプロイ手順は [`BUILD.md`](BUILD.md) を参照。プレビュー上のコメント機能は [`COMMENTS.md`](COMMENTS.md)。
+外部のモデルや別セッションが書いた教材は、カタログ登録前に `yaruo-review` で検査する。詳しいカタログ仕様、シリーズ（`follows`）、ローカル確認、デプロイ手順は [`BUILD.md`](BUILD.md) を参照。スマホでの校正は校正台（BUILD.md「台本形式」）。

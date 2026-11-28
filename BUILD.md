@@ -200,28 +200,6 @@ sudo apt-get install python3-pip python3-venv
 
 次回以降も作業開始時に `source .venv/bin/activate` を実行する。`git pull` で `requirements-dev.txt` が更新された場合は、仮想環境を有効にして `python3 -m pip install -r requirements-dev.txt` を再実行する。ビルドも同じ環境の `python3` で実行する。
 
-### 開発サーバ（推奨）
-
-以下を実行し、表示された URL をブラウザで開く：
-
-```bash
-python3 scripts/dev_server.py
-```
-
-`docs/`、サイト生成スクリプト、テンプレートを監視し、変更すると自動的に再ビルドしてブラウザを再読み込みする。ビルドエラーが起きた場合は、ターミナルにエラーを表示したまま直前の正常なプレビューを維持し、次の変更時に再試行する。
-
-標準では `127.0.0.1:3000` を使用する。変更する場合：
-
-```bash
-python3 scripts/dev_server.py --host 0.0.0.0 --port 8000
-```
-
-本文 Markdown（`docs/books/*/README.md`）だけが変わったときは、全体ビルドを回さずにそのファイルだけをルビ変換して差し替える。ブラウザ側は更新種別にかかわらずページ全体を再読み込みせず、現在開いている Markdown を取り直す。内容が変わっていれば docsify の本文だけを描画し直し、スクロール位置を保ったまま更新する（`/__dev/revision` を更新通知として使う）。
-
-### プレビュー上のコメント
-
-プレビューでは本文を選んでコメントを付け、常駐したエージェントにその場で直させられる。使い方と仕様は [`COMMENTS.md`](./COMMENTS.md) を参照。
-
 ### 手動ビルド
 
 教材ファイルを編集したら必ず実行：

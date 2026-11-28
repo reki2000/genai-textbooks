@@ -81,10 +81,6 @@ python3 scripts/yaruo_lint.py docs/books/{ID}/README.md --check --verbose
 
 会話の同型反復は `scripts/yaruo_beat_repetition.py`（`--show` / `--beats` / `--units`）。lint とは別系統で、**合否ではなくレビュー時の候補区間の絞り込み**に使う。ラベル体系と指標の正本は `.claude/skills/yaruo-review/references/beat-labels.md`。
 
-## プレビュー上のコメント
-
-開発サーバのプレビューで本文にコメントを付け、常駐したエージェント（`/comment-eater`）がその場で直す経路がある。ファイル形式・アンカー解決・状態遷移の詳細は [`COMMENTS.md`](./COMMENTS.md) を参照。
-
 ## ビルドシステム
 
 ソース・生成の分離詳細は [`BUILD.md`](./BUILD.md) を参照。
